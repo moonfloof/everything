@@ -1,0 +1,88 @@
+<div class="sectioncontainer h-entry">
+	{{#if data.title}}
+	<div class="row">
+		<span class="left">{{data.emoji}}</span>
+		<span class="right">
+			<strong class="p-name">{{data.title}}</strong>
+		</span>
+	</div>
+	{{/if}}
+
+	<div class="row">
+		<span class="left">
+			{{#if data.title}}
+			{{else}}
+				{{data.emoji}}
+			{{/if}}
+		</span>
+		<span class="right e-content">
+			{{{data.description}}}
+		</span>
+	</div>
+
+	{{#xif data.type '==' 'audio'}}
+	{{#if data.url}}
+	<div class="row">
+		<span class="left"></span>
+		<div class="right">
+			<audio class="u-audio" controls src="{{data.url}}">
+				<p>Unfortunately, your browser doesn't support this audio format</p>
+			</audio>
+		</div>
+	</div>
+	{{/if}}
+	{{/xif}}
+
+	{{#xif data.type '==' 'video'}}
+	{{#if data.url}}
+	<div class="row">
+		<span class="left"></span>
+		<div class="right">
+			<video class="u-video" src="{{data.url}}" controls>
+				<p>Unfortunately, your browser doesn't support this video format</p>
+			</video>
+		</div>
+	</div>
+	{{/if}}
+	{{/xif}}
+
+	{{#xif data.type '==' 'photo'}}
+	{{#if data.url}}
+	<div class="row">
+		<span class="left"></span>
+		<div class="right">
+			<img class="u-photo" src="{{data.url}}" alt="{{data.title}}" />
+		</div>
+	</div>
+	{{/if}}
+	{{/xif}}
+
+	{{#if data.syndication}}
+	<div class="row">
+		<div class="left">🔗</div>
+		<div class="right">
+			Originally posted on:
+			{{#each data.syndication as |site|}}
+				<strong><a href="{{site.url}}" target="_blank" class="u-syndication">{{site.name}}</a></strong>&nbsp;&nbsp;
+			{{/each}}
+		</div>
+	</div>
+	{{/if}}
+
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{data.created_at}}"
+			datetime="{{data.created_at}}"
+			class="right dt-published"
+		>
+			<small>
+				<a class="u-url u-uid" href="/note/{{data.id}}">
+					{{data.timeago}}
+				</a>
+			</small>
+		</time>
+	</div>
+
+	{{> author }}
+</div>

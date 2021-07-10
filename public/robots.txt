@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /music/*
+Disallow: /youtube/*
+Disallow: /game/*
+Disallow: /tv/*
+Disallow: /film/*
+Disallow: /book/*
+Disallow: /note/*
+Sitemap: https://now.floof.fm/sitemap.xml

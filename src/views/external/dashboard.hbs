@@ -1,0 +1,202 @@
+<div id="dashboard--lead__container" class="rounded-panel">
+	<img id="dashboard--lead__img" src="/favicon.png" />
+	<div id="dashboard--lead__text">
+		Hello! I personally track everything I listen to, everything I
+		watch on TV, every game I play, and more. And so, I call this
+		project "Everything". You can find out more by visiting the
+		<a href="https://github.com/tomboFry/everything#readme" target="_blank"><strong>code repository homepage</strong></a>.
+	</div>
+</div>
+
+{{#> dashpanel title="notes" link="notes"}}
+	<ul>
+	{{#each notes}}
+		<li class="dashboard--panel__li">
+			<span>
+				{{emoji}} {{#if title}}{{title}}{{else}}{{summary}}{{/if}}
+			</span>
+			<small>
+				<a href="/note/{{id}}">{{timeago}}</a>
+			</small>
+		</li>
+	{{/each}}
+	</ul>
+{{/dashpanel}}
+
+<div id="dashboard--panels">
+	{{#> dashpanel title="listening <small>(7 days)</small>" link="music" }}
+		<div class="dashboard--panel--meta">
+			<div class="dashboard--panel--meta__row">
+				<span>fav artist</span>
+				<span>
+					<strong>{{listens.artist.artist}}</strong>
+					<small>(x{{listens.artist.count}})</small>
+				</span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>fav album</span>
+				<span>
+					<strong>{{listens.album.album}}</strong>
+					<small>(x{{listens.album.count}})</small>
+				</span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>fav song</span>
+				<span>
+					<strong>{{listens.song.title}}</strong>
+					<small>(x{{listens.song.count}})</small>
+				</span>
+			</div>
+		</div>
+	{{/dashpanel}}
+
+	{{#> dashpanel title="gaming <small>(7 days)</small>" link="games" }}
+		<div class="dashboard--panel--meta">
+			<div class="dashboard--panel--meta__row">
+				<span>total playtime</span>
+				<span><strong>{{gameStats.totalPlaytimeHuman}}</strong></span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>average length</span>
+				<span><strong>{{gameStats.averagePlaytime}}</strong></span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>total sessions</span>
+				<span><strong>{{gameStats.totalSessions}}</strong></span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>fav game</span>
+				<span><strong>{{gameStats.favouriteGame}}</strong></span>
+			</div>
+		</div>
+	{{/dashpanel}}
+
+	{{#> dashpanel title="youtube" link="youtube" }}
+		<ul>
+		{{#each youtubeLikes}}
+			<li class="dashboard--panel__li">
+				<a href="{{url}}" target="_blank" rel="noopener">
+					<strong>{{ title }}</strong>
+				</a>
+				<small>{{channel}}</small>
+			</li>
+		{{/each}}
+		</ul>
+	{{/dashpanel}}
+
+	{{#if tvEpisodes}}
+		{{#> dashpanel title="watching" link="tv" }}
+			<ul>
+			{{#each tvEpisodes}}
+				<li class="dashboard--panel__li">
+					<strong>{{episode_title}}</strong>
+					<small>from "<em>{{series_title}}</em>"</small>
+				</li>
+			{{/each}}
+			</ul>
+		{{/dashpanel}}
+	{{/if}}
+
+	{{#if films}}
+		{{#> dashpanel title="films" link="films" }}
+			<ul>
+			{{#each films}}
+				<li class="dashboard--panel__li">
+					<a href="{{url}}" target="_blank" rel="noopener">
+						<strong>{{title}} ({{year}})</strong>
+					</a>
+					<small>
+						{{timeago}}
+						{{#if rating}} &bull; {{rating}} / 10 ⭐{{/if}}
+					</small>
+				</li>
+			{{/each}}
+			</ul>
+		{{/dashpanel}}
+	{{/if}}
+
+	{{#if books}}
+		{{#> dashpanel title="reading" link="books" }}
+			<ul>
+			{{#each books}}
+				<li class="dashboard--panel__li">
+					<a href="/book/{{id}}">
+						<strong>{{title}} ({{year}})</strong>
+					</a>
+
+					{{#if progress}}
+						<small>{{{progress}}}</small>
+					{{/if}}
+				</li>
+			{{/each}}
+			</ul>
+		{{/dashpanel}}
+	{{/if}}
+
+	{{#if sleepStats}}
+		{{#> dashpanel title="sleeping" }}
+			<div class="dashboard--panel--meta">
+				<div class="dashboard--panel--meta__row">
+					<span>average bed time</span>
+					<span>
+						<strong>{{sleepStats.averageSleepStartHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>average wake time</span>
+					<span>
+						<strong>{{sleepStats.averageSleepEndHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>average sleep</span>
+					<span>
+						<strong>{{sleepStats.averageDurationHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>shortest &amp; longest</span>
+					<span>
+						<strong>{{sleepStats.shortestHuman}} - {{sleepStats.longestHuman}}</strong>
+					</span>
+				</div>
+			</div>
+		{{/dashpanel}}
+	{{/if}}
+
+	{{#> dashpanel title="misc" }}
+		<div class="dashboard--panel--meta">
+			{{#if location}}
+			<div class="dashboard--panel--meta__row">
+				<span>🌆 location</span>
+				<span><strong>{{location}}</strong></span>
+			</div>
+			{{/if}}
+			<div class="dashboard--panel--meta__row">
+				<span>🔋 battery</span>
+				<span>
+					<strong>{{device.battery_level}}%</strong>
+					<small>({{device.battery_status}})</small>
+				</span>
+			</div>
+			{{#if steps}}
+			<div class="dashboard--panel--meta__row">
+				<span>🚶 steps</span>
+				<span>
+					<strong>{{steps}}</strong>
+					<small>(yesterday)</small>
+				</span>
+			</div>
+			{{/if}}
+			<div class="dashboard--panel--meta__row">
+				<span>🧪 feed</span>
+				<span>
+					Try
+					<a href="/feed">
+						<strong>The Everything Feed</strong>
+					</a>.
+				</span>
+			</div>
+		</div>
+	{{/dashpanel}}
+</div>

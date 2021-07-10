@@ -1,0 +1,10 @@
+<h2>Notes:</h2>
+
+{{> internal/note typeValues=entryTypeValues statusValues=entryStatusValues }}
+<hr/>
+
+{{#each notes as |note| }}
+	{{> internal/note data=note typeValues=../entryTypeValues statusValues=../entryStatusValues }}
+{{/each}}
+
+{{> pagination route="/notes" pagination=pagination }}

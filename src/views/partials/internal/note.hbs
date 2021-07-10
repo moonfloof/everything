@@ -1,0 +1,16 @@
+<form method="POST" action="/notes/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id type="note" }}
+
+		{{> internal/crudRow emoji="📰" name="title" value=data.title }}
+		{{> internal/crudRowParagraph emoji="💬" name="description" value=data.description }}
+		{{> internal/crudRowSelect emoji="📋" name="type" value=data.type values=typeValues }}
+		{{> internal/crudRowSelect emoji="👁" name="status" value=data.status values=statusValues }}
+		{{> internal/crudRow emoji="🔗" name="url" value=data.url }}
+		{{> internal/crudRowParagraph emoji="🐦" name="syndication_json" value=data.syndication_json }}
+		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+		{{> internal/crudRow emoji="🕙" name="updated_at" value=data.updated_at }}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>

@@ -1,0 +1,39 @@
+{
+	"name": "everything",
+	"version": "0.1.0",
+	"description": "",
+	"main": "src/index.js",
+	"type": "module",
+	"scripts": {
+		"start": "nodemon src/index.js",
+		"start:production": "node src/index.js",
+		"lint": "eslint --fix src/**/*.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "moonfloof <git@moonfloof.com>",
+	"license": "AGPL-3.0-or-later",
+	"dependencies": {
+		"@tombofry/stdlib": "^0.9.1",
+		"better-sqlite3": "~8.5.0",
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"express-handlebars": "~7.1.0",
+		"googleapis": "^123.0.0",
+		"helmet": "^7.0.0",
+		"javascript-time-ago": "^2.5.9",
+		"node-geocoder": "^4.2.0",
+		"nodemon": "^3.0.1",
+		"on-finished": "^2.4.1",
+		"phin": "^3.7.0",
+		"sax": "^1.2.4",
+		"uuid": "^9.0.0"
+	},
+	"devDependencies": {
+		"eslint": "^8.45.0"
+	},
+	"nodemonConfig": {
+		"ignore": [
+			"*.json"
+		]
+	}
+}

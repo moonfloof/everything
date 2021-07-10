@@ -1,0 +1,25 @@
+<h2>Films Watched:</h2>
+
+{{#if rescanerror }}
+<div class="error sectioncontainer page--data">
+	<p>
+		Did not rescan Letterboxd.
+	</p>
+</div>
+{{/if}}
+
+<form action="/films/rescan" method="POST" class="sectioncontainer">
+	<label for="rescan">
+		Manually rescan films from Letterboxd
+	</label>
+	<input type="submit" value="Rescan" id="rescan" />
+</form>
+
+{{> internal/film }}
+<hr/>
+
+{{#each films as |film| }}
+	{{> internal/film data=film }}
+{{/each}}
+
+{{> pagination route="/films" pagination=pagination }}

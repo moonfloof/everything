@@ -1,0 +1,12 @@
+<div class="row">
+	<div class="left">🆔</div>
+	<div class="right">
+		{{#if id}}
+			{{#if type}}<a href="{{externalRoot}}/{{type}}/{{id}}">{{/if}}
+			{{id}}
+			{{#if type}}</a>{{/if}}
+		{{else}}
+			Add New Record
+		{{/if}}
+	</div>
+</div>

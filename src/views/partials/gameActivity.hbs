@@ -1,0 +1,57 @@
+<div class="sectioncontainer h-entry">
+	<div class="row p-play-of h-cite">
+		<span class="left">🎮</span>
+		<span class="right">
+			{{#if data.url}}
+			<a href="{{data.url}}" target="_blank" class="u-url" rel="noopener">
+				<strong class="p-name">{{data.name}}</strong>
+			</a>
+			{{else}}
+				<strong class="p-name">{{data.name}}</strong>
+			{{/if}}
+		</span>
+	</div>
+	<div class="row">
+		<span class="left"></span>
+		<span class="right">
+			for
+			<data class="p-duration" value="{{data.durationIso}}">
+				{{data.duration}}
+			</data>
+		</span>
+	</div>
+	{{#if data.achievements}}
+	<div class="row game-achievements--container">
+		<span class="left"></span>
+		<div class="right">
+			<p>Got <strong>{{data.achievements.length}}</strong> {{data.achievementText}}</p>
+			<ul class="game-achievements--list">
+			{{#each data.achievements as |achievement|}}
+				<li>
+					<strong>{{achievement.name}}</strong>
+					{{#if achievement.description}}
+					<br/>{{achievement.description}}
+					{{/if}}
+				</li>
+			{{/each}}
+			</ul>
+		</div>
+	</div>
+	{{/if}}
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{data.created_at}}"
+			datetime="{{data.created_at}}"
+			class="right dt-published"
+		>
+			<small>
+				<a href="/game/{{data.id}}" class="u-url u-uid">
+					{{data.timeago}}
+				</a>
+			</small>
+		</time>
+	</div>
+
+	{{> author }}
+</div>

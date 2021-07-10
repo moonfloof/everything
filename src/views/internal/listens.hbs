@@ -1,0 +1,10 @@
+<h2>Listens:</h2>
+
+{{> internal/listen }}
+<hr/>
+
+{{#each listens as |listen| }}
+	{{> internal/listen data=listen }}
+{{/each}}
+
+{{> pagination route="/listens" pagination=pagination }}

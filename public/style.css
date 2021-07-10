@@ -1,0 +1,436 @@
+@import url('https://rsms.me/inter/inter.css');
+
+:root {
+	--text: #333;
+	--border: #CCC;
+	--panel-bg: #fff;
+
+	--primary-fg: #3e3475;
+	--primary-bg: #f9f8fc;
+
+	--secondary-fg: #347441;
+	--secondary-bg: #f8fcf9;
+
+	--error-fg: #6e2828;
+	--error-bg: #fddcdc;
+}
+
+body,
+html {
+	width: 100%;
+	font-family: Inter, 'Helvetica Neue', Arial, sans-serif;
+	font-weight: 400;
+	color: var(--text);
+	background: var(--primary-bg);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+a {
+	color: var(--primary-fg);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.container {
+	width: 100%;
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 48px;
+}
+
+#header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 24px;
+}
+
+#header--left {
+	flex: 1;
+}
+
+#header--title {
+	font-size: 32px;
+	line-height: 1.4;
+	font-weight: 700;
+}
+
+#header--subtitle {
+	font-size: 22px;
+	line-height: 1.4;
+	margin-top: 0;
+}
+
+#header--right a {
+	margin-left: 24px;
+	font-weight: 700;
+	text-decoration: underline;
+}
+
+div.error {
+	padding: 0 24px 24px;
+	background-color: var(--error-bg);
+	border: 1px solid var(--error-fg);
+	font-weight: 700;
+}
+
+/** DASHBOARD **/
+
+.rounded-panel {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	border-radius: 6px;
+}
+
+#dashboard--lead__container {
+	padding: 12px;
+	background-color: var(--secondary-bg);
+	border: 2px solid var(--secondary-fg);
+	margin-bottom: 24px;
+	line-height: 1.618;
+	display: flex;
+	align-items: flex-start;
+}
+
+#dashboard--lead__img {
+	width: 64px;
+	min-width: 64px;
+	border-radius: 32px;
+	margin-right: 12px;
+}
+
+#dashboard--lead__text {
+	padding: 0;
+	font-size: 14px;
+}
+
+#dashboard--panels {
+	display: grid;
+	grid-template-columns: calc(50% - 12px) calc(50% - 12px);
+	column-gap: 24px;
+}
+
+.dashboard--panel {
+	width: 100%;
+	background-color: var(--panel-bg);
+	padding: 12px;
+	margin-bottom: 24px;
+	height: 136px;
+	display: block;
+}
+
+#dashboard--panel__notes {
+	height: initial !important;
+}
+
+.dashboard--panel__header {
+	display: flex;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.dashboard--panel__header h2 {
+	flex: 1;
+	font-size: 20px;
+	line-height: 1;
+}
+
+.dashboard--panel__header a {
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.dashboard--panel__content {
+	font-size: 14px;
+	display: flex;
+	flex-direction: row;
+}
+
+.dashboard--panel__content,
+.dashboard--panel__content>span {
+	line-height: 20px;
+}
+
+.dashboard--panel__graph {
+	width: 80px;
+	height: 80px;
+	margin-right: 12px;
+}
+
+.dashboard--panel ul {
+	margin-top: 0;
+	width: calc(100% - 16px);
+}
+
+.dashboard--panel__li {
+	margin-top: 0;
+	margin-bottom: 8px;
+}
+
+.dashboard--panel__li a,
+.dashboard--panel__li strong,
+.dashboard--panel__li span,
+.dashboard--panel__li>small {
+	display: block;
+	line-height: 18px;
+	width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.dashboard--panel--meta {
+	flex: 1;
+}
+
+.dashboard--panel--meta__row {
+	font-size: 14px;
+	line-height: 14px;
+	margin-bottom: 8px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.dashboard--panel--meta__row span:last-child {
+	text-align: right;
+	max-width: 75%;
+}
+
+/** MAIN CONTENTS **/
+
+.page--data h2,
+.page--data h3,
+.page--data p,
+.page--data hr,
+.page--data svg,
+.page--data table,
+.page--data .error,
+.page--data form,
+.sectioncontainer {
+	margin-top: 24px;
+}
+
+.page--data__header {
+	display: flex;
+	align-items: center;
+	width: 100%;
+}
+
+.page--data__header a {
+	font-weight: 700;
+	font-size: 14px;
+	margin-right: 16px;
+	flex-shrink: 0;
+}
+
+.page--data__header h2 {
+	margin-top: 0;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	border-bottom: 1px solid var(--border);
+}
+
+tr {
+	border-top: 1px solid var(--border);
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid var(--primary-fg);
+}
+
+img,
+svg,
+audio,
+video {
+	width: 100%;
+	max-width: 100%;
+}
+
+ul {
+	margin-left: 16px;
+	line-height: 20px;
+}
+
+li,
+ol {
+	margin-top: 8px;
+}
+
+summary {
+	cursor: pointer;
+}
+
+.row {
+	display: flex;
+	margin-top: 4px;
+}
+
+.row .left {
+	text-align: center;
+	min-width: 32px;
+	margin-right: 16px;
+	align-self: flex-start;
+}
+
+.row .right {
+	flex: 1;
+}
+
+.row p:first-of-type {
+	margin-top: 0;
+}
+
+/** MUSIC STATS **/
+
+#now-playing {
+	background-color: var(--secondary-bg);
+	color: var(--secondary-fg);
+	padding: 24px;
+	border: 1px solid var(--secondary-fg);
+}
+
+table td {
+	padding: 4px 8px 4px 0;
+	white-space: nowrap;
+}
+
+.align-r {
+	text-align: right;
+}
+
+.table-flex-1 {
+	width: 99%;
+}
+
+.scrobble select {
+	display: block;
+	width: 100%;
+	margin: 16px 0;
+	padding: 6px;
+}
+
+.artist-count {
+	font-weight: 700;
+	padding: 4px 8px;
+	border-radius: 6px;
+	min-width: fit-content;
+	display: block;
+	color: var(--primary-bg);
+	background-color: var(--primary-fg);
+}
+
+/** GAME ACHIEVEMENTS **/
+
+.game-achievements--container {
+	font-size: 14px;
+	margin-top: 8px;
+}
+
+.game-achievements--list {
+	margin-left: 20px;
+	list-style: '🏆' outside;
+}
+
+.game-achievements--list li {
+	padding-left: 8px;
+}
+
+/** PAGINATION **/
+
+.pagination a {
+	flex: 1;
+	text-align: center;
+	margin: 0 8px;
+	padding: 16px 32px;
+	border-radius: 16px;
+	background-color: rgba(45, 28, 136, 0.05);
+	font-weight: 700;
+}
+
+.pagination a:hover {
+	background-color: rgba(45, 28, 136, 0.1);
+	text-decoration: none;
+}
+
+.pagination div {
+	display: flex;
+}
+
+/** NOTES **/
+
+.e-content {
+	line-height: 1.618;
+}
+
+.e-content a {
+	font-weight: 700;
+}
+
+.hidden {
+	display: none;
+}
+
+/** INTERNAL USE ONLY **/
+
+pre {
+	font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+	line-height: 1.2;
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+input.right,
+select.right,
+textarea.right {
+	flex: 1;
+	padding: 2px;
+	max-width: 320px;
+}
+
+input[type="submit"],
+select {
+	padding: 6px 12px;
+}
+
+@media (max-width: 660px) {
+	.container {
+		padding: 48px 24px;
+	}
+
+	#header {
+		display: block;
+		text-align: center;
+		margin-bottom: 48px;
+	}
+
+	#header--right {
+		display: none;
+	}
+
+	#dashboard--lead__img {
+		display: none;
+	}
+
+	#dashboard--panels {
+		display: block;
+	}
+
+	.dashboard--panel {
+		margin-bottom: 24px;
+		height: auto;
+	}
+}

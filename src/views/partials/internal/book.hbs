@@ -1,0 +1,19 @@
+<form method="POST" action="/books/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id type="book" }}
+
+		{{> internal/crudRow emoji="📙" name="title" value=data.title }}
+		{{> internal/crudRow emoji="👤" name="author" value=data.author }}
+		{{> internal/crudRowNumber emoji="📅" name="year" value=data.year }}
+		{{> internal/crudRow emoji="📦" name="genre" value=data.genre }}
+		{{> internal/crudRowNumber emoji="📑" name="pages_total" value=data.pages_total }}
+		{{> internal/crudRowNumber emoji="📈" name="pages_progress" value=data.pages_progress }}
+		{{> internal/crudRowNumber emoji="⭐" name="rating" value=data.rating }}
+		{{> internal/crudRow emoji="🔗" name="url" value=data.url }}
+		{{> internal/crudRow emoji="📬" name="started_at" value=data.started_at }}
+		{{> internal/crudRow emoji="📭" name="completed_at" value=data.completed_at }}
+		{{> internal/crudRow emoji="🕑" name="created_at" value=data.created_at }}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>

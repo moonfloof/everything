@@ -1,0 +1,10 @@
+<h2>Bookmarks:</h2>
+
+{{> internal/bookmark data=bookmark }}
+<hr/>
+
+{{#each bookmarks as |bookmark| }}
+	{{> internal/bookmark data=bookmark }}
+{{/each}}
+
+{{> pagination route="/bookmarks" pagination=pagination }}

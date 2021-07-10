@@ -1,0 +1,78 @@
+<div class="sectioncontainer h-entry">
+	<div class="p-read-of h-cite">
+	<div class="row">
+		<span class="left">📙</span>
+		<span class="right">
+			{{#if data.url}}
+			<a href="{{data.url}}" target="_blank" rel="noopener" class="u-url">
+				<strong class="p-name">{{data.title}}</strong>
+			</a>
+			{{else}}
+				<strong class="p-name">{{data.title}}</strong>
+			{{/if}}
+			({{data.year}})
+		</span>
+	</div>
+	<div class="row">
+		<span class="left"></span>
+		<span class="right">by <span class="p-author">{{data.author}}</span></span>
+	</div>
+	</div>
+
+	{{#if data.progress}}
+	<div class="row">
+		<span class="left"></span>
+		<data class="right p-read-status" value="{{data.status}}">{{{data.progress}}}</data>
+	</div>
+	{{/if}}
+
+	<div class="row">
+		<span class="left"></span>
+		<span class="right"><strong>Started:</strong> {{data.started_at}}</span>
+	</div>
+
+	{{#if data.completed_at}}
+	<div class="row">
+		<span class="left"></span>
+		<span class="right"><strong>Finished:</strong> {{data.completed_at}}</span>
+	</div>
+	{{/if}}
+
+	{{#if data.pages_total}}
+	<div class="row">
+		<span class="left"></span>
+		<span class="right"><strong>Pages:</strong> {{data.pages_total}}</span>
+	</div>
+	{{/if}}
+
+	{{#if data.rating}}
+	<div class="row">
+		<span class="left">⭐</span>
+		<span class="right"><strong>Rating:</strong> {{data.rating}} / 10</span>
+	</div>
+	{{/if}}
+
+	{{#if data.genre}}
+	<div class="row">
+		<span class="left"></span>
+		<span class="right"><strong>Genre:</strong> {{data.genre}}</span>
+	</div>
+	{{/if}}
+
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{data.updated_at}}"
+			datetime="{{data.updated_at}}"
+			class="right dt-published"
+		>
+			<small>
+				<a href="/book/{{data.id}}" class="u-url u-uid">
+					{{data.timeago}}
+				</a>
+			</small>
+		</time>
+	</div>
+
+	{{> author }}
+</div>

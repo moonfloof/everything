@@ -1,0 +1,9 @@
+<div class="page--data">
+	{{> pageHeader title="Reading" url="/" }}
+
+	{{#each books as |book|}}
+		{{> book data=book }}
+	{{/each}}
+
+	{{> pagination pagination=pagination route="/books" }}
+</div>

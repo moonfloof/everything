@@ -1,0 +1,11 @@
+<div class="page--data">
+	{{> pageHeader title="Gaming" url="/" }}
+
+	<h3>Playtime by day</h3>
+	{{{svg}}}
+
+	{{#each gameActivity as |game|}}
+		{{> gameActivity data=game }}
+	{{/each}}
+	{{> pagination pagination=pagination route="/games" }}
+</div>

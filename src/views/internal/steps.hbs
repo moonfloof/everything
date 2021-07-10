@@ -1,0 +1,12 @@
+<h2>Steps:</h2>
+
+{{{svg}}}
+
+{{> internal/steps }}
+<hr/>
+
+{{#each steps as |entry| }}
+	{{> internal/steps data=entry }}
+{{/each}}
+
+{{> pagination route="/steps" pagination=pagination }}

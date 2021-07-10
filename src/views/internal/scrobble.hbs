@@ -1,0 +1,14 @@
+<h2>Scrobble Album:</h2>
+
+<form class="scrobble" action="" method="POST">
+	<br /><label for="dateTime">Date/Time (optional, local time)</label>
+	<br /><input class="right" type="datetime-local" id="dateTime" name="dateTime" />
+
+	<select name="albumId">
+	{{#each albumlist as |album| }}
+		<option value="{{album.value}}">{{album.label}}</option>
+	{{/each}}
+	</select>
+
+	<input type="submit" value="Scrobble" />
+</form>

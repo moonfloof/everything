@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  everything:
+    build: .
+    container_name: everything
+    restart: unless-stopped
+
+    volumes:
+      - ./data:/app/data
+      - "${TOMBOIS_SQLITE_LOCATION}:/app/data/Everything.db"
+
+    env_file:
+      - .env
+
+    environment:
+      # Override the custom sqlite location with the docker-specific location.
+      # The real location is still set via our .env file, as it is mapped in
+      # the volumes block above.
+      TOMBOIS_SQLITE_LOCATION: "/app/data/Everything.db"
+      TZ: ${TZ}
+
+    ports:
+      # Use the ports specified in .env to expose our server ports
+      # Feel free to customize this if you require a specific configuration.
+      - "${TOMBOIS_SERVER_PORT_INTERNAL}:${TOMBOIS_SERVER_PORT_INTERNAL}"
+      - "${TOMBOIS_SERVER_PORT_EXTERNAL}:${TOMBOIS_SERVER_PORT_EXTERNAL}"

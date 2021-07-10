@@ -1,0 +1,21 @@
+<div class="lead">
+	{{#if city}}<p>I am in 🌆 <em>{{city}}</em>.</p>{{/if}}
+
+	{{#if device.battery_level}}
+		<p>
+			My phone is at 🔋 <em>{{device.battery_level}}%</em>
+			battery{{#if device.battery_status}}, and is
+			<em>{{device.battery_status}}</em>{{/if}}.
+		</p>
+	{{/if}}
+
+	{{#if steps}}
+		<p>Yesterday, I took 🚶‍♂️ <em>{{steps}} steps</em>.</p>
+	{{/if}}
+
+	{{#if sleep}}
+		<p>I last slept for 😴 <em>{{sleep}}</em>.</p>
+	{{else}}
+		<p>I am 😴 <em>currently sleeping</em>.</p>
+	{{/if}}
+</div>

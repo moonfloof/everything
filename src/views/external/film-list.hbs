@@ -1,0 +1,9 @@
+<div class="page--data">
+	{{> pageHeader title="Watching (Films)" url="/" }}
+
+	{{#each films as |film|}}
+		{{> film data=film }}
+	{{/each}}
+
+	{{> pagination pagination=pagination route="/films" }}
+</div>

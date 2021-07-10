@@ -1,0 +1,48 @@
+<div class="sectioncontainer h-entry h-review">
+	<div class="row u-watch-of h-cite">
+		<span class="left">🎥</span>
+		<span class="right">
+			{{#if data.url}}
+			<a href="{{data.url}}" class="u-url" target="_blank" rel="noopener">
+				<strong class="p-name">{{data.title}}</strong>
+			</a>
+			{{else}}
+				<strong class="p-name">{{data.title}}</strong>
+			{{/if}}
+			({{data.year}})
+		</span>
+	</div>
+
+	{{#if data.rating}}
+	<div class="row">
+		<span class="left">⭐</span>
+		<span class="right">
+			<strong class="p-rating">{{data.rating}}</strong>
+			<small>/ <span class="p-best">10</span></small>
+		</span>
+	</div>
+	{{/if}}
+	{{#if data.review}}
+		<div class="row">
+			<span class="left">💬</span>
+			<div class="right e-content">{{{data.review}}}</div>
+		</div>
+	{{/if}}
+
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{data.watched_at}}"
+			datetime="{{data.watched_at}}"
+			class="right dt-published"
+		>
+			<small>
+				<a href="/film/{{data.id}}" class="u-url u-uid">
+					{{data.timeago}}
+				</a>
+			</small>
+		</time>
+	</div>
+
+	{{> author }}
+</div>

@@ -1,0 +1,10 @@
+<form method="POST" action="/steps/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id}}
+
+		{{> internal/crudRowNumber emoji="🚶‍♂️" name="step_count_total" value=data.step_count_total step="1" }}
+		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>

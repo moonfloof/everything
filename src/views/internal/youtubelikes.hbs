@@ -1,0 +1,10 @@
+<h2>YouTube Likes:</h2>
+
+{{> internal/youtubelike data=youtubelike }}
+<hr/>
+
+{{#each youtubelikes as |youtubelike| }}
+	{{> internal/youtubelike data=youtubelike }}
+{{/each}}
+
+{{> pagination route="/youtubelikes" pagination=pagination }}

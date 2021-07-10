@@ -1,0 +1,10 @@
+<h2>Purchases:</h2>
+
+{{> internal/purchase }}
+<hr/>
+
+{{#each purchases as |purchase| }}
+	{{> internal/purchase data=purchase }}
+{{/each}}
+
+{{> pagination route="/purchases" pagination=pagination }}

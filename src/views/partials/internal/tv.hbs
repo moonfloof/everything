@@ -1,0 +1,11 @@
+<form method="POST" action="/tv/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id type="tv" }}
+
+		{{> internal/crudRow emoji="📆" name="episode_title" value=data.episode_title }}
+		{{> internal/crudRow emoji="📺" name="series_title" value=data.series_title }}
+		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>

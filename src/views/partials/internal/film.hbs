@@ -1,0 +1,15 @@
+<form method="POST" action="/films/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id type="film" }}
+
+		{{> internal/crudRow emoji="🎥" name="title" value=data.title }}
+		{{> internal/crudRowNumber emoji="📆" name="year" value=data.year }}
+		{{> internal/crudRowNumber emoji="⭐" name="rating" value=data.rating }}
+		{{> internal/crudRowParagraph emoji="💬" name="review" value=data.review }}
+		{{> internal/crudRow emoji="🔗" name="url" value=data.url }}
+		{{> internal/crudRow emoji="👀" name="watched_at" value=data.watched_at }}
+		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>

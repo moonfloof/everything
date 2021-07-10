@@ -1,0 +1,9 @@
+<div class="page--data">
+	{{> pageHeader title="Notes" url="/" }}
+
+	{{#each notes as |note|}}
+		{{> note data=note }}
+	{{/each}}
+
+	{{> pagination pagination=pagination route="/notes" }}
+</div>

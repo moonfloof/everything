@@ -1,0 +1,40 @@
+<div class="sectioncontainer h-entry">
+	<div class="u-like-of h-cite">
+	<div class="row">
+		<span class="left">🧡</span>
+		<span class="right">
+			<strong>
+				<a
+					href="{{data.url}}"
+					target="_blank"
+					rel="noreferrer noopener"
+					class="p-name u-url"
+				>
+					{{data.title}}
+				</a>
+			</strong>
+		</span>
+	</div>
+	<div class="row">
+		<span class="left"></span>
+		<span class="right p-author h-card">{{data.channel}}</span>
+	</div>
+	</div>
+
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{data.created_at}}"
+			datetime="{{data.created_at}}"
+			class="right dt-published"
+		>
+			<small>
+				<a class="u-url u-uid" href="/youtube/{{data.id}}">
+					{{data.timeago}}
+				</a>
+			</small>
+		</time>
+	</div>
+
+	{{> author }}
+</div>

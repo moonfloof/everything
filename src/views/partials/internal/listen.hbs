@@ -1,0 +1,15 @@
+<form method="POST" action="/listens/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id type="music" }}
+
+		{{> internal/crudRow emoji="🎵" name="title" value=data.title }}
+		{{> internal/crudRow emoji="💿" name="album" value=data.album }}
+		{{> internal/crudRow emoji="👤" name="artist" value=data.artist }}
+		{{> internal/crudRow emoji="🔢" name="tracknumber" value=data.tracknumber }}
+		{{> internal/crudRow emoji="📅" name="release_year" value=data.release_year }}
+		{{> internal/crudRow emoji="📦" name="genre" value=data.genre }}
+		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>

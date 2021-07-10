@@ -1,0 +1,14 @@
+<div class="page--data">
+	{{> pageHeader title="Watching (YouTube)" url="/" }}
+
+	<p class="dashboard--lead">
+		Admittedly, I watch a <em>lot</em> of YouTube videos, and here
+		are my favourites. You'll typically find videos about maths,
+		science, music, and comedy.
+	</p>
+	{{#each youtubeLikes as |like|}}
+		{{> youtubeLike data=like }}
+	{{/each}}
+
+	{{> pagination pagination=pagination route="/youtube" }}
+</div>

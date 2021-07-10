@@ -1,0 +1,10 @@
+<h2>Time Tracking:</h2>
+
+{{> internal/timetracking values=categoryValues }}
+<hr/>
+
+{{#each timetracking as |activity| }}
+	{{> internal/timetracking data=activity values=../categoryValues }}
+{{/each}}
+
+{{> pagination route="/timetracking" pagination=pagination }}

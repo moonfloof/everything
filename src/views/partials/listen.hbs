@@ -1,0 +1,34 @@
+<div class="sectioncontainer h-entry">
+	<div class="u-listen-of h-cite">
+	<div class="row">
+		<span class="left">🎵</span>
+		<span class="right">
+			<strong class="p-name">{{data.title}}</strong>
+		</span>
+	</div>
+	<div class="row">
+		<span class="left">💿</span>
+		<span class="right p-publication">{{data.album}}</span>
+	</div>
+	<div class="row">
+		<span class="left">👤</span>
+		<span class="right p-author">{{data.artist}}</span>
+	</div>
+	</div>
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{data.created_at}}"
+			datetime="{{data.created_at}}"
+			class="right dt-published"
+		>
+			<small>
+				<a href="/music/{{data.id}}" class="u-url u-uid">
+					{{data.timeago}}
+				</a>
+			</small>
+		</time>
+	</div>
+
+	{{> author }}
+</div>

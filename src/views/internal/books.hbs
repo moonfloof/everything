@@ -1,0 +1,10 @@
+<h2>Books Read:</h2>
+
+{{> internal/book }}
+<hr/>
+
+{{#each books as |book| }}
+	{{> internal/book data=book }}
+{{/each}}
+
+{{> pagination route="/books" pagination=pagination }}

@@ -1,0 +1,9 @@
+<div class="page--data">
+	{{> pageHeader title="Watching (TV)" url="/" }}
+
+	{{#each episodes as |episode|}}
+		{{> tv data=episode }}
+	{{/each}}
+
+	{{> pagination pagination=pagination route="/tv" }}
+</div>
