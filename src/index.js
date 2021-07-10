@@ -14,7 +14,7 @@ app.use(helmet());
 app.use(express.json());
 
 // Set up routers
-app.use('/overland', overland);
+app.use('/api/overland', overland);
 
 // Start server
 app.listen(3000, () => {

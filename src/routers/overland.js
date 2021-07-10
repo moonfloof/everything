@@ -20,6 +20,7 @@ router.post('/', async (req, res) => {
 		const apiKey = locations[0].properties.device_id;
 		const { id: deviceId } = await validateDevice(apiKey);
 
+		// Add locations to database
 		const promises = locations.map(async location => {
 			const { timestamp } = location.properties;
 
