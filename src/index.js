@@ -17,7 +17,8 @@ app.use(express.json());
 app.use('/api/overland', overland);
 
 // Start server
-app.listen(3000, () => {
+const port = process.env.TOMBOIS_SERVER_PORT;
+app.listen(port, () => {
 	// eslint-disable-next-line no-console
-	console.log('App running');
+	console.log(`App running on port ${port}`);
 });
