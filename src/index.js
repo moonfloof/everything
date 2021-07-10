@@ -5,6 +5,7 @@ import helmet from 'helmet';
 // Routers
 import overland from './routers/overland.js';
 import listenbrainz from './routers/listenbrainz.js';
+import frontend from './routers/frontend.js';
 
 // Load .env file
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(express.json());
 // Set up routers
 app.use('/api/overland', overland);
 app.use('/api/listenbrainz', listenbrainz);
+app.use('/', frontend);
 
 // Start server
 const port = process.env.TOMBOIS_SERVER_PORT;
