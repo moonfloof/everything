@@ -4,6 +4,27 @@ import { insertScrobble } from '../database/listens.js';
 
 const router = express.Router();
 
+router.get('/validate-token', async (req, res) => {
+	try {
+		const { token } = req.query;
+
+		const { description } = await validateDevice(token);
+
+		res.send({
+			code: 200,
+			message: 'Token valid.',
+			valid: true,
+			user: description,
+		});
+	} catch (err) {
+		res.send({
+			code: 200,
+			message: 'Token invalid.',
+			valid: false,
+		});
+	}
+});
+
 router.post('/submit-listens', async (req, res) => {
 	try {
 		// Validate Device API Key
