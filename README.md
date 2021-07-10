@@ -9,6 +9,8 @@ API to track everything I do and store it in a secure SQLite database
 
 ## Installation
 
+* Create a SQLite database using the latest migration
+* Add at least one device to the `devices` table (where `id` is a UUID)
 * `npm install`
 * Copy `.env.template` to `.env` and modify values as you see fit
 * `npm run start:production` (or your preferred way of managing node applications, eg. forever)
