@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
 
 // Routers
+import dashboard from './routers/dashboard.js';
 import devices from './routers/devices.js';
 import overland from './routers/overland.js';
 import listenbrainz from './routers/listenbrainz.js';
@@ -24,6 +25,7 @@ app.use(async (req, res, next) => {
 });
 
 // Set up routers
+app.use('/api/dashboard', dashboard);
 app.use('/api/devices', devices);
 app.use('/api/overland', overland);
 app.use('/api/listenbrainz', listenbrainz);
