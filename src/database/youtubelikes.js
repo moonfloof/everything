@@ -22,3 +22,28 @@ export async function insertYouTubeLike (url, title, deviceId) {
 
 	return statement.run();
 }
+
+/**
+ * Fetch all YouTube likes, or based on a specific ID
+ *
+ * @export
+ * @param {string} [id]
+ * @param {number} [page]
+ */
+export async function getLikes (id, page) {
+	const db = await getDatabase();
+
+	const statement = await db.prepare(`
+		SELECT * FROM youtubelikes
+		WHERE id LIKE $id
+		ORDER BY created_at DESC
+		LIMIT 50 OFFSET $offset
+	`);
+
+	await statement.bind({
+		$id: id || '%',
+		$offset: page ? (page - 1) * 50 : 0,
+	});
+
+	return statement.all();
+}
