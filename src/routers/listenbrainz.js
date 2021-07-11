@@ -28,11 +28,8 @@ router.get('/1/validate-token', async (req, res) => {
 router.post('/1/submit-listens', async (req, res) => {
 	try {
 		// Validate Device API Key
-		const authToken = req.header('Authorization');
-		if (
-			authToken.startsWith('Token ') === false &&
-			authToken.startsWith('token ') === false
-		) {
+		const authToken = req.header('Authorization')?.toLowerCase();
+		if (authToken.startsWith('token ') === false) {
 			throw new Error('Provided token is invalid');
 		}
 		const { id: deviceId } = await validateDevice(authToken.substr(6));
