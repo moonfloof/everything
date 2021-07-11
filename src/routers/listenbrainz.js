@@ -55,11 +55,11 @@ router.post('/1/submit-listens', async (req, res) => {
 				track_name: title,
 				release_name: album,
 			} = scrobble.track_metadata;
-			const {
-				date: releaseDateISO,
-				tags: genres,
-				tracknumber,
-			} = scrobble.track_metadata.additional_info;
+
+			// Apparently additional_info doesn't always get sent
+			const releaseDateISO = scrobble.track_metadata?.additional_info?.date;
+			const genres = scrobble.track_metadata?.additional_info?.tags;
+			const tracknumber = scrobble.track_metadata?.additional_info?.tracknumber;
 
 			// Process payload data
 			const year = releaseDateISO && new Date(releaseDateISO).getFullYear();
