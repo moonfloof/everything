@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
@@ -7,6 +6,7 @@ import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
 // Routers
 import overland from './routers/overland.js';
 import listenbrainz from './routers/listenbrainz.js';
+import youtube from './routers/youtube.js';
 import frontend from './routers/frontend.js';
 
 // Load .env file
@@ -25,6 +25,7 @@ app.use(async (req, res, next) => {
 // Set up routers
 app.use('/api/overland', overland);
 app.use('/api/listenbrainz', listenbrainz);
+app.use('/api/youtube', youtube);
 app.use('/', frontend);
 
 // Start server

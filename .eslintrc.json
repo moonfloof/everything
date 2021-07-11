@@ -77,7 +77,6 @@
 		"block-spacing": [ "error" ],
 		"arrow-spacing": [ "error" ],
 		"comma-spacing": [ "error" ],
-		"no-console": [ "error" ],
 		"spaced-comment": [ "error", "always" ]
 	}
 }
