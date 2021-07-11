@@ -39,3 +39,28 @@ export async function insertScrobble (artist, album, title, tracknumber, year, g
 
 	return statement.run();
 }
+
+/**
+ * Fetch all listens, or based on a specific ID
+ *
+ * @export
+ * @param {string} [id]
+ * @param {number} [page]
+ */
+export async function getListens (id, page) {
+	const db = await getDatabase();
+
+	const statement = await db.prepare(`
+		SELECT * FROM listens
+		WHERE id LIKE $id
+		ORDER BY created_at DESC
+		LIMIT 50 OFFSET $offset
+	`);
+
+	await statement.bind({
+		$id: id || '%',
+		$offset: page ? (page - 1) * 50 : 0,
+	});
+
+	return statement.all();
+}
