@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
+import logEntry from '@tombofry/stdlib/src/express/logEntry.js';
 
 // Routers
 import overland from './routers/overland.js';
@@ -14,6 +16,10 @@ dotenv.config();
 const app = express();
 app.use(helmet());
 app.use(express.json());
+app.use(async (req, res, next) => {
+	logEntry(req, res).then(console.log);
+	next();
+});
 
 // Set up routers
 app.use('/api/overland', overland);
@@ -23,6 +29,5 @@ app.use('/', frontend);
 // Start server
 const port = process.env.TOMBOIS_SERVER_PORT;
 app.listen(port, () => {
-	// eslint-disable-next-line no-console
 	console.log(`App running on port ${port}`);
 });
