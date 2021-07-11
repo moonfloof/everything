@@ -80,6 +80,7 @@ router.post('/1/submit-listens', async (req, res) => {
 
 		res.send({ status: 'ok' });
 	} catch (err) {
+		console.error(err);
 		res.status(500).send({
 			status: 'error',
 			code: 500,
