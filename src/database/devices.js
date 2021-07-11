@@ -13,3 +13,8 @@ export async function validateDevice (apiKey) {
 
 	return device;
 }
+
+export async function getDevices () {
+	const db = await getDatabase();
+	return db.all('SELECT id, description FROM devices');
+}
