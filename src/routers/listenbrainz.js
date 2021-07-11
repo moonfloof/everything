@@ -34,6 +34,10 @@ router.post('/1/submit-listens', async (req, res) => {
 		}
 		const { id: deviceId } = await validateDevice(authToken.substr(6));
 
+		if (Object.keys(req.body).length === 0) {
+			req.body = JSON.parse(req.rawBody);
+		}
+
 		// Ignore "now playing" requests
 		if (req.body.listen_type === 'playing_now') {
 			res.send({ status: 'ok' });
@@ -55,7 +59,7 @@ router.post('/1/submit-listens', async (req, res) => {
 			} = scrobble.track_metadata.additional_info;
 
 			// Process payload data
-			const year = new Date(releaseDateISO).getFullYear();
+			const year = releaseDateISO && new Date(releaseDateISO).getFullYear();
 			const genre = Array.isArray(genres) && genres.length > 0
 				? genres[0]
 				: null;
