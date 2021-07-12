@@ -11,8 +11,6 @@ router.get('/', async (req, res) => {
 			getLikes(),
 		]);
 
-		console.log(listens, youtubelikes);
-
 		res.send({
 			listen: listens[0] || null,
 			youtubelike: youtubelikes[0] || null,
