@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { getDatabase } from './getDatabase.js';
+import timeago from '../adapters/timeago.js';
 
 export async function insertYouTubeLike (url, title, deviceId) {
 	const db = await getDatabase();
@@ -45,5 +46,10 @@ export async function getLikes (id, page) {
 		$offset: page ? (page - 1) * 50 : 0,
 	});
 
-	return statement.all();
+	return statement
+		.all()
+		.then(rows => rows.map(row => ({
+			...row,
+			timeago: timeago.format(new Date(row.created_at)),
+		})));
 }
