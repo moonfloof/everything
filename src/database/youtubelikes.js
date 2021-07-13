@@ -9,9 +9,9 @@ export async function insertYouTubeLike (url, title, deviceId) {
 
 	const statement = await db.prepare(`
 		INSERT INTO youtubelikes
-		(id, url, title, device_id)
+		(id, url, title, channel, device_id)
 		VALUES
-		($id, $url, $title, $deviceId)
+		($id, $url, $title, 'N/A', $deviceId)
 	`);
 
 	await statement.bind({
