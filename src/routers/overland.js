@@ -6,6 +6,10 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
 	try {
+		// Validate Device ID / API Key
+		const { apiKey } = req.query;
+		const { id: deviceId } = await validateDevice(apiKey);
+
 		if (!Array.isArray(req.body.locations)) {
 			throw new Error('Please send an array of locations');
 		}
@@ -15,10 +19,6 @@ router.post('/', async (req, res) => {
 		}
 
 		const { locations } = req.body;
-
-		// Validate Device ID / API Key
-		const apiKey = locations[0].properties.device_id;
-		const { id: deviceId } = await validateDevice(apiKey);
 
 		// Add locations to database
 		const promises = locations.map(async location => {
