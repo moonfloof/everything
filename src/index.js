@@ -1,6 +1,8 @@
+import path from 'path';
 import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
+import exphbs from 'express-handlebars';
 import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
 
 // Routers
@@ -30,6 +32,13 @@ app.use('/api/devices', devices);
 app.use('/api/overland', overland);
 app.use('/api/listenbrainz', listenbrainz);
 app.use('/api/youtube', youtube);
+
+// Set up frontend
+app.engine('.hbs', exphbs({ extname: '.hbs' }));
+app.set('views', path.resolve('src/views'));
+app.set('view engine', '.hbs');
+
+app.use(express.static('public'));
 app.use('/', frontend);
 
 // Start server

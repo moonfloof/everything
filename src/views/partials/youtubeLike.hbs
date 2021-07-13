@@ -1,0 +1,20 @@
+<div class="sectioncontainer">
+	<div class="row">
+		<span class="left">📺</span>
+		<span class="right"><a href="{{data.url}}" target="_blank" rel="noreferrer noopener">{{data.title}}</a></span>
+	</div>
+	<div class="row">
+		<span class="left">👤</span>
+		<span class="right">{{data.channel}}</span>
+	</div>
+	<div class="row">
+		<span class="left">📅</span>
+		<time datetime="{{data.created_at}}" class="right">
+			{{#if showlink }}
+				<a href="/youtubelike/{{data.id}}">{{data.timeago}}</a>
+			{{else}}
+				{{data.timeago}}
+			{{/if}}
+		</span>
+	</div>
+</div>

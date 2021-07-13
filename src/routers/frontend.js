@@ -1,13 +1,31 @@
-import express from 'express';
-import path from 'path';
+import Router from 'express-promise-router';
+import { getListens } from '../database/listens.js';
+import { getLikes } from '../database/youtubelikes.js';
 
-const router = express.Router();
+const router = Router();
 
-router.use('/', express.static('public'));
+// DASHBOARD
 
-router.use('*', (_req, res) => {
-	const file = path.resolve('./public/index.html');
-	res.sendFile(file);
+router.get('/', async (_req, res) => {
+	const [ listens, youtubelikes ] = await Promise.all([
+		getListens(),
+		getLikes(),
+	]);
+
+	const latest = {
+		listen: listens[0] || null,
+		youtubeLike: youtubelikes[0] || null,
+	};
+
+	res.render('dashboard', { latest });
+});
+
+router.get('*', () => { throw new Error('Page Not Found'); });
+
+// eslint-disable-next-line no-unused-vars
+router.use((err, _req, res, next) => {
+	console.log(err);
+	res.render('error', { error: err.message });
 });
 
 export default router;

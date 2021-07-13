@@ -1,0 +1,24 @@
+<div class="sectioncontainer">
+	<div class="row">
+		<span class="left">🎵</span>
+		<span class="right">{{data.title}}</span>
+	</div>
+	<div class="row">
+		<span class="left">💿</span>
+		<span class="right">{{data.album}}</span>
+	</div>
+	<div class="row">
+		<span class="left">👤</span>
+		<span class="right">{{data.artist}}</span>
+	</div>
+	<div class="row">
+		<span class="left">📅</span>
+		<time datetime="{{data.created_at}}" class="right">
+			{{#if showlink }}
+				<a href="/listen/{{data.id}}">{{data.timeago}}</a>
+			{{else}}
+				{{data.timeago}}
+			{{/if}}
+		</span>
+	</div>
+</div>
