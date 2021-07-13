@@ -1,6 +1,7 @@
 import Router from 'express-promise-router';
 import { getListens } from '../database/listens.js';
 import { getLikes } from '../database/youtubelikes.js';
+import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
 const router = Router();
 
@@ -31,7 +32,7 @@ router.get('/listen/:id', async (req, res) => {
 	const listens = await getListens(req.params.id);
 
 	if (listens.length === 0) {
-		throw new Error('Listen not found');
+		throw new NotFoundError('Listen not found');
 	}
 
 	res.render('listensingle', { listen: listens[0] });
@@ -48,18 +49,20 @@ router.get('/youtubelike/:id', async (req, res) => {
 	const youtubeLikes = await getLikes(req.params.id);
 
 	if (youtubeLikes.length === 0) {
-		throw new Error('Like not found');
+		throw new NotFoundError('Like not found');
 	}
 
 	res.render('youtubelikesingle', { youtubeLike: youtubeLikes[0] });
 });
 
-router.get('*', () => { throw new Error('Page Not Found'); });
+router.get('*', () => { throw new NotFoundError('Page Not Found'); });
 
 // eslint-disable-next-line no-unused-vars
 router.use((err, _req, res, next) => {
-	console.log(err);
-	res.render('error', { error: err.message });
+	console.error(err);
+	res
+		.status(err.code || 500)
+		.render('error', { error: err.message });
 });
 
 export default router;
