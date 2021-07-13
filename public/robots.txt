@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /tom/
+Disallow: /api/
+Disallow: /*?*q=
+Disallow: /*?*type=
+Disallow: /*?*sort=
+Disallow: /*?*state=
+Disallow: /*?*labels=
+Sitemap: https://www.tombo.is/sitemap.xml
