@@ -23,9 +23,11 @@ router.post('/', async (req, res) => {
 		// Add locations to database
 		const promises = locations.map(async location => {
 			const { timestamp } = location.properties;
+			const timestampDate = new Date(timestamp);
+			const timestampISO = timestampDate.toISOString();
 
 			const [ lon, lat ] = location?.geometry?.coordinates;
-			await insertLocation(lat, lon, null, timestamp, deviceId);
+			await insertLocation(lat, lon, null, timestampISO, deviceId);
 		});
 
 		await Promise.all(promises);
