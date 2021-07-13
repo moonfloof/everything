@@ -48,7 +48,7 @@ router.get('/youtubelike/:id', async (req, res) => {
 	const youtubeLikes = await getLikes(req.params.id);
 
 	if (youtubeLikes.length === 0) {
-		throw new Error('Listen not found');
+		throw new Error('Like not found');
 	}
 
 	res.render('youtubelikesingle', { youtubeLike: youtubeLikes[0] });
