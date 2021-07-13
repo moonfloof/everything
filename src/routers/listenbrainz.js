@@ -1,20 +1,8 @@
 import express from 'express';
 import { validateDevice } from '../database/devices.js';
-import { insertScrobble, getListens } from '../database/listens.js';
+import { insertScrobble } from '../database/listens.js';
 
 const router = express.Router();
-
-router.get('/scrobbles', async (req, res) => {
-	try {
-		const results = await getListens(req.query.id, req.query.page);
-		res.send({ results });
-	} catch (err) {
-		res.status(400).send({
-			status: 'error',
-			error: err.message,
-		});
-	}
-});
 
 router.get('/1/validate-token', async (req, res) => {
 	try {
