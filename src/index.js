@@ -10,6 +10,7 @@ import overland from './routers/overland.js';
 import listenbrainz from './routers/listenbrainz.js';
 import youtube from './routers/youtube.js';
 import frontend from './routers/frontend.js';
+import { getDatabase } from './database/getDatabase.js';
 
 // Load .env file
 dotenv.config();
@@ -41,4 +42,9 @@ app.use('/', frontend);
 const port = process.env.TOMBOIS_SERVER_PORT;
 app.listen(port, () => {
 	console.log(`App running on port ${port}`);
+});
+
+process.on('beforeExit', async () => {
+	const db = await getDatabase();
+	db.close();
 });
