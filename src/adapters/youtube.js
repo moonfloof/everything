@@ -9,7 +9,7 @@ let accessToken = null;
 let refreshToken = null;
 let youtubeLikes = [];
 
-const storagePath = path.resolve(process.env.TOMBOIS_GOOGLE_TOKENFILE);
+const storagePath = () => path.resolve(process.env.TOMBOIS_GOOGLE_TOKENFILE);
 
 /**
  * @return {Auth.OAuth2Client}
@@ -43,14 +43,14 @@ export const generateAuthUrl = () => {
 };
 
 export const loadTokensFromDisk = () => {
-	if (fs.existsSync(storagePath) === false) {
+	if (fs.existsSync(storagePath()) === false) {
 		accessToken = null;
 		refreshToken = null;
 		youtubeLikes = [];
 		return;
 	}
 
-	const contents = JSON.parse(fs.readFileSync(storagePath).toString());
+	const contents = JSON.parse(fs.readFileSync(storagePath()).toString());
 
 	accessToken = contents.accessToken;
 	refreshToken = contents.refreshToken;
@@ -65,7 +65,7 @@ export const loadTokensFromDisk = () => {
 
 const saveTokensToDisk = () => {
 	const str = JSON.stringify({ accessToken, refreshToken, youtubeLikes }, null, 2);
-	fs.writeFileSync(storagePath, str);
+	fs.writeFileSync(storagePath(), str);
 };
 
 export const retrieveAccessToken = async (authCode) => {
