@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import exphbs from 'express-handlebars';
 import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
+import { loadTokensFromDisk, pollForLikedVideos } from './adapters/youtube.js';
 
 // Routers
 import overland from './routers/overland.js';
@@ -28,6 +29,10 @@ app.use(async (req, res, next) => {
 // Set up routers
 app.use('/api/overland', overland);
 app.use('/api/listenbrainz', listenbrainz);
+
+// Set up YouTube APIs
+loadTokensFromDisk();
+pollForLikedVideos();
 app.use('/api/youtube', youtube);
 
 // Set up frontend

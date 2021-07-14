@@ -1,8 +1,34 @@
 import express from 'express';
+import { generateAuthUrl, retrieveAccessToken } from '../adapters/youtube.js';
 import { validateDevice } from '../database/devices.js';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
 
 const router = express.Router();
+
+const allowedIps = [
+	'127.0.0.1',
+	'192.168.1.',
+];
+
+router.get('/auth', (req, res) => {
+	const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+	const matches = allowedIps.find(allow => ip.includes(allow));
+	if (matches === undefined) {
+		res.redirect('/');
+	}
+	res.redirect(generateAuthUrl());
+});
+
+router.get('/callback', async (req, res) => {
+	const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+	const matches = allowedIps.find(allow => ip.includes(allow));
+	if (matches === undefined) {
+		res.redirect('/');
+	}
+
+	await retrieveAccessToken(req.query.code);
+	res.redirect('/');
+});
 
 router.post('/like', async (req, res) => {
 	try {
