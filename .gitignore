@@ -129,3 +129,6 @@ dist
 psd
 thumb
 sketch
+
+*tokens.json
+*.db
