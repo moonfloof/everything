@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { getDatabase } from './getDatabase.js';
 import timeago from '../adapters/timeago.js';
 
-export async function insertYouTubeLike (url, title, deviceId) {
+export async function insertYouTubeLike (url, title, channel, deviceId) {
 	const db = await getDatabase();
 
 	const id = uuid();
@@ -11,13 +11,14 @@ export async function insertYouTubeLike (url, title, deviceId) {
 		INSERT INTO youtubelikes
 		(id, url, title, channel, device_id)
 		VALUES
-		($id, $url, $title, 'N/A', $deviceId)
+		($id, $url, $title, $channel, $deviceId)
 	`);
 
 	await statement.bind({
 		$id: id,
 		$url: url,
 		$title: title,
+		$channel: channel,
 		$deviceId: deviceId,
 	});
 

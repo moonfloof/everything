@@ -58,7 +58,7 @@ router.get('/youtubelike/:id', async (req, res) => {
 router.get('*', () => { throw new NotFoundError('Page Not Found'); });
 
 // eslint-disable-next-line no-unused-vars
-router.use((err, _req, res, next) => {
+router.use((err, _req, res, _next) => {
 	console.error(err);
 	res
 		.status(err.code || 500)

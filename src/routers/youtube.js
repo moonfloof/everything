@@ -9,7 +9,7 @@ router.post('/like', async (req, res) => {
 		const { url, title, apiKey } = req.body;
 		const { id: deviceId } = await validateDevice(apiKey);
 
-		await insertYouTubeLike(url, title, deviceId);
+		await insertYouTubeLike(url, title, 'N/A', deviceId);
 
 		res.send({ status: 'ok' });
 	} catch (err) {
