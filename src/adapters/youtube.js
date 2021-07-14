@@ -9,7 +9,7 @@ let accessToken = null;
 let refreshToken = null;
 let youtubeLikes = [];
 
-const storagePath = path.resolve('tokens.json');
+const storagePath = path.resolve(process.env.TOMBOIS_GOOGLE_TOKENFILE);
 
 /**
  * @return {Auth.OAuth2Client}
