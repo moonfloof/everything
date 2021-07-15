@@ -47,7 +47,7 @@ export async function updateActivity (name, playtime, deviceId, intervalDuration
 	}
 
 	const lastUpdated = new Date(row.updated_at).getTime();
-	const lastCheck = Date.now() - intervalDuration - 60000;
+	const lastCheck = Date.now() - intervalDuration - (playtime * 1000) - 60000;
 
 	if (lastUpdated < lastCheck) {
 		await insertNewGameActivity(name, deviceId, playtime);
