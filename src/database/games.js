@@ -83,7 +83,7 @@ export async function getGameActivity (id, page) {
 	const statement = await db.prepare(`
 		SELECT * FROM games
 		WHERE id LIKE $id
-		ORDER BY created_at DESC
+		ORDER BY updated_at DESC
 		LIMIT 50 OFFSET $offset
 	`);
 
@@ -96,6 +96,6 @@ export async function getGameActivity (id, page) {
 		.all()
 		.then(rows => rows.map(row => ({
 			...row,
-			timeago: timeago.format(new Date(row.created_at)),
+			timeago: timeago.format(new Date(row.updated_at)),
 		})));
 }
