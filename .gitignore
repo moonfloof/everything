@@ -130,5 +130,5 @@ psd
 thumb
 sketch
 
-*tokens.json
+data/
 *.db
