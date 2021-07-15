@@ -133,12 +133,12 @@ export const pollForLikedVideos = () => {
 			youtubeLikes = data.items.map(v => v.id);
 			saveTokensToDisk();
 		} catch (err) {
+			console.error(err);
 			if (err.code === 401) {
 				accessToken = null;
 				refreshToken = null;
 				saveTokensToDisk();
 			}
-			console.error(err);
 		}
 	};
 

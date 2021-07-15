@@ -1,0 +1,22 @@
+<div class="sectioncontainer">
+	<div class="row">
+		<span class="left">🎮</span>
+		<span class="right"><strong>{{data.name}}</strong></span>
+	</div>
+	<div class="row">
+		<span class="left">⌚</span>
+		<span class="right">{{data.playtime_mins}} minutes</span>
+	</div>
+	<div class="row">
+		<span class="left"></span>
+		<time datetime="{{data.created_at}}" class="right">
+			<small>
+			{{#if showlink }}
+				<a href="/game/{{data.id}}">{{data.timeago}}</a>
+			{{else}}
+				{{data.timeago}}
+			{{/if}}
+			</small>
+		</time>
+	</div>
+</div>

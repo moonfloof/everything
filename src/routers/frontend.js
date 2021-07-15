@@ -2,20 +2,23 @@ import Router from 'express-promise-router';
 import { getListens } from '../database/listens.js';
 import { getLikes } from '../database/youtubelikes.js';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
+import { getGameActivity } from '../database/games.js';
 
 const router = Router();
 
 // DASHBOARD
 
 router.get('/', async (_req, res) => {
-	const [ listens, youtubelikes ] = await Promise.all([
+	const [ listens, youtubelikes, gameActivity ] = await Promise.all([
 		getListens(),
 		getLikes(),
+		getGameActivity(),
 	]);
 
 	const latest = {
 		listen: listens[0] || null,
 		youtubeLike: youtubelikes[0] || null,
+		gameActivity: gameActivity[0] || null,
 	};
 
 	res.render('dashboard', { latest });
@@ -53,6 +56,23 @@ router.get('/youtubelike/:id', async (req, res) => {
 	}
 
 	res.render('youtubelikesingle', { youtubeLike: youtubeLikes[0] });
+});
+
+// STEAM ACTIVITY
+
+router.get('/games', async (req, res) => {
+	const gameActivity = await getGameActivity(undefined, req.query.page);
+	res.render('gamelist', { gameActivity, page: req.query.page });
+});
+
+router.get('/game/:id', async (req, res) => {
+	const gameActivity = await getGameActivity(req.params.id);
+
+	if (gameActivity.length === 0) {
+		throw new NotFoundError('Like not found');
+	}
+
+	res.render('gamesingle', { gameActivity: gameActivity[0] });
 });
 
 router.get('*', () => { throw new NotFoundError('Page Not Found'); });
