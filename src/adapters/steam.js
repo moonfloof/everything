@@ -6,6 +6,10 @@ import Logger from '../lib/logger.js';
 
 const log = new Logger('Steam');
 
+const ignoredGames = [
+	250820,
+];
+
 let gameActivity = [];
 
 const storagePath = () => path.resolve(process.env.TOMBOIS_STEAM_DATA_FILE);
@@ -49,27 +53,29 @@ export const pollForGameActivity = () => {
 		});
 
 		const newActivity = [];
-		body.response.games.forEach(game => {
-			const activity = {
-				...game,
-				newPlaytime: 1,
-			};
+		body.response.games
+			.filter(game => !ignoredGames.includes(game.appid))
+			.forEach(game => {
+				const activity = {
+					...game,
+					newPlaytime: 1,
+				};
 
-			const existing = gameActivity.find(cache => (
-				game.appid === cache.appid
-			));
-			if (!existing) {
+				const existing = gameActivity.find(cache => (
+					game.appid === cache.appid
+				));
+				if (!existing) {
+					newActivity.push(activity);
+					return;
+				}
+
+				activity.newPlaytime = game.playtime_forever - existing.playtime_forever;
+				if (activity.newPlaytime <= 0) {
+					return;
+				}
+
 				newActivity.push(activity);
-				return;
-			}
-
-			activity.newPlaytime = game.playtime_forever - existing.playtime_forever;
-			if (activity.newPlaytime <= 0) {
-				return;
-			}
-
-			newActivity.push(activity);
-		});
+			});
 
 		log.debug(`Found ${newActivity.length} instances of new activity`);
 
