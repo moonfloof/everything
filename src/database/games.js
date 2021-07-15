@@ -6,7 +6,8 @@ export async function insertNewGameActivity (name, deviceId, playtime = 0) {
 	const db = await getDatabase();
 
 	const id = uuid();
-	const timestamp = new Date().toISOString();
+	const createdAt = new Date(Date.now() - (playtime * 1000)).toISOString();
+	const updatedAt = new Date().toISOString();
 
 	const statement = await db.prepare(`
 		INSERT INTO games
@@ -19,8 +20,8 @@ export async function insertNewGameActivity (name, deviceId, playtime = 0) {
 		$id: id,
 		$name: name,
 		$playtime: playtime,
-		$createdAt: timestamp,
-		$updatedAt: timestamp,
+		$createdAt: createdAt,
+		$updatedAt: updatedAt,
 		$deviceId: deviceId,
 	});
 
