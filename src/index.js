@@ -4,14 +4,16 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import exphbs from 'express-handlebars';
 import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
-import { loadTokensFromDisk, pollForLikedVideos } from './adapters/youtube.js';
+import { getDatabase } from './database/getDatabase.js';
+
+// Adapters
+import { pollForLikedVideos } from './adapters/youtube.js';
 
 // Routers
 import overland from './routers/overland.js';
 import listenbrainz from './routers/listenbrainz.js';
 import youtube from './routers/youtube.js';
 import frontend from './routers/frontend.js';
-import { getDatabase } from './database/getDatabase.js';
 
 // Load .env file
 dotenv.config();
@@ -29,10 +31,6 @@ app.use(async (req, res, next) => {
 // Set up routers
 app.use('/api/overland', overland);
 app.use('/api/listenbrainz', listenbrainz);
-
-// Set up YouTube APIs
-loadTokensFromDisk();
-pollForLikedVideos();
 app.use('/api/youtube', youtube);
 
 // Set up frontend
@@ -42,6 +40,9 @@ app.set('view engine', '.hbs');
 
 app.use(express.static('public'));
 app.use('/', frontend);
+
+// Set up polling adapters
+pollForLikedVideos();
 
 // Start server
 const port = process.env.TOMBOIS_SERVER_PORT;

@@ -42,7 +42,7 @@ export const generateAuthUrl = () => {
 	});
 };
 
-export const loadTokensFromDisk = () => {
+const loadTokensFromDisk = () => {
 	if (fs.existsSync(storagePath()) === false) {
 		accessToken = null;
 		refreshToken = null;
@@ -80,6 +80,8 @@ export const retrieveAccessToken = async (authCode) => {
 };
 
 export const pollForLikedVideos = () => {
+	loadTokensFromDisk();
+
 	const fetchVideos = async () => {
 		try {
 			if (accessToken === null) return;
@@ -121,5 +123,4 @@ export const pollForLikedVideos = () => {
 	};
 
 	setInterval(fetchVideos, 60 * 1000);
-	fetchVideos();
 };
