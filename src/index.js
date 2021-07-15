@@ -8,6 +8,7 @@ import { getDatabase } from './database/getDatabase.js';
 
 // Adapters
 import { pollForLikedVideos } from './adapters/youtube.js';
+import { pollForGameActivity } from './adapters/steam.js';
 
 // Routers
 import overland from './routers/overland.js';
@@ -43,6 +44,7 @@ app.use('/', frontend);
 
 // Set up polling adapters
 pollForLikedVideos();
+pollForGameActivity();
 
 // Start server
 const port = process.env.TOMBOIS_SERVER_PORT;
