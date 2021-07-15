@@ -6,12 +6,13 @@ export async function insertYouTubeLike (url, title, channel, deviceId) {
 	const db = await getDatabase();
 
 	const id = uuid();
+	const createdAt = new Date().toISOString();
 
 	const statement = await db.prepare(`
 		INSERT INTO youtubelikes
-		(id, url, title, channel, device_id)
+		(id, url, title, channel, device_id, created_at)
 		VALUES
-		($id, $url, $title, $channel, $deviceId)
+		($id, $url, $title, $channel, $deviceId, $createdAt)
 	`);
 
 	await statement.bind({
@@ -20,6 +21,7 @@ export async function insertYouTubeLike (url, title, channel, deviceId) {
 		$title: title,
 		$channel: channel,
 		$deviceId: deviceId,
+		$createdAt: createdAt,
 	});
 
 	return statement.run();
