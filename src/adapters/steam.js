@@ -2,13 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import phin from 'phin';
 import { updateActivity } from '../database/games.js';
+import Logger from '../lib/logger.js';
+
+const log = new Logger('Steam');
 
 let gameActivity = [];
 
 const storagePath = () => path.resolve(process.env.TOMBOIS_STEAM_DATA_FILE);
 
 const loadGamesFromDisk = () => {
+	log.info('Loading activity cache from disk');
 	if (fs.existsSync(storagePath()) === false) {
+		log.debug('Cache file does not exist, providing defaults');
 		gameActivity = [];
 		return;
 	}
@@ -19,6 +24,7 @@ const loadGamesFromDisk = () => {
 };
 
 const saveGamesToDisk = () => {
+	log.info('Saving activity cache to disk');
 	const str = JSON.stringify({ gameActivity }, null, 2);
 	fs.writeFileSync(storagePath(), str);
 };
@@ -35,6 +41,8 @@ export const pollForGameActivity = () => {
 	const deviceId = '2a57071e-6aea-4ac1-8fb1-bda70ebf76f1';
 
 	const fetchGames = async () => {
+		log.info('Polling steam for new game activity');
+
 		const { body } = await phin({
 			url: apiUrl,
 			parse: 'json',
@@ -62,6 +70,8 @@ export const pollForGameActivity = () => {
 
 			newActivity.push(activity);
 		});
+
+		log.debug(`Found ${newActivity.length} instances of new activity`);
 
 		// Update all new same-game activity
 		for (let i = newActivity.length - 1; i >= 0; i--) {
