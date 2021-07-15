@@ -3,6 +3,9 @@ import path from 'path';
 // eslint-disable-next-line no-unused-vars
 import { google, Auth } from 'googleapis';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
+import Logger from '../lib/logger.js';
+
+const log = new Logger('YouTube');
 
 let client = null;
 let accessToken = null;
@@ -34,6 +37,7 @@ const getClient = () => {
 };
 
 export const generateAuthUrl = () => {
+	log.info('Generating auth URL');
 	return getClient().generateAuthUrl({
 		access_type: 'offline',
 		scope: [
@@ -43,7 +47,9 @@ export const generateAuthUrl = () => {
 };
 
 const loadTokensFromDisk = () => {
+	log.info('Loading tokens and cache data from disk');
 	if (fs.existsSync(storagePath()) === false) {
+		log.debug('Token file does not exist, providing defaults');
 		accessToken = null;
 		refreshToken = null;
 		youtubeLikes = [];
@@ -56,6 +62,7 @@ const loadTokensFromDisk = () => {
 	refreshToken = contents.refreshToken;
 	youtubeLikes = contents.youtubeLikes || [];
 
+	log.debug('Setting client credentials');
 	getClient().setCredentials({
 		access_token: contents.accessToken,
 		refresh_token: contents.refreshToken,
@@ -64,11 +71,13 @@ const loadTokensFromDisk = () => {
 };
 
 const saveTokensToDisk = () => {
+	log.info('Saving tokens and cache data to disk');
 	const str = JSON.stringify({ accessToken, refreshToken, youtubeLikes }, null, 2);
 	fs.writeFileSync(storagePath(), str);
 };
 
 export const retrieveAccessToken = async (authCode) => {
+	log.info('Fetching access token based on auth code');
 	const { tokens } = await getClient().getToken(authCode);
 
 	accessToken = tokens.access_token;
@@ -83,8 +92,12 @@ export const pollForLikedVideos = () => {
 	loadTokensFromDisk();
 
 	const fetchVideos = async () => {
+		log.info('Polling YouTube for liked videos');
 		try {
-			if (accessToken === null) return;
+			if (accessToken === null) {
+				log.debug('No token provided, skipping.');
+				return;
+			}
 
 			const youtube = google.youtube('v3');
 			const { data } = await youtube.videos.list({
@@ -100,6 +113,8 @@ export const pollForLikedVideos = () => {
 			if (newVideos.length === 0) {
 				return;
 			}
+
+			log.debug(`Found ${newVideos.length} new videos`);
 
 			for (let i = newVideos.length - 1; i >= 0; i--) {
 				const video = newVideos[i];
