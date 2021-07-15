@@ -91,6 +91,9 @@ export const retrieveAccessToken = async (authCode) => {
 export const pollForLikedVideos = () => {
 	loadTokensFromDisk();
 
+	const intervalMins = Number(process.env.TOMBOIS_GOOGLE_POLL_INTERVAL) || 5;
+	const intervalMs = intervalMins * 60 * 1000;
+
 	const fetchVideos = async () => {
 		log.info('Polling YouTube for liked videos');
 		try {
@@ -142,5 +145,5 @@ export const pollForLikedVideos = () => {
 		}
 	};
 
-	setInterval(fetchVideos, 60 * 1000);
+	setInterval(fetchVideos, intervalMs);
 };
