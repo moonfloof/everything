@@ -1,31 +1,16 @@
 import express from 'express';
+import isLocal from '../lib/isLocal.js';
 import { generateAuthUrl, retrieveAccessToken } from '../adapters/youtube.js';
 import { validateDevice } from '../database/devices.js';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
 
 const router = express.Router();
 
-const allowedIps = [
-	'127.0.0.1',
-	'192.168.1.',
-];
-
-router.get('/auth', (req, res) => {
-	const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-	const matches = allowedIps.find(allow => ip.includes(allow));
-	if (matches === undefined) {
-		res.redirect('/');
-	}
+router.get('/auth', isLocal, (req, res) => {
 	res.redirect(generateAuthUrl());
 });
 
-router.get('/callback', async (req, res) => {
-	const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-	const matches = allowedIps.find(allow => ip.includes(allow));
-	if (matches === undefined) {
-		res.redirect('/');
-	}
-
+router.get('/callback', isLocal, async (req, res) => {
 	await retrieveAccessToken(req.query.code);
 	res.redirect('/');
 });
