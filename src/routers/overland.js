@@ -1,6 +1,9 @@
 import express from 'express';
 import { validateDevice } from '../database/devices.js';
 import { insertLocation } from '../database/locations.js';
+import Logger from '../lib/logger.js';
+
+const log = new Logger('Overland');
 
 const router = express.Router();
 
@@ -20,17 +23,31 @@ router.post('/', async (req, res) => {
 
 		const { locations } = req.body;
 
+		log.debug(`Received ${locations.length} locations to process`);
+
 		// Add locations to database
-		const promises = locations.map(async location => {
+		const promises = locations.reduce((acc, location) => {
+			if (location?.geometry?.coordinates === undefined) {
+				log.debug('Location not provided, skipping');
+				return acc;
+			}
+			if (location?.geometry?.coordinates.length !== 2) {
+				log.debug('Two coordinates not provided, skipping');
+				return acc;
+			}
+
 			const { timestamp } = location.properties;
 			const timestampDate = new Date(timestamp);
 			const timestampISO = timestampDate.toISOString();
 
 			const [ lon, lat ] = location?.geometry?.coordinates;
-			await insertLocation(lat, lon, null, timestampISO, deviceId);
-		});
+			acc.push({ lat, lon, timestampISO });
+			return acc;
+		}, []);
 
-		await Promise.all(promises);
+		await Promise.all(promises.map(loc => (
+			insertLocation(loc.lat, loc.lon, null, loc.timestampISO, deviceId)
+		)));
 
 		res.send({ result: 'ok' });
 	} catch (err) {
