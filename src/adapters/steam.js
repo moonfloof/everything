@@ -58,7 +58,7 @@ export const pollForGameActivity = () => {
 			.forEach(game => {
 				const activity = {
 					...game,
-					newPlaytime: 1,
+					newPlaytime: existing.playtime_2weeks,
 				};
 
 				const existing = gameActivity.find(cache => (
