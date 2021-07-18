@@ -70,3 +70,21 @@ export async function getListens (id, page) {
 			timeago: timeago.format(new Date(row.created_at)),
 		})));
 }
+
+export async function getPopular (days) {
+	const db = await getDatabase();
+
+	const statement = await db.prepare(`
+		SELECT artist, count(*) as count
+		FROM listens
+		WHERE created_at >= $createdAt
+		GROUP BY artist
+		ORDER BY count DESC, artist ASC;
+	`);
+
+	await statement.bind({
+		$createdAt: new Date(Date.now() - (days * 86400000)).toISOString(),
+	});
+
+	return statement.all();
+}

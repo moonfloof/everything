@@ -1,5 +1,5 @@
 import Router from 'express-promise-router';
-import { getListens } from '../database/listens.js';
+import { getListens, getPopular } from '../database/listens.js';
 import { getLikes } from '../database/youtubelikes.js';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 import { getGameActivity } from '../database/games.js';
@@ -28,7 +28,12 @@ router.get('/', async (_req, res) => {
 
 router.get('/listens', async (req, res) => {
 	const listens = await getListens(undefined, req.query.page);
-	res.render('listenlist', { listens, page: req.query.page });
+	const popular = await getPopular(7);
+	res.render('listenlist', {
+		listens,
+		popular,
+		page: req.query.page,
+	});
 });
 
 router.get('/listen/:id', async (req, res) => {

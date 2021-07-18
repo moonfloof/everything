@@ -39,7 +39,7 @@ h2, h3, h4, h5, h6 {
 	margin-top: 32px;
 }
 
-p, ul{
+p, ul, table {
 	margin-top: 16px;
 }
 
@@ -70,4 +70,12 @@ p {
 	min-width: 32px;
 	margin-right: 16px;
 	align-self: center;
+}
+
+table td {
+	padding: 4px 16px 4px 0;
+}
+
+.align-r {
+	text-align: right;
 }

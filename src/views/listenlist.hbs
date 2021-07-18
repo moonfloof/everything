@@ -1,4 +1,14 @@
+<h2>popular artists (7 days):</h2>
+<table>
+	{{#each popular as |artist| }}
+	<tr>
+		<td class="align-r"><strong>{{artist.artist}}:</strong></td>
+		<td><span>{{artist.count}}</span></td>
+	</tr>
+	{{/each}}
+</table>
+
 <h2>listening to:</h2>
-{{#each listens as |listen|}}
+{{#each listens as |listen| }}
   {{> listen data=listen showlink=true }}
 {{/each}}
