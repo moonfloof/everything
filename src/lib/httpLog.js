@@ -4,17 +4,14 @@ import Logger from './logger.js';
 const log = new Logger('http');
 
 function reqIpAddress (req) {
-	return req.headers['x-forwarded-for'] ||
+	const ip = req.headers['x-forwarded-for'] ||
 		req.ip ||
 		req._remoteAddress ||
-		(req.connection && req.connection.remoteAddress) ||
-		undefined;
-}
+		req.connection?.remoteAddress ||
+		'';
 
-function reqHttpVersion (req) {
-	return `${req.httpVersionMajor}.${req.httpVersionMinor}`;
+	return ip.split(',')[0];
 }
-
 
 function resContentLength (res) {
 	return res.getHeader('content-length');
@@ -24,7 +21,6 @@ function getString (req, res) {
 	let str = '';
 
 	const ip = reqIpAddress(req);
-	const ver = reqHttpVersion(req);
 	const size = (Number(resContentLength(res)) || 0) / 1000;
 	const duration = Date.now() - req.startTimestamp;
 
@@ -32,7 +28,7 @@ function getString (req, res) {
 	str += ip;
 
 	// Request Information
-	str += ` - "${req.method} ${req.originalUrl} HTTP/${ver}"`;
+	str += ` - "${req.method} ${req.originalUrl}"`;
 
 	// Response Information
 	str += ` - ${res.statusCode || 'XXX'} ${duration}ms ${size}kB`;
