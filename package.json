@@ -23,6 +23,7 @@
 		"javascript-time-ago": "^2.3.8",
 		"node-geocoder": "^3.27.0",
 		"nodemon": "^2.0.12",
+		"on-finished": "^2.3.0",
 		"phin": "^3.6.0",
 		"sqlite": "^4.0.23",
 		"sqlite3": "^5.0.2",
@@ -32,6 +33,8 @@
 		"eslint": "^7.30.0"
 	},
 	"nodemonConfig": {
-		"ignore": [ "*.json" ]
+		"ignore": [
+			"*.json"
+		]
 	}
 }

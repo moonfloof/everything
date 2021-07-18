@@ -3,7 +3,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import exphbs from 'express-handlebars';
-import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
+import rawBody from '@tombofry/stdlib/src/express/rawBody.js';
+import logEntry from './lib/httpLog.js';
+import Logger from './lib/logger.js';
 import { getDatabase } from './database/getDatabase.js';
 
 // Adapters
@@ -16,6 +18,8 @@ import listenbrainz from './routers/listenbrainz.js';
 import youtube from './routers/youtube.js';
 import frontend from './routers/frontend.js';
 
+const log = new Logger('http');
+
 // Load .env file
 dotenv.config();
 
@@ -24,10 +28,7 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 app.use(rawBody);
-app.use(async (req, res, next) => {
-	logEntry(req, res).then(console.log);
-	next();
-});
+app.use(logEntry);
 
 // Set up routers
 app.use('/api/overland', overland);
@@ -49,7 +50,7 @@ pollForGameActivity();
 // Start server
 const port = process.env.TOMBOIS_SERVER_PORT;
 app.listen(port, () => {
-	console.log(`App running on port ${port}`);
+	log.info(`App running on port ${port}`);
 });
 
 process.on('beforeExit', async () => {
