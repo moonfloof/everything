@@ -1,6 +1,9 @@
 import express from 'express';
 import { validateDevice } from '../database/devices.js';
 import { insertScrobble } from '../database/listens.js';
+import Logger from '../lib/logger.js';
+
+const log = new Logger('ListenBrainz');
 
 const router = express.Router();
 
@@ -34,6 +37,7 @@ router.post('/1/submit-listens', async (req, res) => {
 		}
 		const { id: deviceId } = await validateDevice(authToken.substr(6));
 
+		// If the JSON Content-Type wasn't specified, parse the manually
 		if (Object.keys(req.body).length === 0) {
 			req.body = JSON.parse(req.rawBody);
 		}
@@ -63,6 +67,8 @@ router.post('/1/submit-listens', async (req, res) => {
 			const genre = Array.isArray(genres) && genres.length > 0
 				? genres[0]
 				: null;
+
+			log.debug(`Saving "${title}" by ${artist}`);
 
 			await insertScrobble(
 				artist,
