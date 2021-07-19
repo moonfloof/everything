@@ -1,46 +1,38 @@
 import { v4 as uuid } from 'uuid';
-import { getDatabase } from './getDatabase.js';
+import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 
-export async function insertNewGameActivity (name, deviceId, playtime = 0) {
-	const db = await getDatabase();
-
+export function insertNewGameActivity (name, deviceId, playtime = 0) {
 	const id = uuid();
 	const createdAt = new Date(Date.now() - (playtime * 1000)).toISOString();
 	const updatedAt = new Date().toISOString();
 
-	const statement = await db.prepare(`
-		INSERT INTO games
+	const statement = getStatement(
+		'insertGameActivity',
+		`INSERT INTO games
 		(id, name, playtime_mins, created_at, updated_at, device_id)
 		VALUES
-		($id, $name, $playtime, $createdAt, $updatedAt, $deviceId)
-	`);
+		($id, $name, $playtime, $createdAt, $updatedAt, $deviceId)`,
+	);
 
-	await statement.bind({
-		$id: id,
-		$name: name,
-		$playtime: playtime,
-		$createdAt: createdAt,
-		$updatedAt: updatedAt,
-		$deviceId: deviceId,
+	return statement.run({
+		id,
+		name,
+		playtime,
+		createdAt,
+		updatedAt,
+		deviceId,
 	});
-
-	return statement.run();
 }
 
-export async function updateActivity (name, playtime, deviceId, intervalDuration) {
-	const db = await getDatabase();
+export function updateActivity (name, playtime, deviceId, intervalDuration) {
+	const selectStatement = getStatement(
+		'getGameActivityByName',
+		`SELECT * FROM games WHERE name = $name
+		ORDER BY created_at DESC LIMIT 1;`,
+	);
 
-	const selectStatement = await db.prepare(`
-		SELECT * FROM games WHERE name = $name
-		ORDER BY created_at DESC LIMIT 1;
-	`);
-
-	await selectStatement.bind({
-		$name: name,
-	});
-
-	const row = await selectStatement.get();
+	const row = selectStatement.get({ name });
 
 	if (row === undefined) {
 		insertNewGameActivity(name, deviceId, playtime);
@@ -51,24 +43,23 @@ export async function updateActivity (name, playtime, deviceId, intervalDuration
 	const lastCheck = Date.now() - intervalDuration - (playtime * 1000) - 60000;
 
 	if (lastUpdated < lastCheck) {
-		await insertNewGameActivity(name, deviceId, playtime);
+		insertNewGameActivity(name, deviceId, playtime);
 		return;
 	}
 
-	const updateStatement = await db.prepare(`
-		UPDATE games
+	const updateStatement = getStatement(
+		'updateGameActivity',
+		`UPDATE games
 		SET playtime_mins = $playtime,
 		    updated_at = $updatedAt
-		WHERE id = $id
-	`);
+		WHERE id = $id`,
+	);
 
-	await updateStatement.bind({
-		$id: row.id,
-		$playtime: row.playtime_mins + playtime,
-		$updatedAt: new Date().toISOString(),
+	updateStatement.run({
+		id: row.id,
+		playtime: row.playtime_mins + playtime,
+		updatedAt: new Date().toISOString(),
 	});
-
-	await updateStatement.run();
 }
 
 /**
@@ -78,25 +69,22 @@ export async function updateActivity (name, playtime, deviceId, intervalDuration
  * @param {string} [id]
  * @param {number} [page]
  */
-export async function getGameActivity (id, page) {
-	const db = await getDatabase();
-
-	const statement = await db.prepare(`
-		SELECT * FROM games
+export function getGameActivity (id, page) {
+	const statement = getStatement(
+		'getGameActivity',
+		`SELECT * FROM games
 		WHERE id LIKE $id
 		ORDER BY updated_at DESC
-		LIMIT 50 OFFSET $offset
-	`);
-
-	await statement.bind({
-		$id: id || '%',
-		$offset: page ? (page - 1) * 50 : 0,
-	});
+		LIMIT 50 OFFSET $offset`,
+	);
 
 	return statement
-		.all()
-		.then(rows => rows.map(row => ({
+		.all({
+			id: id || '%',
+			offset: page ? (page - 1) * 50 : 0,
+		})
+		.map(row => ({
 			...row,
 			timeago: timeago.format(new Date(row.updated_at)),
-		})));
+		}));
 }

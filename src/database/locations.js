@@ -1,26 +1,23 @@
 import { v4 as uuid } from 'uuid';
-import { getDatabase } from './getDatabase.js';
+import { getStatement } from './database.js';
 
-export async function insertLocation (lat, long, city, timestamp, deviceId) {
-	const db = await getDatabase();
-
+export function insertLocation (lat, long, city, createdAt, deviceId) {
 	const id = uuid();
 
-	const statement = await db.prepare(`
-		INSERT INTO location
+	const statement = getStatement(
+		'insertLocation',
+		`INSERT INTO location
 		(id, lat, long, city, created_at, device_id)
 		VALUES
-		($id, $lat, $long, $city, $createdAt, $deviceId)
-	`);
+		($id, $lat, $long, $city, $createdAt, $deviceId)`,
+	);
 
-	await statement.bind({
-		$id: id,
-		$lat: lat,
-		$long: long,
-		$city: city,
-		$createdAt: timestamp,
-		$deviceId: deviceId,
+	return statement.run({
+		id,
+		lat,
+		long,
+		city,
+		createdAt,
+		deviceId,
 	});
-
-	return statement.run();
 }

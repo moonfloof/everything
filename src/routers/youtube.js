@@ -6,7 +6,7 @@ import { insertYouTubeLike } from '../database/youtubelikes.js';
 
 const router = express.Router();
 
-router.get('/auth', isLocal, (req, res) => {
+router.get('/auth', isLocal, (_req, res) => {
 	res.redirect(generateAuthUrl());
 });
 
@@ -15,12 +15,12 @@ router.get('/callback', isLocal, async (req, res) => {
 	res.redirect('/');
 });
 
-router.post('/like', async (req, res) => {
+router.post('/like', (req, res) => {
 	try {
 		const { url, title, apiKey } = req.body;
-		const { id: deviceId } = await validateDevice(apiKey);
+		const { id: deviceId } = validateDevice(apiKey);
 
-		await insertYouTubeLike(url, title, 'N/A', deviceId);
+		insertYouTubeLike(url, title, 'N/A', deviceId);
 
 		res.send({ status: 'ok' });
 	} catch (err) {

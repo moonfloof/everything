@@ -1,30 +1,27 @@
 import { v4 as uuid } from 'uuid';
-import { getDatabase } from './getDatabase.js';
+import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 
-export async function insertYouTubeLike (url, title, channel, deviceId) {
-	const db = await getDatabase();
-
+export function insertYouTubeLike (url, title, channel, deviceId) {
 	const id = uuid();
 	const createdAt = new Date().toISOString();
 
-	const statement = await db.prepare(`
-		INSERT INTO youtubelikes
+	const statement = getStatement(
+		'insertYouTubeLike',
+		`INSERT INTO youtubelikes
 		(id, url, title, channel, device_id, created_at)
 		VALUES
-		($id, $url, $title, $channel, $deviceId, $createdAt)
-	`);
+		($id, $url, $title, $channel, $deviceId, $createdAt)`,
+	);
 
-	await statement.bind({
-		$id: id,
-		$url: url,
-		$title: title,
-		$channel: channel,
-		$deviceId: deviceId,
-		$createdAt: createdAt,
+	return statement.run({
+		id,
+		url,
+		title,
+		channel,
+		deviceId,
+		createdAt,
 	});
-
-	return statement.run();
 }
 
 /**
@@ -34,25 +31,22 @@ export async function insertYouTubeLike (url, title, channel, deviceId) {
  * @param {string} [id]
  * @param {number} [page]
  */
-export async function getLikes (id, page) {
-	const db = await getDatabase();
-
-	const statement = await db.prepare(`
-		SELECT * FROM youtubelikes
+export function getLikes (id, page) {
+	const statement = getStatement(
+		'getYouTubeLikes',
+		`SELECT * FROM youtubelikes
 		WHERE id LIKE $id
 		ORDER BY created_at DESC
-		LIMIT 50 OFFSET $offset
-	`);
-
-	await statement.bind({
-		$id: id || '%',
-		$offset: page ? (page - 1) * 50 : 0,
-	});
+		LIMIT 50 OFFSET $offset`,
+	);
 
 	return statement
-		.all()
-		.then(rows => rows.map(row => ({
+		.all({
+			id: id || '%',
+			offset: page ? (page - 1) * 50 : 0,
+		})
+		.map(row => ({
 			...row,
 			timeago: timeago.format(new Date(row.created_at)),
-		})));
+		}));
 }

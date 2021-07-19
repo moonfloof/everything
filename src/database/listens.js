@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { getDatabase } from './getDatabase.js';
+import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 
 /**
@@ -10,35 +10,32 @@ import timeago from '../adapters/timeago.js';
  * @param {number} [tracknumber]
  * @param {number} [year]
  * @param {string} [genre]
- * @param {Date}   timestamp
+ * @param {Date}   createdAt
  * @param {string} deviceId
  * @return {Promise<any>}
  */
-export async function insertScrobble (artist, album, title, tracknumber, year, genre, timestamp, deviceId) {
-	const db = await getDatabase();
-
+export function insertScrobble (artist, album, title, tracknumber, year, genre, createdAt, deviceId) {
 	const id = uuid();
 
-	const statement = await db.prepare(`
-		INSERT INTO listens
+	const statement = getStatement(
+		'insertListen',
+		`INSERT INTO listens
 		(id, artist, album, title, tracknumber, release_year, genre, created_at, device_id)
 		VALUES
-		($id, $artist, $album, $title, $tracknumber, $year, $genre, $createdAt, $deviceId)
-	`);
+		($id, $artist, $album, $title, $tracknumber, $year, $genre, $createdAt, $deviceId)`,
+	);
 
-	await statement.bind({
-		$id: id,
-		$artist: artist,
-		$album: album,
-		$title: title,
-		$tracknumber: tracknumber,
-		$year: year,
-		$genre: genre,
-		$createdAt: timestamp,
-		$deviceId: deviceId,
+	return statement.run({
+		id,
+		artist,
+		album,
+		title,
+		tracknumber,
+		year,
+		genre,
+		createdAt,
+		deviceId,
 	});
-
-	return statement.run();
 }
 
 /**
@@ -48,43 +45,41 @@ export async function insertScrobble (artist, album, title, tracknumber, year, g
  * @param {string} [id]
  * @param {number} [page]
  */
-export async function getListens (id, page) {
-	const db = await getDatabase();
-
-	const statement = await db.prepare(`
+export function getListens (id, page) {
+	const statement = getStatement('getListens', `
 		SELECT * FROM listens
 		WHERE id LIKE $id
 		ORDER BY created_at DESC
 		LIMIT 50 OFFSET $offset
 	`);
 
-	await statement.bind({
-		$id: id || '%',
-		$offset: page ? (page - 1) * 50 : 0,
-	});
-
 	return statement
-		.all()
-		.then(rows => rows.map(row => ({
+		.all({
+			id: id || '%',
+			offset: page ? (page - 1) * 50 : 0,
+		})
+		.map(row => ({
 			...row,
 			timeago: timeago.format(new Date(row.created_at)),
-		})));
+		}));
 }
 
-export async function getPopular (days) {
-	const db = await getDatabase();
-
-	const statement = await db.prepare(`
-		SELECT artist, count(*) as count
+export function getPopular (days) {
+	const statement = getStatement(
+		'getPopularListens',
+		`SELECT artist, count(*) as count
 		FROM listens
 		WHERE created_at >= $createdAt
 		GROUP BY artist
-		ORDER BY count DESC, artist ASC;
-	`);
+		ORDER BY count DESC, artist ASC;`,
+	);
 
-	await statement.bind({
-		$createdAt: new Date(Date.now() - (days * 86400000)).toISOString(),
-	});
+	const createdAt = new Date(Date.now() - (days * 86400000)).toISOString();
 
-	return statement.all();
+	return statement.all({ createdAt });
+}
+
+export function deleteListen (id) {
+	const statement = getStatement('deleteListen', 'DELETE FROM listens WHERE id = $id');
+	return statement.run({ id });
 }

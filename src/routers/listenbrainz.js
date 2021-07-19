@@ -7,11 +7,11 @@ const log = new Logger('ListenBrainz');
 
 const router = express.Router();
 
-router.get('/1/validate-token', async (req, res) => {
+router.get('/1/validate-token', (req, res) => {
 	try {
 		const { token } = req.query;
 
-		const { description } = await validateDevice(token);
+		const { description } = validateDevice(token);
 
 		res.send({
 			code: 200,
@@ -28,14 +28,14 @@ router.get('/1/validate-token', async (req, res) => {
 	}
 });
 
-router.post('/1/submit-listens', async (req, res) => {
+router.post('/1/submit-listens', (req, res) => {
 	try {
 		// Validate Device API Key
 		const authToken = req.header('Authorization')?.toLowerCase();
 		if (authToken.startsWith('token ') === false) {
 			throw new Error('Provided token is invalid');
 		}
-		const { id: deviceId } = await validateDevice(authToken.substr(6));
+		const { id: deviceId } = validateDevice(authToken.substr(6));
 
 		// If the JSON Content-Type wasn't specified, parse the manually
 		if (Object.keys(req.body).length === 0) {
@@ -48,7 +48,7 @@ router.post('/1/submit-listens', async (req, res) => {
 			return;
 		}
 
-		const promises = req.body.payload.map(async scrobble => {
+		req.body.payload.forEach(scrobble => {
 			// Get payload data
 			const timestamp = new Date(scrobble.listened_at * 1000).toISOString();
 			const {
@@ -70,7 +70,7 @@ router.post('/1/submit-listens', async (req, res) => {
 
 			log.debug(`Saving "${title}" by ${artist}`);
 
-			await insertScrobble(
+			insertScrobble(
 				artist,
 				album,
 				title,
@@ -81,8 +81,6 @@ router.post('/1/submit-listens', async (req, res) => {
 				deviceId,
 			);
 		});
-
-		await Promise.all(promises);
 
 		res.send({ status: 'ok' });
 	} catch (err) {

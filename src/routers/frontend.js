@@ -1,19 +1,17 @@
-import Router from 'express-promise-router';
+import express from 'express';
 import { getListens, getPopular } from '../database/listens.js';
 import { getLikes } from '../database/youtubelikes.js';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 import { getGameActivity } from '../database/games.js';
 
-const router = Router();
+const router = express.Router();
 
 // DASHBOARD
 
-router.get('/', async (_req, res) => {
-	const [ listens, youtubelikes, gameActivity ] = await Promise.all([
-		getListens(),
-		getLikes(),
-		getGameActivity(),
-	]);
+router.get('/', (_req, res) => {
+	const listens = getListens();
+	const youtubelikes = getLikes();
+	const gameActivity = getGameActivity();
 
 	const latest = {
 		listen: listens[0] || null,
@@ -26,9 +24,10 @@ router.get('/', async (_req, res) => {
 
 // LISTENS
 
-router.get('/listens', async (req, res) => {
-	const listens = await getListens(undefined, req.query.page);
-	const popular = await getPopular(7);
+router.get('/listens', (req, res) => {
+	const listens = getListens(undefined, req.query.page);
+	const popular = getPopular(7);
+
 	res.render('listenlist', {
 		listens,
 		popular,
@@ -36,8 +35,8 @@ router.get('/listens', async (req, res) => {
 	});
 });
 
-router.get('/listen/:id', async (req, res) => {
-	const listens = await getListens(req.params.id);
+router.get('/listen/:id', (req, res) => {
+	const listens = getListens(req.params.id);
 
 	if (listens.length === 0) {
 		throw new NotFoundError('Listen not found');
@@ -48,13 +47,13 @@ router.get('/listen/:id', async (req, res) => {
 
 // YOUTUBE LIKES
 
-router.get('/youtubelikes', async (req, res) => {
-	const youtubeLikes = await getLikes(undefined, req.query.page);
+router.get('/youtubelikes', (req, res) => {
+	const youtubeLikes = getLikes(undefined, req.query.page);
 	res.render('youtubelikelist', { youtubeLikes, page: req.query.page });
 });
 
-router.get('/youtubelike/:id', async (req, res) => {
-	const youtubeLikes = await getLikes(req.params.id);
+router.get('/youtubelike/:id', (req, res) => {
+	const youtubeLikes = getLikes(req.params.id);
 
 	if (youtubeLikes.length === 0) {
 		throw new NotFoundError('Like not found');
@@ -65,13 +64,13 @@ router.get('/youtubelike/:id', async (req, res) => {
 
 // STEAM ACTIVITY
 
-router.get('/games', async (req, res) => {
-	const gameActivity = await getGameActivity(undefined, req.query.page);
+router.get('/games', (req, res) => {
+	const gameActivity = getGameActivity(undefined, req.query.page);
 	res.render('gamelist', { gameActivity, page: req.query.page });
 });
 
-router.get('/game/:id', async (req, res) => {
-	const gameActivity = await getGameActivity(req.params.id);
+router.get('/game/:id', (req, res) => {
+	const gameActivity = getGameActivity(req.params.id);
 
 	if (gameActivity.length === 0) {
 		throw new NotFoundError('Like not found');

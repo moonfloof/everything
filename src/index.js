@@ -6,7 +6,7 @@ import exphbs from 'express-handlebars';
 import rawBody from '@tombofry/stdlib/src/express/rawBody.js';
 import logEntry from './lib/httpLog.js';
 import Logger from './lib/logger.js';
-import { getDatabase } from './database/getDatabase.js';
+import { getDatabase } from './database/database.js';
 
 // Adapters
 import { pollForLikedVideos } from './adapters/youtube.js';
@@ -53,7 +53,8 @@ app.listen(port, () => {
 	log.info(`App running on port ${port}`);
 });
 
-process.on('beforeExit', async () => {
-	const db = await getDatabase();
-	db.close();
+process.on('exit', async () => {
+	log.info('Exiting - closing database');
+
+	getDatabase().close();
 });

@@ -7,11 +7,11 @@ const log = new Logger('Overland');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
 	try {
 		// Validate Device ID / API Key
 		const { apiKey } = req.query;
-		const { id: deviceId } = await validateDevice(apiKey);
+		const { id: deviceId } = validateDevice(apiKey);
 
 		if (!Array.isArray(req.body.locations)) {
 			throw new Error('Please send an array of locations');
@@ -26,14 +26,15 @@ router.post('/', async (req, res) => {
 		log.debug(`Received ${locations.length} locations to process`);
 
 		// Add locations to database
-		const promises = locations.reduce((acc, location) => {
+		locations.forEach(location => {
 			if (location?.geometry?.coordinates === undefined) {
 				log.debug('Location not provided, skipping');
-				return acc;
+				return;
 			}
+
 			if (location?.geometry?.coordinates.length !== 2) {
 				log.debug('Two coordinates not provided, skipping');
-				return acc;
+				return;
 			}
 
 			const { timestamp } = location.properties;
@@ -41,13 +42,8 @@ router.post('/', async (req, res) => {
 			const timestampISO = timestampDate.toISOString();
 
 			const [ lon, lat ] = location?.geometry?.coordinates;
-			acc.push({ lat, lon, timestampISO });
-			return acc;
-		}, []);
-
-		await Promise.all(promises.map(loc => (
-			insertLocation(loc.lat, loc.lon, null, loc.timestampISO, deviceId)
-		)));
+			insertLocation(lat, lon, null, timestampISO, deviceId);
+		});
 
 		res.send({ result: 'ok' });
 	} catch (err) {
