@@ -3,8 +3,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import exphbs from 'express-handlebars';
-import rawBody from '@tombofry/stdlib/src/express/rawBody.js';
-import logEntry from './lib/httpLog.js';
+import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
 import Logger from './lib/logger.js';
 import { getDatabase } from './database/database.js';
 
@@ -28,7 +27,7 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 app.use(rawBody);
-app.use(logEntry);
+app.use(logEntry(console.info));
 
 // Set up routers
 app.use('/api/overland', overland);
