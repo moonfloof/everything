@@ -40,7 +40,7 @@ export function updateActivity (name, playtime, deviceId, intervalDuration) {
 	}
 
 	const lastUpdated = new Date(row.updated_at).getTime();
-	const lastCheck = Date.now() - intervalDuration - (playtime * 1000) - 60000;
+	const lastCheck = Date.now() - intervalDuration - (playtime * 60000) - 60000;
 
 	if (lastUpdated < lastCheck) {
 		insertNewGameActivity(name, deviceId, playtime);
