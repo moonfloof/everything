@@ -3,6 +3,9 @@ import { getListens, getPopular } from '../database/listens.js';
 import { getLikes } from '../database/youtubelikes.js';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 import { getGameActivity } from '../database/games.js';
+import Logger from '../lib/logger.js';
+
+const log = new Logger('frontend');
 
 const router = express.Router();
 
@@ -82,8 +85,12 @@ router.get('/game/:id', (req, res) => {
 router.get('*', () => { throw new NotFoundError('Page Not Found'); });
 
 // eslint-disable-next-line no-unused-vars
-router.use((err, _req, res, _next) => {
-	console.error(err);
+router.use((err, req, res, _next) => {
+	log.error(err.message, err.code, req.originalUrl);
+	if (err.code !== 404) {
+		log.error(err.stack);
+	}
+
 	res
 		.status(err.code || 500)
 		.render('error', { error: err.message });
