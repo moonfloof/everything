@@ -1,6 +1,6 @@
 import express from 'express';
 import isLocal from '../lib/isLocal.js';
-import { generateAuthUrl, retrieveAccessToken } from '../adapters/youtube.js';
+import { generateAuthUrl, getYouTubeVideoSnippet, retrieveAccessToken } from '../adapters/youtube.js';
 import { validateDevice } from '../database/devices.js';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
 
@@ -15,12 +15,19 @@ router.get('/callback', isLocal, async (req, res) => {
 	res.redirect('/');
 });
 
-router.post('/like', (req, res) => {
+router.post('/like', async (req, res) => {
 	try {
 		const { url, title, apiKey } = req.body;
 		const { id: deviceId } = validateDevice(apiKey);
 
-		insertYouTubeLike(url, title, 'N/A', deviceId);
+		const details = await getYouTubeVideoSnippet(url);
+
+		insertYouTubeLike(
+			url,
+			title,
+			details?.snippet?.channelTitle || 'N/A',
+			deviceId,
+		);
 
 		res.send({ status: 'ok' });
 	} catch (err) {

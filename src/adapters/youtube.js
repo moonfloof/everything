@@ -149,3 +149,32 @@ export const pollForLikedVideos = () => {
 
 	setInterval(fetchVideos, intervalMs);
 };
+
+export const getYouTubeVideoSnippet = async (url) => {
+	const auth = process.env.TOMBOIS_GOOGLE_APIKEY;
+
+	if (auth === undefined || auth.length === 0) {
+		return {};
+	}
+
+	const videoId = new URL(url).searchParams.get('v');
+	if (videoId === null || typeof videoId !== 'string') {
+		throw new Error('Not a valid YouTube URL');
+	}
+
+	const youtube = google.youtube({
+		version: 'v3',
+		auth,
+	});
+
+	const response = await youtube.videos.list({
+		part: [ 'snippet' ],
+		id: [ videoId ],
+	});
+
+	if (response?.data?.items?.length !== 1) {
+		throw new Error(`No results returned for video ID: ${videoId}`);
+	}
+
+	return response.data.items[0];
+};
