@@ -25,8 +25,14 @@ dotenv.config();
 // Set up API
 const app = express();
 app.use(helmet());
-app.use(express.json());
 app.use(rawBody);
+app.use((req, res, next) => {
+	try {
+		req.body = JSON.parse(req.rawBody);
+	} catch (err) { /* Do nothing */ }
+
+	next();
+});
 app.use(logEntry(console.info));
 
 // Set up routers

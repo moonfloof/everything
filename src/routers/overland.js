@@ -47,8 +47,7 @@ router.post('/', (req, res) => {
 
 		res.send({ result: 'ok' });
 	} catch (err) {
-		// eslint-disable-next-line no-console
-		console.log(err);
+		log.error(err);
 		res.send({ result: 'err', message: err.message });
 	}
 });

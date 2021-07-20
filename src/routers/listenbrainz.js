@@ -37,11 +37,6 @@ router.post('/1/submit-listens', (req, res) => {
 		}
 		const { id: deviceId } = validateDevice(authToken.substr(6));
 
-		// If the JSON Content-Type wasn't specified, parse body manually
-		if (Object.keys(req.body).length === 0) {
-			req.body = JSON.parse(req.rawBody);
-		}
-
 		// Ignore "now playing" requests
 		if (req.body.listen_type === 'playing_now') {
 			res.send({ status: 'ok' });
