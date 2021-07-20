@@ -15,6 +15,7 @@ import { pollForGameActivity } from './adapters/steam.js';
 import overland from './routers/overland.js';
 import listenbrainz from './routers/listenbrainz.js';
 import youtube from './routers/youtube.js';
+import sleep from './routers/sleep.js';
 import frontend from './routers/frontend.js';
 
 const log = new Logger('http');
@@ -39,6 +40,7 @@ app.use(logEntry(console.info));
 app.use('/api/overland', overland);
 app.use('/api/listenbrainz', listenbrainz);
 app.use('/api/youtube', youtube);
+app.use('/api/sleep', sleep);
 
 // Set up frontend
 app.engine('.hbs', exphbs({ extname: '.hbs' }));
