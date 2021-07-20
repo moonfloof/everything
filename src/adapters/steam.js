@@ -39,10 +39,11 @@ export const pollForGameActivity = () => {
 	const intervalMins = Number(process.env.TOMBOIS_STEAM_POLL_INTERVAL) || 5;
 	const intervalMs = intervalMins * 60 * 1000;
 
-	const apiUrl = `https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${process.env.TOMBOIS_STEAM_APIKEY}&steamid=${process.env.TOMBOIS_STEAM_USERID}&format=json`;
+	if (intervalMs === 0) return;
 
 	// FIXME: Remove hard coded device ID
 	const deviceId = '2a57071e-6aea-4ac1-8fb1-bda70ebf76f1';
+	const apiUrl = `https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${process.env.TOMBOIS_STEAM_APIKEY}&steamid=${process.env.TOMBOIS_STEAM_USERID}&format=json`;
 
 	const fetchGames = async () => {
 		log.info('Polling steam for new game activity');

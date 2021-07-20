@@ -94,6 +94,8 @@ export const pollForLikedVideos = () => {
 	const intervalMins = Number(process.env.TOMBOIS_GOOGLE_POLL_INTERVAL) || 5;
 	const intervalMs = intervalMins * 60 * 1000;
 
+	if (intervalMs === 0) return;
+
 	const fetchVideos = async () => {
 		log.info('Polling YouTube for liked videos');
 		try {
