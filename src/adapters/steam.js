@@ -34,7 +34,7 @@ const saveGamesToDisk = () => {
 };
 
 export const pollForGameActivity = () => {
-	const intervalMins = Number(process.env.TOMBOIS_STEAM_POLL_INTERVAL) || 5;
+	const intervalMins = Number(process.env.TOMBOIS_STEAM_POLL_INTERVAL) ?? 5;
 	const intervalMs = intervalMins * 60 * 1000;
 
 	if (intervalMs === 0) return;
