@@ -34,12 +34,12 @@ const saveGamesToDisk = () => {
 };
 
 export const pollForGameActivity = () => {
-	loadGamesFromDisk();
-
 	const intervalMins = Number(process.env.TOMBOIS_STEAM_POLL_INTERVAL) || 5;
 	const intervalMs = intervalMins * 60 * 1000;
 
 	if (intervalMs === 0) return;
+
+	loadGamesFromDisk();
 
 	// FIXME: Remove hard coded device ID
 	const deviceId = '2a57071e-6aea-4ac1-8fb1-bda70ebf76f1';
