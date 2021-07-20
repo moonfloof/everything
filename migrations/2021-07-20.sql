@@ -5,6 +5,6 @@ CREATE TABLE "sleep" (
 	"ended_at"	TEXT,
 	"device_id"	TEXT NOT NULL,
 	PRIMARY KEY("id"),
-	FOREIGN KEY("deviceId") REFERENCES "devices"("id")
+	FOREIGN KEY("device_id") REFERENCES "devices"("id")
 );
 COMMIT;
