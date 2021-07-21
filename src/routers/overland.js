@@ -48,7 +48,7 @@ router.post('/', (req, res) => {
 		res.send({ result: 'ok' });
 	} catch (err) {
 		log.error(err);
-		res.send({ result: 'err', message: err.message });
+		res.status(400).send({ result: 'err', message: err.message });
 	}
 });
 

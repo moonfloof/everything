@@ -3,6 +3,9 @@ import isLocal from '../lib/isLocal.js';
 import { generateAuthUrl, getYouTubeVideoSnippet, retrieveAccessToken } from '../adapters/youtube.js';
 import { validateDevice } from '../database/devices.js';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
+import Logger from '../lib/logger.js';
+
+const log = new Logger('YouTube');
 
 const router = express.Router();
 
@@ -31,7 +34,7 @@ router.post('/like', async (req, res) => {
 
 		res.send({ status: 'ok' });
 	} catch (err) {
-		console.error(err);
+		log.error(err);
 		res.status(400).send({ status: err.message });
 	}
 });
