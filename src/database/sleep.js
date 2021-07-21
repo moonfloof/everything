@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
-import timeago from '../adapters/timeago.js';
+import TimeAgo from '../adapters/timeago.js';
+import { prettyDate } from '../lib/formatDate.js';
 
 function insertNewRecord (timestamp, deviceId) {
 	const statement = getStatement(
@@ -71,8 +72,33 @@ export function getSleepCycles (id, page) {
 			id: id || '%',
 			offset: page ? (page - 1) * 50 : 0,
 		})
-		.map(row => ({
-			...row,
-			timeago: timeago.format(new Date(row.created_at)),
-		}));
+		.map(row => {
+			const startedAt = new Date(row.started_at);
+			const endedAt = row.ended_at ? new Date(row.ended_at) : null;
+			const timeago = TimeAgo.format(startedAt);
+
+			let duration = 'Currently sleeping';
+
+			if (endedAt !== null) {
+				// Difference between start and end, in milliseconds
+				const diff = endedAt.getTime() - startedAt.getTime();
+
+				// 60 mins * 60 secs * 1000 ms
+				const hoursTotal = diff / 3600000;
+
+				// Calculate minutes based on decimal from hours
+				const hoursRounded = Math.floor(hoursTotal);
+				const minutes = Math.round((hoursTotal - hoursRounded) * 60);
+
+				// Convert into string
+				duration = `${hoursRounded} hours, ${minutes} minutes`;
+			}
+
+			return {
+				...row,
+				timeago,
+				duration,
+				created_at: prettyDate(startedAt),
+			};
+		});
 }
