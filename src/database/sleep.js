@@ -51,16 +51,16 @@ export function insertSleepCycle (timestamp, type, deviceId) {
 }
 
 /**
- * Fetch all YouTube likes, or based on a specific ID
+ * Fetch all sleep cycles, or one, based on a specific ID
  *
  * @export
  * @param {string} [id]
  * @param {number} [page]
  */
-export function getLikes (id, page) {
+export function getSleepCycles (id, page) {
 	const statement = getStatement(
-		'getYouTubeLikes',
-		`SELECT * FROM youtubelikes
+		'getSleepCycles',
+		`SELECT * FROM sleep
 		WHERE id LIKE $id
 		ORDER BY created_at DESC
 		LIMIT 50 OFFSET $offset`,
