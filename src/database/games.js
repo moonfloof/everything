@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
+import { prettyDuration } from '../lib/formatDate.js';
 
 export function insertNewGameActivity (name, deviceId, playtime = 0) {
 	const id = uuid();
@@ -85,6 +86,7 @@ export function getGameActivity (id, page) {
 		})
 		.map(row => ({
 			...row,
+			duration: prettyDuration(row.playtime_mins * 60000),
 			timeago: timeago.format(new Date(row.updated_at)),
 		}));
 }

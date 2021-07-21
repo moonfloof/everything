@@ -51,3 +51,23 @@ export function prettyDate (date) {
 
 	return `${day}${th} ${month}, ${year}`;
 }
+
+/**
+ * @param {number} durationMs
+ * @returns {string}
+ */
+export function prettyDuration (durationMs) {
+	// 60 mins * 60 secs * 1000 ms
+	const hoursTotal = durationMs / 3600000;
+
+	// Calculate minutes based on decimal from hours
+	const hoursRounded = Math.floor(hoursTotal);
+	const minutes = Math.round((hoursTotal - hoursRounded) * 60);
+
+	// Convert into string
+	const duration = hoursRounded > 0
+		? `${hoursRounded} hours, ${minutes} minutes`
+		: `${minutes} minutes`;
+
+	return duration;
+}
