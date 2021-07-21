@@ -129,9 +129,7 @@ export const pollForLikedVideos = () => {
 					url,
 					video.snippet.title,
 					video.snippet.channelTitle,
-
-					// FIXME: Remove hard coded device ID
-					'2a57071e-6aea-4ac1-8fb1-bda70ebf76f1',
+					process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 				);
 			}
 

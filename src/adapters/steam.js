@@ -41,8 +41,7 @@ export const pollForGameActivity = () => {
 
 	loadGamesFromDisk();
 
-	// FIXME: Remove hard coded device ID
-	const deviceId = '2a57071e-6aea-4ac1-8fb1-bda70ebf76f1';
+	const deviceId = process.env.TOMBOIS_DEFAULT_DEVICE_ID;
 	const apiUrl = `https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${process.env.TOMBOIS_STEAM_APIKEY}&steamid=${process.env.TOMBOIS_STEAM_USERID}&format=json`;
 
 	const fetchGames = async () => {
