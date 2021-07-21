@@ -62,7 +62,7 @@ export function getSleepCycles (id, page) {
 		'getSleepCycles',
 		`SELECT * FROM sleep
 		WHERE id LIKE $id
-		ORDER BY created_at DESC
+		ORDER BY started_at DESC
 		LIMIT 50 OFFSET $offset`,
 	);
 
