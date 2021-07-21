@@ -64,9 +64,17 @@ export function prettyDuration (durationMs) {
 	const hoursRounded = Math.floor(hoursTotal);
 	const minutes = Math.round((hoursTotal - hoursRounded) * 60);
 
+	const hourUnit = hoursRounded === 1
+		? 'hour'
+		: 'hours';
+
+	const minuteUnit = minutes === 1
+		? 'minute'
+		: 'minutes';
+
 	// Convert into string
 	const duration = hoursRounded > 0
-		? `${hoursRounded} hours, ${minutes} minutes`
+		? `${hoursRounded} ${hourUnit}, ${minutes} ${minuteUnit}`
 		: `${minutes} minutes`;
 
 	return duration;
