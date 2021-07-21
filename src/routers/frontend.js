@@ -4,6 +4,7 @@ import { getLikes } from '../database/youtubelikes.js';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 import { getGameActivity } from '../database/games.js';
 import Logger from '../lib/logger.js';
+import { getSleepCycles } from '../database/sleep.js';
 
 const log = new Logger('frontend');
 
@@ -15,11 +16,13 @@ router.get('/', (_req, res) => {
 	const listens = getListens();
 	const youtubelikes = getLikes();
 	const gameActivity = getGameActivity();
+	const sleep = getSleepCycles();
 
 	const latest = {
 		listen: listens[0] || null,
 		youtubeLike: youtubelikes[0] || null,
 		gameActivity: gameActivity[0] || null,
+		sleep: sleep[0] || null,
 	};
 
 	res.render('dashboard', { latest });
@@ -80,6 +83,23 @@ router.get('/game/:id', (req, res) => {
 	}
 
 	res.render('gamesingle', { gameActivity: gameActivity[0] });
+});
+
+// SLEEP CYCLES
+
+router.get('/sleeps', (req, res) => {
+	const sleep = getSleepCycles(undefined, req.query.page);
+	res.render('sleeplist', { sleep, page: req.query.page });
+});
+
+router.get('/sleep/:id', (req, res) => {
+	const sleep = getSleepCycles(req.params.id);
+
+	if (sleep.length === 0) {
+		throw new NotFoundError('Like not found');
+	}
+
+	res.render('sleepsingle', { sleep: sleep[0] });
 });
 
 router.get('*', () => { throw new NotFoundError('Page Not Found'); });

@@ -1,0 +1,22 @@
+<div class="sectioncontainer">
+	<div class="row">
+		<span class="left">😴</span>
+		<span class="right"><strong>{{data.duration}}</strong></span>
+	</div>
+	<div class="row">
+		<span class="left">📅</span>
+		<span class="right">{{data.created_at}}</span>
+	</div>
+	<div class="row">
+		<span class="left"></span>
+		<time datetime="{{data.started_at}}" class="right">
+			<small>
+			{{#if showlink }}
+				<a href="/sleep/{{data.id}}">{{data.timeago}}</a>
+			{{else}}
+				{{data.timeago}}
+			{{/if}}
+			</small>
+		</time>
+	</div>
+</div>

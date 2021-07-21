@@ -8,3 +8,8 @@
 <h2><a href="/games">playing:</a></h2>
 {{> gameActivity data=latest.gameActivity showlink=true }}
 {{/if}}
+
+{{#if latest.sleep}}
+<h2><a href="/sleeps">sleeping:</a></h2>
+{{> sleep data=latest.sleep showlink=true }}
+{{/if}}
