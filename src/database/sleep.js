@@ -27,7 +27,7 @@ export function insertSleepCycle (timestamp, type, deviceId) {
 	const selectStatement = getStatement(
 		'selectSleepCycle',
 		`SELECT * FROM sleep
-		WHERE ended_at = NULL
+		WHERE ended_at IS NULL
 		ORDER BY started_at DESC`,
 	);
 
@@ -39,7 +39,7 @@ export function insertSleepCycle (timestamp, type, deviceId) {
 
 	const updateStatement = getStatement(
 		'updateSleepCycle',
-		`UPDATE sleeps
+		`UPDATE sleep
 		SET ended_at = $endedAt
 		WHERE id = $id`,
 	);
