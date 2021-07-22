@@ -1,6 +1,7 @@
 import express from 'express';
 import { validateDevice } from '../database/devices.js';
 import { insertSleepCycle } from '../database/sleep.js';
+import { insertTimeTracking } from '../database/timetracking.js';
 import { insertWeight } from '../database/weight.js';
 import Logger from '../lib/logger.js';
 
@@ -41,6 +42,20 @@ router.post('/weight', validateAuth, (req, res) => {
 
 		log.info(`Weight: '${weightKgs}' at '${createdAt}'`);
 		insertWeight(weightKgs, createdAt, req.deviceId);
+
+		res.send({ status: 'ok' });
+	} catch (err) {
+		log.error(err);
+		res.status(400).send({ status: err.message });
+	}
+});
+
+router.post('/time', validateAuth, (req, res) => {
+	try {
+		const { createdAt, category } = req.body;
+
+		log.info(`Time: ${category} started at ${createdAt}`);
+		insertTimeTracking(category, createdAt, req.deviceId);
 
 		res.send({ status: 'ok' });
 	} catch (err) {
