@@ -100,7 +100,7 @@ router.get('/sleeps', (req, res) => {
 
 	const graphData = sleep.map(night => ({
 		y: night.durationNumber,
-		label: night.created_at,
+		label: night.dateFull,
 	}));
 	const svg = generateBarGraph(graphData, 'hours');
 
