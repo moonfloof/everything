@@ -43,6 +43,10 @@ p, ul, table, svg {
 	margin-top: 16px;
 }
 
+img, svg {
+	max-width: 100%;
+}
+
 ul {
 	margin-left: 16px;
 	line-height: 20px;

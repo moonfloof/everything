@@ -66,7 +66,7 @@ export function generateBarGraph (points, yLegend) {
 	const legendY = padding / 2;
 
 	return `
-		<svg width="${graphWidth}" height="${graphHeight}">
+		<svg width="${graphWidth}" height="${graphHeight}" viewBox="0 0 ${graphWidth} ${graphHeight}">
 			${generateText(yAxisWidth, legendY + 16, max, 'end')}
 			${generateText(yAxisWidth, legendY + barHeight, '0', 'end')}
 			${generateText(legendX - legendY, legendY + 12, yLegend || '', 'middle', 'rotate(-90)')}
