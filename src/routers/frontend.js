@@ -73,8 +73,13 @@ router.get('/youtubelike/:id', (req, res) => {
 
 router.get('/games', (req, res) => {
 	const gameActivity = getGameActivity(undefined, req.query.page);
-	const graphData = gameActivity.map(game => ({ y: game.durationNumber, label: game.name }));
+
+	const graphData = gameActivity.map(game => ({
+		y: game.durationNumber,
+		label: game.name,
+	}));
 	const svg = generateBarGraph(graphData, 'hours');
+
 	res.render('gamelist', { gameActivity, page: req.query.page, svg });
 });
 
@@ -92,7 +97,14 @@ router.get('/game/:id', (req, res) => {
 
 router.get('/sleeps', (req, res) => {
 	const sleep = getSleepCycles(undefined, req.query.page);
-	res.render('sleeplist', { sleep, page: req.query.page });
+
+	const graphData = sleep.map(night => ({
+		y: night.durationNumber,
+		label: night.created_at,
+	}));
+	const svg = generateBarGraph(graphData, 'hours');
+
+	res.render('sleeplist', { sleep, page: req.query.page, svg });
 });
 
 router.get('/sleep/:id', (req, res) => {

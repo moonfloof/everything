@@ -78,17 +78,20 @@ export function getSleepCycles (id, page) {
 			const timeago = TimeAgo.format(startedAt);
 
 			let duration = 'Currently sleeping';
+			let durationNumber = 0;
 
 			if (endedAt !== null) {
 				// Difference between start and end, in milliseconds
 				const diff = endedAt.getTime() - startedAt.getTime();
 				duration = prettyDuration(diff);
+				durationNumber = diff / 3600000;
 			}
 
 			return {
 				...row,
 				timeago,
 				duration,
+				durationNumber,
 				created_at: prettyDate(startedAt),
 			};
 		});
