@@ -15,7 +15,7 @@ import { pollForGameActivity } from './adapters/steam.js';
 import overland from './routers/overland.js';
 import listenbrainz from './routers/listenbrainz.js';
 import youtube from './routers/youtube.js';
-import sleep from './routers/sleep.js';
+import health from './routers/health.js';
 import purchases from './routers/purchases.js';
 import frontend from './routers/frontend.js';
 
@@ -41,7 +41,7 @@ app.use(logEntry(console.info));
 app.use('/api/overland', overland);
 app.use('/api/listenbrainz', listenbrainz);
 app.use('/api/youtube', youtube);
-app.use('/api/sleep', sleep);
+app.use('/api/health', health);
 app.use('/api/purchases', purchases);
 
 // Set up frontend

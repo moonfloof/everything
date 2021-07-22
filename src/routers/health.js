@@ -3,20 +3,29 @@ import { validateDevice } from '../database/devices.js';
 import { insertSleepCycle } from '../database/sleep.js';
 import Logger from '../lib/logger.js';
 
-const log = new Logger('Sleep');
+const log = new Logger('Health');
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
+const validateAuth = (req, res, next) => {
 	try {
 		// Validate Device API Key
 		const authToken = req.header('Authorization')?.toLowerCase();
-		const { id: deviceId } = validateDevice(authToken);
+		const { id } = validateDevice(authToken);
+		req.deviceId = id;
+		next();
+	} catch (err) {
+		res.status(401).send({ status: err.message });
+		return;
+	}
+};
 
-		const { timestamp, type } = req.body;
+router.post('/sleep', validateAuth, (req, res) => {
+	try {
+		const { createdAt, type } = req.body;
 
-		log.info(`Logging '${type}' at '${timestamp}'`);
-		insertSleepCycle(timestamp, type, deviceId);
+		log.info(`Sleeping: '${type}' at '${createdAt}'`);
+		insertSleepCycle(createdAt, type, req.deviceId);
 
 		res.send({ status: 'ok' });
 	} catch (err) {
