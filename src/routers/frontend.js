@@ -2,7 +2,7 @@ import express from 'express';
 import { getListens, getPopular } from '../database/listens.js';
 import { getLikes } from '../database/youtubelikes.js';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
-import { getGameActivity } from '../database/games.js';
+import { getGameActivity, getGameActivityByDay } from '../database/games.js';
 import Logger from '../lib/logger.js';
 import { getSleepCycles } from '../database/sleep.js';
 import { generateBarGraph } from '../lib/graphs/bar.js';
@@ -73,12 +73,8 @@ router.get('/youtubelike/:id', (req, res) => {
 
 router.get('/games', (req, res) => {
 	const gameActivity = getGameActivity(undefined, req.query.page);
-
-	const graphData = gameActivity.map(game => ({
-		y: game.durationNumber,
-		label: game.name,
-	}));
-	const svg = generateBarGraph(graphData, 'hours');
+	const gamesByDay = getGameActivityByDay();
+	const svg = generateBarGraph(gamesByDay, 'hours');
 
 	res.render('gamelist', { gameActivity, page: req.query.page, svg });
 });

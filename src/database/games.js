@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { prettyDuration } from '../lib/formatDate.js';
+import { prettyDuration, shortDate } from '../lib/formatDate.js';
 
 export function insertNewGameActivity (name, deviceId, playtime = 0) {
 	const id = uuid();
@@ -89,5 +89,38 @@ export function getGameActivity (id, page) {
 			duration: prettyDuration(row.playtime_mins * 60000),
 			durationNumber: row.playtime_mins / 60,
 			timeago: timeago.format(new Date(row.updated_at)),
+		}));
+}
+
+/**
+ * Fetch total duration of games played from the last two weeks
+ *
+ * @export
+ * @return {object[]}
+ */
+export function getGameActivityByDay () {
+	const twoWeeksAgoMs = 14 * 86400 * 1000;
+	const twoWeeksAgo = new Date(Date.now() - twoWeeksAgoMs);
+	twoWeeksAgo.setHours(0);
+	twoWeeksAgo.setMinutes(0);
+	twoWeeksAgo.setSeconds(0);
+	const createdAt = twoWeeksAgo.toISOString();
+
+	const statement = getStatement(
+		'getGameActivityByDay',
+		`SELECT
+			DATE(created_at) as day,
+			SUM(playtime_mins) as playtime_mins
+		FROM games
+		WHERE created_at >= $createdAt
+		GROUP BY day
+		ORDER BY day DESC`,
+	);
+
+	return statement
+		.all({ createdAt })
+		.map(row => ({
+			y: row.playtime_mins / 60,
+			label: shortDate(new Date(row.day)),
 		}));
 }
