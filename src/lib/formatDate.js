@@ -52,6 +52,14 @@ export function prettyDate (date) {
 	return `${day}${th} ${month}, ${year}`;
 }
 
+/** @param {Date} date */
+export function shortDate (date) {
+	const day = padString(date.getDate(), 2);
+	const month = padString(date.getMonth() + 1, 2);
+
+	return `${day}/${month}`;
+}
+
 /**
  * @param {number} durationMs
  * @returns {string}

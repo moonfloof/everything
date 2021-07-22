@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
-import { prettyDate, prettyDuration } from '../lib/formatDate.js';
+import { prettyDate, prettyDuration, shortDate } from '../lib/formatDate.js';
 
 function insertNewRecord (timestamp, deviceId) {
 	const statement = getStatement(
@@ -93,6 +93,7 @@ export function getSleepCycles (id, page) {
 				duration,
 				durationNumber,
 				dateFull: prettyDate(startedAt),
+				dateShort: shortDate(startedAt),
 			};
 		});
 }
