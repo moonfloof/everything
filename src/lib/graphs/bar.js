@@ -1,31 +1,12 @@
 const graphWidth = 640;
 const graphHeight = 180;
 const yAxisWidth = 24;
+const xAxisWidth = 16;
 const pointLimit = 14;
 const padding = 12;
 
 const pointWidth = (graphWidth - yAxisWidth) / pointLimit;
-const barHeight = graphHeight - padding;
-
-function generateBar (y, max, index, label) {
-	const height = Math.round((y / max) * barHeight);
-	const width = pointWidth - padding;
-	const posX = (index * pointWidth) + (padding / 2) + yAxisWidth;
-	const posY = barHeight - height + (padding / 2);
-
-	return `
-		<rect
-			x="${posX}" y="${padding / 2}" rx="8" ry="8"
-			width="${width}" height="${barHeight}"
-			style="opacity:0.1;"
-		/>
-		<rect
-			x="${posX}" y="${posY}" rx="8" ry="8"
-			width="${width}" height="${height}"
-			style="fill:#2d1c88"
-		/>
-	`;
-}
+const barHeight = graphHeight - padding - xAxisWidth;
 
 function generateText (x, y, text, align = 'start', transform = '') {
 	return `
@@ -38,6 +19,38 @@ function generateText (x, y, text, align = 'start', transform = '') {
 		>
 			${text}
 		</text>
+	`;
+}
+
+/**
+ * @param {number} y
+ * @param {number} max
+ * @param {number} index
+ * @param {string} label
+ * @return {string} SVG containing two rectangles and the X axis label
+ */
+function generateBar (y, max, index, label) {
+	const height = Math.round((y / max) * barHeight);
+	const width = pointWidth - padding;
+	const posX = (index * pointWidth) + (padding / 2) + yAxisWidth;
+	const posY = barHeight - height + (padding / 2);
+
+	const textScale = 0.75;
+
+	const text = generateText(posX / textScale + (16 / textScale), (barHeight + 24) / textScale, label, 'middle', `scale(${textScale})`);
+
+	return `
+		<rect
+			x="${posX}" y="${padding / 2}" rx="8" ry="8"
+			width="${width}" height="${barHeight}"
+			style="opacity:0.1;"
+		/>
+		<rect
+			x="${posX}" y="${posY}" rx="8" ry="8"
+			width="${width}" height="${height}"
+			style="fill:#2d1c88"
+		/>
+		${text}
 	`;
 }
 
