@@ -1,6 +1,7 @@
 import express from 'express';
 import { validateDevice } from '../database/devices.js';
 import { insertSleepCycle } from '../database/sleep.js';
+import { insertWeight } from '../database/weight.js';
 import Logger from '../lib/logger.js';
 
 const log = new Logger('Health');
@@ -26,6 +27,20 @@ router.post('/sleep', validateAuth, (req, res) => {
 
 		log.info(`Sleeping: '${type}' at '${createdAt}'`);
 		insertSleepCycle(createdAt, type, req.deviceId);
+
+		res.send({ status: 'ok' });
+	} catch (err) {
+		log.error(err);
+		res.status(400).send({ status: err.message });
+	}
+});
+
+router.post('/weight', validateAuth, (req, res) => {
+	try {
+		const { createdAt, weightKgs } = req.body;
+
+		log.info(`Weight: '${weightKgs}' at '${createdAt}'`);
+		insertWeight(weightKgs, createdAt, req.deviceId);
 
 		res.send({ status: 'ok' });
 	} catch (err) {
