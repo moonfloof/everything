@@ -1,10 +1,12 @@
 import express from 'express';
+import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
+
 import { getListens, getPopular } from '../database/listens.js';
 import { getLikes } from '../database/youtubelikes.js';
-import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 import { getGameActivity, getGameActivityByDay } from '../database/games.js';
-import Logger from '../lib/logger.js';
 import { getSleepCycles } from '../database/sleep.js';
+
+import Logger from '../lib/logger.js';
 import { generateBarGraph } from '../lib/graphs/bar.js';
 
 const log = new Logger('frontend');
@@ -112,6 +114,8 @@ router.get('/sleep/:id', (req, res) => {
 
 	res.render('sleepsingle', { sleep: sleep[0] });
 });
+
+// NOT FOUND
 
 router.get('*', () => { throw new NotFoundError('Page Not Found'); });
 
