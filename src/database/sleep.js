@@ -92,8 +92,8 @@ export function getSleepCycles (id, page) {
 				timeago,
 				duration,
 				durationNumber,
-				dateFull: prettyDate(startedAt),
-				dateShort: shortDate(startedAt),
+				dateFull: prettyDate(endedAt ?? startedAt),
+				dateShort: shortDate(endedAt ?? startedAt),
 			};
 		});
 }
