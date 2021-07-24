@@ -4,6 +4,7 @@ const yAxisWidth = 24;
 const xAxisWidth = 16;
 const pointLimit = 14;
 const padding = 12;
+const boxRadius = 6;
 
 const pointWidth = (graphWidth - yAxisWidth) / pointLimit;
 const barHeight = graphHeight - padding - xAxisWidth;
@@ -41,12 +42,12 @@ function generateBar (y, max, index, label) {
 
 	return `
 		<rect
-			x="${posX}" y="${padding / 2}" rx="8" ry="8"
+			x="${posX}" y="${padding / 2}" rx="${boxRadius}" ry="${boxRadius}"
 			width="${width}" height="${barHeight}"
 			style="opacity:0.1;"
 		/>
 		<rect
-			x="${posX}" y="${posY}" rx="8" ry="8"
+			x="${posX}" y="${posY}" rx="${boxRadius}" ry="${boxRadius}"
 			width="${width}" height="${height}"
 			style="fill:#2d1c88"
 		/>
