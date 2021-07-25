@@ -3,11 +3,12 @@ import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
 import { getListens, getPopular } from '../../database/listens.js';
 import { getLikes } from '../../database/youtubelikes.js';
-import { getGameActivity, getGameActivityByDay } from '../../database/games.js';
+import { countGameActivity, getGameActivity, getGameActivityByDay } from '../../database/games.js';
 import { getSleepCycles } from '../../database/sleep.js';
 
 import Logger from '../../lib/logger.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
+import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const log = new Logger('frontend');
 
@@ -85,13 +86,15 @@ router.get('/youtubelike/:id', (req, res) => {
 // STEAM ACTIVITY
 
 router.get('/games', (req, res) => {
-	const gameActivity = getGameActivity(undefined, req.query.page);
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countGameActivity());
+	const gameActivity = getGameActivity(undefined, page);
 	const gamesByDay = getGameActivityByDay();
 	const svg = generateBarGraph(gamesByDay, 'hours');
 
 	res.render(
 		'external/gamelist',
-		{ gameActivity, page: req.query.page, svg },
+		{ gameActivity, page: req.query.page, svg, pagination },
 	);
 });
 

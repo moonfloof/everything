@@ -125,3 +125,12 @@ export function getGameActivityByDay () {
 			label: shortDate(new Date(row.day)),
 		}));
 }
+
+export function countGameActivity () {
+	const statement = getStatement(
+		'countGameActivity',
+		'SELECT COUNT(*) as total FROM games',
+	);
+
+	return statement.get().total;
+}
