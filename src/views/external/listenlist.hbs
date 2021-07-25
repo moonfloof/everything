@@ -12,3 +12,5 @@
 {{#each listens as |listen| }}
 	{{> listen data=listen showlink=true }}
 {{/each}}
+
+{{> pagination pagination=pagination route="/listens" }}

@@ -2,3 +2,5 @@
 {{#each youtubeLikes as |like|}}
 	{{> youtubeLike data=like showlink=true }}
 {{/each}}
+
+{{> pagination pagination=pagination route="/youtubelikes" }}

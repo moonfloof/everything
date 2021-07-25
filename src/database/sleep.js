@@ -98,3 +98,12 @@ export function getSleepCycles (id, page) {
 			};
 		});
 }
+
+export function countSleepCycles () {
+	const statement = getStatement(
+		'countSleepCycles',
+		'SELECT COUNT(*) as total FROM sleep',
+	);
+
+	return statement.get().total;
+}

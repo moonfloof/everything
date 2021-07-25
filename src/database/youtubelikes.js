@@ -51,3 +51,12 @@ export function getLikes (id, page) {
 			timeago: timeago.format(new Date(row.created_at)),
 		}));
 }
+
+export function countYouTubeLikes () {
+	const statement = getStatement(
+		'countYouTubeLikes',
+		'SELECT COUNT(*) as total FROM youtubelikes',
+	);
+
+	return statement.get().total;
+}

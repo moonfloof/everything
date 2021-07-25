@@ -1,10 +1,10 @@
 import express from 'express';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
-import { getListens, getPopular } from '../../database/listens.js';
-import { getLikes } from '../../database/youtubelikes.js';
+import { countListens, getListens, getPopular } from '../../database/listens.js';
+import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
 import { countGameActivity, getGameActivity, getGameActivityByDay } from '../../database/games.js';
-import { getSleepCycles } from '../../database/sleep.js';
+import { countSleepCycles, getSleepCycles } from '../../database/sleep.js';
 
 import Logger from '../../lib/logger.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
@@ -38,12 +38,15 @@ router.get('/', (_req, res) => {
 // LISTENS
 
 router.get('/listens', (req, res) => {
-	const listens = getListens(undefined, req.query.page);
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countListens());
+
+	const listens = getListens(undefined, page);
 	const popular = getPopular(7);
 
 	res.render(
 		'external/listenlist',
-		{ listens, popular, page: req.query.page },
+		{ listens, popular, pagination },
 	);
 });
 
@@ -63,10 +66,14 @@ router.get('/listen/:id', (req, res) => {
 // YOUTUBE LIKES
 
 router.get('/youtubelikes', (req, res) => {
-	const youtubeLikes = getLikes(undefined, req.query.page);
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countYouTubeLikes());
+
+	const youtubeLikes = getLikes(undefined, page);
+
 	res.render(
 		'external/youtubelikelist',
-		{ youtubeLikes, page: req.query.page },
+		{ youtubeLikes, pagination },
 	);
 });
 
@@ -88,13 +95,14 @@ router.get('/youtubelike/:id', (req, res) => {
 router.get('/games', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countGameActivity());
+
 	const gameActivity = getGameActivity(undefined, page);
 	const gamesByDay = getGameActivityByDay();
 	const svg = generateBarGraph(gamesByDay, 'hours');
 
 	res.render(
 		'external/gamelist',
-		{ gameActivity, page: req.query.page, svg, pagination },
+		{ gameActivity, svg, pagination },
 	);
 });
 
@@ -114,8 +122,10 @@ router.get('/game/:id', (req, res) => {
 // SLEEP CYCLES
 
 router.get('/sleeps', (req, res) => {
-	const sleep = getSleepCycles(undefined, req.query.page);
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countSleepCycles());
 
+	const sleep = getSleepCycles(undefined, page);
 	const graphData = sleep.map(night => ({
 		y: night.durationNumber,
 		label: night.dateShort,
@@ -124,7 +134,7 @@ router.get('/sleeps', (req, res) => {
 
 	res.render(
 		'external/sleeplist',
-		{ sleep, page: req.query.page, svg },
+		{ sleep, svg, pagination },
 	);
 });
 

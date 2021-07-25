@@ -84,3 +84,12 @@ export function deleteListen (id) {
 	const statement = getStatement('deleteListen', 'DELETE FROM listens WHERE id = $id');
 	return statement.run({ id });
 }
+
+export function countListens () {
+	const statement = getStatement(
+		'countListens',
+		'SELECT COUNT(*) as total FROM listens',
+	);
+
+	return statement.get().total;
+}
