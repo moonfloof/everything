@@ -9,6 +9,7 @@ import timetracking from './routers/internal/timetracking.js';
 import sleep from './routers/internal/sleep.js';
 import listens from './routers/internal/listens.js';
 import youtubelikes from './routers/internal/youtubelikes.js';
+import weight from './routers/internal/weight.js';
 import frontend from './routers/internal/frontend.js';
 
 const log = new Logger('server-int');
@@ -23,6 +24,7 @@ app.use('/timetracking', timetracking);
 app.use('/sleep', sleep);
 app.use('/listens', listens);
 app.use('/youtubelikes', youtubelikes);
+app.use('/weight', weight);
 app.use('/', frontend);
 
 const startServer = () => {

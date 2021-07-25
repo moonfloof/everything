@@ -38,9 +38,39 @@ export function getWeight (id, page) {
 		.all({
 			id: id || '%',
 			offset: calculateOffset(page),
-		})
-		.map(row => ({
-			...row,
-			timeago: TimeAgo.format(row.created_at),
-		}));
+		});
+}
+
+export function countWeight () {
+	const statement = getStatement(
+		'countWeight',
+		'SELECT COUNT(*) as total FROM weight',
+	);
+
+	return statement.get().total;
+}
+
+export function deleteWeight (id) {
+	const statement = getStatement(
+		'deleteWeight',
+		'DELETE FROM weight WHERE id = $id',
+	);
+
+	return statement.run({ id });
+}
+
+export function updateWeight (id, weight_kgs, created_at) {
+	const statement = getStatement(
+		'updateWeight',
+		`UPDATE weight
+		SET weight_kgs = $weight_kgs,
+		    created_at = $created_at
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		weight_kgs,
+		created_at,
+	});
 }

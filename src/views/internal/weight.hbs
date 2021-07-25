@@ -1,0 +1,6 @@
+<h2>Weight:</h2>
+{{#each weight as |entry| }}
+	{{> internal/weight data=entry }}
+{{/each}}
+
+{{> pagination route="/weights" pagination=pagination }}
