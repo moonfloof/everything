@@ -4,6 +4,7 @@ import { getDatabase } from './database/database.js';
 
 // Servers
 import appExternal from './app-external.js';
+import appInternal from './app-internal.js';
 
 // Adapters
 import { pollForLikedVideos } from './adapters/youtube.js';
@@ -20,6 +21,7 @@ pollForGameActivity();
 
 // Start servers
 appExternal();
+appInternal();
 
 process.on('exit', async () => {
 	log.info('Exiting - closing database');
