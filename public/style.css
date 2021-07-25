@@ -61,14 +61,6 @@ p {
 	line-height: 20px;
 }
 
-pre {
-	font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
-	line-height: 1.2;
-	width: 100%;
-	overflow-x: auto;
-	overflow-y: hidden;
-}
-
 .sectioncontainer {
 	margin-top: 32px;
 }
@@ -90,4 +82,26 @@ table td {
 
 .align-r {
 	text-align: right;
+}
+
+/**
+ *  INTERNAL USE ONLY
+ */
+
+pre {
+	font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+	line-height: 1.2;
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+input.right, select.right {
+	flex: 1;
+	padding: 2px;
+	max-width: 320px;
+}
+
+input[type="submit"] {
+	padding: 6px 12px;
 }

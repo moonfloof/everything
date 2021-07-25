@@ -3,6 +3,7 @@ import Logger from './lib/logger.js';
 import appCreate from './lib/appCreate.js';
 
 // Routers
+import purchases from './routers/internal/purchases.js';
 import frontend from './routers/internal/frontend.js';
 
 const log = new Logger('server-int');
@@ -11,6 +12,7 @@ const app = appCreate();
 
 // Set up routers
 app.use(express.static('public'));
+app.use('/purchases', purchases);
 app.use('/', frontend);
 
 const startServer = () => {

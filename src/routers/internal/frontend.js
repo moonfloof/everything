@@ -2,7 +2,6 @@ import express from 'express';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
 import Logger from '../../lib/logger.js';
-
 const log = new Logger('frontend');
 
 const router = express.Router();
