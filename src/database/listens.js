@@ -89,6 +89,33 @@ export function deleteListen (id) {
 	return statement.run({ id });
 }
 
+export function updateListen (id, artist, album, title, tracknumber, release_year, genre, created_at) {
+	const statement = getStatement(
+		'updateListen',
+		`UPDATE listens
+		SET artist = $artist,
+		    album = $album,
+		    title = $title,
+		    tracknumber = $tracknumber,
+		    release_year = $release_year,
+		    genre = $genre,
+		    created_at = $created_at
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		artist,
+		album,
+		title,
+		tracknumber,
+		release_year,
+		genre,
+		created_at,
+	});
+}
+
+
 export function countListens () {
 	const statement = getStatement(
 		'countListens',
