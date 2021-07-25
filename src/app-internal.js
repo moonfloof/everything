@@ -5,6 +5,7 @@ import appCreate from './lib/appCreate.js';
 // Routers
 import purchases from './routers/internal/purchases.js';
 import games from './routers/internal/games.js';
+import timetracking from './routers/internal/timetracking.js';
 import frontend from './routers/internal/frontend.js';
 
 const log = new Logger('server-int');
@@ -15,6 +16,7 @@ const app = appCreate();
 app.use(express.static('public'));
 app.use('/purchases', purchases);
 app.use('/games', games);
+app.use('/timetracking', timetracking);
 app.use('/', frontend);
 
 const startServer = () => {

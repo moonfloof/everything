@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 import { getStatement } from './database.js';
 
 function insertNewRecord (category, timestamp, deviceId) {
@@ -64,4 +65,61 @@ export function insertTimeTracking (category, timestamp, deviceId) {
 	if (category.toLowerCase().startsWith('stop')) return;
 
 	insertNewRecord(category, timestamp, deviceId);
+}
+
+export function getTimeTracking (id, page) {
+	const statement = getStatement(
+		'getTimeTracking',
+		`SELECT * FROM timetracking
+		WHERE id LIKE $id
+		ORDER BY created_at DESC
+		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+	);
+
+	return statement.all({
+		id: id || '%',
+		offset: calculateOffset(page),
+	});
+}
+
+export function countTimeTracking () {
+	const statement = getStatement(
+		'countTimeTracking',
+		'SELECT COUNT(*) as total FROM timetracking',
+	);
+
+	return statement.get().total;
+}
+
+export function deleteTimeTracking (id) {
+	const statement = getStatement(
+		'deleteTimeTracking',
+		'DELETE FROM timetracking WHERE id = $id',
+	);
+
+	return statement.run({ id });
+}
+
+export function updateTimeTracking (id, category, created_at, ended_at) {
+	const statement = getStatement(
+		'updateTimeTracking',
+		`UPDATE timetracking
+		SET category = $category,
+		    created_at = $created_at,
+		    ended_at = $ended_at,
+		    duration_secs = $duration_secs
+		WHERE id = $id`,
+	);
+
+	const createdAtMs = new Date(created_at).getTime();
+	const endedAtMs = new Date(ended_at).getTime();
+	const duration_secs = (endedAtMs - createdAtMs) / 1000;
+
+	return statement.run({
+		id,
+		category,
+		created_at,
+		ended_at,
+		duration_secs,
+	});
 }

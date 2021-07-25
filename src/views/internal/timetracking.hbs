@@ -1,0 +1,6 @@
+<h2>Time Tracking:</h2>
+{{#each timetracking as |activity| }}
+	{{> internal/timetracking data=activity }}
+{{/each}}
+
+{{> pagination route="/timetracking" pagination=pagination }}
