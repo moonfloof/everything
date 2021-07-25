@@ -3,6 +3,7 @@ import express from 'express';
 import helmet from 'helmet';
 import exphbs from 'express-handlebars';
 import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
+import formBodyParser from './formParser.js';
 
 const appCreate = () => {
 	const app = express();
@@ -12,6 +13,11 @@ const appCreate = () => {
 		try {
 			req.body = JSON.parse(req.rawBody);
 		} catch (err) { /* Do nothing */ }
+		try {
+			if (!req.body) {
+				req.body = formBodyParser(req.rawBody);
+			}
+		} catch (err) { /* do nothing */ console.error(err); }
 
 		next();
 	});
