@@ -34,3 +34,35 @@ export function getPurchases (purchaseId, page) {
 
 	return statement.all({ id, offset });
 }
+
+export function deletePurchase (id) {
+	const statement = getStatement(
+		'deletePurchase',
+		'DELETE FROM purchases WHERE id = $id',
+	);
+
+	return statement.run({ id });
+}
+
+
+export function updatePurchase (id, amount, currency, merchant, category, createdAt) {
+	const statement = getStatement(
+		'updatePurchase',
+		`UPDATE purchases
+		SET amount = $amount,
+		    currency = $currency,
+		    merchant = $merchant,
+		    category = $category,
+		    created_at = $createdAt
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		amount,
+		currency,
+		merchant,
+		category,
+		createdAt,
+	});
+}
