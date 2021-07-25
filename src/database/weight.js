@@ -1,6 +1,5 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
-import TimeAgo from '../adapters/timeago.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
 export function insertWeight (weight_kgs, created_at, device_id) {
