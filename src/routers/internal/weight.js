@@ -1,5 +1,5 @@
 import express from 'express';
-import { countWeight, deleteWeight, getWeight, updateWeight } from '../../database/weight.js';
+import { countWeight, deleteWeight, getWeight, insertWeight, updateWeight } from '../../database/weight.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -16,6 +16,18 @@ router.get('/', (req, res) => {
 });
 
 // CRUD
+
+router.post('/', (req, res) => {
+	const {  weight_kgs, created_at } = req.body;
+
+	insertWeight(
+		weight_kgs,
+		created_at || new Date().toISOString(),
+		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+	);
+
+	res.redirect('/weight');
+});
 
 router.post('/:id', (req, res) => {
 	const { id } = req.params;
