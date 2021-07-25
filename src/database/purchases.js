@@ -2,13 +2,13 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
-export function insertPurchase (amount, merchant, category, currency, createdAt, deviceId) {
+export function insertPurchase (amount, merchant, category, currency, created_at, device_id) {
 	const statement = getStatement(
 		'insertPurchase',
 		`INSERT INTO purchases
 		(id, amount, merchant, category, currency, created_at, device_id)
 		VALUES
-		($id, $amount, $merchant, $category, $currency, $createdAt, $deviceId)`,
+		($id, $amount, $merchant, $category, $currency, $created_at, $device_id)`,
 	);
 
 	return statement.run({
@@ -17,8 +17,8 @@ export function insertPurchase (amount, merchant, category, currency, createdAt,
 		merchant,
 		category,
 		currency,
-		createdAt,
-		deviceId,
+		created_at,
+		device_id,
 	});
 }
 
@@ -32,12 +32,13 @@ export function countPurchases () {
 }
 
 export function getPurchases (id, page) {
-	const statement = getStatement('getPurchases', `
-		SELECT * FROM purchases
+	const statement = getStatement(
+		'getPurchases',
+		`SELECT * FROM purchases
 		WHERE id LIKE $id
 		ORDER BY created_at DESC
-		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset
-	`);
+		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+	);
 
 	return statement.all({
 		id: id || '%',
@@ -54,7 +55,7 @@ export function deletePurchase (id) {
 	return statement.run({ id });
 }
 
-export function updatePurchase (id, amount, currency, merchant, category, createdAt) {
+export function updatePurchase (id, amount, currency, merchant, category, created_at) {
 	const statement = getStatement(
 		'updatePurchase',
 		`UPDATE purchases
@@ -62,7 +63,7 @@ export function updatePurchase (id, amount, currency, merchant, category, create
 		    currency = $currency,
 		    merchant = $merchant,
 		    category = $category,
-		    created_at = $createdAt
+		    created_at = $created_at
 		WHERE id = $id`,
 	);
 
@@ -72,6 +73,6 @@ export function updatePurchase (id, amount, currency, merchant, category, create
 		currency,
 		merchant,
 		category,
-		createdAt,
+		created_at,
 	});
 }

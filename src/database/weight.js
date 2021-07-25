@@ -3,20 +3,20 @@ import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
-export function insertWeight (weightKgs, createdAt, deviceId) {
+export function insertWeight (weight_kgs, created_at, device_id) {
 	const statement = getStatement(
 		'insertWeight',
 		`INSERT INTO weight
 		(id, weight_kgs, created_at, device_id)
 		VALUES
-		($id, $weightKgs, $createdAt, $deviceId)`,
+		($id, $weight_kgs, $created_at, $device_id)`,
 	);
 
 	return statement.run({
 		id: uuid(),
-		weightKgs,
-		createdAt: new Date(createdAt).toISOString(),
-		deviceId,
+		weight_kgs,
+		created_at: new Date(created_at).toISOString(),
+		device_id,
 	});
 }
 

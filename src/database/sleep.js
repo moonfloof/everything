@@ -4,25 +4,25 @@ import TimeAgo from '../adapters/timeago.js';
 import { prettyDate, prettyDuration, shortDate } from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
-function insertNewRecord (timestamp, deviceId) {
+function insertNewRecord (timestamp, device_id) {
 	const statement = getStatement(
 		'insertSleepCycle',
 		`INSERT INTO sleep
 		(id, started_at, device_id)
 		VALUES
-		($id, $startedAt, $deviceId)`,
+		($id, $started_at, $device_id)`,
 	);
 
 	return statement.run({
 		id: uuid(),
-		startedAt: new Date(timestamp).toISOString(),
-		deviceId,
+		started_at: new Date(timestamp).toISOString(),
+		device_id,
 	});
 }
 
-export function insertSleepCycle (timestamp, type, deviceId) {
+export function insertSleepCycle (timestamp, type, device_id) {
 	if (type?.toLowerCase() === 'sleep') {
-		insertNewRecord(timestamp, deviceId);
+		insertNewRecord(timestamp, device_id);
 		return;
 	}
 
@@ -42,13 +42,13 @@ export function insertSleepCycle (timestamp, type, deviceId) {
 	const updateStatement = getStatement(
 		'updateSleepCycle',
 		`UPDATE sleep
-		SET ended_at = $endedAt
+		SET ended_at = $ended_at
 		WHERE id = $id`,
 	);
 
 	updateStatement.run({
 		id: row.id,
-		endedAt: new Date(timestamp).toISOString(),
+		ended_at: new Date(timestamp).toISOString(),
 	});
 }
 
@@ -74,16 +74,16 @@ export function getSleepCycles (id, page) {
 			offset: calculateOffset(page),
 		})
 		.map(row => {
-			const startedAt = new Date(row.started_at);
-			const endedAt = row.ended_at ? new Date(row.ended_at) : null;
-			const timeago = TimeAgo.format(startedAt);
+			const started_at = new Date(row.started_at);
+			const ended_at = row.ended_at ? new Date(row.ended_at) : null;
+			const timeago = TimeAgo.format(started_at);
 
 			let duration = 'Currently sleeping';
 			let durationNumber = 0;
 
-			if (endedAt !== null) {
+			if (ended_at !== null) {
 				// Difference between start and end, in milliseconds
-				const diff = endedAt.getTime() - startedAt.getTime();
+				const diff = ended_at.getTime() - started_at.getTime();
 				duration = prettyDuration(diff);
 				durationNumber = diff / 3600000;
 			}
@@ -93,8 +93,8 @@ export function getSleepCycles (id, page) {
 				timeago,
 				duration,
 				durationNumber,
-				dateFull: prettyDate(endedAt ?? startedAt),
-				dateShort: shortDate(endedAt ?? startedAt),
+				dateFull: prettyDate(ended_at ?? started_at),
+				dateShort: shortDate(ended_at ?? started_at),
 			};
 		});
 }

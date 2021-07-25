@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 
-export function insertLocation (lat, long, city, createdAt, deviceId) {
+export function insertLocation (lat, long, city, created_at, device_id) {
 	const id = uuid();
 
 	const statement = getStatement(
@@ -9,7 +9,7 @@ export function insertLocation (lat, long, city, createdAt, deviceId) {
 		`INSERT INTO location
 		(id, lat, long, city, created_at, device_id)
 		VALUES
-		($id, $lat, $long, $city, $createdAt, $deviceId)`,
+		($id, $lat, $long, $city, $created_at, $device_id)`,
 	);
 
 	return statement.run({
@@ -17,7 +17,7 @@ export function insertLocation (lat, long, city, createdAt, deviceId) {
 		lat,
 		long,
 		city,
-		createdAt,
-		deviceId,
+		created_at,
+		device_id,
 	});
 }

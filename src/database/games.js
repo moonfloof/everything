@@ -4,30 +4,30 @@ import timeago from '../adapters/timeago.js';
 import { prettyDuration, shortDate } from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
-export function insertNewGameActivity (name, deviceId, playtime = 0) {
+export function insertNewGameActivity (name, device_id, playtime_mins = 0) {
 	const id = uuid();
-	const createdAt = new Date(Date.now() - (playtime * 1000)).toISOString();
-	const updatedAt = new Date().toISOString();
+	const created_at = new Date(Date.now() - (playtime_mins * 60000)).toISOString();
+	const updated_at = new Date().toISOString();
 
 	const statement = getStatement(
 		'insertGameActivity',
 		`INSERT INTO games
 		(id, name, playtime_mins, created_at, updated_at, device_id)
 		VALUES
-		($id, $name, $playtime, $createdAt, $updatedAt, $deviceId)`,
+		($id, $name, $playtime_mins, $created_at, $updated_at, $device_id)`,
 	);
 
 	return statement.run({
 		id,
 		name,
-		playtime,
-		createdAt,
-		updatedAt,
-		deviceId,
+		playtime_mins,
+		created_at,
+		updated_at,
+		device_id,
 	});
 }
 
-export function updateActivity (name, playtime, deviceId, intervalDuration) {
+export function updateActivity (name, playtime_mins, device_id, intervalDuration) {
 	const selectStatement = getStatement(
 		'getGameActivityByName',
 		`SELECT * FROM games WHERE name = $name
@@ -37,30 +37,30 @@ export function updateActivity (name, playtime, deviceId, intervalDuration) {
 	const row = selectStatement.get({ name });
 
 	if (row === undefined) {
-		insertNewGameActivity(name, deviceId, playtime);
+		insertNewGameActivity(name, device_id, playtime_mins);
 		return;
 	}
 
 	const lastUpdated = new Date(row.updated_at).getTime();
-	const lastCheck = Date.now() - intervalDuration - (playtime * 60000) - 60000;
+	const lastCheck = Date.now() - intervalDuration - (playtime_mins * 60000) - 60000;
 
 	if (lastUpdated < lastCheck) {
-		insertNewGameActivity(name, deviceId, playtime);
+		insertNewGameActivity(name, device_id, playtime_mins);
 		return;
 	}
 
 	const updateStatement = getStatement(
 		'updateGameActivity',
 		`UPDATE games
-		SET playtime_mins = $playtime,
-		    updated_at = $updatedAt
+		SET playtime_mins = $playtime_mins,
+		    updated_at = $updated_at
 		WHERE id = $id`,
 	);
 
 	updateStatement.run({
 		id: row.id,
-		playtime: row.playtime_mins + playtime,
-		updatedAt: new Date().toISOString(),
+		playtime_mins: row.playtime_mins + playtime_mins,
+		updated_at: new Date().toISOString(),
 	});
 }
 
@@ -105,7 +105,7 @@ export function getGameActivityByDay () {
 	twoWeeksAgo.setHours(0);
 	twoWeeksAgo.setMinutes(0);
 	twoWeeksAgo.setSeconds(0);
-	const createdAt = twoWeeksAgo.toISOString();
+	const created_at = twoWeeksAgo.toISOString();
 
 	const statement = getStatement(
 		'getGameActivityByDay',
@@ -113,13 +113,13 @@ export function getGameActivityByDay () {
 			DATE(created_at) as day,
 			SUM(playtime_mins) as playtime_mins
 		FROM games
-		WHERE created_at >= $createdAt
+		WHERE created_at >= $created_at
 		GROUP BY day
 		ORDER BY day DESC`,
 	);
 
 	return statement
-		.all({ createdAt })
+		.all({ created_at })
 		.map(row => ({
 			y: row.playtime_mins / 60,
 			label: shortDate(new Date(row.day)),
@@ -158,7 +158,7 @@ export function updateGameActivity (id, name, playtime_mins, created_at, updated
 	return statement.run({
 		id,
 		name,
-		playtime_mins,
+		playtime_mins: Number(playtime_mins),
 		created_at,
 		updated_at,
 	});

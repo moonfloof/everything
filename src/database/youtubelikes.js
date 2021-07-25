@@ -3,16 +3,16 @@ import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
-export function insertYouTubeLike (url, title, channel, deviceId) {
+export function insertYouTubeLike (url, title, channel, device_id) {
 	const id = uuid();
-	const createdAt = new Date().toISOString();
+	const created_at = new Date().toISOString();
 
 	const statement = getStatement(
 		'insertYouTubeLike',
 		`INSERT INTO youtubelikes
 		(id, url, title, channel, device_id, created_at)
 		VALUES
-		($id, $url, $title, $channel, $deviceId, $createdAt)`,
+		($id, $url, $title, $channel, $device_id, $created_at)`,
 	);
 
 	return statement.run({
@@ -20,8 +20,8 @@ export function insertYouTubeLike (url, title, channel, deviceId) {
 		url,
 		title,
 		channel,
-		deviceId,
-		createdAt,
+		device_id,
+		created_at,
 	});
 }
 

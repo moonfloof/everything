@@ -2,41 +2,41 @@ import { v4 as uuid } from 'uuid';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 import { getStatement } from './database.js';
 
-function insertNewRecord (category, timestamp, deviceId) {
+function insertNewRecord (category, timestamp, device_id) {
 	const statement = getStatement(
 		'insertTimeTracking',
 		`INSERT INTO timetracking
 		(id, category, created_at, duration_secs, device_id)
 		VALUES
-		($id, $category, $createdAt, 0, $deviceId)`,
+		($id, $category, $created_at, 0, $device_id)`,
 	);
 
 	return statement.run({
 		id: uuid(),
 		category,
-		createdAt: new Date(timestamp).toISOString(),
-		deviceId,
+		created_at: new Date(timestamp).toISOString(),
+		device_id,
 	});
 }
 
-function endSession (id, createdAt, timestamp) {
+function endSession (id, created_at, timestamp) {
 	const updateStatement = getStatement(
 		'updateTimeTracking',
 		`UPDATE timetracking
 		SET
-			ended_at = $endedAt,
+			ended_at = $ended_at,
 			duration_secs = $duration
 		WHERE id = $id`,
 	);
 
-	const startedAt = new Date(createdAt);
-	const endedAt = new Date(timestamp);
-	const duration = (endedAt.getTime() - startedAt.getTime()) / 1000;
+	const started_at = new Date(created_at);
+	const ended_at = new Date(timestamp);
+	const duration = (ended_at.getTime() - started_at.getTime()) / 1000;
 
 	updateStatement.run({
 		id,
 		duration,
-		endedAt: endedAt.toISOString(),
+		ended_at: ended_at.toISOString(),
 	});
 }
 
@@ -44,10 +44,10 @@ function endSession (id, createdAt, timestamp) {
  * @export
  * @param {string} category
  * @param {string} timestamp
- * @param {string} deviceId
+ * @param {string} device_id
  * @return {void}
  */
-export function insertTimeTracking (category, timestamp, deviceId) {
+export function insertTimeTracking (category, timestamp, device_id) {
 	const selectStatement = getStatement(
 		'selectTimeTracking',
 		`SELECT * FROM timetracking
@@ -64,7 +64,7 @@ export function insertTimeTracking (category, timestamp, deviceId) {
 
 	if (category.toLowerCase().startsWith('stop')) return;
 
-	insertNewRecord(category, timestamp, deviceId);
+	insertNewRecord(category, timestamp, device_id);
 }
 
 export function getTimeTracking (id, page) {
@@ -111,9 +111,9 @@ export function updateTimeTracking (id, category, created_at, ended_at) {
 		WHERE id = $id`,
 	);
 
-	const createdAtMs = new Date(created_at).getTime();
-	const endedAtMs = new Date(ended_at).getTime();
-	const duration_secs = (endedAtMs - createdAtMs) / 1000;
+	const created_at_ms = new Date(created_at).getTime();
+	const ended_at_ms = new Date(ended_at).getTime();
+	const duration_secs = (ended_at_ms - created_at_ms) / 1000;
 
 	return statement.run({
 		id,
