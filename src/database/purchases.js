@@ -54,7 +54,6 @@ export function deletePurchase (id) {
 	return statement.run({ id });
 }
 
-
 export function updatePurchase (id, amount, currency, merchant, category, createdAt) {
 	const statement = getStatement(
 		'updatePurchase',

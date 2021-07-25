@@ -4,7 +4,6 @@ const formBodyParser = (body) => {
 	return body
 		.split('&')
 		.reduce((acc, field) => {
-			console.log(field);
 			let [ key, value ] = field.split('=');
 			key = decodeURIComponent(key.replace(/\+/g, ' '));
 			value = decodeURIComponent(value.replace(/\+/g, ' '));

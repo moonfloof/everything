@@ -1,5 +1,5 @@
 <h2>Purchases:</h2>
 {{#each purchases as |purchase| }}
-	{{> purchase purchase=purchase }}
+	{{> internal/purchase data=purchase }}
 {{/each}}
 {{> pagination route="/purchases" pagination=pagination }}

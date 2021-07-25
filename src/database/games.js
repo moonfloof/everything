@@ -134,3 +134,32 @@ export function countGameActivity () {
 
 	return statement.get().total;
 }
+
+export function deleteGameActivity (id) {
+	const statement = getStatement(
+		'deleteGameActivity',
+		'DELETE FROM games WHERE id = $id',
+	);
+
+	return statement.run({ id });
+}
+
+export function updateGameActivity (id, name, playtime_mins, created_at, updated_at) {
+	const statement = getStatement(
+		'updateGameActivity',
+		`UPDATE games
+		SET name = $name,
+		    playtime_mins = $playtime_mins,
+		    created_at = $created_at,
+		    updated_at = $updated_at
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		name,
+		playtime_mins,
+		created_at,
+		updated_at,
+	});
+}
