@@ -1,5 +1,5 @@
 import express from 'express';
-import { countListens, deleteListen, getListens, updateListen } from '../../database/listens.js';
+import { countListens, deleteListen, getListens, insertScrobble, updateListen } from '../../database/listens.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -16,6 +16,23 @@ router.get('/', (req, res) => {
 });
 
 // CRUD
+
+router.post('/', (req, res) => {
+	const { artist, album, title, tracknumber, release_year, genre, created_at } = req.body;
+
+	insertScrobble(
+		artist,
+		album,
+		title,
+		tracknumber,
+		release_year,
+		genre,
+		created_at || new Date().toISOString(),
+		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+	);
+
+	res.redirect('/listens');
+});
 
 router.post('/:id', (req, res) => {
 	const { id } = req.params;
