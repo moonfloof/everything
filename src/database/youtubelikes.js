@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { RECORDS_PER_PAGE } from './constants.js';
+import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
 export function insertYouTubeLike (url, title, channel, deviceId) {
 	const id = uuid();
@@ -44,7 +44,7 @@ export function getLikes (id, page) {
 	return statement
 		.all({
 			id: id || '%',
-			offset: page ? (page - 1) * RECORDS_PER_PAGE : 0,
+			offset: calculateOffset(page),
 		})
 		.map(row => ({
 			...row,

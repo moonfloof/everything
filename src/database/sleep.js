@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
 import { prettyDate, prettyDuration, shortDate } from '../lib/formatDate.js';
-import { RECORDS_PER_PAGE } from './constants.js';
+import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
 function insertNewRecord (timestamp, deviceId) {
 	const statement = getStatement(
@@ -71,7 +71,7 @@ export function getSleepCycles (id, page) {
 	return statement
 		.all({
 			id: id || '%',
-			offset: page ? (page - 1) * RECORDS_PER_PAGE : 0,
+			offset: calculateOffset(page),
 		})
 		.map(row => {
 			const startedAt = new Date(row.started_at);

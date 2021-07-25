@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
-import { RECORDS_PER_PAGE } from './constants.js';
+import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
 export function insertWeight (weightKgs, createdAt, deviceId) {
 	const statement = getStatement(
@@ -37,7 +37,7 @@ export function getWeight (id, page) {
 	return statement
 		.all({
 			id: id || '%',
-			offset: page ? (page - 1) * RECORDS_PER_PAGE : 0,
+			offset: calculateOffset(page),
 		})
 		.map(row => ({
 			...row,
