@@ -3,10 +3,7 @@ import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
-export function insertYouTubeLike (url, title, channel, device_id) {
-	const id = uuid();
-	const created_at = new Date().toISOString();
-
+export function insertYouTubeLike (url, title, channel, device_id, created_at) {
 	const statement = getStatement(
 		'insertYouTubeLike',
 		`INSERT INTO youtubelikes
@@ -16,12 +13,12 @@ export function insertYouTubeLike (url, title, channel, device_id) {
 	);
 
 	return statement.run({
-		id,
+		id: uuid(),
 		url,
 		title,
 		channel,
 		device_id,
-		created_at,
+		created_at: created_at || new Date().toISOString(),
 	});
 }
 
