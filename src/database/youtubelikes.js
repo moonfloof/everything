@@ -60,3 +60,32 @@ export function countYouTubeLikes () {
 
 	return statement.get().total;
 }
+
+export function deleteYouTubeLike (id) {
+	const statement = getStatement(
+		'deleteYouTubeLike',
+		'DELETE FROM youtubelikes WHERE id = $id',
+	);
+
+	return statement.run({ id });
+}
+
+export function updateYouTubeLike (id, url, title, channel, created_at) {
+	const statement = getStatement(
+		'updateYouTubeLike',
+		`UPDATE youtubelikes
+		SET url = $url,
+		    title = $title,
+		    channel = $channel,
+		    created_at = $created_at
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		url,
+		title,
+		channel,
+		created_at,
+	});
+}

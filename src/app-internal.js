@@ -8,6 +8,7 @@ import games from './routers/internal/games.js';
 import timetracking from './routers/internal/timetracking.js';
 import sleep from './routers/internal/sleep.js';
 import listens from './routers/internal/listens.js';
+import youtubelikes from './routers/internal/youtubelikes.js';
 import frontend from './routers/internal/frontend.js';
 
 const log = new Logger('server-int');
@@ -21,6 +22,7 @@ app.use('/games', games);
 app.use('/timetracking', timetracking);
 app.use('/sleep', sleep);
 app.use('/listens', listens);
+app.use('/youtubelikes', youtubelikes);
 app.use('/', frontend);
 
 const startServer = () => {
