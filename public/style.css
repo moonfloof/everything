@@ -88,6 +88,22 @@ table td {
 	text-align: right;
 }
 
+.pagination a {
+	flex: 1;
+	text-align: center;
+	margin: 0 16px;
+	padding: 16px 32px;
+	border-radius: 16px;
+	background-color: rgba(45, 28, 136, 0.05);
+	font-weight: 700;
+}
+.pagination a:hover {
+	background-color: rgba(45, 28, 136, 0.1);
+}
+.pagination div {
+	display: flex;
+}
+
 /**
  *  INTERNAL USE ONLY
  */
