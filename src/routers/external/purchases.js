@@ -1,6 +1,6 @@
 import express from 'express';
-import { insertPurchase } from '../database/purchases.js';
-import Logger from '../lib/logger.js';
+import { insertPurchase } from '../../database/purchases.js';
+import Logger from '../../lib/logger.js';
 
 const log = new Logger('Purchases');
 

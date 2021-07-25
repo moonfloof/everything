@@ -1,9 +1,9 @@
 import express from 'express';
-import { validateDevice } from '../database/devices.js';
-import { insertSleepCycle } from '../database/sleep.js';
-import { insertTimeTracking } from '../database/timetracking.js';
-import { insertWeight } from '../database/weight.js';
-import Logger from '../lib/logger.js';
+import { validateDevice } from '../../database/devices.js';
+import { insertSleepCycle } from '../../database/sleep.js';
+import { insertTimeTracking } from '../../database/timetracking.js';
+import { insertWeight } from '../../database/weight.js';
+import Logger from '../../lib/logger.js';
 
 const log = new Logger('Health');
 

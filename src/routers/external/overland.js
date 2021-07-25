@@ -1,7 +1,7 @@
 import express from 'express';
-import { validateDevice } from '../database/devices.js';
-import { insertLocation } from '../database/locations.js';
-import Logger from '../lib/logger.js';
+import { validateDevice } from '../../database/devices.js';
+import { insertLocation } from '../../database/locations.js';
+import Logger from '../../lib/logger.js';
 
 const log = new Logger('Overland');
 

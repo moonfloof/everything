@@ -3,12 +3,12 @@ import Logger from './lib/logger.js';
 import appCreate from './lib/appCreate.js';
 
 // Routers
-import overland from './routers/overland.js';
-import listenbrainz from './routers/listenbrainz.js';
-import youtube from './routers/youtube.js';
-import health from './routers/health.js';
-import purchases from './routers/purchases.js';
-import frontend from './routers/frontend.js';
+import overland from './routers/external/overland.js';
+import listenbrainz from './routers/external/listenbrainz.js';
+import youtube from './routers/external/youtube.js';
+import health from './routers/external/health.js';
+import purchases from './routers/external/purchases.js';
+import frontend from './routers/external/frontend.js';
 
 const log = new Logger('server-ext');
 

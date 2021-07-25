@@ -1,13 +1,13 @@
 import express from 'express';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
-import { getListens, getPopular } from '../database/listens.js';
-import { getLikes } from '../database/youtubelikes.js';
-import { getGameActivity, getGameActivityByDay } from '../database/games.js';
-import { getSleepCycles } from '../database/sleep.js';
+import { getListens, getPopular } from '../../database/listens.js';
+import { getLikes } from '../../database/youtubelikes.js';
+import { getGameActivity, getGameActivityByDay } from '../../database/games.js';
+import { getSleepCycles } from '../../database/sleep.js';
 
-import Logger from '../lib/logger.js';
-import { generateBarGraph } from '../lib/graphs/bar.js';
+import Logger from '../../lib/logger.js';
+import { generateBarGraph } from '../../lib/graphs/bar.js';
 
 const log = new Logger('frontend');
 

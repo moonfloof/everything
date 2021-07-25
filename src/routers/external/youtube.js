@@ -1,9 +1,9 @@
 import express from 'express';
-import isLocal from '../lib/isLocal.js';
-import { generateAuthUrl, getYouTubeVideoSnippet, retrieveAccessToken } from '../adapters/youtube.js';
-import { validateDevice } from '../database/devices.js';
-import { insertYouTubeLike } from '../database/youtubelikes.js';
-import Logger from '../lib/logger.js';
+import isLocal from '../../lib/isLocal.js';
+import { generateAuthUrl, getYouTubeVideoSnippet, retrieveAccessToken } from '../../adapters/youtube.js';
+import { validateDevice } from '../../database/devices.js';
+import { insertYouTubeLike } from '../../database/youtubelikes.js';
+import Logger from '../../lib/logger.js';
 
 const log = new Logger('YouTube');
 

@@ -1,7 +1,7 @@
 import express from 'express';
-import { validateDevice } from '../database/devices.js';
-import { insertScrobble } from '../database/listens.js';
-import Logger from '../lib/logger.js';
+import { validateDevice } from '../../database/devices.js';
+import { insertScrobble } from '../../database/listens.js';
+import Logger from '../../lib/logger.js';
 
 const log = new Logger('ListenBrainz');
 
