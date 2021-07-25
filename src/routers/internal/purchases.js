@@ -1,14 +1,19 @@
 import express from 'express';
 
-import { deletePurchase, getPurchases, updatePurchase } from '../../database/purchases.js';
+import { countPurchases, deletePurchase, getPurchases, updatePurchase } from '../../database/purchases.js';
+import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
 
 // FRONTEND
 
 router.get('/', (req, res) => {
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countPurchases());
+
 	const purchases = getPurchases(undefined, req.query.page);
-	res.render('internal/purchases', { purchases });
+
+	res.render('internal/purchases', { purchases, pagination });
 });
 
 // CRUD

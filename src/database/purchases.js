@@ -22,6 +22,15 @@ export function insertPurchase (amount, merchant, category, currency, createdAt,
 	});
 }
 
+export function countPurchases () {
+	const statement = getStatement(
+		'countPurchases',
+		'SELECT COUNT(*) as total FROM purchases',
+	);
+
+	return statement.get().count;
+}
+
 export function getPurchases (purchaseId, page) {
 	const statement = getStatement('getPurchases', `
 		SELECT * FROM purchases
