@@ -18,9 +18,18 @@ router.get('/', (req, res) => {
 // CRUD
 
 router.post('/', (req, res) => {
-	const { category, created_at } = req.body;
+	const { category, created_at, ended_at } = req.body;
 
-	insertTimeTracking(category, created_at, process.env.TOMBOIS_DEFAULT_DEVICE_ID);
+	insertTimeTracking(
+		category,
+		created_at,
+		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+	);
+	insertTimeTracking(
+		'stop',
+		ended_at || new Date().toISOString(),
+		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+	);
 
 	res.redirect('/timetracking');
 });

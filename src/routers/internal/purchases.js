@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
 		merchant,
 		category,
 		currency,
-		created_at,
+		created_at || new Date().toISOString(),
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	);
 
