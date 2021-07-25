@@ -28,7 +28,10 @@ router.get('/', (_req, res) => {
 		sleep: sleep[0] || null,
 	};
 
-	res.render('dashboard', { latest });
+	res.render(
+		'external/dashboard',
+		{ latest },
+	);
 });
 
 // LISTENS
@@ -37,11 +40,10 @@ router.get('/listens', (req, res) => {
 	const listens = getListens(undefined, req.query.page);
 	const popular = getPopular(7);
 
-	res.render('listenlist', {
-		listens,
-		popular,
-		page: req.query.page,
-	});
+	res.render(
+		'external/listenlist',
+		{ listens, popular, page: req.query.page },
+	);
 });
 
 router.get('/listen/:id', (req, res) => {
@@ -51,14 +53,20 @@ router.get('/listen/:id', (req, res) => {
 		throw new NotFoundError('Listen not found');
 	}
 
-	res.render('listensingle', { listen: listens[0] });
+	res.render(
+		'external/listensingle',
+		{ listen: listens[0] },
+	);
 });
 
 // YOUTUBE LIKES
 
 router.get('/youtubelikes', (req, res) => {
 	const youtubeLikes = getLikes(undefined, req.query.page);
-	res.render('youtubelikelist', { youtubeLikes, page: req.query.page });
+	res.render(
+		'external/youtubelikelist',
+		{ youtubeLikes, page: req.query.page },
+	);
 });
 
 router.get('/youtubelike/:id', (req, res) => {
@@ -68,7 +76,10 @@ router.get('/youtubelike/:id', (req, res) => {
 		throw new NotFoundError('Like not found');
 	}
 
-	res.render('youtubelikesingle', { youtubeLike: youtubeLikes[0] });
+	res.render(
+		'external/youtubelikesingle',
+		{ youtubeLike: youtubeLikes[0] },
+	);
 });
 
 // STEAM ACTIVITY
@@ -78,7 +89,10 @@ router.get('/games', (req, res) => {
 	const gamesByDay = getGameActivityByDay();
 	const svg = generateBarGraph(gamesByDay, 'hours');
 
-	res.render('gamelist', { gameActivity, page: req.query.page, svg });
+	res.render(
+		'external/gamelist',
+		{ gameActivity, page: req.query.page, svg },
+	);
 });
 
 router.get('/game/:id', (req, res) => {
@@ -88,7 +102,10 @@ router.get('/game/:id', (req, res) => {
 		throw new NotFoundError('Like not found');
 	}
 
-	res.render('gamesingle', { gameActivity: gameActivity[0] });
+	res.render(
+		'external/gamesingle',
+		{ gameActivity: gameActivity[0] },
+	);
 });
 
 // SLEEP CYCLES
@@ -102,7 +119,10 @@ router.get('/sleeps', (req, res) => {
 	}));
 	const svg = generateBarGraph(graphData, 'hours');
 
-	res.render('sleeplist', { sleep, page: req.query.page, svg });
+	res.render(
+		'external/sleeplist',
+		{ sleep, page: req.query.page, svg },
+	);
 });
 
 router.get('/sleep/:id', (req, res) => {
@@ -112,7 +132,10 @@ router.get('/sleep/:id', (req, res) => {
 		throw new NotFoundError('Like not found');
 	}
 
-	res.render('sleepsingle', { sleep: sleep[0] });
+	res.render(
+		'external/sleepsingle',
+		{ sleep: sleep[0] },
+	);
 });
 
 // NOT FOUND
@@ -128,7 +151,7 @@ router.use((err, req, res, _next) => {
 
 	res
 		.status(err.code || 500)
-		.render('error', { error: err.message });
+		.render('external/error', { error: err.message });
 });
 
 export default router;
