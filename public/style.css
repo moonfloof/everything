@@ -61,6 +61,14 @@ p {
 	line-height: 20px;
 }
 
+pre {
+	font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+	line-height: 1.2;
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
 .sectioncontainer {
 	margin-top: 32px;
 }
