@@ -4,9 +4,8 @@ import timeago from '../adapters/timeago.js';
 import { prettyDuration, shortDate } from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
-export function insertNewGameActivity (name, device_id, playtime_mins = 0) {
+export function insertNewGameActivity (name, device_id, playtime_mins = 0, created_at) {
 	const id = uuid();
-	const created_at = new Date(Date.now() - (playtime_mins * 60000)).toISOString();
 	const updated_at = new Date().toISOString();
 
 	const statement = getStatement(
@@ -21,7 +20,7 @@ export function insertNewGameActivity (name, device_id, playtime_mins = 0) {
 		id,
 		name,
 		playtime_mins,
-		created_at,
+		created_at: created_at || new Date(Date.now() - (playtime_mins * 60000)).toISOString(),
 		updated_at,
 		device_id,
 	});

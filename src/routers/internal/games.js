@@ -1,5 +1,5 @@
 import express from 'express';
-import { countGameActivity, deleteGameActivity, getGameActivity, updateGameActivity } from '../../database/games.js';
+import { countGameActivity, deleteGameActivity, getGameActivity, insertNewGameActivity, updateGameActivity } from '../../database/games.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -16,6 +16,13 @@ router.get('/', (req, res) => {
 });
 
 // CRUD
+
+router.post('/', (req, res) => {
+	const { name, playtime_mins, created_at } = req.body;
+
+	insertNewGameActivity(name, process.env.TOMBOIS_DEFAULT_DEVICE_ID, playtime_mins, created_at);
+	res.redirect('/games');
+});
 
 router.post('/:id', (req, res) => {
 	const { id } = req.params;
