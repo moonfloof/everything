@@ -1,5 +1,5 @@
 import express from 'express';
-import { countTimeTracking, deleteTimeTracking, getTimeTracking, updateTimeTracking } from '../../database/timetracking.js';
+import { countTimeTracking, deleteTimeTracking, getTimeTracking, insertTimeTracking, updateTimeTracking } from '../../database/timetracking.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -16,6 +16,14 @@ router.get('/', (req, res) => {
 });
 
 // CRUD
+
+router.post('/', (req, res) => {
+	const { category, created_at } = req.body;
+
+	insertTimeTracking(category, created_at, process.env.TOMBOIS_DEFAULT_DEVICE_ID);
+
+	res.redirect('/timetracking');
+});
 
 router.post('/:id', (req, res) => {
 	const { id } = req.params;

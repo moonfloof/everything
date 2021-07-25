@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 import { getStatement } from './database.js';
 
-function insertNewRecord (category, timestamp, device_id) {
+function insertNewRecord (category, created_at, device_id) {
 	const statement = getStatement(
 		'insertTimeTracking',
 		`INSERT INTO timetracking
@@ -14,7 +14,7 @@ function insertNewRecord (category, timestamp, device_id) {
 	return statement.run({
 		id: uuid(),
 		category,
-		created_at: new Date(timestamp).toISOString(),
+		created_at: new Date(created_at).toISOString(),
 		device_id,
 	});
 }
@@ -47,7 +47,7 @@ function endSession (id, created_at, timestamp) {
  * @param {string} device_id
  * @return {void}
  */
-export function insertTimeTracking (category, timestamp, device_id) {
+export function insertTimeTracking (category, created_at, device_id) {
 	const selectStatement = getStatement(
 		'selectTimeTracking',
 		`SELECT * FROM timetracking
@@ -59,12 +59,12 @@ export function insertTimeTracking (category, timestamp, device_id) {
 	const row = selectStatement.get();
 
 	if (row !== undefined) {
-		endSession(row.id, row.created_at, timestamp);
+		endSession(row.id, row.created_at, created_at);
 	}
 
 	if (category.toLowerCase().startsWith('stop')) return;
 
-	insertNewRecord(category, timestamp, device_id);
+	insertNewRecord(category, created_at, device_id);
 }
 
 export function getTimeTracking (id, page) {

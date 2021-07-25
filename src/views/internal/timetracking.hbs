@@ -1,4 +1,8 @@
 <h2>Time Tracking:</h2>
+
+{{> internal/timetracking data=activity }}
+<hr/>
+
 {{#each timetracking as |activity| }}
 	{{> internal/timetracking data=activity }}
 {{/each}}
