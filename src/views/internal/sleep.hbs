@@ -1,0 +1,6 @@
+<h2>Sleep:</h2>
+{{#each sleep as |activity| }}
+	{{> internal/sleep data=activity }}
+{{/each}}
+
+{{> pagination route="/sleep" pagination=pagination }}

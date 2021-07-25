@@ -1,0 +1,10 @@
+<form method="POST" action="/sleep/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id}}
+
+		{{> internal/crudRow emoji="🕗" name="started_at" value=data.started_at }}
+		{{> internal/crudRow emoji="🕙" name="ended_at" value=data.ended_at }}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>

@@ -107,3 +107,29 @@ export function countSleepCycles () {
 
 	return statement.get().total;
 }
+
+
+export function deleteSleepCycle (id) {
+	const statement = getStatement(
+		'deleteSleepCycle',
+		'DELETE FROM sleep WHERE id = $id',
+	);
+
+	return statement.run({ id });
+}
+
+export function updateSleepCycle (id, started_at, ended_at) {
+	const statement = getStatement(
+		'updateSleepCycle',
+		`UPDATE sleep
+		SET started_at = $started_at,
+		    ended_at = $ended_at
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		started_at,
+		ended_at,
+	});
+}
