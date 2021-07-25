@@ -23,7 +23,7 @@ const getClient = () => {
 	client = new google.auth.OAuth2({
 		clientId: process.env.TOMBOIS_GOOGLE_CLIENTID,
 		clientSecret: process.env.TOMBOIS_GOOGLE_CLIENTSECRET,
-		redirectUri: process.env.TOMBOIS_SERVER_URI + '/api/youtube/callback',
+		redirectUri: process.env.TOMBOIS_SERVER_EXTERNAL_URI + '/api/youtube/callback',
 	});
 
 	client.on('tokens', tokens => {
