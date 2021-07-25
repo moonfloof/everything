@@ -1,13 +1,11 @@
 import path from 'path';
 import express from 'express';
-import helmet from 'helmet';
 import exphbs from 'express-handlebars';
 import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
 import formBodyParser from './formParser.js';
 
 const appCreate = () => {
 	const app = express();
-	app.use(helmet());
 	app.use(rawBody);
 	app.use((req, _res, next) => {
 		try {

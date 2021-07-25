@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import Logger from './lib/logger.js';
 import appCreate from './lib/appCreate.js';
 
@@ -13,6 +14,7 @@ import frontend from './routers/external/frontend.js';
 const log = new Logger('server-ext');
 
 const app = appCreate();
+app.use(helmet);
 
 // Set up routers
 app.use('/api/overland', overland);
