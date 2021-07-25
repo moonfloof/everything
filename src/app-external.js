@@ -1,5 +1,6 @@
 import express from 'express';
 import Logger from './lib/logger.js';
+import appCreate from './lib/appCreate.js';
 
 // Routers
 import overland from './routers/overland.js';
@@ -8,9 +9,8 @@ import youtube from './routers/youtube.js';
 import health from './routers/health.js';
 import purchases from './routers/purchases.js';
 import frontend from './routers/frontend.js';
-import appCreate from './lib/appCreate.js';
 
-const log = new Logger('http');
+const log = new Logger('server-ext');
 
 const app = appCreate();
 
@@ -25,9 +25,9 @@ app.use(express.static('public'));
 app.use('/', frontend);
 
 const startServer = () => {
-	const port = process.env.TOMBOIS_SERVER_PORT;
+	const port = process.env.TOMBOIS_SERVER_PORT_EXTERNAL;
 	app.listen(port, () => {
-		log.info(`App running on port ${port}`);
+		log.info(`Running on port ${port}`);
 	});
 };
 
