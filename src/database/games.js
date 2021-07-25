@@ -88,7 +88,7 @@ export function getGameActivity (id, page) {
 			...row,
 			duration: prettyDuration(row.playtime_mins * 60000),
 			durationNumber: row.playtime_mins / 60,
-			timeago: timeago.format(new Date(row.updated_at)),
+			timeago: timeago.format(new Date(row.created_at)),
 		}));
 }
 
