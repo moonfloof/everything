@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
+import { RECORDS_PER_PAGE } from './constants.js';
 
 export function insertWeight (weightKgs, createdAt, deviceId) {
 	const statement = getStatement(
@@ -30,13 +31,13 @@ export function getWeight (id, page) {
 		`SELECT * FROM weight
 		WHERE id LIKE $id
 		ORDER BY created_at DESC
-		LIMIT 50 OFFSET $offset`,
+		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
 	);
 
 	return statement
 		.all({
 			id: id || '%',
-			offset: page ? (page - 1) * 50 : 0,
+			offset: page ? (page - 1) * RECORDS_PER_PAGE : 0,
 		})
 		.map(row => ({
 			...row,

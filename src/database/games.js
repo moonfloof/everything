@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { prettyDuration, shortDate } from '../lib/formatDate.js';
+import { RECORDS_PER_PAGE } from './constants.js';
 
 export function insertNewGameActivity (name, deviceId, playtime = 0) {
 	const id = uuid();
@@ -76,13 +77,13 @@ export function getGameActivity (id, page) {
 		`SELECT * FROM games
 		WHERE id LIKE $id
 		ORDER BY updated_at DESC
-		LIMIT 50 OFFSET $offset`,
+		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
 	);
 
 	return statement
 		.all({
 			id: id || '%',
-			offset: page ? (page - 1) * 50 : 0,
+			offset: page ? (page - 1) * RECORDS_PER_PAGE : 0,
 		})
 		.map(row => ({
 			...row,

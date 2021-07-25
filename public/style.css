@@ -76,6 +76,10 @@ p {
 	align-self: center;
 }
 
+.row .right {
+	flex: 1;
+}
+
 table td {
 	padding: 4px 16px 4px 0;
 }

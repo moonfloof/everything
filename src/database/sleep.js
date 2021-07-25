@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
 import { prettyDate, prettyDuration, shortDate } from '../lib/formatDate.js';
+import { RECORDS_PER_PAGE } from './constants.js';
 
 function insertNewRecord (timestamp, deviceId) {
 	const statement = getStatement(
@@ -64,13 +65,13 @@ export function getSleepCycles (id, page) {
 		`SELECT * FROM sleep
 		WHERE id LIKE $id
 		ORDER BY started_at DESC
-		LIMIT 50 OFFSET $offset`,
+		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
 	);
 
 	return statement
 		.all({
 			id: id || '%',
-			offset: page ? (page - 1) * 50 : 0,
+			offset: page ? (page - 1) * RECORDS_PER_PAGE : 0,
 		})
 		.map(row => {
 			const startedAt = new Date(row.started_at);

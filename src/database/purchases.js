@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
+import { RECORDS_PER_PAGE } from './constants.js';
 
 export function insertPurchase (amount, merchant, category, currency, createdAt, deviceId) {
 	const statement = getStatement(
@@ -26,11 +27,11 @@ export function getPurchases (purchaseId, page) {
 		SELECT * FROM purchases
 		WHERE id LIKE $id
 		ORDER BY created_at DESC
-		LIMIT 50 OFFSET $offset
+		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset
 	`);
 
 	const id = purchaseId || '%';
-	const offset = page ? (page - 1) * 50 : 0;
+	const offset = page ? (page - 1) * RECORDS_PER_PAGE : 0;
 
 	return statement.all({ id, offset });
 }
