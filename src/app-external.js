@@ -14,7 +14,7 @@ import frontend from './routers/external/frontend.js';
 const log = new Logger('server-ext');
 
 const app = appCreate();
-app.use(helmet);
+app.use(helmet());
 
 // Set up routers
 app.use('/api/overland', overland);
