@@ -54,8 +54,11 @@ router.post('/', (req, res) => {
 
 		// Get latest battery level
 		const lastLoc = locations[locations.length - 1];
-		const { battery_state, battery_level } = lastLoc.properties;
-		updateDevice(deviceId, (battery_level * 100) || 100, battery_state);
+		let { battery_state, battery_level } = lastLoc.properties;
+
+		battery_level = (battery_level * 100) || 100;
+		if (battery_state === 'unknown') battery_state = null;
+		updateDevice(deviceId, battery_level, battery_state);
 
 		res.send({ result: 'ok' });
 	} catch (err) {

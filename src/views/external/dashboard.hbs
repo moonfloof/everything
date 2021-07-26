@@ -1,15 +1,19 @@
-<h2><a href="/listens">listening to:</a></h2>
-{{> listen data=latest.listen showlink=true }}
-
-<h2><a href="/youtubelikes">liking on youtube:</a></h2>
-{{> youtubeLike data=latest.youtubeLike showlink=true }}
-
-{{#if latest.gameActivity}}
-<h2><a href="/games">playing:</a></h2>
-{{> gameActivity data=latest.gameActivity showlink=true }}
+{{#if device}}
+	{{> device device=device }}
 {{/if}}
 
-{{#if latest.sleep}}
+<h2><a href="/listens">listening to:</a></h2>
+{{> listen data=listen showlink=true }}
+
+<h2><a href="/youtubelikes">liking on youtube:</a></h2>
+{{> youtubeLike data=youtubeLike showlink=true }}
+
+{{#if gameActivity}}
+<h2><a href="/games">playing:</a></h2>
+{{> gameActivity data=gameActivity showlink=true }}
+{{/if}}
+
+{{#if sleep}}
 <h2><a href="/sleeps">sleeping:</a></h2>
-{{> sleep data=latest.sleep showlink=true }}
+{{> sleep data=sleep showlink=true }}
 {{/if}}

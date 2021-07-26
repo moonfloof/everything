@@ -5,6 +5,7 @@ import { countListens, getListens, getPopular } from '../../database/listens.js'
 import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
 import { countGameActivity, getGameActivity, getGameActivityByDay } from '../../database/games.js';
 import { countSleepCycles, getSleepCycles } from '../../database/sleep.js';
+import { getDevices } from '../../database/devices.js';
 
 import Logger from '../../lib/logger.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
@@ -21,18 +22,15 @@ router.get('/', (_req, res) => {
 	const youtubelikes = getLikes();
 	const gameActivity = getGameActivity();
 	const sleep = getSleepCycles();
+	const devices = getDevices();
 
-	const latest = {
+	res.render('external/dashboard', {
 		listen: listens[0] || null,
 		youtubeLike: youtubelikes[0] || null,
 		gameActivity: gameActivity[0] || null,
 		sleep: sleep[0] || null,
-	};
-
-	res.render(
-		'external/dashboard',
-		{ latest },
-	);
+		device: devices[0] || null,
+	});
 });
 
 // LISTENS

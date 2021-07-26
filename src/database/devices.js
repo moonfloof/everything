@@ -19,7 +19,8 @@ export function getDevices () {
 	const statement = getStatement(
 		'getDevices',
 		`SELECT id, description, battery_level, battery_status
-		FROM devices`,
+		FROM devices
+		ORDER BY updated_at DESC`,
 	);
 
 	return statement.all();
@@ -30,7 +31,8 @@ export function updateDevice (id, battery_level, battery_status) {
 		'updateDevice',
 		`UPDATE devices
 		SET battery_status = $battery_status,
-		    battery_level = $battery_level
+		    battery_level = $battery_level,
+		    updated_at = $updated_at
 		WHERE id = $id`,
 	);
 
@@ -38,5 +40,6 @@ export function updateDevice (id, battery_level, battery_status) {
 		id,
 		battery_level,
 		battery_status,
+		updated_at: new Date().toISOString(),
 	});
 }
