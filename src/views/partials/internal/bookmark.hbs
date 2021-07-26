@@ -1,0 +1,11 @@
+<form method="POST" action="/bookmarks/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id}}
+
+		{{> internal/crudRow emoji="🔖" name="title" value=data.title }}
+		{{> internal/crudRow emoji="🔗" name="url" value=data.url }}
+		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>
