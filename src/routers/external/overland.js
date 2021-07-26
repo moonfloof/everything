@@ -57,7 +57,13 @@ router.post('/', (req, res) => {
 		let { battery_state, battery_level } = lastLoc.properties;
 
 		battery_level = (battery_level * 100) || 100;
-		if (battery_state === 'unknown') battery_state = null;
+		switch (battery_state) {
+			case true: battery_state = 'charging'; break;
+			case false: battery_state = 'unplugged'; break;
+			case 'unknown': battery_state = null; break;
+			default: break;
+		}
+
 		updateDevice(deviceId, battery_level, battery_state);
 
 		res.send({ result: 'ok' });
