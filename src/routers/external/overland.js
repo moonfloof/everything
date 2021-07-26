@@ -56,7 +56,8 @@ router.post('/', (req, res) => {
 		const lastLoc = locations[locations.length - 1];
 		let { battery_state, battery_level } = lastLoc.properties;
 
-		battery_level = (battery_level * 100) || 100;
+		battery_level = (Math.round(battery_level * 10000) / 100) || 100;
+
 		switch (battery_state) {
 			case true: battery_state = 'charging'; break;
 			case false: battery_state = 'unplugged'; break;
