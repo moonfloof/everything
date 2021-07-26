@@ -1,5 +1,5 @@
 import express from 'express';
-import { validateDevice } from '../../database/devices.js';
+import { updateDevice, validateDevice } from '../../database/devices.js';
 import { insertLocation } from '../../database/locations.js';
 import Logger from '../../lib/logger.js';
 
@@ -25,6 +25,13 @@ router.post('/', (req, res) => {
 
 		log.debug(`Received ${locations.length} locations to process`);
 
+		// Sort by timestamp ascending
+		locations.sort((a, b) => {
+			const dateA = new Date(a.properties.timestamp);
+			const dateB = new Date(b.properties.timestamp);
+			return dateA - dateB;
+		});
+
 		// Add locations to database
 		locations.forEach(location => {
 			if (location?.geometry?.coordinates === undefined) {
@@ -44,6 +51,11 @@ router.post('/', (req, res) => {
 			const [ lon, lat ] = location?.geometry?.coordinates;
 			insertLocation(lat, lon, null, timestampISO, deviceId);
 		});
+
+		// Get latest battery level
+		const lastLoc = locations[locations.length - 1];
+		const { battery_state, battery_level } = lastLoc.properties;
+		updateDevice(deviceId, (battery_level * 100) || 100, battery_state);
 
 		res.send({ result: 'ok' });
 	} catch (err) {

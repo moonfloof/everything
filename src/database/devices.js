@@ -14,3 +14,29 @@ export function validateDevice (api_key) {
 
 	return device;
 }
+
+export function getDevices () {
+	const statement = getStatement(
+		'getDevices',
+		`SELECT id, description, battery_level, battery_status
+		FROM devices`,
+	);
+
+	return statement.all();
+}
+
+export function updateDevice (id, battery_level, battery_status) {
+	const statement = getStatement(
+		'updateDevice',
+		`UPDATE devices
+		SET battery_status = $battery_status,
+		    battery_level = $battery_level
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		battery_level,
+		battery_status,
+	});
+}
