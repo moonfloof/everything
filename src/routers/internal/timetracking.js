@@ -22,14 +22,17 @@ router.post('/', (req, res) => {
 
 	insertTimeTracking(
 		category,
-		created_at,
+		created_at || new Date().toISOString(),
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	);
-	insertTimeTracking(
-		'stop',
-		ended_at || new Date().toISOString(),
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+
+	if (category?.toLowerCase().includes('stop')) {
+		insertTimeTracking(
+			'stop',
+			ended_at || new Date().toISOString(),
+			process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+		);
+	}
 
 	res.redirect('/timetracking');
 });
