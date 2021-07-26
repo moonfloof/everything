@@ -19,9 +19,9 @@ function insertNewRecord (category, created_at, device_id) {
 	});
 }
 
-function endSession (id, created_at, timestamp) {
+function endTimeTrackingSession (id, created_at, timestamp) {
 	const updateStatement = getStatement(
-		'updateTimeTracking',
+		'endTimeTrackingSession',
 		`UPDATE timetracking
 		SET
 			ended_at = $ended_at,
@@ -59,7 +59,7 @@ export function insertTimeTracking (category, created_at, device_id) {
 	const row = selectStatement.get();
 
 	if (row !== undefined) {
-		endSession(row.id, row.created_at, created_at);
+		endTimeTrackingSession(row.id, row.created_at, created_at);
 	}
 
 	if (category.toLowerCase().startsWith('stop')) return;
