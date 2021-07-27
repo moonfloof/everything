@@ -4,7 +4,7 @@ import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 import { countListens, getListenGraph, getListens, getListensPopular } from '../../database/listens.js';
 import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
 import { countGameActivity, getGameActivity, getGameActivityByDay } from '../../database/games.js';
-import { countSleepCycles, getSleepCycles } from '../../database/sleep.js';
+import { getSleepCycles } from '../../database/sleep.js';
 import { getSteps } from '../../database/steps.js';
 import { getDevices } from '../../database/devices.js';
 
@@ -23,7 +23,7 @@ router.get('/', (_req, res) => {
 	const listens = getListens();
 	const youtubelikes = getLikes();
 	const gameActivity = getGameActivity();
-	const sleep = getSleepCycles();
+	const sleep = getSleepCycles()?.[0]?.duration;
 	const devices = getDevices();
 	const city = getLatestCity();
 	const steps = getSteps();
@@ -32,7 +32,7 @@ router.get('/', (_req, res) => {
 		listen: listens[0] || null,
 		youtubeLike: youtubelikes[0] || null,
 		gameActivity: gameActivity[0] || null,
-		sleep: sleep[0] || null,
+		sleep,
 		device: devices[0] || null,
 		steps: steps?.[0]?.step_count_total || null,
 		city,
@@ -122,38 +122,6 @@ router.get('/game/:id', (req, res) => {
 	res.render(
 		'external/gamesingle',
 		{ gameActivity: gameActivity[0] },
-	);
-});
-
-// SLEEP CYCLES
-
-router.get('/sleeps', (req, res) => {
-	const { page = 0 } = req.query;
-	const pagination = handlebarsPagination(page, countSleepCycles());
-
-	const sleep = getSleepCycles(undefined, page);
-	const graphData = sleep.map(night => ({
-		y: night.durationNumber,
-		label: night.dateShort,
-	}));
-	const svg = generateBarGraph(graphData, 'hours');
-
-	res.render(
-		'external/sleeplist',
-		{ sleep, svg, pagination },
-	);
-});
-
-router.get('/sleep/:id', (req, res) => {
-	const sleep = getSleepCycles(req.params.id);
-
-	if (sleep.length === 0) {
-		throw new NotFoundError('Like not found');
-	}
-
-	res.render(
-		'external/sleepsingle',
-		{ sleep: sleep[0] },
 	);
 });
 

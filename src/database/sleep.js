@@ -78,7 +78,7 @@ export function getSleepCycles (id, page) {
 			const ended_at = row.ended_at ? new Date(row.ended_at) : null;
 			const timeago = TimeAgo.format(started_at);
 
-			let duration = 'Currently sleeping';
+			let duration = null;
 			let durationNumber = 0;
 
 			if (ended_at !== null) {
