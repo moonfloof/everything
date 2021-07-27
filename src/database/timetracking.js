@@ -115,15 +115,17 @@ export function updateTimeTracking (id, category, created_at, ended_at) {
 		WHERE id = $id`,
 	);
 
+	const ended_at_date = new Date(ended_at || Date.now());
+
 	const created_at_ms = new Date(created_at).getTime();
-	const ended_at_ms = new Date(ended_at).getTime();
+	const ended_at_ms = ended_at_date.getTime();
 	const duration_secs = (ended_at_ms - created_at_ms) / 1000;
 
 	return statement.run({
 		id,
 		category,
 		created_at,
-		ended_at,
+		ended_at: ended_at_date.toISOString(),
 		duration_secs,
 	});
 }
