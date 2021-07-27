@@ -101,6 +101,10 @@ export function deleteTimeTracking (id) {
 }
 
 export function updateTimeTracking (id, category, created_at, ended_at) {
+	if (category?.toLowerCase().startsWith('stop')) {
+		return;
+	}
+
 	const statement = getStatement(
 		'updateTimeTracking',
 		`UPDATE timetracking
