@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { dayMs } from '../lib/formatDate.js';
 
 /**
  * @export
@@ -76,7 +77,7 @@ export function getPopular (days) {
 		ORDER BY count DESC, artist ASC;`,
 	);
 
-	const created_at = new Date(Date.now() - (days * 86400000)).toISOString();
+	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
 
 	return statement.all({ created_at });
 }

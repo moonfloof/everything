@@ -4,6 +4,7 @@ import path from 'path';
 import { google, Auth } from 'googleapis';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
 import Logger from '../lib/logger.js';
+import { minuteMs } from '../lib/formatDate.js';
 
 const log = new Logger('YouTube');
 
@@ -90,7 +91,7 @@ export const retrieveAccessToken = async (authCode) => {
 
 export const pollForLikedVideos = () => {
 	const intervalMins = Number(process.env.TOMBOIS_GOOGLE_POLL_INTERVAL) ?? 5;
-	const intervalMs = intervalMins * 60 * 1000;
+	const intervalMs = intervalMins * minuteMs;
 
 	if (intervalMs === 0) return;
 

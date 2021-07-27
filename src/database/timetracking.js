@@ -25,17 +25,17 @@ function endTimeTrackingSession (id, created_at, timestamp) {
 		`UPDATE timetracking
 		SET
 			ended_at = $ended_at,
-			duration_secs = $duration
+			duration_secs = $duration_secs
 		WHERE id = $id`,
 	);
 
 	const started_at = new Date(created_at);
 	const ended_at = new Date(timestamp);
-	const duration = (ended_at.getTime() - started_at.getTime()) / 1000;
+	const duration_secs = (ended_at.getTime() - started_at.getTime()) / 1000;
 
 	updateStatement.run({
 		id,
-		duration,
+		duration_secs,
 		ended_at: ended_at.toISOString(),
 	});
 }

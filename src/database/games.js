@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { prettyDuration, shortDate } from '../lib/formatDate.js';
+import { minuteMs, prettyDuration, shortDate, weekMs } from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
 export function insertNewGameActivity (name, device_id, playtime_mins = 0, created_at) {
@@ -20,7 +20,7 @@ export function insertNewGameActivity (name, device_id, playtime_mins = 0, creat
 		id,
 		name,
 		playtime_mins,
-		created_at: created_at || new Date(Date.now() - (playtime_mins * 60000)).toISOString(),
+		created_at: created_at || new Date(Date.now() - (playtime_mins * minuteMs)).toISOString(),
 		updated_at,
 		device_id,
 	});
@@ -41,7 +41,7 @@ export function updateActivity (name, playtime_mins, device_id, intervalDuration
 	}
 
 	const lastUpdated = new Date(row.updated_at).getTime();
-	const lastCheck = Date.now() - intervalDuration - (playtime_mins * 60000) - 60000;
+	const lastCheck = Date.now() - intervalDuration - (playtime_mins * minuteMs) - minuteMs;
 
 	if (lastUpdated < lastCheck) {
 		insertNewGameActivity(name, device_id, playtime_mins);
@@ -86,7 +86,7 @@ export function getGameActivity (id, page) {
 		})
 		.map(row => ({
 			...row,
-			duration: prettyDuration(row.playtime_mins * 60000),
+			duration: prettyDuration(row.playtime_mins * minuteMs),
 			durationNumber: row.playtime_mins / 60,
 			timeago: timeago.format(new Date(row.created_at)),
 		}));
@@ -99,8 +99,7 @@ export function getGameActivity (id, page) {
  * @return {object[]}
  */
 export function getGameActivityByDay () {
-	const twoWeeksAgoMs = 14 * 86400 * 1000;
-	const twoWeeksAgo = new Date(Date.now() - twoWeeksAgoMs);
+	const twoWeeksAgo = new Date(Date.now() - (2 * weekMs));
 	twoWeeksAgo.setHours(0);
 	twoWeeksAgo.setMinutes(0);
 	twoWeeksAgo.setSeconds(0);

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import phin from 'phin';
 import { updateActivity } from '../database/games.js';
+import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 
 const log = new Logger('Steam');
@@ -35,7 +36,7 @@ const saveGamesToDisk = () => {
 
 export const pollForGameActivity = () => {
 	const intervalMins = Number(process.env.TOMBOIS_STEAM_POLL_INTERVAL) ?? 5;
-	const intervalMs = intervalMins * 60 * 1000;
+	const intervalMs = intervalMins * minuteMs;
 
 	if (intervalMs === 0) return;
 
