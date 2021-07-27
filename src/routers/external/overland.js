@@ -1,13 +1,15 @@
 import express from 'express';
+import { getGeocoder } from '../../adapters/geocoder.js';
 import { updateDevice, validateDevice } from '../../database/devices.js';
 import { insertLocation } from '../../database/locations.js';
+import { asyncForEach } from '../../lib/asyncForEach.js';
 import Logger from '../../lib/logger.js';
 
 const log = new Logger('Overland');
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
 	try {
 		// Validate Device ID / API Key
 		const { apiKey } = req.query;
@@ -33,7 +35,7 @@ router.post('/', (req, res) => {
 		});
 
 		// Add locations to database
-		locations.forEach(location => {
+		await asyncForEach(locations, async (location, index) => {
 			if (location?.geometry?.coordinates === undefined) {
 				log.debug('Location not provided, skipping');
 				return;
@@ -49,13 +51,25 @@ router.post('/', (req, res) => {
 			const timestampISO = timestampDate.toISOString();
 
 			const [ lon, lat ] = location?.geometry?.coordinates;
-			insertLocation(lat, lon, null, timestampISO, deviceId);
+
+			// Get city from last location in batch
+			let city = null;
+			if (index === locations.length - 1) {
+				const results = await getGeocoder().reverse({ lat, lon });
+				city = results?.[0]?.city;
+				if (results?.[0]?.state && typeof city === 'string') {
+					city += `, ${results?.[0]?.state}`;
+				}
+			}
+
+			insertLocation(lat, lon, city, timestampISO, deviceId);
 		});
 
 		// Get latest battery level
 		const lastLoc = locations[locations.length - 1];
 		let { battery_state, battery_level } = lastLoc.properties;
 
+		// Round to two decimal places
 		battery_level = (Math.round(battery_level * 10000) / 100) || 100;
 
 		switch (battery_state) {

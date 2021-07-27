@@ -1,3 +1,15 @@
+// Date constants
+export const minuteSecs = 60;
+export const hourSecs = 60 * minuteSecs;
+export const daySecs = 24 * hourSecs;
+export const weekSecs = 7 * daySecs;
+
+// Date constants in milliseconds
+export const minuteMs = minuteSecs * 1000;
+export const hourMs = hourSecs * 1000;
+export const dayMs = daySecs * 1000;
+export const weekMs = weekSecs * 1000;
+
 /**
  * @param {string} str
  * @param {number} length

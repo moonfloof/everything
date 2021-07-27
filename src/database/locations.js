@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
+import { dayMs } from '../lib/formatDate.js';
 
 export function insertLocation (lat, long, city, created_at, device_id) {
 	const id = uuid();
@@ -20,4 +21,20 @@ export function insertLocation (lat, long, city, created_at, device_id) {
 		created_at,
 		device_id,
 	});
+}
+
+export function getLatestCity () {
+	const statement = getStatement(
+		'getLatestCity',
+		`SELECT city FROM location
+		WHERE city IS NOT NULL AND
+		      created_at >= $created_at
+		ORDER BY created_at DESC
+		LIMIT 1`,
+	);
+
+	// Only return city if the data comes from the last two days
+	const created_at = new Date(Date.now() - (2 * dayMs)).toISOString();
+
+	return statement.get({ created_at })?.city;
 }

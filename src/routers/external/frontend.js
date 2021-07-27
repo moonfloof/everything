@@ -10,6 +10,7 @@ import { getDevices } from '../../database/devices.js';
 import Logger from '../../lib/logger.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
+import { getLatestCity } from '../../database/locations.js';
 
 const log = new Logger('frontend');
 
@@ -23,6 +24,7 @@ router.get('/', (_req, res) => {
 	const gameActivity = getGameActivity();
 	const sleep = getSleepCycles();
 	const devices = getDevices();
+	const city = getLatestCity();
 
 	res.render('external/dashboard', {
 		listen: listens[0] || null,
@@ -30,6 +32,7 @@ router.get('/', (_req, res) => {
 		gameActivity: gameActivity[0] || null,
 		sleep: sleep[0] || null,
 		device: devices[0] || null,
+		city,
 	});
 });
 
