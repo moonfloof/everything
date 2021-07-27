@@ -9,6 +9,7 @@ import listenbrainz from './routers/external/listenbrainz.js';
 import youtube from './routers/external/youtube.js';
 import health from './routers/external/health.js';
 import purchases from './routers/external/purchases.js';
+import bookmarks from './routers/external/bookmarks.js';
 import frontend from './routers/external/frontend.js';
 
 const log = new Logger('server-ext');
@@ -22,6 +23,7 @@ app.use('/api/listenbrainz', listenbrainz);
 app.use('/api/youtube', youtube);
 app.use('/api/health', health);
 app.use('/api/purchases', purchases);
+app.use('/api/bookmarks', bookmarks);
 
 app.use(express.static('public'));
 app.use('/', frontend);
