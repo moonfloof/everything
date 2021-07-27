@@ -20,8 +20,8 @@ function insertNewRecord (timestamp, device_id) {
 	});
 }
 
-export function insertSleepCycle (timestamp, type, device_id) {
-	if (type?.toLowerCase() === 'sleep') {
+export function insertSleepCycle (timestamp, isSleep, device_id) {
+	if (isSleep) {
 		insertNewRecord(timestamp, device_id);
 		return;
 	}

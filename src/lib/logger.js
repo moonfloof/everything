@@ -1,5 +1,5 @@
 import util from 'util';
-import formatDate from './formatDate.js';
+import { formatDateTime } from './formatDate.js';
 
 const levels = {
 	debug: 0,
@@ -39,7 +39,7 @@ export default class Logger {
 	 * @param {any[]}  args  Items to print
 	 */
 	format (level, args) {
-		const timestamp = formatDate(new Date());
+		const timestamp = formatDateTime(new Date());
 		const argTypes = args
 			.map(a => formats[typeof a] || formats.default)
 			.join(' ');

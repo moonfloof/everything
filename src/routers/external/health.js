@@ -1,6 +1,7 @@
 import express from 'express';
 import { validateDevice } from '../../database/devices.js';
 import { insertSleepCycle } from '../../database/sleep.js';
+import { insertSteps } from '../../database/steps.js';
 import { insertTimeTracking } from '../../database/timetracking.js';
 import { insertWeight } from '../../database/weight.js';
 import Logger from '../../lib/logger.js';
@@ -12,7 +13,7 @@ const router = express.Router();
 const validateAuth = (req, res, next) => {
 	try {
 		// Validate Device API Key
-		const authToken = req.header('Authorization')?.toLowerCase();
+		const authToken = req.header('Authorization');
 		const { id } = validateDevice(authToken);
 		req.deviceId = id;
 		next();
@@ -24,10 +25,19 @@ const validateAuth = (req, res, next) => {
 
 router.post('/sleep', validateAuth, (req, res) => {
 	try {
-		const { createdAt, type } = req.body;
+		const { createdAt, type, stepsToday } = req.body;
 
-		log.info(`Sleeping: '${type}' at '${createdAt}'`);
-		insertSleepCycle(createdAt, type, req.deviceId);
+		log.info(`${type} at '${createdAt}'`);
+
+		const isSleep = type?.toLowerCase() === 'sleep';
+		insertSleepCycle(createdAt, isSleep, req.deviceId);
+
+		// This gets logged in the "sleep" API request because
+		// this request gets sent once per day when no more steps will
+		// be taken. It's the perfect opportunity.
+		if (stepsToday && isSleep) {
+			insertSteps(stepsToday, createdAt, req.deviceId);
+		}
 
 		res.send({ status: 'ok' });
 	} catch (err) {

@@ -24,16 +24,26 @@ function padString (str, length, pad = '0') {
 }
 
 /** @param {Date} date */
-export default function formatDate (date) {
-	const year = padString(date.getFullYear(), 4);
-	const mon = padString(date.getMonth() + 1, 2);
-	const day = padString(date.getDate(), 2);
-
+export function formatTime (date) {
 	const hour = padString(date.getHours(), 2);
 	const mins = padString(date.getMinutes(), 2);
 	const secs = padString(date.getSeconds(), 2);
 
-	return `${year}-${mon}-${day} ${hour}:${mins}:${secs}`;
+	return `${hour}:${mins}:${secs}`;
+}
+
+/** @param {Date} date */
+export function formatDate (date) {
+	const year = padString(date.getFullYear(), 4);
+	const mon = padString(date.getMonth() + 1, 2);
+	const day = padString(date.getDate(), 2);
+
+	return `${year}-${mon}-${day}`;
+}
+
+/** @param {Date} date */
+export function formatDateTime (date) {
+	return `${formatDate(date)} ${formatTime(date)}`;
 }
 
 const months = [
