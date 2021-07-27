@@ -5,6 +5,7 @@ import { countListens, getListenGraph, getListens, getListensPopular } from '../
 import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
 import { countGameActivity, getGameActivity, getGameActivityByDay } from '../../database/games.js';
 import { countSleepCycles, getSleepCycles } from '../../database/sleep.js';
+import { getSteps } from '../../database/steps.js';
 import { getDevices } from '../../database/devices.js';
 
 import Logger from '../../lib/logger.js';
@@ -25,6 +26,7 @@ router.get('/', (_req, res) => {
 	const sleep = getSleepCycles();
 	const devices = getDevices();
 	const city = getLatestCity();
+	const steps = getSteps();
 
 	res.render('external/dashboard', {
 		listen: listens[0] || null,
@@ -32,6 +34,7 @@ router.get('/', (_req, res) => {
 		gameActivity: gameActivity[0] || null,
 		sleep: sleep[0] || null,
 		device: devices[0] || null,
+		steps: steps?.[0]?.step_count_total || null,
 		city,
 	});
 });
