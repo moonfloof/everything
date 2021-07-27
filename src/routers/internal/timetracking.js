@@ -10,9 +10,22 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countTimeTracking());
 
+	const categoryValues = [
+		'Stop Current',
+		'Toilet',
+		'Cooking/Eating',
+		'Work',
+		'Social',
+		'Hygiene',
+		'Productive',
+		'Housework',
+		'Distraction',
+		'Exercise',
+	];
+
 	const timetracking = getTimeTracking(undefined, page);
 
-	res.render('internal/timetracking', { timetracking, pagination });
+	res.render('internal/timetracking', { timetracking, pagination, categoryValues });
 });
 
 // CRUD
