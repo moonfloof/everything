@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
-import { dayMs } from '../lib/formatDate.js';
+import { dayMs, shortDate } from '../lib/formatDate.js';
 
 /**
  * @export
@@ -67,21 +67,6 @@ export function getListens (id, page) {
 		}));
 }
 
-export function getPopular (days) {
-	const statement = getStatement(
-		'getPopularListens',
-		`SELECT artist, count(*) as count
-		FROM listens
-		WHERE created_at >= $created_at
-		GROUP BY artist
-		ORDER BY count DESC, artist ASC;`,
-	);
-
-	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
-
-	return statement.all({ created_at });
-}
-
 export function deleteListen (id) {
 	const statement = getStatement(
 		'deleteListen',
@@ -116,7 +101,6 @@ export function updateListen (id, artist, album, title, tracknumber, release_yea
 	});
 }
 
-
 export function countListens () {
 	const statement = getStatement(
 		'countListens',
@@ -124,4 +108,37 @@ export function countListens () {
 	);
 
 	return statement.get().total;
+}
+
+export function getListensPopular (days) {
+	const statement = getStatement(
+		'getListensPopular',
+		`SELECT artist, count(*) as count
+		FROM listens
+		WHERE created_at >= $created_at
+		GROUP BY artist
+		ORDER BY count DESC, artist ASC;`,
+	);
+
+	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
+
+	return statement.all({ created_at });
+}
+
+export function getListenGraph () {
+	const statement = getStatement(
+		'getListenGraph',
+		`SELECT DATE(created_at) as day, COUNT(*) as y
+		FROM listens
+		GROUP BY day
+		ORDER BY day DESC
+		LIMIT 14;`,
+	);
+
+	return statement
+		.all()
+		.map(row => ({
+			...row,
+			label: shortDate(new Date(row.day)),
+		}));
 }

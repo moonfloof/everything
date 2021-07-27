@@ -1,7 +1,7 @@
 import express from 'express';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
-import { countListens, getListens, getPopular } from '../../database/listens.js';
+import { countListens, getListenGraph, getListens, getListensPopular } from '../../database/listens.js';
 import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
 import { countGameActivity, getGameActivity, getGameActivityByDay } from '../../database/games.js';
 import { countSleepCycles, getSleepCycles } from '../../database/sleep.js';
@@ -43,11 +43,13 @@ router.get('/listens', (req, res) => {
 	const pagination = handlebarsPagination(page, countListens());
 
 	const listens = getListens(undefined, page);
-	const popular = getPopular(7);
+	const popular = getListensPopular(7);
+	const graphPoints = getListenGraph();
+	const svg = generateBarGraph(graphPoints, 'scrobbles');
 
 	res.render(
 		'external/listenlist',
-		{ listens, popular, pagination },
+		{ listens, popular, pagination, svg },
 	);
 });
 
