@@ -89,4 +89,34 @@ router.post('/overland', async (req, res) => {
 	}
 });
 
+// Battery Level and Status
+router.post('/battery', (req, res) => {
+	try {
+		const token = req.headers['authorization'];
+		const { id } = validateDevice(token);
+		let { battery_level, battery_state } = req.body;
+
+		// Round to two decimal places
+		battery_level = (Math.round(battery_level * 10000) / 100) || 100;
+
+		switch (battery_state) {
+			case true: battery_state = 'charging'; break;
+			case false: battery_state = 'unplugged'; break;
+			case 'unknown': battery_state = null; break;
+			default: break;
+		}
+
+		if (typeof battery_state !== 'string') {
+			battery_state = null;
+		}
+
+		updateDevice(id, battery_level, battery_state);
+
+		res.send({ status: 'ok' });
+	} catch (err) {
+		log.error(err);
+		res.status(400).send({ status: 'err', message: err.message });
+	}
+});
+
 export default router;
