@@ -1,6 +1,6 @@
 const graphWidth = 640;
 const graphHeight = 180;
-const yAxisWidth = 24;
+const yAxisWidth = 32;
 const xAxisWidth = 16;
 const pointLimit = 14;
 const padding = 12;
@@ -79,11 +79,19 @@ export function generateBarGraph (points, yLegend) {
 	const legendX = -(barHeight / 2);
 	const legendY = padding / 2;
 
+	const axisText = generateText(
+		legendX - legendY,
+		legendY + yAxisWidth - 8,
+		yLegend || '',
+		'middle',
+		'rotate(-90)',
+	);
+
 	return `
 		<svg width="100%" viewBox="0 0 ${graphWidth} ${graphHeight}">
 			${generateText(yAxisWidth, legendY + 16, max, 'end')}
 			${generateText(yAxisWidth, legendY + barHeight, '0', 'end')}
-			${generateText(legendX - legendY, legendY + 12, yLegend || '', 'middle', 'rotate(-90)')}
+			${axisText}
 			${formattedPoints}
 		</svg>
 	`;

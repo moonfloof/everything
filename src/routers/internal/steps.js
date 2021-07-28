@@ -1,5 +1,7 @@
 import express from 'express';
 import { countSteps, deleteSteps, getSteps, insertSteps, updateSteps } from '../../database/steps.js';
+import { shortDate } from '../../lib/formatDate.js';
+import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -12,7 +14,12 @@ router.get('/', (req, res) => {
 
 	const steps = getSteps(undefined, page);
 
-	res.render('internal/steps', { steps, pagination });
+	const svg = generateBarGraph(steps.map(s => ({
+		label: shortDate(new Date(s.created_at)),
+		y: s.step_count_total,
+	})), 'daily steps');
+
+	res.render('internal/steps', { steps, pagination, svg });
 });
 
 // CRUD
