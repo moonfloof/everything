@@ -1,17 +1,17 @@
-<h2>popular artists (7 days):</h2>
+<h2>Most scrobbled artists (7 days):</h2>
 <table>
 	{{#each popular as |artist| }}
 	<tr>
-		<td class="align-r"><strong>{{artist.artist}}:</strong></td>
-		<td><span>{{artist.count}}</span></td>
+		<td class="align-r">{{artist.artist}}</td>
+		<td><strong>{{artist.count}}</strong></td>
 	</tr>
 	{{/each}}
 </table>
 
-<h2>scrobble count by day:</h2>
+<h2>Scrobble count by day:</h2>
 {{{svg}}}
 
-<h2>listening to:</h2>
+<h2>Listening to:</h2>
 {{#each listens as |listen| }}
 	{{> listen data=listen showlink=true }}
 {{/each}}
