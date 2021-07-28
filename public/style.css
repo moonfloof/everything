@@ -66,6 +66,17 @@ p {
 	line-height: 20px;
 }
 
+p.lead {
+	font-size: 18px;
+	line-height: 26px;
+}
+
+p.lead em {
+	font-style: normal;
+	font-weight: 700;
+	color: #222;
+}
+
 .sectioncontainer {
 	margin-top: 32px;
 }
