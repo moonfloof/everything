@@ -97,7 +97,7 @@ router.post('/battery', (req, res) => {
 		let { battery_level, battery_state } = req.body;
 
 		// Round to two decimal places
-		battery_level = (Math.round(battery_level * 10000) / 100) || 100;
+		battery_level = (Math.round(battery_level * 100) / 100) || 100;
 
 		switch (battery_state) {
 			case true: battery_state = 'charging'; break;
