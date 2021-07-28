@@ -2,13 +2,17 @@
 	{{> device device=device city=city }}
 {{/if}}
 
-<h2><a href="/listens">listening to:</a></h2>
-{{> listen data=listen showlink=true }}
+{{#if listen }}
+	<h2><a href="/listens">listening to:</a></h2>
+	{{> listen data=listen showlink=true }}
+{{/if}}
 
-<h2><a href="/youtubelikes">liking on youtube:</a></h2>
-{{> youtubeLike data=youtubeLike showlink=true }}
+{{#if youtubeLike }}
+	<h2><a href="/youtubelikes">liking on youtube:</a></h2>
+	{{> youtubeLike data=youtubeLike showlink=true }}
+{{/if}}
 
-{{#if gameActivity}}
-<h2><a href="/games">playing:</a></h2>
-{{> gameActivity data=gameActivity showlink=true }}
+{{#if gameActivity }}
+	<h2><a href="/games">playing:</a></h2>
+	{{> gameActivity data=gameActivity showlink=true }}
 {{/if}}
