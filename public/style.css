@@ -1,6 +1,6 @@
 body, html {
 	width: 100%;
-	background: #f1eef7;
+	background: #f9f7fc;
 	font-family: 'Helvetica Neue',arial,sans-serif;
 	font-weight: 400;
 	color: #111016;
@@ -16,7 +16,7 @@ body, html {
 }
 
 a {
-	color: #2d1c88;
+	color: #3e3475;
 	text-decoration: none;
 }
 
@@ -45,7 +45,7 @@ p, ul, table, svg, hr {
 
 hr {
 	border: 0;
-	border-top: 1px solid #2d1c88;
+	border-top: 1px solid #3e3475;
 }
 
 img, svg {

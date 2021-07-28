@@ -49,7 +49,7 @@ function generateBar (y, max, index, label) {
 		<rect
 			x="${posX}" y="${posY}" rx="${boxRadius}" ry="${boxRadius}"
 			width="${width}" height="${height}"
-			style="fill:#2d1c88"
+			style="fill:#3e3475"
 		/>
 		${text}
 	`;
