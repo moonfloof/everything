@@ -12,6 +12,7 @@ import youtubelikes from './routers/internal/youtubelikes.js';
 import weight from './routers/internal/weight.js';
 import bookmarks from './routers/internal/bookmarks.js';
 import steps from './routers/internal/steps.js';
+import food from './routers/internal/food.js';
 import frontend from './routers/internal/frontend.js';
 
 const log = new Logger('server-int');
@@ -29,6 +30,7 @@ app.use('/youtubelikes', youtubelikes);
 app.use('/weight', weight);
 app.use('/bookmarks', bookmarks);
 app.use('/steps', steps);
+app.use('/food', food);
 app.use('/', frontend);
 
 const startServer = () => {

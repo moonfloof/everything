@@ -1,0 +1,10 @@
+<h2>Food:</h2>
+
+{{> internal/food values=typeValues }}
+<hr/>
+
+{{#each food as |entry| }}
+	{{> internal/food data=entry values=../typeValues }}
+{{/each}}
+
+{{> pagination route="/food" pagination=pagination }}

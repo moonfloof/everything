@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
 // CRUD
 
 router.post('/', (req, res) => {
-	const {  weight_kgs, created_at } = req.body;
+	const { weight_kgs, created_at } = req.body;
 
 	insertWeight(
 		weight_kgs,
