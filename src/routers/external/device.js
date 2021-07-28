@@ -9,7 +9,8 @@ const log = new Logger('Overland');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+// Overland
+router.post('/overland', async (req, res) => {
 	try {
 		// Validate Device ID / API Key
 		const { apiKey } = req.query;

@@ -4,7 +4,7 @@ import Logger from './lib/logger.js';
 import appCreate from './lib/appCreate.js';
 
 // Routers
-import overland from './routers/external/overland.js';
+import device from './routers/external/device.js';
 import listenbrainz from './routers/external/listenbrainz.js';
 import youtube from './routers/external/youtube.js';
 import health from './routers/external/health.js';
@@ -18,7 +18,7 @@ const app = appCreate();
 app.use(helmet());
 
 // Set up routers
-app.use('/api/overland', overland);
+app.use('/api/device', device);
 app.use('/api/listenbrainz', listenbrainz);
 app.use('/api/youtube', youtube);
 app.use('/api/health', health);
