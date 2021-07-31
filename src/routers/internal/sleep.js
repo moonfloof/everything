@@ -21,15 +21,18 @@ router.post('/', (req, res) => {
 	const { started_at, ended_at } = req.body;
 
 	insertSleepCycle(
-		started_at,
+		new Date(started_at || Date.now()).toISOString(),
 		'sleep',
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	);
-	insertSleepCycle(
-		ended_at || new Date().toISOString(),
-		'wake',
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+
+	if (ended_at) {
+		insertSleepCycle(
+			new Date(ended_at).toISOString(),
+			'wake',
+			process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+		);
+	}
 
 	res.redirect('/sleep');
 });

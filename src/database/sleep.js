@@ -130,6 +130,6 @@ export function updateSleepCycle (id, started_at, ended_at) {
 	return statement.run({
 		id,
 		started_at,
-		ended_at,
+		ended_at: new Date(ended_at || Date.now()).toISOString(),
 	});
 }
