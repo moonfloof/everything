@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
 
 	insertTimeTracking(
 		category,
-		created_at || new Date().toISOString(),
+		new Date(created_at || Date.now()).toISOString(),
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	);
 

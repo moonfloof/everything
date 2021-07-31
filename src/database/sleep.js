@@ -83,8 +83,10 @@ export function getSleepCycles (id, page) {
 
 			if (ended_at !== null) {
 				// Difference between start and end, in milliseconds
-				const diff = ended_at.getTime() - started_at.getTime();
+				const diff = ended_at - started_at;
 				duration = prettyDuration(diff);
+
+				// Hours as a decimal (eg. `7.56`)
 				durationNumber = diff / 3600000;
 			}
 

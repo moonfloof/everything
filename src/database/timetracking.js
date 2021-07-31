@@ -31,7 +31,8 @@ function endTimeTrackingSession (id, created_at, timestamp) {
 
 	const started_at = new Date(created_at);
 	const ended_at = new Date(timestamp);
-	const duration_secs = (ended_at.getTime() - started_at.getTime()) / 1000;
+
+	const duration_secs = (ended_at - started_at) / 1000;
 
 	updateStatement.run({
 		id,
@@ -116,10 +117,9 @@ export function updateTimeTracking (id, category, created_at, ended_at) {
 	);
 
 	const ended_at_date = new Date(ended_at || Date.now());
+	const created_at_date = new Date(created_at);
 
-	const created_at_ms = new Date(created_at).getTime();
-	const ended_at_ms = ended_at_date.getTime();
-	const duration_secs = (ended_at_ms - created_at_ms) / 1000;
+	const duration_secs = (ended_at_date - created_at_date) / 1000;
 
 	return statement.run({
 		id,
