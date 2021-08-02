@@ -6,10 +6,13 @@ import { insertSteps } from '../../database/steps.js';
 import { insertTimeTracking } from '../../database/timetracking.js';
 import { insertWeight } from '../../database/weight.js';
 import Logger from '../../lib/logger.js';
+import { trimStrings } from '../../lib/middleware/trimStrings.js';
 
 const log = new Logger('Health');
 
 const router = express.Router();
+
+router.use(trimStrings);
 
 const validateAuth = (req, res, next) => {
 	try {
