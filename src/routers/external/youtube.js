@@ -1,5 +1,5 @@
 import express from 'express';
-import isLocal from '../../lib/isLocal.js';
+import isLocal from '../../lib/middleware/isLocal.js';
 import { generateAuthUrl, getYouTubeVideoSnippet, retrieveAccessToken } from '../../adapters/youtube.js';
 import { validateDevice } from '../../database/devices.js';
 import { insertYouTubeLike } from '../../database/youtubelikes.js';

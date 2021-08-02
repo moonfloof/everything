@@ -1,6 +1,7 @@
 import express from 'express';
 import Logger from './lib/logger.js';
 import appCreate from './lib/appCreate.js';
+import { trimStrings } from './lib/middleware/trimStrings.js';
 
 // Routers
 import purchases from './routers/internal/purchases.js';
@@ -19,8 +20,10 @@ const log = new Logger('server-int');
 
 const app = appCreate();
 
-// Set up routers
 app.use(express.static('public'));
+app.use(trimStrings);
+
+// Set up routers
 app.use('/purchases', purchases);
 app.use('/games', games);
 app.use('/timetracking', timetracking);
