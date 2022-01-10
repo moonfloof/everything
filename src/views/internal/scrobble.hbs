@@ -1,0 +1,13 @@
+<h2>Scrobble Album:</h2>
+
+<form action="" method="POST">
+	<select name="albumId">
+	{{#each albumlist as |album| }}
+		<option value="{{album.value}}">{{album.label}}</option>
+	{{/each}}
+	</select>
+
+	<br/>
+
+	<input type="submit" value="Scrobble" />
+</form>

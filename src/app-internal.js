@@ -15,6 +15,7 @@ import bookmarks from './routers/internal/bookmarks.js';
 import steps from './routers/internal/steps.js';
 import food from './routers/internal/food.js';
 import frontend from './routers/internal/frontend.js';
+import scrobble from './routers/internal/scrobble.js';
 
 const log = new Logger('server-int');
 
@@ -34,6 +35,7 @@ app.use('/weight', weight);
 app.use('/bookmarks', bookmarks);
 app.use('/steps', steps);
 app.use('/food', food);
+app.use('/scrobble', scrobble);
 app.use('/', frontend);
 
 const startServer = () => {
