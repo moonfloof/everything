@@ -35,6 +35,10 @@ router.post('/', async (req, res) => {
 		// Step 1: Get tracks from album
 		const album = await getAlbumTracks(req.body.albumId);
 
+		if (album === null) {
+			throw new Error('Could not load album');
+		}
+
 		let now = Date.now();
 
 		// Step 2: Scrobble each track using duration and current time

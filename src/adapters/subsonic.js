@@ -31,7 +31,14 @@ const getBaseParams = () => {
 	};
 };
 
+const checkEnvironment = () => {
+	return !process.env.TOMBOIS_SUBSONIC_URL ||
+		!process.env.TOMBOIS_SUBSONIC_USERNAME;
+};
+
 export const getAlbumList = async (page = 0) => {
+	if (checkEnvironment()) return [];
+
 	const params = new URLSearchParams({
 		...getBaseParams(),
 		type: 'newest',
@@ -47,6 +54,8 @@ export const getAlbumList = async (page = 0) => {
 };
 
 export const getAllAlbums = async () => {
+	if (checkEnvironment()) return [];
+
 	let albums = [];
 	let lastResponseLength = 1;
 	let page = 0;
@@ -62,6 +71,8 @@ export const getAllAlbums = async () => {
 };
 
 export const getAlbumTracks = async (albumId) => {
+	if (checkEnvironment()) return null;
+
 	const params = new URLSearchParams({
 		...getBaseParams(),
 		id: albumId,
@@ -75,6 +86,8 @@ export const getAlbumTracks = async (albumId) => {
 };
 
 export const scrobbleTrack = async (trackId, timestamp) => {
+	if (checkEnvironment()) return null;
+
 	const params = new URLSearchParams({
 		...getBaseParams(),
 		id: trackId,
