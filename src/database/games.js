@@ -124,6 +124,26 @@ export function getGameActivityByDay () {
 		}));
 }
 
+export function getGameDashboardGraph () {
+	const statement = getStatement(
+		'getGameDashboardGraph',
+		`SELECT
+			DATE(created_at) as day,
+			SUM(playtime_mins) as playtime_mins
+		FROM games
+		GROUP BY day
+		ORDER BY day DESC
+		LIMIT ${RECORDS_PER_PAGE}`,
+	);
+
+	return statement
+		.all()
+		.map(row => ({
+			min: 0,
+			max: row.playtime_mins,
+		}));
+}
+
 export function countGameActivity () {
 	const statement = getStatement(
 		'countGameActivity',

@@ -24,12 +24,18 @@ function padString (str, length, pad = '0') {
 }
 
 /** @param {Date} date */
-export function formatTime (date) {
+export function formatTime (date, includeSeconds = true) {
 	const hour = padString(date.getHours(), 2);
 	const mins = padString(date.getMinutes(), 2);
 	const secs = padString(date.getSeconds(), 2);
 
-	return `${hour}:${mins}:${secs}`;
+	let formatted = `${hour}:${mins}`;
+
+	if (includeSeconds) {
+		formatted += `:${secs}`;
+	}
+
+	return formatted;
 }
 
 /** @param {Date} date */
@@ -94,18 +100,21 @@ export function prettyDuration (durationMs) {
 	const hoursRounded = Math.floor(hoursTotal);
 	const minutes = Math.round((hoursTotal - hoursRounded) * 60);
 
-	const hourUnit = hoursRounded === 1
-		? 'hour'
-		: 'hours';
+	// const hourUnit = hoursRounded === 1
+	// 	? 'hour'
+	// 	: 'hours';
 
-	const minuteUnit = minutes === 1
-		? 'minute'
-		: 'minutes';
+	// const minuteUnit = minutes === 1
+	// 	? 'minute'
+	// 	: 'minutes';
+
+	const hourUnit = 'h';
+	const minuteUnit = 'm';
 
 	// Convert into string
 	const duration = hoursRounded > 0
-		? `${hoursRounded} ${hourUnit}, ${minutes} ${minuteUnit}`
-		: `${minutes} minutes`;
+		? `${hoursRounded}${hourUnit} ${minutes}${minuteUnit}`
+		: `${minutes}${minuteUnit}`;
 
 	return duration;
 }

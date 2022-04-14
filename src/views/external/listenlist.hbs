@@ -1,19 +1,21 @@
-<h2>Most scrobbled artists (7 days):</h2>
-<table>
-	{{#each popular as |artist| }}
-	<tr>
-		<td class="align-r">{{artist.artist}}</td>
-		<td><strong>{{artist.count}}</strong></td>
-	</tr>
+<div class="page--data">
+	<h2>Most scrobbled artists (7 days):</h2>
+	<table>
+		{{#each popular as |artist| }}
+		<tr>
+			<td class="align-r">{{artist.artist}}</td>
+			<td><strong>{{artist.count}}</strong></td>
+		</tr>
+		{{/each}}
+	</table>
+
+	<h2>Scrobble count by day:</h2>
+	{{{svg}}}
+
+	<h2>Listening to:</h2>
+	{{#each listens as |listen| }}
+		{{> listen data=listen showlink=true }}
 	{{/each}}
-</table>
 
-<h2>Scrobble count by day:</h2>
-{{{svg}}}
-
-<h2>Listening to:</h2>
-{{#each listens as |listen| }}
-	{{> listen data=listen showlink=true }}
-{{/each}}
-
-{{> pagination pagination=pagination route="/listens" }}
+	{{> pagination pagination=pagination route="/music" }}
+</div>

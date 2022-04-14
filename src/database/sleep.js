@@ -1,7 +1,14 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
-import { prettyDate, prettyDuration, shortDate } from '../lib/formatDate.js';
+import {
+	dayMs,
+	formatTime,
+	hourMs,
+	prettyDate,
+	prettyDuration,
+	shortDate,
+} from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
 function insertNewRecord (timestamp, device_id) {
@@ -78,6 +85,9 @@ export function getSleepCycles (id, page) {
 			const ended_at = row.ended_at ? new Date(row.ended_at) : null;
 			const timeago = TimeAgo.format(started_at);
 
+			//                                               secs/day   / hours  offset  AM/PM
+			const startTimeNormalised = ((started_at.getTime() % dayMs) / hourMs + 8) % 12;
+
 			let duration = null;
 			let durationNumber = 0;
 
@@ -95,9 +105,56 @@ export function getSleepCycles (id, page) {
 				timeago,
 				duration,
 				durationNumber,
+				startTimeNormalised,
 				dateFull: prettyDate(ended_at ?? started_at),
 				dateShort: shortDate(ended_at ?? started_at),
 			};
+		});
+}
+
+export function getSleepStats () {
+	return getSleepCycles()
+		.slice(0, 10)
+		.reduce((acc, cur) => {
+			let newAcc = { ...acc };
+
+			// Skip currently sleeping
+			if (cur.durationNumber === 0) return newAcc;
+
+			if (cur.durationNumber > acc.longest) {
+				newAcc.longest = cur.durationNumber;
+				newAcc.longestHuman = cur.duration;
+			}
+
+			if (cur.durationNumber < acc.shortest) {
+				newAcc.shortest = cur.durationNumber;
+				newAcc.shortestHuman = cur.duration;
+			}
+
+			const startDate = new Date(cur.started_at);
+
+			const formatted = formatTime(startDate, false);
+
+			if (cur.startTimeNormalised < acc.earliest) {
+				newAcc.earliest = cur.startTimeNormalised;
+				newAcc.earliestHuman = formatted;
+			}
+
+			if (cur.startTimeNormalised > acc.latest) {
+				newAcc.latest = cur.startTimeNormalised;
+				newAcc.latestHuman = formatted;
+			}
+
+			return newAcc;
+		}, {
+			earliest: 100,
+			earliestHuman: '',
+			latest: 0,
+			latestHuman: '',
+			longest: 0,
+			longestHuman: '',
+			shortest: 100,
+			shortestHuman: '',
 		});
 }
 

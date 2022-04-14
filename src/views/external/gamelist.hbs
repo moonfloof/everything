@@ -1,8 +1,10 @@
-<h2>Playtime by day:</h2>
-{{{svg}}}
+<div class="page--data">
+	<h2>Playtime by day:</h2>
+	{{{svg}}}
 
-<h2>Playing:</h2>
-{{#each gameActivity as |game|}}
-	{{> gameActivity data=game showlink=true }}
-{{/each}}
-{{> pagination pagination=pagination route="/games" }}
+	<h2>Playing:</h2>
+	{{#each gameActivity as |game|}}
+		{{> gameActivity data=game showlink=true }}
+	{{/each}}
+	{{> pagination pagination=pagination route="/games" }}
+</div>

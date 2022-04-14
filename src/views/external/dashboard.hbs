@@ -1,18 +1,127 @@
-{{#if device }}
-	{{> device device=device city=city }}
-{{/if}}
+<p class="dashboard--lead">
+	I keep track of my own data and post it publicly so it's useless to
+	advertisers, who collect their own data and consider it very valuable
+	(so they can sell things). It's a custom coded solution, where most data
+	is collected automatically, but some (like sleep) is manual. More is
+	collected than you can see, although I am certainly not giving you my
+	entire location history!
+</p>
 
-{{#if listen }}
-	<h2><a href="/listens">Listening to:</a></h2>
-	{{> listen data=listen showlink=true }}
-{{/if}}
+<p class="dashboard--lead">
+	The following data has been collected over the
+	<strong>last seven days</strong>:
+</p>
 
-{{#if youtubeLike }}
-	<h2><a href="/youtubelikes">Liking on YouTube:</a></h2>
-	{{> youtubeLike data=youtubeLike showlink=true }}
-{{/if}}
+<div id="dashboard--panels">
+	{{#> dashpanel title="sleep" }}
+		<div class="dashboard--panel__graph">
+			{{{sleepGraph}}}
+		</div>
+		<div class="dashboard--panel--meta">
+			<div class="dashboard--panel--meta__row">
+				<span>earliest night</span>
+				<span>
+					<strong>{{sleepStats.earliestHuman}}</strong>
+				</span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>latest night</span>
+				<span>
+					<strong>{{sleepStats.latestHuman}}</strong>
+				</span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>longest sleep</span>
+				<span>
+					<strong>{{sleepStats.longestHuman}}</strong>
+				</span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>shortest sleep</span>
+				<span>
+					<strong>{{sleepStats.shortestHuman}}</strong>
+				</span>
+			</div>
+		</div>
+	{{/dashpanel}}
 
-{{#if gameActivity }}
-	<h2><a href="/games">Playing:</a></h2>
-	{{> gameActivity data=gameActivity showlink=true }}
-{{/if}}
+	{{#> dashpanel title="music" showlink=true }}
+		<div class="dashboard--panel__graph">
+			{{{listenGraph}}}
+		</div>
+		<div class="dashboard--panel--meta">
+			<div class="dashboard--panel--meta__row">
+				<span>fav artist</span>
+				<span>
+					<strong>{{listens.artist.artist}}</strong>
+					<small>(x{{listens.artist.count}})</small>
+				</span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>fav album</span>
+				<span>
+					<strong>{{listens.album.album}}</strong>
+					<small>(x{{listens.album.count}})</small>
+				</span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>fav song</span>
+				<span>
+					<strong>{{listens.song.title}}</strong>
+					<small>(x{{listens.song.count}})</small>
+				</span>
+			</div>
+		</div>
+	{{/dashpanel}}
+
+	{{#> dashpanel title="games" showlink=true }}
+		<div class="dashboard--panel__graph">
+			{{{gamesGraph}}}
+		</div>
+		<div class="dashboard--panel--meta">
+			<div class="dashboard--panel--meta__row">
+				<span>This section will be updated soon.</span>
+				<span></span>
+			</div>
+		</div>
+	{{/dashpanel}}
+
+	{{#> dashpanel title="youtube" showlink=true }}
+		<ul>
+		{{#each youtubeLikes}}
+			<li class="dashboard--panel__li">
+				<a href="{{url}}" target="_blank" rel="noopener">
+					<strong>{{ title }}</strong>
+				</a>
+				<small>{{channel}}</small>
+			</li>
+		{{/each}}
+		</ul>
+	{{/dashpanel}}
+
+	{{#> dashpanel title="misc" }}
+
+		<div class="dashboard--panel--meta">
+			<div class="dashboard--panel--meta__row">
+				<span>🌆 location</span>
+				<span><strong>{{location}}</strong></span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>🔋 battery</span>
+				<span>
+					<strong>{{device.battery_level}}%</strong>
+					<small>({{device.battery_status}})</small>
+				</span>
+			</div>
+			{{#if steps}}
+			<div class="dashboard--panel--meta__row">
+				<span>🚶 steps</span>
+				<span>
+					<strong>{{steps}}</strong>
+					<small>(yesterday)</small>
+				</span>
+			</div>
+			{{/if}}
+		</div>
+	{{/dashpanel}}
+</div>

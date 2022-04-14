@@ -1,6 +1,13 @@
-<h2>Liking on YouTube:</h2>
-{{#each youtubeLikes as |like|}}
-	{{> youtubeLike data=like showlink=true }}
-{{/each}}
+<div class="page--data">
+	<h2>YouTube Liked Videos</h2>
+	<p class="dashboard--lead">
+		Admittedly, I watch a <em>lot</em> of YouTube videos, and here
+		are my favourites. You'll typically find videos about maths,
+		science, music, and comedy.
+	</p>
+	{{#each youtubeLikes as |like|}}
+		{{> youtubeLike data=like showlink=true }}
+	{{/each}}
 
-{{> pagination pagination=pagination route="/youtubelikes" }}
+	{{> pagination pagination=pagination route="/youtube" }}
+</div>

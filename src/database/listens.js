@@ -125,6 +125,30 @@ export function getListensPopular (days) {
 	return statement.all({ created_at });
 }
 
+export function getListenPopularDashboard (days) {
+	const genStatement = table => getStatement(
+		`getListenPopularDashboard_${table}`,
+		`SELECT ${table}, count(*) as count
+		FROM listens
+		WHERE created_at >= $created_at
+		GROUP BY ${table}
+		ORDER BY count DESC
+		LIMIT 1;`,
+	);
+
+	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
+
+	const artist = genStatement('artist').all({ created_at })?.[0];
+	const album = genStatement('album').all({ created_at })?.[0];
+	const song = genStatement('title').all({ created_at })?.[0];
+
+	return {
+		artist,
+		album,
+		song,
+	};
+}
+
 export function getListenGraph () {
 	const statement = getStatement(
 		'getListenGraph',
@@ -140,5 +164,23 @@ export function getListenGraph () {
 		.map(row => ({
 			...row,
 			label: shortDate(new Date(row.day)),
+		}));
+}
+
+export function getListenDashboardGraph () {
+	const statement = getStatement(
+		'getListenDashboardGraph',
+		`SELECT DATE(created_at) as day, COUNT(*) as max
+		FROM listens
+		GROUP BY day
+		ORDER BY day DESC
+		LIMIT 14;`,
+	);
+
+	return statement
+		.all()
+		.map(row => ({
+			min: 0,
+			max: row.max,
 		}));
 }

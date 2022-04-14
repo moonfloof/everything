@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
-import { formatDate } from '../lib/formatDate.js';
+import { dayMs, formatDate } from '../lib/formatDate.js';
 
 export function insertSteps (step_count_total, created_at, device_id) {
 	const statement = getStatement(
@@ -39,6 +39,19 @@ export function getSteps (id, page) {
 			id: id || '%',
 			offset: calculateOffset(page),
 		});
+}
+
+export function getStepsYesterday () {
+	const statement = getStatement(
+		'getStepsYesterday',
+		`SELECT * FROM steps
+		WHERE DATE(created_at) = $created_at
+		LIMIT 1`,
+	);
+
+	const yesterday = new Date(Date.now() - dayMs);
+
+	return statement.all({ created_at: formatDate(yesterday) });
 }
 
 export function countSteps () {

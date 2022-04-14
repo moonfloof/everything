@@ -1,17 +1,25 @@
 import express from 'express';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
-import { countListens, getListenGraph, getListens, getListensPopular } from '../../database/listens.js';
+import {
+	countListens,
+	getListenDashboardGraph,
+	getListenGraph,
+	getListenPopularDashboard,
+	getListens,
+	getListensPopular,
+} from '../../database/listens.js';
 import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
-import { countGameActivity, getGameActivity, getGameActivityByDay } from '../../database/games.js';
-import { getSleepCycles } from '../../database/sleep.js';
-import { getSteps } from '../../database/steps.js';
+import { countGameActivity, getGameActivity, getGameActivityByDay, getGameDashboardGraph } from '../../database/games.js';
+import { getSleepCycles, getSleepStats } from '../../database/sleep.js';
+import { getStepsYesterday } from '../../database/steps.js';
 import { getDevices } from '../../database/devices.js';
 
 import Logger from '../../lib/logger.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { getLatestCity } from '../../database/locations.js';
+import { generateSmallBarGraph } from '../../lib/graphs/barSmall.js';
 
 const log = new Logger('frontend');
 
@@ -20,28 +28,43 @@ const router = express.Router();
 // DASHBOARD
 
 router.get('/', (_req, res) => {
-	const listens = getListens();
-	const youtubelikes = getLikes();
-	const gameActivity = getGameActivity();
-	const sleep = getSleepCycles()?.[0]?.duration;
-	const devices = getDevices();
-	const city = getLatestCity();
-	const steps = getSteps();
+	const listens = getListenPopularDashboard(7);
+	const youtubeLikes = getLikes().slice(0, 2);
+	const games = getGameActivity();
+	const device = getDevices()[0];
+	const location = getLatestCity();
+	const steps = getStepsYesterday()[0]?.step_count_total;
+	const sleepStats = getSleepStats();
+	const sleep = getSleepCycles();
+
+	const sleepGraphStats = sleep
+		.filter(night => night.ended_at !== null)
+		.map(night => ({
+			min: night.startTimeNormalised,
+			max: night.startTimeNormalised + night.durationNumber,
+		}));
+
+	const sleepGraph = generateSmallBarGraph(sleepGraphStats);
+	const listenGraph = generateSmallBarGraph(getListenDashboardGraph());
+	const gamesGraph = generateSmallBarGraph(getGameDashboardGraph());
 
 	res.render('external/dashboard', {
-		listen: listens[0] || null,
-		youtubeLike: youtubelikes[0] || null,
-		gameActivity: gameActivity[0] || null,
-		sleep,
-		device: devices[0] || null,
-		steps: steps?.[0]?.step_count_total || null,
-		city,
+		sleepStats,
+		sleepGraph,
+		listens,
+		listenGraph,
+		youtubeLikes,
+		games,
+		gamesGraph,
+		device,
+		steps,
+		location,
 	});
 });
 
 // LISTENS
 
-router.get('/listens', (req, res) => {
+router.get('/music', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countListens());
 
@@ -56,7 +79,7 @@ router.get('/listens', (req, res) => {
 	);
 });
 
-router.get('/listen/:id', (req, res) => {
+router.get('/music/:id', (req, res) => {
 	const listens = getListens(req.params.id);
 
 	if (listens.length === 0) {
@@ -71,7 +94,7 @@ router.get('/listen/:id', (req, res) => {
 
 // YOUTUBE LIKES
 
-router.get('/youtubelikes', (req, res) => {
+router.get('/youtube', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countYouTubeLikes());
 
@@ -83,7 +106,7 @@ router.get('/youtubelikes', (req, res) => {
 	);
 });
 
-router.get('/youtubelike/:id', (req, res) => {
+router.get('/youtube/:id', (req, res) => {
 	const youtubeLikes = getLikes(req.params.id);
 
 	if (youtubeLikes.length === 0) {
