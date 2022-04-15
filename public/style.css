@@ -249,6 +249,9 @@ input[type="submit"] {
 }
 
 @media (max-width: 660px) {
+	.container {
+		padding: 24px;
+	}
 	#header {
 		display: block;
 		text-align: center;
