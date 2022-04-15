@@ -3,8 +3,8 @@ import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
 import {
 	dayMs,
-	formatTime,
 	hourMs,
+	formatTime,
 	prettyDate,
 	prettyDuration,
 	shortDate,
@@ -85,8 +85,9 @@ export function getSleepCycles (id, page) {
 			const ended_at = row.ended_at ? new Date(row.ended_at) : null;
 			const timeago = TimeAgo.format(started_at);
 
-			//                                               secs/day   / hours  offset  AM/PM
-			const startTimeNormalised = ((started_at.getTime() % dayMs) / hourMs + 8) % 12;
+			const startTimeMs = (started_at.getTime() % dayMs);
+			const twelveHours = 12 * hourMs;
+			const startTimeNormalised = (((startTimeMs + twelveHours) % dayMs) - twelveHours) / hourMs;
 
 			let duration = null;
 			let durationNumber = 0;

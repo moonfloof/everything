@@ -60,12 +60,24 @@ export function generateSmallBarGraph (points, minOverride, maxOverride) {
 		))
 		.join('');
 
+	const zeroLine = Math.round(graphHeight
+		- 1
+		- (Math.abs(min) / Math.abs(max === 0 ? 1 : max))
+		* graphHeight);
+
 	return `
 		<svg
 			width="${graphWidth}" height="${graphHeight}"
 			viewBox="0 0 ${graphWidth} ${graphHeight}"
 		>
 			${bars}
+			<rect
+				x="0"
+				y="${zeroLine}"
+				width="${graphWidth}"
+				height="1"
+				fill-opacity="0.8"
+			/>
 		</svg>
 	`;
 }
