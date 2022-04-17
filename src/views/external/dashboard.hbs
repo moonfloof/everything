@@ -102,10 +102,12 @@
 	{{#> dashpanel title="misc" }}
 
 		<div class="dashboard--panel--meta">
+			{{#if location}}
 			<div class="dashboard--panel--meta__row">
 				<span>🌆 location</span>
 				<span><strong>{{location}}</strong></span>
 			</div>
+			{{/if}}
 			<div class="dashboard--panel--meta__row">
 				<span>🔋 battery</span>
 				<span>
