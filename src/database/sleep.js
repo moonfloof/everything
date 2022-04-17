@@ -116,10 +116,6 @@ export function getSleepCycles (id, page) {
 
 export function getSleepStats () {
 	const emptyStats = {
-		earliest: 100,
-		earliestHuman: '',
-		latest: 0,
-		latestHuman: '',
 		longest: 0,
 		longestHuman: '',
 		shortest: 100,
@@ -132,42 +128,27 @@ export function getSleepStats () {
 
 	if (sleep.length === 0) return emptyStats;
 
-	const stats = sleep.slice(0, 10)
-		.reduce((acc, cur) => {
-			let newAcc = { ...acc };
+	const stats = sleep.reduce((acc, cur) => {
+		let newAcc = { ...acc };
 
-			// Skip currently sleeping
-			if (cur.durationNumber === 0) return newAcc;
+		// Skip currently sleeping
+		if (cur.durationNumber === 0) return newAcc;
 
-			if (cur.durationNumber > acc.longest) {
-				newAcc.longest = cur.durationNumber;
-				newAcc.longestHuman = cur.duration;
-			}
+		if (cur.durationNumber > acc.longest) {
+			newAcc.longest = cur.durationNumber;
+			newAcc.longestHuman = cur.duration;
+		}
 
-			if (cur.durationNumber < acc.shortest) {
-				newAcc.shortest = cur.durationNumber;
-				newAcc.shortestHuman = cur.duration;
-			}
+		if (cur.durationNumber < acc.shortest) {
+			newAcc.shortest = cur.durationNumber;
+			newAcc.shortestHuman = cur.duration;
+		}
 
-			const startDate = new Date(cur.started_at);
+		newAcc.totalSleep += cur.startTimeNormalised;
+		newAcc.totalWake += cur.startTimeNormalised + cur.durationNumber;
 
-			const formatted = formatTime(startDate, false);
-
-			if (cur.startTimeNormalised < acc.earliest) {
-				newAcc.earliest = cur.startTimeNormalised;
-				newAcc.earliestHuman = formatted;
-			}
-
-			if (cur.startTimeNormalised > acc.latest) {
-				newAcc.latest = cur.startTimeNormalised;
-				newAcc.latestHuman = formatted;
-			}
-
-			newAcc.totalSleep += cur.startTimeNormalised;
-			newAcc.totalWake += cur.startTimeNormalised + cur.durationNumber;
-
-			return newAcc;
-		}, emptyStats);
+		return newAcc;
+	}, emptyStats);
 
 	const averageSleep = stats.totalSleep * 360000;
 	const averageWake = stats.totalWake * 360000;
