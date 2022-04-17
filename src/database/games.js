@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { minuteMs, prettyDuration, shortDate, weekMs } from '../lib/formatDate.js';
+import { dayMs, getStartOfDay, minuteMs, prettyDuration, shortDate } from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
 export function insertNewGameActivity (name, device_id, playtime_mins = 0, created_at) {
@@ -93,20 +93,44 @@ export function getGameActivity (id, page) {
 }
 
 /**
+ * Fetch all game activity, or based on a specific ID
+ *
+ * @export
+ * @param {string} [id]
+ * @param {number} [page]
+ */
+export function getGameActivityByDay (days = 7) {
+	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
+
+	const statement = getStatement(
+		'getGameActivityByDay',
+		`SELECT * FROM games
+		WHERE created_at >= $created_at
+		ORDER BY updated_at DESC`,
+	);
+
+	return statement
+		.all({ created_at })
+		.map(row => ({
+			...row,
+			duration: prettyDuration(row.playtime_mins * minuteMs),
+			durationNumber: row.playtime_mins / 60,
+			timeago: timeago.format(new Date(row.created_at)),
+		}));
+}
+
+/**
  * Fetch total duration of games played from the last two weeks
  *
  * @export
  * @return {object[]}
  */
-export function getGameActivityByDay () {
-	const twoWeeksAgo = new Date(Date.now() - (2 * weekMs));
-	twoWeeksAgo.setHours(0);
-	twoWeeksAgo.setMinutes(0);
-	twoWeeksAgo.setSeconds(0);
-	const created_at = twoWeeksAgo.toISOString();
+export function getGameActivityGroupedByDay (days = 14) {
+	const daysAgo = new Date(Date.now() - (days * dayMs));
+	const created_at = getStartOfDay(daysAgo).toISOString();
 
 	const statement = getStatement(
-		'getGameActivityByDay',
+		'getGameActivityGroupedByDay',
 		`SELECT
 			DATE(created_at) as day,
 			SUM(playtime_mins) as playtime_mins
@@ -142,6 +166,45 @@ export function getGameDashboardGraph () {
 			min: 0,
 			max: row.playtime_mins,
 		}));
+}
+
+export function getGameStats () {
+	const emptyStats = {
+		totalPlaytime: 0,
+		games: {},
+	};
+	const games = getGameActivityByDay(7);
+
+	if (games.length === 0) return emptyStats;
+
+	const stats = games.reduce((acc, cur) => {
+		let newAcc = { ...acc };
+
+		newAcc.games[cur.name] = newAcc.games[cur.name] === undefined
+			? 1
+			: newAcc.games[cur.name] + 1;
+
+		newAcc.totalPlaytime += cur.playtime_mins;
+
+		return newAcc;
+	}, emptyStats);
+
+	stats.averagePlaytime = prettyDuration((stats.totalPlaytime / games.length) * 60000);
+	stats.totalSessions = games.length;
+	stats.totalPlaytimeHuman = prettyDuration(stats.totalPlaytime * 60000);
+	stats.favouriteGame = Object
+		.entries(stats.games)
+		.reduce((acc, cur) => {
+			const [ game, count ] = cur;
+			const newAcc = { ...acc };
+			if (count >= acc.count) {
+				newAcc.count = count;
+				newAcc.game = game;
+			}
+			return newAcc;
+		}, { game: '', count: 0 })
+		.game;
+	return stats;
 }
 
 export function countGameActivity () {

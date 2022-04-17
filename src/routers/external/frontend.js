@@ -10,7 +10,7 @@ import {
 	getListensPopular,
 } from '../../database/listens.js';
 import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
-import { countGameActivity, getGameActivity, getGameActivityByDay, getGameDashboardGraph } from '../../database/games.js';
+import { countGameActivity, getGameActivity, getGameActivityGroupedByDay, getGameDashboardGraph, getGameStats } from '../../database/games.js';
 import { getSleepCycles, getSleepStats } from '../../database/sleep.js';
 import { getStepsYesterday } from '../../database/steps.js';
 import { getDevices } from '../../database/devices.js';
@@ -30,6 +30,7 @@ const router = express.Router();
 router.get('/', (_req, res) => {
 	const listens = getListenPopularDashboard(7);
 	const youtubeLikes = getLikes().slice(0, 2);
+	const gameStats = getGameStats();
 	const games = getGameActivity();
 	const device = getDevices()[0];
 	const location = getLatestCity();
@@ -56,6 +57,7 @@ router.get('/', (_req, res) => {
 		youtubeLikes,
 		games,
 		gamesGraph,
+		gameStats,
 		device,
 		steps,
 		location,
@@ -126,7 +128,7 @@ router.get('/games', (req, res) => {
 	const pagination = handlebarsPagination(page, countGameActivity());
 
 	const gameActivity = getGameActivity(undefined, page);
-	const gamesByDay = getGameActivityByDay();
+	const gamesByDay = getGameActivityGroupedByDay();
 	const svg = generateBarGraph(gamesByDay, 'hours');
 
 	res.render(

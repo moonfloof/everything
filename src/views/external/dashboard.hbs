@@ -80,8 +80,20 @@
 		</div>
 		<div class="dashboard--panel--meta">
 			<div class="dashboard--panel--meta__row">
-				<span>This section will be updated soon.</span>
-				<span></span>
+				<span>fav game</span>
+				<span><strong>{{gameStats.favouriteGame}}</strong></span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>total sessions</span>
+				<span><strong>{{gameStats.totalSessions}}</strong></span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>total playtime</span>
+				<span><strong>{{gameStats.totalPlaytimeHuman}}</strong></span>
+			</div>
+			<div class="dashboard--panel--meta__row">
+				<span>average length</span>
+				<span><strong>{{gameStats.averagePlaytime}}</strong></span>
 			</div>
 		</div>
 	{{/dashpanel}}
