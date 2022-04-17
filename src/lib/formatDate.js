@@ -118,3 +118,7 @@ export function prettyDuration (durationMs) {
 
 	return duration;
 }
+
+export function getStartOfDay (date = new Date()) {
+	return new Date(`${formatDate(date)}T00:00:00.000Z`);
+}

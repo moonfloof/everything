@@ -8,6 +8,7 @@ import {
 	prettyDate,
 	prettyDuration,
 	shortDate,
+	getStartOfDay,
 } from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
@@ -114,8 +115,24 @@ export function getSleepCycles (id, page) {
 }
 
 export function getSleepStats () {
-	return getSleepCycles()
-		.slice(0, 10)
+	const emptyStats = {
+		earliest: 100,
+		earliestHuman: '',
+		latest: 0,
+		latestHuman: '',
+		longest: 0,
+		longestHuman: '',
+		shortest: 100,
+		shortestHuman: '',
+		totalSleep: 0,
+		totalWake: 0,
+	};
+
+	const sleep = getSleepCycles().slice(0, 10);
+
+	if (sleep.length === 0) return emptyStats;
+
+	const stats = sleep.slice(0, 10)
 		.reduce((acc, cur) => {
 			let newAcc = { ...acc };
 
@@ -146,17 +163,22 @@ export function getSleepStats () {
 				newAcc.latestHuman = formatted;
 			}
 
+			newAcc.totalSleep += cur.startTimeNormalised;
+			newAcc.totalWake += cur.startTimeNormalised + cur.durationNumber;
+
 			return newAcc;
-		}, {
-			earliest: 100,
-			earliestHuman: '',
-			latest: 0,
-			latestHuman: '',
-			longest: 0,
-			longestHuman: '',
-			shortest: 100,
-			shortestHuman: '',
-		});
+		}, emptyStats);
+
+	const averageSleep = stats.totalSleep * 360000;
+	const averageWake = stats.totalWake * 360000;
+
+	// Use today for the correct timezone
+	const today = getStartOfDay().getTime();
+
+	stats.averageSleepHuman = formatTime(new Date(today + averageSleep), false);
+	stats.averageWakeHuman = formatTime(new Date(today + averageWake), false);
+
+	return stats;
 }
 
 export function countSleepCycles () {
