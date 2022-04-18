@@ -3,5 +3,5 @@
  * @param {import('express').Request} req
  */
 export function getCanonicalUrl (req) {
-	return `${req.protocol}://${req.hostname}${req.baseUrl}${req.path}`;
+	return `${process.env.TOMBOIS_SERVER_EXTERNAL_URI}${req.baseUrl}${req.path}`;
 }
