@@ -16,11 +16,7 @@ const logger = new Logger('cache');
 /** @type {Record<string, CacheObj>} */
 let cache = {};
 
-/**
- * @export
- * @param {number} durationSecs
- */
-export default function getCache (durationSecs) {
+export default function getCache () {
 	/**
 	 * @param {import('express').Request} req
 	 * @param {import('express').Response} res
@@ -29,6 +25,13 @@ export default function getCache (durationSecs) {
 	return (req, res, next) => {
 		const key = getCanonicalUrl(req);
 		const cacheValue = cache[key];
+
+		const durationSecs = Number(process.env.TOMBOIS_SERVER_CACHE_DURATION_SECS || 600);
+
+		if (durationSecs === 0) {
+			next();
+			return;
+		}
 
 		const durationMs = durationSecs * 1000;
 		const lastUpdate = Date.now() - durationMs;

@@ -30,13 +30,12 @@ import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import getCache from '../../lib/middleware/cachePage.js';
 
 const log = new Logger('frontend');
-const cacheTenMinutes = getCache(600);
 
 const router = express.Router();
 
 // DASHBOARD
 
-router.get('/', cacheTenMinutes, (req, res) => {
+router.get('/', getCache(), (req, res) => {
 	const listens = getListenPopularDashboard(7);
 	const youtubeLikes = getLikes().slice(0, 2);
 	const gameStats = getGameStats();
@@ -76,7 +75,7 @@ router.get('/', cacheTenMinutes, (req, res) => {
 
 // LISTENS
 
-router.get('/music', cacheTenMinutes, (req, res) => {
+router.get('/music', getCache(), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countListens());
 
@@ -109,7 +108,7 @@ router.get('/music/:id', (req, res) => {
 
 // YOUTUBE LIKES
 
-router.get('/youtube', cacheTenMinutes, (req, res) => {
+router.get('/youtube', getCache(), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countYouTubeLikes());
 
@@ -137,7 +136,7 @@ router.get('/youtube/:id', (req, res) => {
 
 // STEAM ACTIVITY
 
-router.get('/games', cacheTenMinutes, (req, res) => {
+router.get('/games', getCache(), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countGameActivity());
 
