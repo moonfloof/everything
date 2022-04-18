@@ -9,8 +9,14 @@ import {
 	getListens,
 	getListensPopular,
 } from '../../database/listens.js';
+import {
+	countGameActivity,
+	getGameActivity,
+	getGameActivityGroupedByDay,
+	getGameDashboardGraph,
+	getGameStats,
+} from '../../database/games.js';
 import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
-import { countGameActivity, getGameActivity, getGameActivityGroupedByDay, getGameDashboardGraph, getGameStats } from '../../database/games.js';
 import { getSleepCycles, getSleepStats } from '../../database/sleep.js';
 import { getStepsYesterday } from '../../database/steps.js';
 import { getDevices } from '../../database/devices.js';
@@ -20,6 +26,7 @@ import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { getLatestCity } from '../../database/locations.js';
 import { generateSmallBarGraph } from '../../lib/graphs/barSmall.js';
+import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 
 const log = new Logger('frontend');
 
@@ -27,7 +34,7 @@ const router = express.Router();
 
 // DASHBOARD
 
-router.get('/', (_req, res) => {
+router.get('/', (req, res) => {
 	const listens = getListenPopularDashboard(7);
 	const youtubeLikes = getLikes().slice(0, 2);
 	const gameStats = getGameStats();
@@ -61,6 +68,7 @@ router.get('/', (_req, res) => {
 		device,
 		steps,
 		location,
+		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -75,10 +83,13 @@ router.get('/music', (req, res) => {
 	const graphPoints = getListenGraph();
 	const svg = generateBarGraph(graphPoints, 'scrobbles');
 
-	res.render(
-		'external/listenlist',
-		{ listens, popular, pagination, svg },
-	);
+	res.render('external/listenlist', {
+		listens,
+		popular,
+		pagination,
+		svg,
+		canonicalUrl: getCanonicalUrl(req),
+	});
 });
 
 router.get('/music/:id', (req, res) => {
@@ -88,10 +99,10 @@ router.get('/music/:id', (req, res) => {
 		throw new NotFoundError('Listen not found');
 	}
 
-	res.render(
-		'external/listensingle',
-		{ listen: listens[0] },
-	);
+	res.render('external/listensingle', {
+		listen: listens[0],
+		canonicalUrl: getCanonicalUrl(req),
+	});
 });
 
 // YOUTUBE LIKES
@@ -102,10 +113,11 @@ router.get('/youtube', (req, res) => {
 
 	const youtubeLikes = getLikes(undefined, page);
 
-	res.render(
-		'external/youtubelikelist',
-		{ youtubeLikes, pagination },
-	);
+	res.render('external/youtubelikelist', {
+		youtubeLikes,
+		pagination,
+		canonicalUrl: getCanonicalUrl(req),
+	});
 });
 
 router.get('/youtube/:id', (req, res) => {
@@ -115,10 +127,10 @@ router.get('/youtube/:id', (req, res) => {
 		throw new NotFoundError('Like not found');
 	}
 
-	res.render(
-		'external/youtubelikesingle',
-		{ youtubeLike: youtubeLikes[0] },
-	);
+	res.render('external/youtubelikesingle', {
+		youtubeLike: youtubeLikes[0],
+		canonicalUrl: getCanonicalUrl(req),
+	});
 });
 
 // STEAM ACTIVITY
@@ -131,10 +143,12 @@ router.get('/games', (req, res) => {
 	const gamesByDay = getGameActivityGroupedByDay();
 	const svg = generateBarGraph(gamesByDay, 'hours');
 
-	res.render(
-		'external/gamelist',
-		{ gameActivity, svg, pagination },
-	);
+	res.render('external/gamelist', {
+		gameActivity,
+		svg,
+		pagination,
+		canonicalUrl: getCanonicalUrl(req),
+	});
 });
 
 router.get('/game/:id', (req, res) => {
@@ -144,10 +158,10 @@ router.get('/game/:id', (req, res) => {
 		throw new NotFoundError('Like not found');
 	}
 
-	res.render(
-		'external/gamesingle',
-		{ gameActivity: gameActivity[0] },
-	);
+	res.render('external/gamesingle', {
+		gameActivity: gameActivity[0],
+		canonicalUrl: getCanonicalUrl(req),
+	});
 });
 
 // NOT FOUND
