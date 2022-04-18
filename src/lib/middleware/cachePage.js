@@ -3,6 +3,9 @@
 // a very simple singleton object.
 
 import { getCanonicalUrl } from '../getCanonicalUrl.js';
+import Logger from '../logger.js';
+
+const logger = new Logger('cache');
 
 /**
  * @typedef {object} CacheObj
@@ -35,7 +38,7 @@ export default function getCache (durationSecs) {
 			return;
 		}
 
-		console.log('Updating Cache for ' + key);
+		logger.info(`Caching '${key}' for ${durationSecs} seconds`);
 
 		res.sendResponse = res.send;
 		res.send = body => {
