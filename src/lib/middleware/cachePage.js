@@ -2,7 +2,6 @@
 // this caching solution will store the entirety of common pages in memory using
 // a very simple singleton object.
 
-import { getCanonicalUrl } from '../getCanonicalUrl.js';
 import Logger from '../logger.js';
 
 const logger = new Logger('cache');
@@ -23,7 +22,7 @@ export default function getCache () {
 	 * @param {import('express').NextFunction} next
 	 */
 	return (req, res, next) => {
-		const key = getCanonicalUrl(req);
+		const key = req.originalUrl;
 		const cacheValue = cache[key];
 
 		const durationSecs = Number(process.env.TOMBOIS_SERVER_CACHE_DURATION_SECS || 600);
