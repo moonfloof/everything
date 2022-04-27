@@ -8,7 +8,7 @@ const logger = new Logger('cache');
 
 /**
  * @typedef {object} CacheObj
- * @property {number} lastUpdate
+ * @property {number} lastUpdateUnixMs
  * @property {string} contents
  */
 
@@ -33,9 +33,9 @@ export default function getCache () {
 		}
 
 		const durationMs = durationSecs * 1000;
-		const lastUpdate = Date.now() - durationMs;
+		const lastUpdateUnixMs = Date.now() - durationMs;
 
-		if (cacheValue?.lastUpdate > lastUpdate) {
+		if (cacheValue?.lastUpdateUnixMs > lastUpdateUnixMs) {
 			res.send(cacheValue.contents);
 			return;
 		}
@@ -46,10 +46,34 @@ export default function getCache () {
 		res.send = body => {
 			cache[key] = {
 				contents: body,
-				lastUpdate: Date.now(),
+				lastUpdateUnixMs: Date.now(),
 			};
 			res.sendResponse(body);
 		};
 		next();
 	};
+}
+
+export function pollForCacheDeletion () {
+	const intervalDurationSecs = Number(process.env.TOMBOIS_SERVER_CACHE_INTERVAL_SECS || 1200);
+	const cacheDurationSecs = Number(process.env.TOMBOIS_SERVER_CACHE_DURATION_SECS || 600);
+
+	if (intervalDurationSecs <= 0 || cacheDurationSecs <= 0) {
+		return;
+	}
+
+	const intervalDurationMs = intervalDurationSecs * 1000;
+	const cacheDurationMs = cacheDurationSecs * 1000;
+
+	setInterval(() => {
+		Object.keys(cache).forEach(key => {
+			if (cache[key].lastUpdateUnixMs > Date.now() - cacheDurationMs) {
+				return;
+			}
+
+			// Remove from cache entirely
+			logger.info(`Cache for '${key}' expired. Deleting`);
+			delete cache[key];
+		});
+	}, intervalDurationMs);
 }

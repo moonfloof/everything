@@ -9,6 +9,7 @@ import appInternal from './app-internal.js';
 // Adapters
 import { pollForLikedVideos } from './adapters/youtube.js';
 import { pollForGameActivity } from './adapters/steam.js';
+import { pollForCacheDeletion } from './lib/middleware/cachePage.js';
 
 const log = new Logger('http');
 
@@ -18,6 +19,7 @@ dotenv.config();
 // Set up polling adapters
 pollForLikedVideos();
 pollForGameActivity();
+pollForCacheDeletion();
 
 // Start servers
 appExternal();
