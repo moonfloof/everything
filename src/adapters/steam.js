@@ -8,7 +8,9 @@ import Logger from '../lib/logger.js';
 const log = new Logger('Steam');
 
 const ignoredGames = [
-	250820,
+	250820,  // Steam VR
+	755540,  // LIV
+	1173510, // XSOverlay
 ];
 
 let gameActivity = [];
