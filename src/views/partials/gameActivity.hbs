@@ -9,7 +9,11 @@
 	</div>
 	<div class="row">
 		<span class="left"></span>
-		<time datetime="{{data.created_at}}" class="right">
+		<time
+			title="{{data.created_at}}"
+			datetime="{{data.created_at}}"
+			class="right"
+		>
 			<small>
 			{{#if showlink }}
 				<a href="/game/{{data.id}}">{{data.timeago}}</a>
