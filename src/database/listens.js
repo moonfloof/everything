@@ -180,6 +180,7 @@ export function getListenDashboardGraph () {
 	return statement
 		.all()
 		.map(row => ({
+			...row,
 			min: 0,
 			max: row.max,
 		}));

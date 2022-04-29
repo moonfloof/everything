@@ -28,6 +28,8 @@ import { getLatestCity } from '../../database/locations.js';
 import { generateSmallBarGraph } from '../../lib/graphs/barSmall.js';
 import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import getCache from '../../lib/middleware/cachePage.js';
+import addMissingDates from '../../lib/addMissingDates.js';
+import { shortDate } from '../../lib/formatDate.js';
 
 const log = new Logger('frontend');
 
@@ -49,13 +51,14 @@ router.get('/', getCache(), (req, res) => {
 	const sleepGraphStats = sleep
 		.filter(night => night.ended_at !== null)
 		.map(night => ({
+			created_at: night.ended_at,
 			min: night.startTimeNormalised,
 			max: night.startTimeNormalised + night.durationNumber,
 		}));
 
-	const sleepGraph = generateSmallBarGraph(sleepGraphStats);
-	const listenGraph = generateSmallBarGraph(getListenDashboardGraph());
-	const gamesGraph = generateSmallBarGraph(getGameDashboardGraph());
+	const sleepGraph = generateSmallBarGraph(addMissingDates(sleepGraphStats));
+	const listenGraph = generateSmallBarGraph(addMissingDates(getListenDashboardGraph(), 'day'));
+	const gamesGraph = generateSmallBarGraph(addMissingDates(getGameDashboardGraph(), 'day'));
 
 	res.render('external/dashboard', {
 		sleepStats,
@@ -82,7 +85,11 @@ router.get('/music', getCache(), (req, res) => {
 	const listens = getListens(undefined, page);
 	const popular = getListensPopular(7);
 	const graphPoints = getListenGraph();
-	const svg = generateBarGraph(graphPoints, 'scrobbles');
+	const svg = generateBarGraph(addMissingDates(
+		graphPoints,
+		'day',
+		(date) => ({ y: 0, label: shortDate(date) }),
+	), 'scrobbles');
 
 	res.render('external/listenlist', {
 		listens,
@@ -142,7 +149,11 @@ router.get('/games', getCache(), (req, res) => {
 
 	const gameActivity = getGameActivity(undefined, page);
 	const gamesByDay = getGameActivityGroupedByDay();
-	const svg = generateBarGraph(gamesByDay, 'hours');
+	const svg = generateBarGraph(addMissingDates(
+		gamesByDay,
+		'day',
+		(date) => ({ y: 0, label: shortDate(date) }),
+	), 'hours');
 
 	res.render('external/gamelist', {
 		gameActivity,

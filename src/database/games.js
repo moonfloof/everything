@@ -143,6 +143,7 @@ export function getGameActivityGroupedByDay (days = 14) {
 	return statement
 		.all({ created_at })
 		.map(row => ({
+			...row,
 			y: row.playtime_mins / 60,
 			label: shortDate(new Date(row.day)),
 		}));
@@ -163,6 +164,7 @@ export function getGameDashboardGraph () {
 	return statement
 		.all()
 		.map(row => ({
+			...row,
 			min: 0,
 			max: row.playtime_mins,
 		}));
