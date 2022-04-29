@@ -122,3 +122,21 @@ export function prettyDuration (durationMs) {
 export function getStartOfDay (date = new Date()) {
 	return new Date(`${formatDate(date)}T00:00:00.000Z`);
 }
+
+/**
+ * @param {Date} dateA
+ * @param {Date} dateB
+ * @returns {boolean}
+ */
+export function isSameDate (dateA, dateB) {
+	const yearSame = dateA.getFullYear() === dateB.getFullYear();
+	if (yearSame === false) return false;
+
+	const monthSame = dateA.getMonth() === dateB.getMonth();
+	if (monthSame === false) return false;
+
+	const daySame = dateA.getDate() === dateB.getDate();
+	if (daySame === false) return false;
+
+	return true;
+}
