@@ -51,7 +51,7 @@ router.post('/overland', async (req, res) => {
 			const timestampDate = new Date(timestamp);
 			const timestampISO = timestampDate.toISOString();
 
-			const [ lon, lat ] = location?.geometry?.coordinates;
+			const [ lon, lat ] = location?.geometry?.coordinates ?? [];
 
 			// Get city from last location in batch
 			let city = null;
