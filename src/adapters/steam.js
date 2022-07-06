@@ -11,6 +11,7 @@ const ignoredGames = [
 	250820,  // Steam VR
 	755540,  // LIV
 	1173510, // XSOverlay
+	1009850, // OVR Advanced Settings
 ];
 
 let gameActivity = [];
