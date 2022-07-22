@@ -1,0 +1,28 @@
+<div class="sectioncontainer">
+	<div class="row">
+		<span class="left">📆</span>
+		<span class="right">
+			<strong>{{data.episode_title}}</strong>
+		</span>
+	</div>
+	<div class="row">
+		<span class="left">📺</span>
+		<span class="right">{{data.series_title}}</span>
+	</div>
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{data.created_at}}"
+			datetime="{{data.created_at}}"
+			class="right"
+		>
+			<small>
+			{{#if showlink }}
+				<a href="/tv/{{data.id}}">{{data.timeago}}</a>
+			{{else}}
+				{{data.timeago}}
+			{{/if}}
+			</small>
+		</time>
+	</div>
+</div>

@@ -111,6 +111,17 @@
 		</ul>
 	{{/dashpanel}}
 
+	{{#> dashpanel title="tv" showlink=true }}
+		<ul>
+		{{#each tvEpisodes}}
+			<li class="dashboard--panel__li">
+				<strong>{{episode_title}}</strong>
+				<small>from "<em>{{series_title}}</em>"</small>
+			</li>
+		{{/each}}
+		</ul>
+	{{/dashpanel}}
+
 	{{#> dashpanel title="misc" }}
 		<div class="dashboard--panel--meta">
 			{{#if location}}

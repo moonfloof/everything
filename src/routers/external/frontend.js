@@ -30,6 +30,7 @@ import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
 import { shortDate } from '../../lib/formatDate.js';
+import { countEpisodes, getEpisodes } from '../../database/tv.js';
 
 const log = new Logger('frontend');
 
@@ -40,6 +41,7 @@ const router = express.Router();
 router.get('/', getCache(), (req, res) => {
 	const listens = getListenPopularDashboard(7);
 	const youtubeLikes = getLikes().slice(0, 2);
+	const tvEpisodes = getEpisodes().slice(0, 2);
 	const gameStats = getGameStats();
 	const games = getGameActivity();
 	const device = getDevices()[0];
@@ -66,6 +68,7 @@ router.get('/', getCache(), (req, res) => {
 		listens,
 		listenGraph,
 		youtubeLikes,
+		tvEpisodes,
 		games,
 		gamesGraph,
 		gameStats,
@@ -172,6 +175,34 @@ router.get('/game/:id', (req, res) => {
 
 	res.render('external/gamesingle', {
 		gameActivity: gameActivity[0],
+		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+// TV SHOWS
+
+router.get('/tv', getCache(), (req, res) => {
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countEpisodes());
+
+	const episodes = getEpisodes(undefined, page);
+
+	res.render('external/tvlist', {
+		episodes,
+		pagination,
+		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+router.get('/tv/:id', (req, res) => {
+	const episodes = getEpisodes(req.params.id);
+
+	if (episodes.length === 0) {
+		throw new NotFoundError('Episode not found');
+	}
+
+	res.render('external/tvsingle', {
+		episode: episodes[0],
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
