@@ -5,7 +5,7 @@
 
 <p>Pick an episode:</p>
 
-<form class="scrobble" action="/tv" method="POST">
+<form class="scrobble" action="/tv/episode" method="POST">
 	<select name="episodeId">
 	{{#each episodeList as |episode| }}
 		<option value="{{episode.id}}">{{episode.title}}</option>
