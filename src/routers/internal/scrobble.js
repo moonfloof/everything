@@ -52,8 +52,8 @@ router.post('/', async (req, res) => {
 		console.error(err);
 	}
 
-	// Step 3: Redirect to scrobble page
-	res.redirect('/scrobble');
+	// Step 3: Redirect to listens page
+	res.redirect('/listens');
 });
 
 export default router;
