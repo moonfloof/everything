@@ -8,7 +8,8 @@
 	--panel-bg: #fff;
 }
 
-body, html {
+body,
+html {
 	width: 100%;
 	font-family: Inter, 'Helvetica Neue', Arial, sans-serif;
 	font-weight: 400;
@@ -115,7 +116,9 @@ a:hover {
 	display: flex;
 	flex-direction: row;
 }
-.dashboard--panel__content, .dashboard--panel__content > span {
+
+.dashboard--panel__content,
+.dashboard--panel__content>span {
 	line-height: 20px;
 }
 
@@ -135,7 +138,8 @@ a:hover {
 	margin-bottom: 8px;
 }
 
-.dashboard--panel__li a, .dashboard--panel__li small {
+.dashboard--panel__li a,
+.dashboard--panel__li small {
 	display: block;
 	line-height: 18px;
 	width: 100%;
@@ -204,7 +208,8 @@ hr {
 	border-top: 1px solid var(--primary);
 }
 
-img, svg {
+img,
+svg {
 	max-width: 100%;
 }
 
@@ -213,7 +218,8 @@ ul {
 	line-height: 20px;
 }
 
-li, ol {
+li,
+ol {
 	margin-top: 8px;
 }
 
@@ -272,7 +278,8 @@ pre {
 	overflow-y: hidden;
 }
 
-input.right, select.right {
+input.right,
+select.right {
 	flex: 1;
 	padding: 2px;
 	max-width: 320px;
@@ -280,6 +287,13 @@ input.right, select.right {
 
 input[type="submit"] {
 	padding: 6px 12px;
+}
+
+.scrobble select {
+	display: block;
+	width: 100%;
+	margin: 16px 0;
+	padding: 6px;
 }
 
 @media (max-width: 660px) {
