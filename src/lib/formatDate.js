@@ -15,7 +15,7 @@ export const weekMs = weekSecs * 1000;
  * @param {number} length
  * @param {string} pad
  */
-function padString (str, length, pad = '0') {
+export function padString (str, length, pad = '0') {
 	let newStr = str.toString();
 	while (newStr.length < length) {
 		newStr = `${pad}${newStr}`;

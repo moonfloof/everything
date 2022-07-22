@@ -1,0 +1,10 @@
+<h2>Watched TV Episodes:</h2>
+
+{{> internal/tv }}
+<hr/>
+
+{{#each episodes as |episode| }}
+	{{> internal/tv data=episode }}
+{{/each}}
+
+{{> pagination route="/tv/list" pagination=pagination }}
