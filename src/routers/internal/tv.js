@@ -42,37 +42,47 @@ router.get('/episode', async (req, res) => {
 });
 
 router.post('/episode', async (req, res) => {
-	const episode = await getEpisode(req.body.episodeId);
-	const seasonNumber = padString(episode.seasonNumber, 2);
-	const episodeNumber = padString(episode.episodeNumber, 2);
-	const episodeTitle = `S${seasonNumber}E${episodeNumber} - ${episode.title}`;
-	const seriesTitle = `${episode.series.title} (${episode.series.year})`;
+	try {
+		const episode = await getEpisode(req.body.episodeId);
+		const seasonNumber = padString(episode.seasonNumber, 2);
+		const episodeNumber = padString(episode.episodeNumber, 2);
+		const episodeTitle = `S${seasonNumber}E${episodeNumber} - ${episode.title}`;
+		const seriesTitle = `${episode.series.title} (${episode.series.year})`;
 
-	insertEpisode(
-		seriesTitle,
-		episodeTitle,
-		new Date().toISOString(),
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+		insertEpisode(
+			seriesTitle,
+			episodeTitle,
+			new Date().toISOString(),
+			process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+		);
 
-	res.redirect('/tv/list');
+		res.redirect('/tv/list');
+	} catch (err) {
+		console.error(err);
+		res.redirect('/');
+	}
 });
 
 router.post('/episode', async (req, res) => {
-	const episode = await getEpisode(req.body.episodeId);
-	const seasonNumber = padString(episode.seasonNumber, 2);
-	const episodeNumber = padString(episode.episodeNumber, 2);
-	const episodeTitle = `S${seasonNumber}E${episodeNumber} - ${episode.title}`;
-	const seriesTitle = `${episode.series.title} (${episode.series.year})`;
+	try {
+		const episode = await getEpisode(req.body.episodeId);
+		const seasonNumber = padString(episode.seasonNumber, 2);
+		const episodeNumber = padString(episode.episodeNumber, 2);
+		const episodeTitle = `S${seasonNumber}E${episodeNumber} - ${episode.title}`;
+		const seriesTitle = `${episode.series.title} (${episode.series.year})`;
 
-	insertEpisode(
-		seriesTitle,
-		episodeTitle,
-		new Date().toISOString(),
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+		insertEpisode(
+			seriesTitle,
+			episodeTitle,
+			new Date().toISOString(),
+			process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+		);
 
-	res.redirect('/tv/list');
+		res.redirect('/tv/list');
+	} catch (err) {
+		console.error(err);
+		res.redirect('/');
+	}
 });
 
 router.post('/', (req, res) => {
