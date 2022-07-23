@@ -25,6 +25,7 @@
 		"nodemon": "^2.0.19",
 		"on-finished": "^2.4.1",
 		"phin": "^3.6.1",
+		"sax": "^1.2.4",
 		"uuid": "^8.3.2"
 	},
 	"devDependencies": {

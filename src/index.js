@@ -10,6 +10,7 @@ import appInternal from './app-internal.js';
 import { pollForLikedVideos } from './adapters/youtube.js';
 import { pollForGameActivity } from './adapters/steam.js';
 import { pollForCacheDeletion } from './lib/middleware/cachePage.js';
+import { pollForFilmActivity } from './adapters/letterboxd.js';
 
 const log = new Logger('http');
 
@@ -20,6 +21,7 @@ dotenv.config();
 pollForLikedVideos();
 pollForGameActivity();
 pollForCacheDeletion();
+pollForFilmActivity();
 
 // Start servers
 appExternal();
