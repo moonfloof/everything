@@ -86,7 +86,7 @@ export const pollForGameActivity = () => {
 		// Update all new same-game activity
 		for (let i = newActivity.length - 1; i >= 0; i--) {
 			const game = newActivity[i];
-			await updateActivity(
+			updateActivity(
 				game.name,
 				game.newPlaytime,
 				deviceId,
