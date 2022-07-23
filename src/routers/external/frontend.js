@@ -31,6 +31,7 @@ import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
 import { shortDate } from '../../lib/formatDate.js';
 import { countEpisodes, getEpisodes } from '../../database/tv.js';
+import { getFilms } from '../../database/films.js';
 
 const log = new Logger('frontend');
 
@@ -42,6 +43,7 @@ router.get('/', getCache(), (req, res) => {
 	const listens = getListenPopularDashboard(7);
 	const youtubeLikes = getLikes().slice(0, 2);
 	const tvEpisodes = getEpisodes().slice(0, 2);
+	const films = getFilms().slice(0, 2);
 	const gameStats = getGameStats();
 	const games = getGameActivity();
 	const device = getDevices()[0];
@@ -69,6 +71,7 @@ router.get('/', getCache(), (req, res) => {
 		listenGraph,
 		youtubeLikes,
 		tvEpisodes,
+		films,
 		games,
 		gamesGraph,
 		gameStats,

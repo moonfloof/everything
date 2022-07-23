@@ -139,6 +139,7 @@ a:hover {
 }
 
 .dashboard--panel__li a,
+.dashboard--panel__li strong,
 .dashboard--panel__li small {
 	display: block;
 	line-height: 18px;

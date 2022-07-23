@@ -60,7 +60,7 @@ export function getFilms (id, page) {
 		})
 		.map(row => ({
 			...row,
-			timeago: timeago.format(new Date(row.created_at)),
+			timeago: timeago.format(new Date(row.watched_at)),
 		}));
 }
 

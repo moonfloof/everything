@@ -122,6 +122,24 @@
 		</ul>
 	{{/dashpanel}}
 
+	{{#if films}}
+		{{#> dashpanel title="films" showlink=false }}
+			<ul>
+			{{#each films}}
+				<li class="dashboard--panel__li">
+					<a href="{{url}}" target="_blank" rel="noopener">
+						<strong>{{title}} ({{year}})</strong>
+					</a>
+					<small>
+						{{timeago}}
+						{{#if rating}} &bull; {{rating}} / 10 ⭐{{/if}}
+					</small>
+				</li>
+			{{/each}}
+			</ul>
+		{{/dashpanel}}
+	{{/if}}
+
 	{{#> dashpanel title="misc" }}
 		<div class="dashboard--panel--meta">
 			{{#if location}}
