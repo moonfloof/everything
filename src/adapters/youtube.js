@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-// eslint-disable-next-line no-unused-vars
-import { google, Auth } from 'googleapis';
+import { google } from 'googleapis';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
 import Logger from '../lib/logger.js';
 import { minuteMs } from '../lib/formatDate.js';
@@ -16,7 +15,7 @@ let youtubeLikes = [];
 const storagePath = () => path.resolve(process.env.TOMBOIS_GOOGLE_TOKENFILE);
 
 /**
- * @return {Auth.OAuth2Client}
+ * @return {import('googleapis').Auth.OAuth2Client}
  */
 const getClient = () => {
 	if (client !== null) return client;
