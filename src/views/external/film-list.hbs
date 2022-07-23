@@ -1,0 +1,9 @@
+<div class="page--data">
+	{{> pageHeader title="Watched Films" url="/" }}
+
+	{{#each films as |film|}}
+		{{> film data=film showlink=true }}
+	{{/each}}
+
+	{{> pagination pagination=pagination route="/films" }}
+</div>

@@ -31,7 +31,7 @@ import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
 import { shortDate } from '../../lib/formatDate.js';
 import { countEpisodes, getEpisodes } from '../../database/tv.js';
-import { getFilms } from '../../database/films.js';
+import { countFilms, getFilms } from '../../database/films.js';
 
 const log = new Logger('frontend');
 
@@ -206,6 +206,34 @@ router.get('/tv/:id', (req, res) => {
 
 	res.render('external/tvsingle', {
 		episode: episodes[0],
+		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+// FILMS
+
+router.get('/films', getCache(), (req, res) => {
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countFilms());
+
+	const films = getFilms(undefined, page);
+
+	res.render('external/film-list', {
+		films,
+		pagination,
+		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+router.get('/film/:id', (req, res) => {
+	const films = getFilms(req.params.id);
+
+	if (films.length === 0) {
+		throw new NotFoundError('Film not found');
+	}
+
+	res.render('external/film-single', {
+		film: films[0],
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
