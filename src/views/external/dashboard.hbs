@@ -111,16 +111,18 @@
 		</ul>
 	{{/dashpanel}}
 
-	{{#> dashpanel title="tv" showlink=true }}
-		<ul>
-		{{#each tvEpisodes}}
-			<li class="dashboard--panel__li">
-				<strong>{{episode_title}}</strong>
-				<small>from "<em>{{series_title}}</em>"</small>
-			</li>
-		{{/each}}
-		</ul>
-	{{/dashpanel}}
+	{{#if tvEpisodes}}
+		{{#> dashpanel title="tv" showlink=true }}
+			<ul>
+			{{#each tvEpisodes}}
+				<li class="dashboard--panel__li">
+					<strong>{{episode_title}}</strong>
+					<small>from "<em>{{series_title}}</em>"</small>
+				</li>
+			{{/each}}
+			</ul>
+		{{/dashpanel}}
+	{{/if}}
 
 	{{#if films}}
 		{{#> dashpanel title="films" showlink=false }}
