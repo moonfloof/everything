@@ -1,0 +1,10 @@
+<h2>Films Watched:</h2>
+
+{{> internal/film }}
+<hr/>
+
+{{#each films as |film| }}
+	{{> internal/film data=film }}
+{{/each}}
+
+{{> pagination route="/films" pagination=pagination }}
