@@ -97,7 +97,7 @@ router.get('/music', getCache(), (req, res) => {
 		(date) => ({ y: 0, label: shortDate(date) }),
 	), 'scrobbles');
 
-	res.render('external/listenlist', {
+	res.render('external/listen-list', {
 		listens,
 		popular,
 		pagination,
@@ -113,7 +113,7 @@ router.get('/music/:id', (req, res) => {
 		throw new NotFoundError('Listen not found');
 	}
 
-	res.render('external/listensingle', {
+	res.render('external/listen-single', {
 		listen: listens[0],
 		canonicalUrl: getCanonicalUrl(req),
 	});
@@ -127,7 +127,7 @@ router.get('/youtube', getCache(), (req, res) => {
 
 	const youtubeLikes = getLikes(undefined, page);
 
-	res.render('external/youtubelikelist', {
+	res.render('external/youtubelike-list', {
 		youtubeLikes,
 		pagination,
 		canonicalUrl: getCanonicalUrl(req),
@@ -141,7 +141,7 @@ router.get('/youtube/:id', (req, res) => {
 		throw new NotFoundError('Like not found');
 	}
 
-	res.render('external/youtubelikesingle', {
+	res.render('external/youtubelike-single', {
 		youtubeLike: youtubeLikes[0],
 		canonicalUrl: getCanonicalUrl(req),
 	});
@@ -161,7 +161,7 @@ router.get('/games', getCache(), (req, res) => {
 		(date) => ({ y: 0, label: shortDate(date) }),
 	), 'hours');
 
-	res.render('external/gamelist', {
+	res.render('external/game-list', {
 		gameActivity,
 		svg,
 		pagination,
@@ -176,7 +176,7 @@ router.get('/game/:id', (req, res) => {
 		throw new NotFoundError('Like not found');
 	}
 
-	res.render('external/gamesingle', {
+	res.render('external/game-single', {
 		gameActivity: gameActivity[0],
 		canonicalUrl: getCanonicalUrl(req),
 	});
@@ -190,7 +190,7 @@ router.get('/tv', getCache(), (req, res) => {
 
 	const episodes = getEpisodes(undefined, page);
 
-	res.render('external/tvlist', {
+	res.render('external/tv-list', {
 		episodes,
 		pagination,
 		canonicalUrl: getCanonicalUrl(req),
@@ -204,7 +204,7 @@ router.get('/tv/:id', (req, res) => {
 		throw new NotFoundError('Episode not found');
 	}
 
-	res.render('external/tvsingle', {
+	res.render('external/tv-single', {
 		episode: episodes[0],
 		canonicalUrl: getCanonicalUrl(req),
 	});
