@@ -3,7 +3,7 @@ import phin from 'phin';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import { formatDate, minuteMs, weekMs } from '../lib/formatDate.js';
+import { formatDate } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { insertFilm } from '../database/films.js';
 
@@ -116,8 +116,8 @@ const parseFeed = async (feed) => new Promise((resolve, reject) => {
 export const pollForFilmActivity = async () => {
 	const deviceId = process.env.TOMBOIS_DEFAULT_DEVICE_ID;
 	const username = process.env.TOMBOIS_LETTERBOXD_USERNAME;
-	const intervalMins = Number(process.env.TOMBOIS_LETTERBOXD_POLL_INTERVAL) ?? 1440;
-	const intervalMs = intervalMins * minuteMs;
+	const intervalSecs = Number(process.env.TOMBOIS_LETTERBOXD_POLL_INTERVAL_SECS) ?? 86400;
+	const intervalMs = intervalSecs * 1000;
 
 	if (username === '' || username === undefined) return;
 	if (intervalMs === 0) return;
@@ -129,11 +129,13 @@ export const pollForFilmActivity = async () => {
 		const newActivity = (await parseFeed(feed)).reverse();
 
 		newActivity.forEach(film => {
+			// Skip films older than double the interval
+			if (film.watchedDate.getTime() < Date.now() - (intervalMs * 2)) {
+				return;
+			}
+
 			const existsInCache = filmActivity.some(filmCached => {
-				if (film.guid === filmCached.guid) {
-					return filmCached.watchedDate.getTime() < Date.now() - (weekMs * 2);
-				}
-				return false;
+				return film.guid === filmCached.guid;
 			});
 
 			if (existsInCache) return;
