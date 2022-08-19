@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
 			throw new Error('Could not load album');
 		}
 
-		let now = Date.now();
+		let now = new Date(req.body.dateTime || Date.now()).getTime();
 
 		// Step 2: Scrobble each track using duration and current time
 		for (let songIndex = album.song.length - 1; songIndex >= 0; songIndex--) {
