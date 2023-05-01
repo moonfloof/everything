@@ -1,6 +1,6 @@
 import path from 'path';
 import express from 'express';
-import exphbs from 'express-handlebars';
+import { engine } from 'express-handlebars';
 import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
 import formBodyParser from './formParser.js';
 
@@ -22,7 +22,7 @@ const appCreate = () => {
 	app.use(logEntry(console.info));
 
 	// Set up frontend
-	app.engine('.hbs', exphbs({ extname: '.hbs' }));
+	app.engine('.hbs', engine({ extname: '.hbs' }));
 	app.set('views', path.resolve('src/views'));
 	app.set('view engine', '.hbs');
 

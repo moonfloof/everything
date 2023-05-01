@@ -13,23 +13,23 @@
 	"author": "TomboFry <tom@tombofry.co.uk>",
 	"license": "AGPL-3.0-or-later",
 	"dependencies": {
-		"@tombofry/stdlib": "^0.9.0",
-		"better-sqlite3": "^8.0.1",
-		"dotenv": "^10.0.0",
-		"express": "^4.17.1",
-		"express-handlebars": "^5.3.2",
+		"@tombofry/stdlib": "^0.9.1",
+		"better-sqlite3": "^8.3.0",
+		"dotenv": "^16.0.3",
+		"express": "^4.18.2",
+		"express-handlebars": "^7.0.7",
 		"googleapis": "^81.0.0",
-		"helmet": "^5.1.0",
-		"javascript-time-ago": "^2.3.8",
-		"node-geocoder": "^3.27.0",
-		"nodemon": "^2.0.19",
+		"helmet": "^6.1.5",
+		"javascript-time-ago": "^2.5.9",
+		"node-geocoder": "^4.2.0",
+		"nodemon": "^2.0.22",
 		"on-finished": "^2.4.1",
-		"phin": "^3.6.1",
+		"phin": "^3.7.0",
 		"sax": "^1.2.4",
-		"uuid": "^8.3.2"
+		"uuid": "^9.0.0"
 	},
 	"devDependencies": {
-		"eslint": "^8.19.0"
+		"eslint": "^8.39.0"
 	},
 	"nodemonConfig": {
 		"ignore": [
