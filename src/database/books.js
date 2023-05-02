@@ -1,0 +1,138 @@
+import { v4 as uuid } from 'uuid';
+import { getStatement } from './database.js';
+import timeago from '../adapters/timeago.js';
+import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { prettyDate } from '../lib/formatDate.js';
+
+/**
+ * @typedef {object} Book
+ * @property {string} [id]
+ * @property {string} title
+ * @property {string} author
+ * @property {string} [genre]
+ * @property {number} year
+ * @property {number} [pages_total]
+ * @property {number} [pages_progress]
+ * @property {number} [rating]
+ * @property {string} [url]
+ * @property {string} created_at
+ * @property {string} started_at
+ * @property {string} [completed_at]
+ * @property {string} device_id
+*/
+
+/**
+ * @export
+ * @param {Book} book
+ * @return {*}
+ */
+export function insertBook (book) {
+	const id = uuid();
+
+	const statement = getStatement(
+		'insertBook',
+		`INSERT INTO books
+		(id, title, author, genre, year, pages_total, pages_progress, rating, url, started_at, completed_at, created_at, updated_at, device_id)
+		VALUES
+		($id, $title, $author, $genre, $year, $pages_total, $pages_progress, $rating, $url, $started_at, $completed_at, $created_at, $updated_at, $device_id)`,
+	);
+
+	return statement.run({
+		id,
+		...book,
+	});
+}
+
+/**
+ * Fetch all books, or based on a specific ID
+ *
+ * @export
+ * @param {string} [id]
+ * @param {number} [page]
+ */
+export function getBooks (id, page) {
+	const statement = getStatement(
+		'getBooks',
+		`SELECT * FROM books
+		WHERE id LIKE $id
+		ORDER BY updated_at DESC
+		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+	);
+
+	return statement
+		.all({
+			id: id || '%',
+			offset: calculateOffset(page),
+		})
+		.map(row => {
+			let progress = null;
+
+			if (row.pages_total !== null) {
+				const percent = Math.round((row.pages_progress / row.pages_total) * 100);
+				progress = row.pages_total === row.pages_progress
+					? `completed on ${prettyDate(new Date(row.completed_at))}`
+					: `read ${percent}% <small>(${row.pages_progress || 0} / ${row.pages_total} pages)</small>`;
+			}
+
+			return {
+				...row,
+				progress,
+				timeago: timeago.format(new Date(row.updated_at || row.created_at)),
+			};
+		});
+}
+
+/**
+ * @export
+ * @param {string} id
+ */
+export function deleteBook (id) {
+	const statement = getStatement(
+		'deleteBook',
+		'DELETE FROM books WHERE id = $id',
+	);
+
+	return statement.run({ id });
+}
+
+/**
+ * @export
+ * @param {string} id
+ * @param {Book} book
+ */
+export function updateBook (id, book) {
+	const statement = getStatement(
+		'updateBook',
+		`UPDATE books
+		SET title = $title,
+		    author = $author,
+		    genre = $genre,
+		    year = $year,
+		    pages_total = $pages_total,
+		    pages_progress = $pages_progress,
+		    rating = $rating,
+		    url = $url,
+		    created_at = $created_at,
+		    updated_at = $updated_at,
+		    started_at = $started_at,
+		    completed_at = $completed_at
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		...book,
+	});
+}
+
+/**
+ * @return {number} Number of books recorded in database
+ */
+export function countBooks () {
+	const statement = getStatement(
+		'countBooks',
+		'SELECT COUNT(*) as total FROM books',
+	);
+
+	return statement.get().total;
+}

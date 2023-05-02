@@ -32,6 +32,7 @@ import addMissingDates from '../../lib/addMissingDates.js';
 import { shortDate } from '../../lib/formatDate.js';
 import { countEpisodes, getEpisodes } from '../../database/tv.js';
 import { countFilms, getFilms } from '../../database/films.js';
+import { countBooks, getBooks } from '../../database/books.js';
 
 const log = new Logger('frontend');
 
@@ -51,6 +52,7 @@ router.get('/', getCache(), (req, res) => {
 	const steps = getStepsYesterday()[0]?.step_count_total;
 	const sleepStats = getSleepStats();
 	const sleep = getSleepCycles();
+	const books = getBooks().slice(0, 2);
 
 	const sleepGraphStats = sleep
 		.filter(night => night.ended_at !== null)
@@ -72,6 +74,7 @@ router.get('/', getCache(), (req, res) => {
 		youtubeLikes,
 		tvEpisodes,
 		films,
+		books,
 		games,
 		gamesGraph,
 		gameStats,
@@ -234,6 +237,34 @@ router.get('/film/:id', (req, res) => {
 
 	res.render('external/film-single', {
 		film: films[0],
+		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+// BOOKS
+
+router.get('/books', getCache(), (req, res) => {
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countBooks());
+
+	const books = getBooks(undefined, page);
+
+	res.render('external/book-list', {
+		books,
+		pagination,
+		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+router.get('/book/:id', (req, res) => {
+	const books = getBooks(req.params.id);
+
+	if (books.length === 0) {
+		throw new NotFoundError('Book not found');
+	}
+
+	res.render('external/book-single', {
+		book: books[0],
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });

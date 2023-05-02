@@ -18,6 +18,7 @@ import frontend from './routers/internal/frontend.js';
 import scrobble from './routers/internal/scrobble.js';
 import tv from './routers/internal/tv.js';
 import films from './routers/internal/films.js';
+import books from './routers/internal/books.js';
 
 const log = new Logger('server-int');
 
@@ -40,6 +41,7 @@ app.use('/food', food);
 app.use('/scrobble', scrobble);
 app.use('/tv', tv);
 app.use('/films', films);
+app.use('/books', books);
 app.use('/', frontend);
 
 const startServer = () => {
