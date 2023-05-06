@@ -38,10 +38,9 @@ better way to do it).
 
 ## Manual Data Entry
 
-Data is entered using the internal CRUD API, and all but sleep is hidden from
-public view.
+Data is entered using the internal CRUD API.
 
-* **Health**
+* **Health** - All hidden from public view except sleep.
   * Sleep
   * Time-tracking
   * Steps
@@ -52,6 +51,8 @@ public view.
 * **Scrobbles** - [Subsonic API](http://www.subsonic.org/pages/api.jsp)
   installed locally, to get a list of artists and their albums (this is great
   for listening to physical media, where scrobbling is not automatic).
+* **Books** - Also stores progress using page numbers (eg. read 48 pages,
+  total 230 pages, therefore progress is 21%)
 * **Web Bookmarks** - this can be automated by connecting Pocket through IFTTT,
   and making a POST request to `/api/bookmarks` with a JSON body containing
   `apiKey`, `title`, `url` as properties.
