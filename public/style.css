@@ -242,10 +242,25 @@ ol {
 
 table td {
 	padding: 4px 8px 4px 0;
+	white-space: nowrap;
 }
 
 .align-r {
 	text-align: right;
+}
+
+.table-flex-1 {
+	width: 99%;
+}
+
+.artist-count {
+	font-weight: 700;
+	padding: 4px 8px;
+	border-radius: 6px;
+	min-width: fit-content;
+	display: block;
+	color: var(--background);
+	background-color: var(--primary);
 }
 
 .pagination a {

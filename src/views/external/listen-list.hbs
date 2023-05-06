@@ -1,15 +1,23 @@
 <div class="page--data">
 	{{> pageHeader title="Listening to" url="/" }}
 
+	{{#if popular}}
 	<h3>Most scrobbled artists (7 days)</h3>
 	<table>
 		{{#each popular as |artist| }}
 		<tr>
-			<td class="align-r">{{artist.artist}}</td>
-			<td><strong>{{artist.count}}</strong></td>
+			<td class="align-r">
+				{{artist.artist}}
+			</td>
+			<td class="table-flex-1">
+				<span class="artist-count" style="width: {{artist.popularityPercentage}}%">
+					{{artist.count}}
+				</span>
+			</td>
 		</tr>
 		{{/each}}
 	</table>
+	{{/if}}
 
 	<h3>Scrobble count by day</h3>
 	{{{svg}}}

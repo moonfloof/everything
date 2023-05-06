@@ -122,7 +122,12 @@ export function getListensPopular (days) {
 
 	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
 
-	return statement.all({ created_at });
+	const rows = statement.all({ created_at });
+
+	return rows.map(row => ({
+		...row,
+		popularityPercentage: (row.count / rows[0].count) * 100,
+	}));
 }
 
 export function getListenPopularDashboard (days) {
