@@ -29,7 +29,7 @@ import { generateSmallBarGraph } from '../../lib/graphs/barSmall.js';
 import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
-import { shortDate } from '../../lib/formatDate.js';
+import { prettyDate, shortDate } from '../../lib/formatDate.js';
 import { countEpisodes, getEpisodes } from '../../database/tv.js';
 import { countFilms, getFilms } from '../../database/films.js';
 import { countBooks, getBooks } from '../../database/books.js';
@@ -100,24 +100,32 @@ router.get('/music', getCache(), (req, res) => {
 		(date) => ({ y: 0, label: shortDate(date) }),
 	), 'scrobbles');
 
+	const description = popular.length > 0
+		? `My favourite artist in the last 7 days has been ${popular[0].artist}, with ${popular[0].count} listens`
+		: 'I haven\'t listened to any music in the last 7 days!';
+
 	res.render('external/listen-list', {
 		listens,
 		popular,
 		pagination,
 		svg,
 		canonicalUrl: getCanonicalUrl(req),
+		description,
 	});
 });
 
 router.get('/music/:id', (req, res) => {
-	const listens = getListens(req.params.id);
+	const [ listen ] = getListens(req.params.id);
 
-	if (listens.length === 0) {
+	if (!listen) {
 		throw new NotFoundError('Listen not found');
 	}
 
+	const description = `I listened to '${listen.title}' by ${listen.artist} on ${prettyDate(new Date(listen.created_at))}`;
+
 	res.render('external/listen-single', {
-		listen: listens[0],
+		listen,
+		description,
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -138,14 +146,17 @@ router.get('/youtube', getCache(), (req, res) => {
 });
 
 router.get('/youtube/:id', (req, res) => {
-	const youtubeLikes = getLikes(req.params.id);
+	const [ youtubeLike ] = getLikes(req.params.id);
 
-	if (youtubeLikes.length === 0) {
+	if (!youtubeLike) {
 		throw new NotFoundError('Like not found');
 	}
 
+	const description = `I liked '${youtubeLike.title}' by ${youtubeLike.channel} on ${prettyDate(new Date(youtubeLike.created_at))}`;
+
 	res.render('external/youtubelike-single', {
-		youtubeLike: youtubeLikes[0],
+		youtubeLike,
+		description,
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -173,14 +184,17 @@ router.get('/games', getCache(), (req, res) => {
 });
 
 router.get('/game/:id', (req, res) => {
-	const gameActivity = getGameActivity(req.params.id);
+	const [ gameActivity ] = getGameActivity(req.params.id);
 
-	if (gameActivity.length === 0) {
-		throw new NotFoundError('Like not found');
+	if (!gameActivity) {
+		throw new NotFoundError('Game not found');
 	}
 
+	const description = `I played ${gameActivity.name} for ${gameActivity.duration} on ${prettyDate(new Date(gameActivity.created_at))}`;
+
 	res.render('external/game-single', {
-		gameActivity: gameActivity[0],
+		gameActivity,
+		description,
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -201,14 +215,17 @@ router.get('/tv', getCache(), (req, res) => {
 });
 
 router.get('/tv/:id', (req, res) => {
-	const episodes = getEpisodes(req.params.id);
+	const [ episode ] = getEpisodes(req.params.id);
 
-	if (episodes.length === 0) {
+	if (!episode) {
 		throw new NotFoundError('Episode not found');
 	}
 
+	const description = `I watched '${episode.episode_title}' of ${episode.series_title} on ${prettyDate(new Date(episode.created_at))}`;
+
 	res.render('external/tv-single', {
-		episode: episodes[0],
+		episode,
+		description,
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -229,14 +246,17 @@ router.get('/films', getCache(), (req, res) => {
 });
 
 router.get('/film/:id', (req, res) => {
-	const films = getFilms(req.params.id);
+	const [ film ] = getFilms(req.params.id);
 
-	if (films.length === 0) {
+	if (!film) {
 		throw new NotFoundError('Film not found');
 	}
 
+	const description = `I watched ${film.title} (${film.year}) on ${prettyDate(new Date(film.watched_at))}`;
+
 	res.render('external/film-single', {
-		film: films[0],
+		film,
+		description,
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -257,14 +277,29 @@ router.get('/books', getCache(), (req, res) => {
 });
 
 router.get('/book/:id', (req, res) => {
-	const books = getBooks(req.params.id);
+	const [ book ] = getBooks(req.params.id);
 
-	if (books.length === 0) {
+	if (!book) {
 		throw new NotFoundError('Book not found');
 	}
 
+	const percentageComplete = book.pages_total
+		? Math.round((book.pages_progress / book.pages_total) * 100)
+		: 0;
+
+	const prefix = percentageComplete === 100
+		? 'I finished reading'
+		: `I am ${percentageComplete}% through reading`;
+
+	const suffix = percentageComplete === 100
+		? ` on ${prettyDate(new Date(book.completed_at))}`
+		: '';
+
+	const description = `${prefix} '${book.title}' (${book.year}) by ${book.author}${suffix}`;
+
 	res.render('external/book-single', {
-		book: books[0],
+		book,
+		description,
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
