@@ -64,14 +64,15 @@ export function insertSleepCycle (timestamp, isSleep, device_id) {
  * Fetch all sleep cycles, or one, based on a specific ID
  *
  * @export
- * @param {string} [id]
- * @param {number} [page]
+ * @param {object} options
+ * @param {string} [options.id]
+ * @param {number} [options.page]
  */
-export function getSleepCycles (id, page) {
+export function getSleepCycles ({ id, page = 0, days = 10 } = {}) {
 	const statement = getStatement(
 		'getSleepCycles',
 		`SELECT * FROM sleep
-		WHERE id LIKE $id
+		WHERE id LIKE $id AND started_at >= $started_at
 		ORDER BY started_at DESC
 		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
 	);
@@ -80,6 +81,7 @@ export function getSleepCycles (id, page) {
 		.all({
 			id: id || '%',
 			offset: calculateOffset(page),
+			started_at: new Date(Date.now() - (dayMs * days)).toISOString(),
 		})
 		.map(row => {
 			const started_at = new Date(row.started_at);

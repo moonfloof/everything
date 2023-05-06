@@ -14,37 +14,39 @@
 </p>
 
 <div id="dashboard--panels">
-	{{#> dashpanel title="sleep" }}
-		<div class="dashboard--panel__graph">
-			{{{sleepGraph}}}
-		</div>
-		<div class="dashboard--panel--meta">
-			<div class="dashboard--panel--meta__row">
-				<span>average bed time</span>
-				<span>
-					<strong>{{sleepStats.averageSleepHuman}}</strong>
-				</span>
+	{{#if sleep}}
+		{{#> dashpanel title="sleep" }}
+			<div class="dashboard--panel__graph">
+				{{{sleepGraph}}}
 			</div>
-			<div class="dashboard--panel--meta__row">
-				<span>average wake time</span>
-				<span>
-					<strong>{{sleepStats.averageWakeHuman}}</strong>
-				</span>
+			<div class="dashboard--panel--meta">
+				<div class="dashboard--panel--meta__row">
+					<span>average bed time</span>
+					<span>
+						<strong>{{sleepStats.averageSleepHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>average wake time</span>
+					<span>
+						<strong>{{sleepStats.averageWakeHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>longest sleep</span>
+					<span>
+						<strong>{{sleepStats.longestHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>shortest sleep</span>
+					<span>
+						<strong>{{sleepStats.shortestHuman}}</strong>
+					</span>
+				</div>
 			</div>
-			<div class="dashboard--panel--meta__row">
-				<span>longest sleep</span>
-				<span>
-					<strong>{{sleepStats.longestHuman}}</strong>
-				</span>
-			</div>
-			<div class="dashboard--panel--meta__row">
-				<span>shortest sleep</span>
-				<span>
-					<strong>{{sleepStats.shortestHuman}}</strong>
-				</span>
-			</div>
-		</div>
-	{{/dashpanel}}
+		{{/dashpanel}}
+	{{/if}}
 
 	{{#> dashpanel title="music" showlink=true }}
 		<div class="dashboard--panel__graph">
