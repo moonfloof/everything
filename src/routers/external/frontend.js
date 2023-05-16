@@ -88,11 +88,23 @@ router.get('/', getCache(), (req, res) => {
 // LISTENS
 
 router.get('/music', getCache(), (req, res) => {
-	const { page = 0 } = req.query;
+	const { page = 0, days = '7' } = req.query;
 	const pagination = handlebarsPagination(page, countListens());
 
+	const daysInt = Number(days);
+	const dayOptions = [
+		{ value: 7, selected: daysInt === 7 },
+		{ value: 14, selected: daysInt === 14 },
+		{ value: 30, selected: daysInt === 30 },
+		{ value: 60, selected: daysInt === 60 },
+	];
+
+	if (!Number.isSafeInteger(daysInt) || daysInt < 1 || daysInt > 60) {
+		throw new Error('"days" query must be a number between 1 and 60');
+	}
+
 	const listens = getListens(undefined, page);
-	const popular = getListensPopular(7);
+	const popular = getListensPopular(daysInt).slice(0, 30);
 	const graphPoints = getListenGraph();
 	const svg = generateBarGraph(addMissingDates(
 		graphPoints,
@@ -109,6 +121,8 @@ router.get('/music', getCache(), (req, res) => {
 		popular,
 		pagination,
 		svg,
+		days,
+		dayOptions,
 		canonicalUrl: getCanonicalUrl(req),
 		description,
 	});

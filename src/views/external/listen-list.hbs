@@ -1,8 +1,21 @@
 <div class="page--data">
 	{{> pageHeader title="Listening to" url="/" }}
 
+	<h3>Most scrobbled artists ({{days}} days)</h3>
+
+	<form action="/music" method="get" name="days">
+		<select name="days">
+			{{#each dayOptions as |option|}}
+				<option
+					{{#if option.selected}}selected{{/if}}
+					value="{{option.value}}"
+				>{{option.value}} days</option>
+			{{/each}}
+		</select>
+		<input type="submit" value="Go" />
+	</form>
+
 	{{#if popular}}
-	<h3>Most scrobbled artists (7 days)</h3>
 	<table>
 		{{#each popular as |artist| }}
 		<tr>
@@ -17,6 +30,10 @@
 		</tr>
 		{{/each}}
 	</table>
+	{{else}}
+	<div class="error">
+		<p class="lead">I haven't listened to any music within the last {{days}} days! 😭</p>
+	</div>
 	{{/if}}
 
 	<h3>Scrobble count by day</h3>

@@ -70,6 +70,13 @@ a:hover {
 	text-decoration: underline;
 }
 
+div.error {
+	padding: 0 24px 24px;
+	background-color: #fddcdc;
+	border: 1px solid #6e2828;
+	font-weight: 700;
+}
+
 .dashboard--lead {
 	margin: 0 0 24px 0;
 	padding: 0;
@@ -173,6 +180,8 @@ a:hover {
 .page--data hr,
 .page--data svg,
 .page--data table,
+.page--data .error,
+.page--data form,
 .sectioncontainer {
 	margin-top: 24px;
 }
@@ -301,7 +310,8 @@ select.right {
 	max-width: 320px;
 }
 
-input[type="submit"] {
+input[type="submit"],
+select {
 	padding: 6px 12px;
 }
 
