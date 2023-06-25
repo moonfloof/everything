@@ -8,7 +8,7 @@
 
 <div id="dashboard--panels">
 	{{#if sleep}}
-		{{#> dashpanel title="sleep" }}
+		{{#> dashpanel title="sleeping" }}
 			<div class="dashboard--panel__graph">
 				{{{sleepGraph}}}
 			</div>
@@ -41,7 +41,7 @@
 		{{/dashpanel}}
 	{{/if}}
 
-	{{#> dashpanel title="music" showlink=true }}
+	{{#> dashpanel title="listening" link="music" }}
 		<div class="dashboard--panel__graph">
 			{{{listenGraph}}}
 		</div>
@@ -70,7 +70,7 @@
 		</div>
 	{{/dashpanel}}
 
-	{{#> dashpanel title="games" showlink=true }}
+	{{#> dashpanel title="gaming" link="games" }}
 		<div class="dashboard--panel__graph">
 			{{{gamesGraph}}}
 		</div>
@@ -94,7 +94,7 @@
 		</div>
 	{{/dashpanel}}
 
-	{{#> dashpanel title="youtube" showlink=true }}
+	{{#> dashpanel title="youtube" link="youtube" }}
 		<ul>
 		{{#each youtubeLikes}}
 			<li class="dashboard--panel__li">
@@ -108,7 +108,7 @@
 	{{/dashpanel}}
 
 	{{#if tvEpisodes}}
-		{{#> dashpanel title="tv" showlink=true }}
+		{{#> dashpanel title="watching" link="tv" }}
 			<ul>
 			{{#each tvEpisodes}}
 				<li class="dashboard--panel__li">
@@ -121,7 +121,7 @@
 	{{/if}}
 
 	{{#if films}}
-		{{#> dashpanel title="films" showlink=true }}
+		{{#> dashpanel title="films" link="films" }}
 			<ul>
 			{{#each films}}
 				<li class="dashboard--panel__li">
@@ -139,7 +139,7 @@
 	{{/if}}
 
 	{{#if books}}
-		{{#> dashpanel title="books" showlink=true }}
+		{{#> dashpanel title="reading" link="books" }}
 			<ul>
 			{{#each books}}
 				<li class="dashboard--panel__li">
