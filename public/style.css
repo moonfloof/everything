@@ -77,6 +77,14 @@ div.error {
 	font-weight: 700;
 }
 
+#migration-notice {
+	padding: 24px;
+	background-color: #fddcdc;
+	border: 1px solid #6e2828;
+	margin-bottom: 24px;
+	line-height: 1.618;
+}
+
 .dashboard--lead {
 	margin: 0 0 24px 0;
 	padding: 0;

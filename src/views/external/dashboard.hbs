@@ -1,12 +1,12 @@
-<p class="dashboard--lead">
-	I keep track of my own data and post a lot of it publicly. It's a
-	custom-coded project where I collect data from various sources and
-	collate it into one database. However, in some cases data entry is
-	manual (such as sleep and films watched). For more information see:
-	<a href="https://git.tombo.sh/tom/tombo-is-server" target="_blank" rel="noopener">
-		https://git.tombo.sh/tom/tombo-is-server
-	</a>.
-</p>
+{{#if showMigrationNotice}}
+	<div id="migration-notice">
+		<strong>Migration Notice:</strong>
+		After the 31st July 2023, this site will be permanently
+		migrating from <strong>tombo.is</strong> to
+		<strong><a href="https://www.tomgardiner.me/now">tomgardiner.me/now</a></strong>.
+		Please update your bookmarks.
+	</div>
+{{/if}}
 
 <div id="dashboard--panels">
 	{{#if sleep}}

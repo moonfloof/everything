@@ -1,6 +1,7 @@
 import express from 'express';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
+// Database
 import {
 	countListens,
 	getListenDashboardGraph,
@@ -20,19 +21,20 @@ import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
 import { getSleepCycles, getSleepStats } from '../../database/sleep.js';
 import { getStepsYesterday } from '../../database/steps.js';
 import { getDevices } from '../../database/devices.js';
+import { countEpisodes, getEpisodes } from '../../database/tv.js';
+import { countFilms, getFilms } from '../../database/films.js';
+import { countBooks, getBooks } from '../../database/books.js';
+import { getLatestCity } from '../../database/locations.js';
 
+// Lib
 import Logger from '../../lib/logger.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
-import { getLatestCity } from '../../database/locations.js';
 import { generateSmallBarGraph } from '../../lib/graphs/barSmall.js';
 import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
 import { prettyDate, shortDate } from '../../lib/formatDate.js';
-import { countEpisodes, getEpisodes } from '../../database/tv.js';
-import { countFilms, getFilms } from '../../database/films.js';
-import { countBooks, getBooks } from '../../database/books.js';
 
 const log = new Logger('frontend');
 
@@ -66,7 +68,10 @@ router.get('/', getCache(), (req, res) => {
 	const listenGraph = generateSmallBarGraph(addMissingDates(getListenDashboardGraph(), 'day'));
 	const gamesGraph = generateSmallBarGraph(addMissingDates(getGameDashboardGraph(), 'day'));
 
+	const showMigrationNotice = req.hostname === 'tombo.is';
+
 	res.render('external/dashboard', {
+		showMigrationNotice,
 		sleepStats,
 		sleepGraph,
 		listens,
