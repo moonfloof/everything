@@ -68,7 +68,7 @@ router.get('/', getCache(), (req, res) => {
 	const listenGraph = generateSmallBarGraph(addMissingDates(getListenDashboardGraph(), 'day'));
 	const gamesGraph = generateSmallBarGraph(addMissingDates(getGameDashboardGraph(), 'day'));
 
-	const showMigrationNotice = req.hostname === 'tombo.is';
+	const showMigrationNotice = req.hostname === 'www.tombo.is';
 
 	res.render('external/dashboard', {
 		showMigrationNotice,
