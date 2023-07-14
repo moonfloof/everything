@@ -250,11 +250,15 @@ ol {
 	text-align: center;
 	min-width: 32px;
 	margin-right: 16px;
-	align-self: center;
+	align-self: flex-start;
 }
 
 .row .right {
 	flex: 1;
+}
+
+.row p:first-of-type {
+	margin-top: 0;
 }
 
 table td {
@@ -312,7 +316,8 @@ pre {
 }
 
 input.right,
-select.right {
+select.right,
+textarea.right {
 	flex: 1;
 	padding: 2px;
 	max-width: 320px;

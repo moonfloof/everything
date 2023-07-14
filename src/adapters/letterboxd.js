@@ -23,6 +23,7 @@ const log = new Logger('Letterboxd');
  * @property {number} filmYear
  * @property {number} [memberRating]
  * @property {string} creator
+ * @property {string} description
  */
 
 /** @type {LetterboxdFilm[]} */
@@ -101,6 +102,10 @@ const parseFeed = async (feed) => new Promise((resolve, reject) => {
 		items[currentIndex][currentTag] = value;
 	};
 
+	parser.oncdata = text => {
+		items[currentIndex][currentTag] = text.trim();
+	};
+
 	parser.onclosetag = node => {
 		if (node !== 'item') return;
 
@@ -142,10 +147,18 @@ export const pollForFilmActivity = async () => {
 
 			log.info(`Adding new film '${film.filmTitle} (${film.filmYear})'`);
 
+			// Letterboxd descriptions always start with the poster image URL,
+			// so we need to remove that.
+			const hasReview = film.guid.includes('letterboxd-review');
+			const review = hasReview
+				? film.description.replace(/<p>.*?<\/p>/, '')
+				: null;
+
 			insertFilm(
 				film.filmTitle,
 				film.filmYear,
 				film.memberRating ? film.memberRating * 2 : null,
+				review,
 				film.link,
 				formatDate(film.watchedDate),
 				film.pubDate.toISOString(),

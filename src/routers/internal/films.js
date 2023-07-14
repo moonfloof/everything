@@ -19,12 +19,13 @@ router.get('/', (req, res) => {
 // CRUD
 
 router.post('/', (req, res) => {
-	const { title, year, rating, url, watched_at, created_at } = req.body;
+	const { title, year, rating, review, url, watched_at, created_at } = req.body;
 
 	insertFilm(
 		title,
 		Number(year),
 		rating ? Number(rating) : null,
+		review,
 		url,
 		watched_at || formatDate(new Date()),
 		created_at || new Date().toISOString(),
@@ -36,7 +37,7 @@ router.post('/', (req, res) => {
 
 router.post('/:id', (req, res) => {
 	const { id } = req.params;
-	const { crudType, title, year, rating, url, watched_at, created_at } = req.body;
+	const { crudType, title, year, rating, review, url, watched_at, created_at } = req.body;
 
 	switch (crudType) {
 		case 'delete':
@@ -49,6 +50,7 @@ router.post('/:id', (req, res) => {
 				title,
 				Number(year),
 				rating ? Number(rating) : null,
+				review || null,
 				url,
 				watched_at || formatDate(new Date()),
 				created_at || new Date().toISOString(),

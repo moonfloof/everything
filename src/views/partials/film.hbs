@@ -18,6 +18,19 @@
 		<span class="right"><strong>{{data.rating}}</strong> <small>/ 10</small></span>
 	</div>
 	{{/if}}
+	{{#if data.review}}
+		<div class="row">
+			<span class="left">💬</span>
+			<span class="right">
+				{{#if showlink}}
+					<a href="/film/{{data.id}}"><strong>My review</strong></a>
+				{{else}}
+					<p><strong>My Review:</strong></p>
+					{{{data.review}}}
+				{{/if}}
+			</span>
+		</div>
+	{{/if}}
 	<div class="row">
 		<span class="left"></span>
 		<time

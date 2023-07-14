@@ -8,21 +8,22 @@ import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
  * @param {string} title
  * @param {string} year
  * @param {string} rating
+ * @param {string} review
  * @param {string} url
  * @param {string} watched_at
  * @param {string} created_at
  * @param {string} device_id
  * @return {Promise<any>}
  */
-export function insertFilm (title, year, rating, url, watched_at, created_at, device_id) {
+export function insertFilm (title, year, rating, review, url, watched_at, created_at, device_id) {
 	const id = uuid();
 
 	const statement = getStatement(
 		'insertFilm',
 		`INSERT INTO films
-		(id, title, year, rating, url, watched_at, created_at, device_id)
+		(id, title, year, rating, review, url, watched_at, created_at, device_id)
 		VALUES
-		($id, $title, $year, $rating, $url, $watched_at, $created_at, $device_id)`,
+		($id, $title, $year, $rating, $review, $url, $watched_at, $created_at, $device_id)`,
 	);
 
 	return statement.run({
@@ -30,6 +31,7 @@ export function insertFilm (title, year, rating, url, watched_at, created_at, de
 		title,
 		year,
 		rating,
+		review,
 		url,
 		watched_at,
 		created_at,
@@ -77,17 +79,19 @@ export function deleteFilm (id) {
  * @param {string} title
  * @param {string} year
  * @param {string} rating
+ * @param {string} review
  * @param {string} url
  * @param {string} watched_at
  * @param {string} created_at
  */
-export function updateFilm (id, title, year, rating, url, watched_at, created_at) {
+export function updateFilm (id, title, year, rating, review, url, watched_at, created_at) {
 	const statement = getStatement(
 		'updateFilm',
 		`UPDATE films
 		SET title = $title,
 		    year = $year,
 		    rating = $rating,
+		    review = $review,
 		    url = $url,
 		    watched_at = $watched_at,
 		    created_at = $created_at
@@ -99,6 +103,7 @@ export function updateFilm (id, title, year, rating, url, watched_at, created_at
 		title,
 		year,
 		rating,
+		review,
 		url,
 		watched_at,
 		created_at,
