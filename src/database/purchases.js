@@ -28,7 +28,7 @@ export function countPurchases () {
 		'SELECT COUNT(*) as total FROM purchases',
 	);
 
-	return statement.get().count;
+	return statement.get().total;
 }
 
 export function getPurchases (id, page) {

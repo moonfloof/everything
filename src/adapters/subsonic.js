@@ -24,7 +24,7 @@ const getBaseParams = () => {
 	return {
 		u: process.env.TOMBOIS_SUBSONIC_USERNAME,
 		v: '1.15.0',
-		c: 'tombo.is',
+		c: 'tombo-everything',
 		t: password,
 		s: salt,
 		f: 'json',

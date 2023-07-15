@@ -27,7 +27,6 @@ import { countBooks, getBooks } from '../../database/books.js';
 import { getLatestCity } from '../../database/locations.js';
 
 // Lib
-import Logger from '../../lib/logger.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { generateSmallBarGraph } from '../../lib/graphs/barSmall.js';
@@ -36,7 +35,6 @@ import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
 import { prettyDate, shortDate } from '../../lib/formatDate.js';
 
-const log = new Logger('frontend');
 
 const router = express.Router();
 
@@ -323,17 +321,5 @@ router.get('/book/:id', (req, res) => {
 // NOT FOUND
 
 router.get('*', () => { throw new NotFoundError('Page Not Found'); });
-
-// eslint-disable-next-line no-unused-vars
-router.use((err, req, res, _next) => {
-	log.error(err.message, err.code, req.originalUrl);
-	if (err.code !== 404) {
-		log.error(err.stack);
-	}
-
-	res
-		.status(err.code || 500)
-		.render('external/error', { error: err.message });
-});
 
 export default router;

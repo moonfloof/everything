@@ -1,18 +1,21 @@
-import { RECORDS_PER_PAGE } from '../database/constants.js';
+import { MAX_PAGE, RECORDS_PER_PAGE } from '../database/constants.js';
 
+/**
+ * @param {number} page
+ * @param {number} recordCount
+ */
 const handlebarsPagination = (page, recordCount) => {
-	const pageNumber = Number(page) || 0;
-	const totalPages = Math.ceil(recordCount / RECORDS_PER_PAGE) - 1;
+	const totalPages = Math.min(Math.ceil(recordCount / RECORDS_PER_PAGE) - 1, MAX_PAGE);
 
 	return {
-		page: pageNumber,
+		page: page,
 		totalPages,
 
-		showPrev: pageNumber > 0,
-		showNext: pageNumber < totalPages,
+		showPrev: page > 0,
+		showNext: page < totalPages,
 
-		prevPage: pageNumber - 1,
-		nextPage: pageNumber + 1,
+		prevPage: page - 1,
+		nextPage: page + 1,
 	};
 };
 

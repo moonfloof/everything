@@ -149,8 +149,7 @@ export const pollForFilmActivity = async () => {
 
 			// Letterboxd descriptions always start with the poster image URL,
 			// so we need to remove that.
-			const hasReview = film.guid.includes('letterboxd-review');
-			const review = hasReview
+			const review = film.guid.includes('letterboxd-review')
 				? film.description.replace(/<p>.*?<\/p>/, '')
 				: null;
 

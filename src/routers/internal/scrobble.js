@@ -3,7 +3,7 @@ import { getAllAlbums, getAlbumTracks, scrobbleTrack } from '../../adapters/subs
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
 	try {
 		// Step 1: Get all artists / albums from subsonic
 		const albumlistRaw = await getAllAlbums();
