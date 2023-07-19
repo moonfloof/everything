@@ -248,6 +248,10 @@ ol {
 	margin-top: 8px;
 }
 
+summary {
+	cursor: pointer;
+}
+
 .row {
 	display: flex;
 	margin-top: 4px;

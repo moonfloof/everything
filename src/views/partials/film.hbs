@@ -23,10 +23,14 @@
 			<span class="left">💬</span>
 			<span class="right">
 				{{#if showlink}}
-					<a href="/film/{{data.id}}"><strong>My review</strong></a>
-				{{else}}
-					<p><strong>My Review:</strong></p>
+				<details>
+					<summary><strong>My Review</strong> (click to expand)</summary>
+					<br/>
 					{{{data.review}}}
+				</details>
+				{{else}}
+				<p><strong>My Review:</strong></p>
+				{{{data.review}}}
 				{{/if}}
 			</span>
 		</div>
