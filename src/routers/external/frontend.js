@@ -35,7 +35,6 @@ import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
 import { prettyDate, shortDate } from '../../lib/formatDate.js';
 
-
 const router = express.Router();
 
 // DASHBOARD

@@ -183,8 +183,8 @@ export function getGameStats () {
 		let newAcc = { ...acc };
 
 		newAcc.games[cur.name] = newAcc.games[cur.name] === undefined
-			? 1
-			: newAcc.games[cur.name] + 1;
+			? cur.playtime_mins
+			: newAcc.games[cur.name] + cur.playtime_mins;
 
 		newAcc.totalPlaytime += cur.playtime_mins;
 
@@ -197,14 +197,14 @@ export function getGameStats () {
 	stats.favouriteGame = Object
 		.entries(stats.games)
 		.reduce((acc, cur) => {
-			const [ game, count ] = cur;
+			const [ game, duration ] = cur;
 			const newAcc = { ...acc };
-			if (count >= acc.count) {
-				newAcc.count = count;
+			if (duration >= acc.duration) {
+				newAcc.duration = duration;
 				newAcc.game = game;
 			}
 			return newAcc;
-		}, { game: '', count: 0 })
+		}, { game: '', duration: 0 })
 		.game;
 	return stats;
 }
