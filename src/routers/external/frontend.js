@@ -311,6 +311,7 @@ router.use(helmet({
 	contentSecurityPolicy: {
 		directives: {
 			'media-src': 'https:',
+			'img-src': 'https:',
 		},
 	},
 }));

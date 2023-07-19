@@ -8,6 +8,7 @@ export const entryTypeValues = [
 	'post',
 	'audio',
 	'video',
+	'photo',
 ];
 
 export const entryTypeEmojiMap = {
@@ -15,6 +16,7 @@ export const entryTypeEmojiMap = {
 	post: '📰',
 	audio: '🎵',
 	video: '🎥',
+	photo: '📸',
 };
 
 export const entryStatusValues = [

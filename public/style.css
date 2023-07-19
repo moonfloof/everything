@@ -314,6 +314,10 @@ table td {
 	display: flex;
 }
 
+.hidden {
+	display: none;
+}
+
 /**
  *  INTERNAL USE ONLY
  */

@@ -1,32 +1,31 @@
-<div class="sectioncontainer">
-	{{#xif data.url '||' data.title}}
+<div class="sectioncontainer h-entry">
+	{{#if data.title}}
 	<div class="row">
 		<span class="left">{{data.emoji}}</span>
 		<span class="right">
-			<strong>
-			{{#if data.url}}
-				<a href="{{data.url}}" target="_blank" rel="noopener">
-					{{#if data.title}}
-						{{data.title}}
-					{{else}}
-						{{data.url}}
-					{{/if}}
-				</a>
-			{{else}}
-				{{data.title}}
-			{{/if}}
-			</strong>
+			<strong class="p-name">{{data.title}}</strong>
 		</span>
 	</div>
-	{{/xif}}
+	{{/if}}
+
+	<div class="row">
+		<span class="left">
+			{{#if data.title}}
+			{{else}}
+				{{data.emoji}}
+			{{/if}}
+		</span>
+		<span class="right e-content">
+			{{{data.description}}}
+		</span>
+	</div>
 
 	{{#xif data.type '==' 'audio'}}
 	{{#if data.url}}
 	<div class="row">
 		<span class="left"></span>
 		<div class="right">
-			<audio controls>
-				<source src="{{data.url}}"/>
+			<audio class="u-audio" controls src="{{data.url}}">
 				<p>Unfortunately, your browser doesn't support this audio format</p>
 			</audio>
 		</div>
@@ -39,8 +38,7 @@
 	<div class="row">
 		<span class="left"></span>
 		<div class="right">
-			<video controls>
-				<source src="{{data.url}}"/>
+			<video class="u-video" src="{{data.url}}" controls>
 				<p>Unfortunately, your browser doesn't support this video format</p>
 			</video>
 		</div>
@@ -48,12 +46,21 @@
 	{{/if}}
 	{{/xif}}
 
+	{{#xif data.type '==' 'photo'}}
+	{{#if data.url}}
 	<div class="row">
-		<span class="left">
-			{{#xif data.url '||' data.title}}{{else}}{{data.emoji}}{{/xif}}
-		</span>
+		<span class="left"></span>
+		<div class="right">
+			<img class="u-photo" src="{{data.url}}" alt="{{data.title}}" />
+		</div>
+	</div>
+	{{/if}}
+	{{/xif}}
+
+	<div class="row hidden h-card p-author">
+		<span class="left">👤</span>
 		<span class="right">
-			{{{data.description}}}
+			<span class="">Tom Gardiner</span>
 		</span>
 	</div>
 
@@ -62,14 +69,10 @@
 		<time
 			title="{{data.created_at}}"
 			datetime="{{data.created_at}}"
-			class="right"
+			class="right dt-published"
 		>
 			<small>
-			{{#if showlink }}
-				<a href="/note/{{data.id}}">{{data.timeago}}</a>
-			{{else}}
-				{{data.timeago}}
-			{{/if}}
+				<a class="u-url u-uid" href="/note/{{data.id}}">{{data.timeago}}</a>
 			</small>
 		</time>
 	</div>
