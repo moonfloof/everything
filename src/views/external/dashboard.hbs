@@ -9,9 +9,6 @@
 <div id="dashboard--panels">
 	{{#if sleep}}
 		{{#> dashpanel title="sleeping" }}
-			<div class="dashboard--panel__graph">
-				{{{sleepGraph}}}
-			</div>
 			<div class="dashboard--panel--meta">
 				<div class="dashboard--panel--meta__row">
 					<span>average bed time</span>
@@ -42,9 +39,6 @@
 	{{/if}}
 
 	{{#> dashpanel title="listening" link="music" }}
-		<div class="dashboard--panel__graph">
-			{{{listenGraph}}}
-		</div>
 		<div class="dashboard--panel--meta">
 			<div class="dashboard--panel--meta__row">
 				<span>fav artist</span>
@@ -71,9 +65,6 @@
 	{{/dashpanel}}
 
 	{{#> dashpanel title="gaming" link="games" }}
-		<div class="dashboard--panel__graph">
-			{{{gamesGraph}}}
-		</div>
 		<div class="dashboard--panel--meta">
 			<div class="dashboard--panel--meta__row">
 				<span>total playtime</span>

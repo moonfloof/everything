@@ -4,7 +4,6 @@ import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 // Database
 import {
 	countListens,
-	getListenDashboardGraph,
 	getListenGraph,
 	getListenPopularDashboard,
 	getListens,
@@ -14,11 +13,10 @@ import {
 	countGameActivity,
 	getGameActivity,
 	getGameActivityGroupedByDay,
-	getGameDashboardGraph,
 	getGameStats,
 } from '../../database/games.js';
 import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
-import { getSleepCycles, getSleepStats } from '../../database/sleep.js';
+import { getSleepStats } from '../../database/sleep.js';
 import { getStepsYesterday } from '../../database/steps.js';
 import { getDevices } from '../../database/devices.js';
 import { countEpisodes, getEpisodes } from '../../database/tv.js';
@@ -29,7 +27,6 @@ import { getLatestCity } from '../../database/locations.js';
 // Lib
 import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
-import { generateSmallBarGraph } from '../../lib/graphs/barSmall.js';
 import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
@@ -50,32 +47,16 @@ router.get('/', getCache(), (req, res) => {
 	const location = getLatestCity();
 	const steps = getStepsYesterday()[0]?.step_count_total;
 	const sleepStats = getSleepStats();
-	const sleep = getSleepCycles();
 	const books = getBooks().slice(0, 2);
-
-	const sleepGraphStats = sleep
-		.filter(night => night.ended_at !== null)
-		.map(night => ({
-			created_at: night.ended_at,
-			min: night.startTimeNormalised,
-			max: night.startTimeNormalised + night.durationNumber,
-		}));
-
-	const sleepGraph = generateSmallBarGraph(addMissingDates(sleepGraphStats));
-	const listenGraph = generateSmallBarGraph(addMissingDates(getListenDashboardGraph(), 'day'));
-	const gamesGraph = generateSmallBarGraph(addMissingDates(getGameDashboardGraph(), 'day'));
 
 	res.render('external/dashboard', {
 		sleepStats,
-		sleepGraph,
 		listens,
-		listenGraph,
 		youtubeLikes,
 		tvEpisodes,
 		films,
 		books,
 		games,
-		gamesGraph,
 		gameStats,
 		device,
 		steps,
