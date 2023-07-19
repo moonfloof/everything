@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countSleepCycles());
 
-	const sleep = getSleepCycles({ page });
+	const sleep = getSleepCycles({ page, days: 10000 });
 
 	res.render('internal/sleep', { sleep, pagination });
 });
