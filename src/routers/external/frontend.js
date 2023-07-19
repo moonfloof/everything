@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 
 // Database
@@ -23,6 +24,7 @@ import { countEpisodes, getEpisodes } from '../../database/tv.js';
 import { countFilms, getFilms } from '../../database/films.js';
 import { countBooks, getBooks } from '../../database/books.js';
 import { getLatestCity } from '../../database/locations.js';
+import { countNotes, getNotes } from '../../database/notes.js';
 
 // Lib
 import { generateBarGraph } from '../../lib/graphs/bar.js';
@@ -48,6 +50,7 @@ router.get('/', getCache(), (req, res) => {
 	const steps = getStepsYesterday()[0]?.step_count_total;
 	const sleepStats = getSleepStats();
 	const books = getBooks().slice(0, 2);
+	const notes = getNotes().slice(0, 5);
 
 	res.render('external/dashboard', {
 		sleepStats,
@@ -58,6 +61,7 @@ router.get('/', getCache(), (req, res) => {
 		books,
 		games,
 		gameStats,
+		notes,
 		device,
 		steps,
 		location,
@@ -294,6 +298,47 @@ router.get('/book/:id', (req, res) => {
 	res.render('external/book-single', {
 		book,
 		description,
+		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+// NOTES
+
+// Disable media-src CSP for Notes, as we may want to embed <audio> and <video>
+// sources from other domains. ⚠ As a result, you are responsible for posting
+// reliable/trust-worthy sources (eg. from your own domains).
+router.use(helmet({
+	contentSecurityPolicy: {
+		directives: {
+			'media-src': 'https:',
+		},
+	},
+}));
+
+router.get('/notes', getCache(), (req, res) => {
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countNotes());
+
+	const notes = getNotes(undefined, page);
+
+	res.render('external/note-list', {
+		notes,
+		pagination,
+		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+router.get('/note/:id', (req, res) => {
+	const [ note ] = getNotes(req.params.id);
+
+	if (!note) {
+		throw new NotFoundError('Note not found');
+	}
+
+	res.render('external/note-single', {
+		note,
+		description: note.summary,
+		title: note.title || note.summary,
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });

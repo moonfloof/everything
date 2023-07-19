@@ -6,6 +6,22 @@
 	Please update your bookmarks.
 </div>
 
+
+{{#> dashpanel title="notes" link="notes"}}
+	<ul>
+	{{#each notes}}
+		<li class="dashboard--panel__li">
+			<strong>
+				{{emoji}} {{#if title}}{{title}}{{else}}{{summary}}{{/if}}
+			</strong>
+			<small>
+				<a href="/note/{{id}}">{{timeago}}</a>
+			</small>
+		</li>
+	{{/each}}
+	</ul>
+{{/dashpanel}}
+
 <div id="dashboard--panels">
 	{{#if sleep}}
 		{{#> dashpanel title="sleeping" }}

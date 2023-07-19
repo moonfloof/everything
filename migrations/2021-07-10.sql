@@ -7,17 +7,16 @@ CREATE TABLE IF NOT EXISTS "devices" (
 	PRIMARY KEY("id")
 );
 CREATE TABLE IF NOT EXISTS "entries" (
-	"id"          TEXT NOT NULL UNIQUE,
-	"title"       TEXT,
-	"description" TEXT,
-	"type"        TEXT NOT NULL,
-	"length"      REAL,
-	"location"    TEXT,
-	"status"      TEXT NOT NULL DEFAULT 'public',
-	"url"         TEXT,
-	"created_at"  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	"updated_at"  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	"device_id"   TEXT NOT NULL,
+	"id"               TEXT NOT NULL UNIQUE,
+	"title"            TEXT,
+	"description"      TEXT NOT NULL,
+	"type"             TEXT NOT NULL DEFAULT 'note',
+	"status"           TEXT NOT NULL DEFAULT 'public',
+	"url"              TEXT,
+	"syndication_json" TEXT,
+	"created_at"       TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	"updated_at"       TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	"device_id"        TEXT NOT NULL,
 	PRIMARY KEY("id"),
 	FOREIGN KEY("device_id") REFERENCES "devices"("id")
 );

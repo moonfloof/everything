@@ -3,6 +3,7 @@ import express from 'express';
 import { engine } from 'express-handlebars';
 import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
 import formBodyParser from './formParser.js';
+import { helpers } from './handlebarsExtensions.js';
 
 const appCreate = () => {
 	const app = express();
@@ -22,7 +23,7 @@ const appCreate = () => {
 	app.use(logEntry(console.info));
 
 	// Set up frontend
-	app.engine('.hbs', engine({ extname: '.hbs' }));
+	app.engine('.hbs', engine({ extname: '.hbs', helpers }));
 	app.set('views', path.resolve('src/views'));
 	app.set('view engine', '.hbs');
 

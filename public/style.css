@@ -94,19 +94,23 @@ div.error {
 
 #dashboard--panels {
 	display: grid;
-	grid-template-columns: 50% 50%;
+	grid-template-columns: calc(50% - 12px) calc(50% - 12px);
 	column-gap: 24px;
-	row-gap: 24px;
 }
 
 .dashboard--panel {
 	width: 100%;
 	background-color: var(--panel-bg);
 	padding: 12px;
+	margin-bottom: 24px;
 	height: 136px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	border-radius: 6px;
 	display: block;
+}
+
+#dashboard--panel__notes {
+	height: initial !important;
 }
 
 .dashboard--panel__header {
@@ -227,7 +231,10 @@ hr {
 }
 
 img,
-svg {
+svg,
+audio,
+video {
+	width: 100%;
 	max-width: 100%;
 }
 

@@ -5,6 +5,7 @@ import { trimStrings } from './lib/middleware/trimStrings.js';
 import { validatePageNumber } from './lib/middleware/validatePageNumber.js';
 
 // Routers
+import notes from './routers/internal/notes.js';
 import purchases from './routers/internal/purchases.js';
 import games from './routers/internal/games.js';
 import timetracking from './routers/internal/timetracking.js';
@@ -44,6 +45,7 @@ app.use('/scrobble', scrobble);
 app.use('/tv', tv);
 app.use('/films', films);
 app.use('/books', books);
+app.use('/notes', notes);
 app.use('/', frontend);
 
 // eslint-disable-next-line no-unused-vars
