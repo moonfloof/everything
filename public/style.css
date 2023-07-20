@@ -77,6 +77,8 @@ div.error {
 	font-weight: 700;
 }
 
+/** DASHBOARD **/
+
 #migration-notice {
 	padding: 24px;
 	background-color: #fddcdc;
@@ -185,6 +187,8 @@ div.error {
 	max-width: 60%;
 }
 
+/** MAIN CONTENTS **/
+
 .page--data h2,
 .page--data h3,
 .page--data p,
@@ -272,6 +276,8 @@ summary {
 	margin-top: 0;
 }
 
+/** MUSIC STATS **/
+
 table td {
 	padding: 4px 8px 4px 0;
 	white-space: nowrap;
@@ -285,6 +291,13 @@ table td {
 	width: 99%;
 }
 
+.scrobble select {
+	display: block;
+	width: 100%;
+	margin: 16px 0;
+	padding: 6px;
+}
+
 .artist-count {
 	font-weight: 700;
 	padding: 4px 8px;
@@ -294,6 +307,8 @@ table td {
 	color: var(--background);
 	background-color: var(--primary);
 }
+
+/** PAGINATION **/
 
 .pagination a {
 	flex: 1;
@@ -314,13 +329,21 @@ table td {
 	display: flex;
 }
 
+/** NOTES **/
+
+.e-content {
+	line-height: 1.618;
+}
+
+.e-content a {
+	font-weight: 700;
+}
+
 .hidden {
 	display: none;
 }
 
-/**
- *  INTERNAL USE ONLY
- */
+/** INTERNAL USE ONLY **/
 
 pre {
 	font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
@@ -341,13 +364,6 @@ textarea.right {
 input[type="submit"],
 select {
 	padding: 6px 12px;
-}
-
-.scrobble select {
-	display: block;
-	width: 100%;
-	margin: 16px 0;
-	padding: 6px;
 }
 
 @media (max-width: 660px) {
