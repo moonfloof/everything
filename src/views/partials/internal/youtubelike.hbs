@@ -1,6 +1,6 @@
 <form method="POST" action="/youtubelikes/{{data.id}}">
 	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+		{{> internal/id id=data.id type="youtube" }}
 
 		{{> internal/crudRow emoji="📺" name="title" value=data.title }}
 		{{> internal/crudRow emoji="👤" name="channel" value=data.channel }}

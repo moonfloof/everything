@@ -1,6 +1,6 @@
 <form method="POST" action="/listens/{{data.id}}">
 	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+		{{> internal/id id=data.id type="music" }}
 
 		{{> internal/crudRow emoji="🎵" name="title" value=data.title }}
 		{{> internal/crudRow emoji="💿" name="album" value=data.album }}

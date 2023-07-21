@@ -1,6 +1,6 @@
 <form method="POST" action="/films/{{data.id}}">
 	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+		{{> internal/id id=data.id type="film" }}
 
 		{{> internal/crudRow emoji="🎥" name="title" value=data.title }}
 		{{> internal/crudRowNumber emoji="📆" name="year" value=data.year }}

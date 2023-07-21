@@ -27,6 +27,11 @@ export function xif (v1, operator, v2, options) {
 	}
 }
 
+export function externalRoot () {
+	return process.env.TOMBOIS_SERVER_EXTERNAL_URI;
+}
+
 export const helpers = {
 	xif,
+	externalRoot,
 };

@@ -1,6 +1,6 @@
 <form method="POST" action="/notes/{{data.id}}">
 	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+		{{> internal/id id=data.id type="note" }}
 
 		{{> internal/crudRow emoji="📰" name="title" value=data.title }}
 		{{> internal/crudRowParagraph emoji="💬" name="description" value=data.description }}

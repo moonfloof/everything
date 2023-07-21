@@ -1,6 +1,6 @@
 <form method="POST" action="/books/{{data.id}}">
 	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+		{{> internal/id id=data.id type="book" }}
 
 		{{> internal/crudRow emoji="📙" name="title" value=data.title }}
 		{{> internal/crudRow emoji="👤" name="author" value=data.author }}

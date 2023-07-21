@@ -1,6 +1,6 @@
 <form method="POST" action="/games/{{data.id}}">
 	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+		{{> internal/id id=data.id type="game" }}
 
 		{{> internal/crudRow emoji="🎮" name="name" value=data.name }}
 		{{> internal/crudRowNumber emoji="⌚" name="playtime_mins" value=data.playtime_mins }}
