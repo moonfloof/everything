@@ -1,26 +1,28 @@
-<div class="sectioncontainer">
+<div class="sectioncontainer h-entry">
+	<div class="p-read-of h-cite">
 	<div class="row">
 		<span class="left">📙</span>
 		<span class="right">
 			{{#if data.url}}
-			<a href="{{data.url}}" target="_blank" rel="noopener">
-				<strong>{{data.title}}</strong>
+			<a href="{{data.url}}" target="_blank" rel="noopener" class="u-url">
+				<strong class="p-name">{{data.title}}</strong>
 			</a>
 			{{else}}
-				<strong>{{data.title}}</strong>
+				<strong class="p-name">{{data.title}}</strong>
 			{{/if}}
 			({{data.year}})
 		</span>
 	</div>
 	<div class="row">
 		<span class="left">👤</span>
-		<span class="right">{{data.author}}</span>
+		<span class="right p-author">{{data.author}}</span>
+	</div>
 	</div>
 
 	{{#if data.progress}}
 	<div class="row">
 		<span class="left">📈</span>
-		<span class="right">{{{data.progress}}}</span>
+		<span class="right p-read-status" value="{{data.status}}">{{{data.progress}}}</span>
 	</div>
 	{{/if}}
 
