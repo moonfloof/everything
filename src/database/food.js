@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
-import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { calculateGetParameters } from './constants.js';
 
 export function insertFood (name, type, created_at, device_id) {
 	const statement = getStatement(
@@ -22,23 +22,22 @@ export function insertFood (name, type, created_at, device_id) {
 
 /**
  * @export
- * @param {string} [id]
- * @param {number} [page]
+ * @param {object} parameters
+ * @param {string} [parameters.id]
+ * @param {number} [parameters.page]
+ * @param {number} [parameters.limit]
+ * @param {number} [parameters.days]
  */
-export function getFood (id, page) {
+export function getFood (parameters) {
 	const statement = getStatement(
 		'getFood',
 		`SELECT * FROM food
-		WHERE id LIKE $id
+		WHERE id LIKE $id AND created_at >= $created_at
 		ORDER BY created_at DESC
-		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all({
-			id: id || '%',
-			offset: calculateOffset(page),
-		});
+	return statement.all(calculateGetParameters(parameters));
 }
 
 export function countFood () {

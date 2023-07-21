@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { calculateGetParameters } from './constants.js';
 
 export function insertYouTubeLike (url, title, channel, device_id, created_at) {
 	const statement = getStatement(
@@ -26,23 +26,23 @@ export function insertYouTubeLike (url, title, channel, device_id, created_at) {
  * Fetch all YouTube likes, or based on a specific ID
  *
  * @export
- * @param {string} [id]
- * @param {number} [page]
+ * @param {object} parameters
+ * @param {string} [parameters.id]
+ * @param {number} [parameters.page]
+ * @param {number} [parameters.limit]
+ * @param {number} [parameters.days]
  */
-export function getLikes (id, page) {
+export function getLikes (parameters) {
 	const statement = getStatement(
 		'getYouTubeLikes',
 		`SELECT * FROM youtubelikes
-		WHERE id LIKE $id
+		WHERE id LIKE $id AND created_at >= $created_at
 		ORDER BY created_at DESC
-		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+		LIMIT $limit OFFSET $offset`,
 	);
 
 	return statement
-		.all({
-			id: id || '%',
-			offset: calculateOffset(page),
-		})
+		.all(calculateGetParameters(parameters))
 		.map(row => ({
 			...row,
 			timeago: timeago.format(new Date(row.created_at)),

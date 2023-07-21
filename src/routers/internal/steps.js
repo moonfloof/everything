@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countSteps());
 
-	const steps = getSteps(undefined, page);
+	const steps = getSteps({ page });
 
 	const svg = generateBarGraph(steps.map(s => ({
 		label: shortDate(new Date(s.created_at)),

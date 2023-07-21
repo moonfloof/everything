@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countBooks());
 
-	const books = getBooks(undefined, page);
+	const books = getBooks({ page });
 
 	res.render('internal/books', { books, pagination });
 });

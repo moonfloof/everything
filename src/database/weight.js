@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
-import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { calculateGetParameters } from './constants.js';
 
 export function insertWeight (weight_kgs, created_at, device_id) {
 	const statement = getStatement(
@@ -20,24 +20,25 @@ export function insertWeight (weight_kgs, created_at, device_id) {
 }
 
 /**
+ * Fetch weight records
+ *
  * @export
- * @param {string} [id]
- * @param {number} [page]
+ * @param {object} parameters
+ * @param {string} [parameters.id]
+ * @param {number} [parameters.page]
+ * @param {number} [parameters.limit]
+ * @param {number} [parameters.days]
  */
-export function getWeight (id, page) {
+export function getWeight (parameters) {
 	const statement = getStatement(
 		'getWeight',
 		`SELECT * FROM weight
-		WHERE id LIKE $id
+		WHERE id LIKE $id AND created_at >= $created_at
 		ORDER BY created_at DESC
-		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all({
-			id: id || '%',
-			offset: calculateOffset(page),
-		});
+	return statement.all(calculateGetParameters(parameters));
 }
 
 export function countWeight () {

@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countYouTubeLikes());
 
-	const youtubelikes = getLikes(undefined, page);
+	const youtubelikes = getLikes({ page });
 
 	res.render('internal/youtubelikes', { youtubelikes, pagination });
 });

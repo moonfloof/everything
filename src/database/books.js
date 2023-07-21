@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { calculateGetParameters } from './constants.js';
 import { prettyDate } from '../lib/formatDate.js';
 
 /**
@@ -47,23 +47,23 @@ export function insertBook (book) {
  * Fetch all books, or based on a specific ID
  *
  * @export
- * @param {string} [id]
- * @param {number} [page]
+ * @param {object} parameters
+ * @param {string} [parameters.id]
+ * @param {number} [parameters.page]
+ * @param {number} [parameters.limit]
+ * @param {number} [parameters.days]
  */
-export function getBooks (id, page) {
+export function getBooks (parameters) {
 	const statement = getStatement(
 		'getBooks',
 		`SELECT * FROM books
-		WHERE id LIKE $id
+		WHERE id LIKE $id AND created_at >= $created_at
 		ORDER BY updated_at DESC
-		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+		LIMIT $limit OFFSET $offset`,
 	);
 
 	return statement
-		.all({
-			id: id || '%',
-			offset: calculateOffset(page),
-		})
+		.all(calculateGetParameters(parameters))
 		.map(row => {
 			let progress = null;
 			let status = 'to-read';

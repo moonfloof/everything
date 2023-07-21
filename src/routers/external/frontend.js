@@ -87,7 +87,7 @@ router.get('/music', getCache(), (req, res) => {
 		throw new Error('"days" query must be a number between 1 and 60');
 	}
 
-	const listens = getListens(undefined, page);
+	const listens = getListens({ page });
 	const popular = getListensPopular(daysInt).slice(0, 30);
 	const graphPoints = getListenGraph();
 	const svg = generateBarGraph(addMissingDates(
@@ -113,7 +113,7 @@ router.get('/music', getCache(), (req, res) => {
 });
 
 router.get('/music/:id', (req, res) => {
-	const [ listen ] = getListens(req.params.id);
+	const [ listen ] = getListens({ id: req.params.id });
 
 	if (!listen) {
 		throw new NotFoundError('Listen not found');
@@ -134,7 +134,7 @@ router.get('/youtube', getCache(), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countYouTubeLikes());
 
-	const youtubeLikes = getLikes(undefined, page);
+	const youtubeLikes = getLikes({ page });
 
 	res.render('external/youtubelike-list', {
 		youtubeLikes,
@@ -144,7 +144,7 @@ router.get('/youtube', getCache(), (req, res) => {
 });
 
 router.get('/youtube/:id', (req, res) => {
-	const [ youtubeLike ] = getLikes(req.params.id);
+	const [ youtubeLike ] = getLikes({ id: req.params.id });
 
 	if (!youtubeLike) {
 		throw new NotFoundError('Like not found');
@@ -165,7 +165,7 @@ router.get('/games', getCache(), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countGameActivity());
 
-	const gameActivity = getGameActivity(undefined, page);
+	const gameActivity = getGameActivity({ page });
 	const gamesByDay = getGameActivityGroupedByDay();
 	const svg = generateBarGraph(addMissingDates(
 		gamesByDay,
@@ -182,7 +182,7 @@ router.get('/games', getCache(), (req, res) => {
 });
 
 router.get('/game/:id', (req, res) => {
-	const [ gameActivity ] = getGameActivity(req.params.id);
+	const [ gameActivity ] = getGameActivity({ id: req.params.id });
 
 	if (!gameActivity) {
 		throw new NotFoundError('Game not found');
@@ -203,7 +203,7 @@ router.get('/tv', getCache(), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countEpisodes());
 
-	const episodes = getEpisodes(undefined, page);
+	const episodes = getEpisodes({ page });
 
 	res.render('external/tv-list', {
 		episodes,
@@ -213,7 +213,7 @@ router.get('/tv', getCache(), (req, res) => {
 });
 
 router.get('/tv/:id', (req, res) => {
-	const [ episode ] = getEpisodes(req.params.id);
+	const [ episode ] = getEpisodes({ id: req.params.id });
 
 	if (!episode) {
 		throw new NotFoundError('Episode not found');
@@ -234,7 +234,7 @@ router.get('/films', getCache(), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countFilms());
 
-	const films = getFilms(undefined, page);
+	const films = getFilms({ page });
 
 	res.render('external/film-list', {
 		films,
@@ -244,7 +244,7 @@ router.get('/films', getCache(), (req, res) => {
 });
 
 router.get('/film/:id', (req, res) => {
-	const [ film ] = getFilms(req.params.id);
+	const [ film ] = getFilms({ id: req.params.id });
 
 	if (!film) {
 		throw new NotFoundError('Film not found');
@@ -265,7 +265,7 @@ router.get('/books', getCache(), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countBooks());
 
-	const books = getBooks(undefined, page);
+	const books = getBooks({ page });
 
 	res.render('external/book-list', {
 		books,
@@ -275,7 +275,7 @@ router.get('/books', getCache(), (req, res) => {
 });
 
 router.get('/book/:id', (req, res) => {
-	const [ book ] = getBooks(req.params.id);
+	const [ book ] = getBooks({ id: req.params.id });
 
 	if (!book) {
 		throw new NotFoundError('Book not found');
@@ -330,7 +330,7 @@ router.get('/notes', getCache(), (req, res) => {
 });
 
 router.get('/note/:id', (req, res) => {
-	const [ note ] = getNotes(req.params.id);
+	const [ note ] = getNotes({ id: req.params.id });
 
 	if (!note) {
 		throw new NotFoundError('Note not found');

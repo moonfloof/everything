@@ -9,8 +9,9 @@ import {
 	prettyDuration,
 	shortDate,
 	getStartOfDay,
+	daySecs,
 } from '../lib/formatDate.js';
-import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { calculateGetParameters } from './constants.js';
 
 function insertNewRecord (timestamp, device_id) {
 	const statement = getStatement(
@@ -64,24 +65,25 @@ export function insertSleepCycle (timestamp, isSleep, device_id) {
  * Fetch all sleep cycles, or one, based on a specific ID
  *
  * @export
- * @param {object} options
- * @param {string} [options.id]
- * @param {number} [options.page]
+ * @param {object} parameters
+ * @param {string} [parameters.id]
+ * @param {number} [parameters.page]
+ * @param {number} [parameters.limit]
+ * @param {number} [parameters.days]
  */
-export function getSleepCycles ({ id, page = 0, days = 10 } = {}) {
+export function getSleepCycles (parameters) {
 	const statement = getStatement(
 		'getSleepCycles',
 		`SELECT * FROM sleep
 		WHERE id LIKE $id AND started_at >= $started_at
 		ORDER BY started_at DESC
-		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+		LIMIT $limit OFFSET $offset`,
 	);
 
 	return statement
 		.all({
-			id: id || '%',
-			offset: calculateOffset(page),
-			started_at: new Date(Date.now() - (dayMs * days)).toISOString(),
+			...calculateGetParameters(parameters),
+			started_at: new Date(Date.now() - (parameters.days * daySecs)).toISOString(),
 		})
 		.map(row => {
 			const started_at = new Date(row.started_at);
@@ -126,7 +128,7 @@ export function getSleepStats () {
 		totalWake: 0,
 	};
 
-	const sleep = getSleepCycles().slice(0, 10);
+	const sleep = getSleepCycles({ days: 10 }).slice(0, 10);
 
 	if (sleep.length === 0) return emptyStats;
 

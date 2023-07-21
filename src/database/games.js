@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { dayMs, getStartOfDay, isoDuration, minuteMs, prettyDuration, shortDate } from '../lib/formatDate.js';
-import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { calculateGetParameters } from './constants.js';
 
 export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, created_at) {
 	const id = uuid();
@@ -68,23 +68,23 @@ export function updateActivity (name, playtime_mins, url, device_id, intervalDur
  * Fetch all game activity, or based on a specific ID
  *
  * @export
- * @param {string} [id]
- * @param {number} [page]
+ * @param {object} parameters
+ * @param {string} [parameters.id]
+ * @param {number} [parameters.page]
+ * @param {number} [parameters.limit]
+ * @param {number} [parameters.days]
  */
-export function getGameActivity (id, page) {
+export function getGameActivity (parameters) {
 	const statement = getStatement(
 		'getGameActivity',
 		`SELECT * FROM games
-		WHERE id LIKE $id
+		WHERE id LIKE $id AND created_at >= $created_at
 		ORDER BY updated_at DESC
-		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+		LIMIT $limit OFFSET $offset`,
 	);
 
 	return statement
-		.all({
-			id: id || '%',
-			offset: calculateOffset(page),
-		})
+		.all(calculateGetParameters(parameters))
 		.map(row => ({
 			...row,
 			duration: prettyDuration(row.playtime_mins * minuteMs),
@@ -160,7 +160,7 @@ export function getGameDashboardGraph () {
 		FROM games
 		GROUP BY day
 		ORDER BY day DESC
-		LIMIT ${RECORDS_PER_PAGE}`,
+		LIMIT $limit`,
 	);
 
 	return statement

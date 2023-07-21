@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 		'Exercise',
 	];
 
-	const timetracking = getTimeTracking(undefined, page);
+	const timetracking = getTimeTracking({ page });
 
 	res.render('internal/timetracking', { timetracking, pagination, categoryValues });
 });

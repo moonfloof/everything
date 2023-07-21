@@ -25,7 +25,7 @@ router.get('/', (req, res) => {
 		'snack',
 	];
 
-	const food = getFood(undefined, page);
+	const food = getFood({ page });
 
 	res.render('internal/food', { food, pagination, typeValues });
 });

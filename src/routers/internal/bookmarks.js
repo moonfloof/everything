@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countBookmarks());
 
-	const bookmarks = getBookmarks(undefined, page);
+	const bookmarks = getBookmarks({ page });
 
 	res.render('internal/bookmarks', { bookmarks, pagination });
 });

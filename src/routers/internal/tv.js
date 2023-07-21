@@ -12,7 +12,7 @@ router.get('/list', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countEpisodes());
 
-	const episodes = getEpisodes(undefined, page);
+	const episodes = getEpisodes({ page });
 
 	res.render('internal/tv', { episodes, pagination });
 });

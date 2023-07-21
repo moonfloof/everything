@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countListens());
 
-	const listens = getListens(undefined, page);
+	const listens = getListens({ page });
 
 	res.render('internal/listens', { listens, pagination });
 });

@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
-import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
+import { calculateGetParameters } from './constants.js';
 import timeago from '../adapters/timeago.js';
 
 export const entryTypeValues = [
@@ -20,8 +20,8 @@ export const entryTypeEmojiMap = {
 };
 
 export const entryStatusValues = [
-	'private',
 	'public',
+	'private',
 ];
 
 export function insertNote (
@@ -66,26 +66,38 @@ export function countNotes (status = 'public') {
 	return statement.get({ status: status || '%' }).total;
 }
 
-export function getNotes (id, page, status = 'public') {
+/**
+ * @param {object} parameters
+ * @param {string} [parameters.id]
+ * @param {string} [parameters.status]
+ * @param {number} [parameters.page]
+ * @param {number} [parameters.limit]
+ * @param {number} [parameters.days]
+ */
+export function getNotes (parameters) {
 	const statement = getStatement(
 		'getNotes',
 		`SELECT * FROM entries
-		WHERE id LIKE $id AND status LIKE $status
+		WHERE id LIKE $id AND status LIKE $status AND created_at >= $created_at
 		ORDER BY created_at DESC
-		LIMIT ${RECORDS_PER_PAGE} OFFSET $offset`,
+		LIMIT $limit OFFSET $offset`,
 	);
 
 	return statement
 		.all({
-			id: id || '%',
-			status: status || '%',
-			offset: calculateOffset(page),
+			...calculateGetParameters(parameters),
+			status: parameters?.status || 'public',
 		})
 		.map(row => ({
 			...row,
 			emoji: entryTypeEmojiMap[row.type || 'note'],
-			summary: row.description.replace(/<[^>]+?>/g, ''),
 			timeago: timeago.format(new Date(row.created_at)),
+
+			// ⚠ Note: I would not normally rely on regex like this.
+			// It's unsafe, but considering the *only* content stored in
+			// notes is content I've generated myself, I didn't mind
+			// in this specific instance.
+			summary: row.description.replace(/<[^>]+?>/g, ''),
 		}));
 }
 

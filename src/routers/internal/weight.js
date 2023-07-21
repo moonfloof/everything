@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countWeight());
 
-	const weight = getWeight(undefined, page);
+	const weight = getWeight({ page });
 
 	res.render('internal/weight', { weight, pagination });
 });

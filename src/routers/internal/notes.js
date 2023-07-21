@@ -20,7 +20,7 @@ router.get('/', validatePageNumber(true), (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countNotes('%'));
 
-	const notes = getNotes(undefined, req.query.page, '%');
+	const notes = getNotes({ page, status: '%' });
 
 	res.render('internal/notes', { notes, pagination, entryTypeValues, entryStatusValues });
 });

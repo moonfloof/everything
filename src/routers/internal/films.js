@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countFilms());
 
-	const films = getFilms(undefined, page);
+	const films = getFilms({ page });
 
 	res.render('internal/films', { films, pagination });
 });

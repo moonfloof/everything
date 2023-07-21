@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countPurchases());
 
-	const purchases = getPurchases(undefined, req.query.page);
+	const purchases = getPurchases({ page });
 
 	res.render('internal/purchases', { purchases, pagination });
 });

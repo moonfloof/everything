@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countGameActivity());
 
-	const games = getGameActivity(undefined, page);
+	const games = getGameActivity({ page });
 
 	res.render('internal/games', { games, pagination });
 });
