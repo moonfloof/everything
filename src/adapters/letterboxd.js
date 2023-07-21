@@ -118,18 +118,20 @@ const parseFeed = async (feed) => new Promise((resolve, reject) => {
 	parser.write(feed).close();
 });
 
-export const pollForFilmActivity = async () => {
-	const deviceId = process.env.TOMBOIS_DEFAULT_DEVICE_ID;
-	const username = process.env.TOMBOIS_LETTERBOXD_USERNAME;
+export const fetchFilms = () => {
 	const intervalSecs = Number(process.env.TOMBOIS_LETTERBOXD_POLL_INTERVAL_SECS) ?? 86400;
 	const intervalMs = intervalSecs * 1000;
+	const deviceId = process.env.TOMBOIS_DEFAULT_DEVICE_ID;
+	const username = process.env.TOMBOIS_LETTERBOXD_USERNAME;
 
-	if (username === '' || username === undefined) return;
-	if (intervalMs === 0) return;
+	if (username === '' || username === undefined || intervalMs === 0) {
+		log.warn(`Will not fetch films due to one of: username = '${username}', intervalMs = '${intervalMs}'.`);
+		return;
+	}
 
 	loadFilmsFromDisk();
 
-	const fetchFilms = async () => {
+	return async () => {
 		const feed = await fetchLetterboxdFeed(username);
 		const newActivity = (await parseFeed(feed)).reverse();
 
@@ -169,6 +171,14 @@ export const pollForFilmActivity = async () => {
 
 		saveFilmsToDisk();
 	};
+};
 
-	setInterval(fetchFilms, intervalMs);
+export const pollForFilmActivity = async () => {
+	const intervalSecs = Number(process.env.TOMBOIS_LETTERBOXD_POLL_INTERVAL_SECS) ?? 86400;
+	const intervalMs = intervalSecs * 1000;
+
+	const fetchFn = fetchFilms();
+	if (!fetchFn) return;
+
+	setInterval(fetchFn, intervalMs);
 };
