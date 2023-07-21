@@ -7,7 +7,7 @@
 		science, music, and comedy.
 	</p>
 	{{#each youtubeLikes as |like|}}
-		{{> youtubeLike data=like showlink=true }}
+		{{> youtubeLike data=like }}
 	{{/each}}
 
 	{{> pagination pagination=pagination route="/youtube" }}

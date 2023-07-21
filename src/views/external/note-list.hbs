@@ -2,7 +2,7 @@
 	{{> pageHeader title="Notes" url="/" }}
 
 	{{#each notes as |note|}}
-		{{> note data=note showlink=true }}
+		{{> note data=note }}
 	{{/each}}
 
 	{{> pagination pagination=pagination route="/notes" }}

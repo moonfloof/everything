@@ -2,7 +2,7 @@
 	{{> pageHeader title="Reading" url="/" }}
 
 	{{#each books as |book|}}
-		{{> book data=book showlink=true }}
+		{{> book data=book }}
 	{{/each}}
 
 	{{> pagination pagination=pagination route="/books" }}

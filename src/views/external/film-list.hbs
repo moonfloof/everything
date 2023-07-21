@@ -2,7 +2,7 @@
 	{{> pageHeader title="Watching (Films)" url="/" }}
 
 	{{#each films as |film|}}
-		{{> film data=film showlink=true }}
+		{{> film data=film }}
 	{{/each}}
 
 	{{> pagination pagination=pagination route="/films" }}

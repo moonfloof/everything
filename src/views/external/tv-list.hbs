@@ -2,7 +2,7 @@
 	{{> pageHeader title="Watching (TV)" url="/" }}
 
 	{{#each episodes as |episode|}}
-		{{> tv data=episode showlink=true }}
+		{{> tv data=episode }}
 	{{/each}}
 
 	{{> pagination pagination=pagination route="/tv" }}
