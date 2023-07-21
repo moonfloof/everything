@@ -14,33 +14,33 @@
 		</span>
 	</div>
 	<div class="row">
-		<span class="left">👤</span>
-		<span class="right p-author">{{data.author}}</span>
+		<span class="left"></span>
+		<span class="right">by <span class="p-author">{{data.author}}</span></span>
 	</div>
 	</div>
 
 	{{#if data.progress}}
 	<div class="row">
-		<span class="left">📈</span>
+		<span class="left"></span>
 		<data class="right p-read-status" value="{{data.status}}">{{{data.progress}}}</data>
 	</div>
 	{{/if}}
 
 	<div class="row">
-		<span class="left">📅</span>
+		<span class="left"></span>
 		<span class="right"><strong>Started:</strong> {{data.started_at}}</span>
 	</div>
 
 	{{#if data.completed_at}}
 	<div class="row">
-		<span class="left">📅</span>
+		<span class="left"></span>
 		<span class="right"><strong>Finished:</strong> {{data.completed_at}}</span>
 	</div>
 	{{/if}}
 
 	{{#if data.pages_total}}
 	<div class="row">
-		<span class="left">📜</span>
+		<span class="left"></span>
 		<span class="right"><strong>Pages:</strong> {{data.pages_total}}</span>
 	</div>
 	{{/if}}
@@ -54,7 +54,7 @@
 
 	{{#if data.genre}}
 	<div class="row">
-		<span class="left">📦</span>
+		<span class="left"></span>
 		<span class="right"><strong>Genre:</strong> {{data.genre}}</span>
 	</div>
 	{{/if}}
