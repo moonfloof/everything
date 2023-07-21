@@ -184,7 +184,7 @@ div.error {
 
 .dashboard--panel--meta__row span:last-child {
 	text-align: right;
-	max-width: 60%;
+	max-width: 75%;
 }
 
 /** MAIN CONTENTS **/

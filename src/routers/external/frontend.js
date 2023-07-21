@@ -344,6 +344,32 @@ router.get('/note/:id', (req, res) => {
 	});
 });
 
+// GLOBAL FEED
+
+router.get('/feed', getCache(), async (req, res) => {
+	const parameters = { limit: 1000, days: 7 };
+
+	const typeMap = (type, entries) => entries.map(data => ({
+		type,
+		created_at: new Date(data.created_at),
+		data,
+	}));
+
+	let entries = (await Promise.all([
+		typeMap('game', getGameActivity(parameters)),
+		typeMap('listen', getListens(parameters)),
+		typeMap('note', getNotes({ ...parameters, status: 'public' })),
+		typeMap('episode', getEpisodes(parameters)),
+		typeMap('film', getFilms(parameters)),
+		typeMap('book', getBooks(parameters)),
+		typeMap('like', getLikes(parameters)),
+	])).flat(1);
+
+	entries.sort((a, b) => b.created_at - a.created_at);
+
+	res.render('external/feed', { entries });
+});
+
 // NOT FOUND
 
 router.get('*', () => { throw new NotFoundError('Page Not Found'); });
