@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { dayMs, getStartOfDay, minuteMs, prettyDuration, shortDate } from '../lib/formatDate.js';
+import { dayMs, getStartOfDay, isoDuration, minuteMs, prettyDuration, shortDate } from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
 export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, created_at) {
@@ -89,6 +89,7 @@ export function getGameActivity (id, page) {
 			...row,
 			duration: prettyDuration(row.playtime_mins * minuteMs),
 			durationNumber: row.playtime_mins / 60,
+			durationIso: isoDuration(row.playtime_mins * minuteMs),
 			timeago: timeago.format(new Date(row.created_at)),
 		}));
 }

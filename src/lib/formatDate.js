@@ -119,6 +119,27 @@ export function prettyDuration (durationMs) {
 	return duration;
 }
 
+export function isoDuration (durationMs) {
+	// 60 mins * 60 secs * 1000 ms
+	const hoursTotal = durationMs / 3600000;
+
+	// Calculate minutes based on decimal from hours
+	const hoursRounded = Math.floor(hoursTotal);
+	const minutes = Math.round((hoursTotal - hoursRounded) * 60);
+
+	let output = 'PT';
+
+	if (hoursRounded > 0) {
+		output += padString(hoursRounded, 2) + 'H';
+	}
+
+	if (minutes > 0) {
+		output += padString(minutes, 2) + 'M';
+	}
+
+	return output;
+}
+
 export function getStartOfDay (date = new Date()) {
 	return new Date(`${formatDate(date)}T00:00:00.000Z`);
 }
