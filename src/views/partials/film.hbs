@@ -1,54 +1,48 @@
-<div class="sectioncontainer">
-	<div class="row">
+<div class="sectioncontainer h-entry h-review">
+	<div class="row u-watch-of h-cite">
 		<span class="left">🎥</span>
 		<span class="right">
 			{{#if data.url}}
-			<a href="{{data.url}}" target="_blank" rel="noopener">
-				<strong>{{data.title}}</strong>
+			<a href="{{data.url}}" class="u-url" target="_blank" rel="noopener">
+				<strong class="p-name">{{data.title}}</strong>
 			</a>
 			{{else}}
-				<strong>{{data.title}}</strong>
+				<strong class="p-name">{{data.title}}</strong>
 			{{/if}}
 			({{data.year}})
 		</span>
 	</div>
+
 	{{#if data.rating}}
 	<div class="row">
 		<span class="left">⭐</span>
-		<span class="right"><strong>{{data.rating}}</strong> <small>/ 10</small></span>
+		<span class="right">
+			<strong class="p-rating">{{data.rating}}</strong>
+			<small>/ <span class="p-best">10</span></small>
+		</span>
 	</div>
 	{{/if}}
 	{{#if data.review}}
 		<div class="row">
 			<span class="left">💬</span>
-			<span class="right">
-				{{#if showlink}}
-				<details>
-					<summary><strong>My Review</strong> (click to expand)</summary>
-					<br/>
-					{{{data.review}}}
-				</details>
-				{{else}}
-				<p><strong>My Review:</strong></p>
-				{{{data.review}}}
-				{{/if}}
-			</span>
+			<div class="right e-content">{{{data.review}}}</div>
 		</div>
 	{{/if}}
+
 	<div class="row">
 		<span class="left"></span>
 		<time
 			title="{{data.watched_at}}"
 			datetime="{{data.watched_at}}"
-			class="right"
+			class="right dt-published"
 		>
 			<small>
-			{{#if showlink }}
-				<a href="/film/{{data.id}}">{{data.timeago}}</a>
-			{{else}}
-				{{data.timeago}}
-			{{/if}}
+				<a href="/film/{{data.id}}" class="u-url u-uid">
+					{{data.timeago}}
+				</a>
 			</small>
 		</time>
 	</div>
+
+	{{> author }}
 </div>
