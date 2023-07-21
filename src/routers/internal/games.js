@@ -18,15 +18,15 @@ router.get('/', (req, res) => {
 // CRUD
 
 router.post('/', (req, res) => {
-	const { name, playtime_mins, created_at } = req.body;
+	const { name, playtime_mins, url, created_at } = req.body;
 
-	insertNewGameActivity(name, process.env.TOMBOIS_DEFAULT_DEVICE_ID, playtime_mins, created_at);
+	insertNewGameActivity(name, process.env.TOMBOIS_DEFAULT_DEVICE_ID, playtime_mins, url, created_at);
 	res.redirect('/games');
 });
 
 router.post('/:id', (req, res) => {
 	const { id } = req.params;
-	const { crudType, name, playtime_mins, created_at, updated_at } = req.body;
+	const { crudType, name, playtime_mins, url, created_at, updated_at } = req.body;
 
 	switch (crudType) {
 		case 'delete':
@@ -34,7 +34,7 @@ router.post('/:id', (req, res) => {
 			break;
 
 		case 'update':
-			updateGameActivity(id, name, playtime_mins, created_at, updated_at);
+			updateGameActivity(id, name, playtime_mins, url, created_at, updated_at);
 			break;
 
 		default:

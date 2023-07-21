@@ -4,29 +4,30 @@ import timeago from '../adapters/timeago.js';
 import { dayMs, getStartOfDay, minuteMs, prettyDuration, shortDate } from '../lib/formatDate.js';
 import { calculateOffset, RECORDS_PER_PAGE } from './constants.js';
 
-export function insertNewGameActivity (name, device_id, playtime_mins = 0, created_at) {
+export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, created_at) {
 	const id = uuid();
 	const updated_at = new Date().toISOString();
 
 	const statement = getStatement(
 		'insertGameActivity',
 		`INSERT INTO games
-		(id, name, playtime_mins, created_at, updated_at, device_id)
+		(id, name, playtime_mins, url, created_at, updated_at, device_id)
 		VALUES
-		($id, $name, $playtime_mins, $created_at, $updated_at, $device_id)`,
+		($id, $name, $playtime_mins, $url, $created_at, $updated_at, $device_id)`,
 	);
 
 	return statement.run({
 		id,
 		name,
 		playtime_mins,
+		url,
 		created_at: created_at || new Date(Date.now() - (playtime_mins * minuteMs)).toISOString(),
 		updated_at,
 		device_id,
 	});
 }
 
-export function updateActivity (name, playtime_mins, device_id, intervalDuration) {
+export function updateActivity (name, playtime_mins, url, device_id, intervalDuration) {
 	const selectStatement = getStatement(
 		'getGameActivityByName',
 		`SELECT * FROM games WHERE name = $name
@@ -36,7 +37,7 @@ export function updateActivity (name, playtime_mins, device_id, intervalDuration
 	const row = selectStatement.get({ name });
 
 	if (row === undefined) {
-		insertNewGameActivity(name, device_id, playtime_mins);
+		insertNewGameActivity(name, device_id, playtime_mins, url);
 		return;
 	}
 
@@ -44,7 +45,7 @@ export function updateActivity (name, playtime_mins, device_id, intervalDuration
 	const lastCheck = Date.now() - intervalDuration - (playtime_mins * minuteMs) - minuteMs;
 
 	if (lastUpdated < lastCheck) {
-		insertNewGameActivity(name, device_id, playtime_mins);
+		insertNewGameActivity(name, device_id, playtime_mins, url);
 		return;
 	}
 
@@ -227,12 +228,13 @@ export function deleteGameActivity (id) {
 	return statement.run({ id });
 }
 
-export function updateGameActivity (id, name, playtime_mins, created_at, updated_at) {
+export function updateGameActivity (id, name, playtime_mins, url, created_at, updated_at) {
 	const statement = getStatement(
 		'updateGameActivity',
 		`UPDATE games
 		SET name = $name,
 		    playtime_mins = $playtime_mins,
+		    url = $url,
 		    created_at = $created_at,
 		    updated_at = $updated_at
 		WHERE id = $id`,
@@ -242,6 +244,7 @@ export function updateGameActivity (id, name, playtime_mins, created_at, updated
 		id,
 		name,
 		playtime_mins: Number(playtime_mins),
+		url,
 		created_at,
 		updated_at,
 	});

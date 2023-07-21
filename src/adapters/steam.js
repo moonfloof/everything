@@ -89,6 +89,7 @@ export const pollForGameActivity = () => {
 			updateActivity(
 				game.name,
 				game.newPlaytime,
+				`https://store.steampowered.com/app/${game.appid}/`,
 				deviceId,
 				intervalMs,
 			);

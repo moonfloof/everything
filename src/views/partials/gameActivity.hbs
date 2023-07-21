@@ -1,7 +1,15 @@
-<div class="sectioncontainer">
-	<div class="row">
+<div class="sectioncontainer h-entry">
+	<div class="row p-play-of h-cite">
 		<span class="left">🎮</span>
-		<span class="right"><strong>{{data.name}}</strong></span>
+		<span class="right">
+			{{#if data.url}}
+			<a href="{{data.url}}" target="_blank" class="u-url" rel="noopener">
+				<strong class="p-name">{{data.name}}</strong>
+			</a>
+			{{else}}
+				<strong class="p-name">{{data.name}}</strong>
+			{{/if}}
+		</span>
 	</div>
 	<div class="row">
 		<span class="left">⌚</span>
@@ -12,14 +20,12 @@
 		<time
 			title="{{data.created_at}}"
 			datetime="{{data.created_at}}"
-			class="right"
+			class="right dt-published"
 		>
 			<small>
-			{{#if showlink }}
-				<a href="/game/{{data.id}}">{{data.timeago}}</a>
-			{{else}}
-				{{data.timeago}}
-			{{/if}}
+				<a href="/game/{{data.id}}" class="u-url u-uid">
+					{{data.timeago}}
+				</a>
 			</small>
 		</time>
 	</div>
