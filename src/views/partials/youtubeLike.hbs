@@ -1,4 +1,5 @@
-<div class="sectioncontainer">
+<div class="sectioncontainer h-entry">
+	<div class="u-like-of h-cite">
 	<div class="row">
 		<span class="left">📺</span>
 		<span class="right">
@@ -7,6 +8,7 @@
 					href="{{data.url}}"
 					target="_blank"
 					rel="noreferrer noopener"
+					class="p-name u-url"
 				>
 					{{data.title}}
 				</a>
@@ -15,22 +17,24 @@
 	</div>
 	<div class="row">
 		<span class="left">👤</span>
-		<span class="right">{{data.channel}}</span>
+		<span class="right p-author h-card">{{data.channel}}</span>
 	</div>
+	</div>
+
 	<div class="row">
 		<span class="left"></span>
 		<time
 			title="{{data.created_at}}"
 			datetime="{{data.created_at}}"
-			class="right"
+			class="right dt-published"
 		>
 			<small>
-			{{#if showlink }}
-				<a href="/youtube/{{data.id}}">{{data.timeago}}</a>
-			{{else}}
-				{{data.timeago}}
-			{{/if}}
+				<a class="u-url u-uid" href="/youtube/{{data.id}}">
+					{{data.timeago}}
+				</a>
 			</small>
 		</time>
 	</div>
+
+	{{> author }}
 </div>
