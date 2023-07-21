@@ -1,9 +1,9 @@
 User-agent: *
-Disallow: /tom/
-Disallow: /api/
-Disallow: /*?*q=
-Disallow: /*?*type=
-Disallow: /*?*sort=
-Disallow: /*?*state=
-Disallow: /*?*labels=
+Disallow: /music/*
+Disallow: /youtube/*
+Disallow: /game/*
+Disallow: /tv/*
+Disallow: /film/*
+Disallow: /book/*
+Disallow: /note/*
 Sitemap: https://now.tomgardiner.me/sitemap.xml
