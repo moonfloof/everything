@@ -33,6 +33,7 @@ import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
 import { formatTime, prettyDate, shortDate } from '../../lib/formatDate.js';
+import { getNowPlaying } from './listenbrainz.js';
 
 const router = express.Router();
 
@@ -87,6 +88,7 @@ router.get('/music', getCache(), (req, res) => {
 		throw new Error('"days" query must be a number between 1 and 60');
 	}
 
+	const nowPlaying = getNowPlaying();
 	const listens = getListens({ page });
 	const popular = getListensPopular(daysInt).slice(0, 30);
 	const graphPoints = getListenGraph();
@@ -101,6 +103,7 @@ router.get('/music', getCache(), (req, res) => {
 		: 'I haven\'t listened to any music in the last 7 days!';
 
 	res.render('external/listen-list', {
+		nowPlaying,
 		listens,
 		popular,
 		pagination,

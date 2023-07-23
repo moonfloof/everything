@@ -1,6 +1,15 @@
 <div class="page--data">
 	{{> pageHeader title="Listening to" url="/" }}
 
+	{{#if nowPlaying}}
+		<p id="now-playing" class="rounded-panel">
+			🎧 Now playing:
+			<strong>{{nowPlaying.title}}</strong> by
+			<strong>{{nowPlaying.artist}}</strong>
+		</p>
+		<hr/>
+	{{/if}}
+
 	<h3>Most scrobbled artists ({{days}} days)</h3>
 
 	<form action="/music" method="get" name="days">

@@ -3,9 +3,16 @@
 :root {
 	--text: #333;
 	--border: #CCC;
-	--primary: #3e3475;
-	--background: #f9f7fc;
 	--panel-bg: #fff;
+
+	--primary-fg: #3e3475;
+	--primary-bg: #f9f8fc;
+
+	--secondary-fg: #347441;
+	--secondary-bg: #f8fcf9;
+
+	--error-fg: #6e2828;
+	--error-bg: #fddcdc;
 }
 
 body,
@@ -14,7 +21,7 @@ html {
 	font-family: Inter, 'Helvetica Neue', Arial, sans-serif;
 	font-weight: 400;
 	color: var(--text);
-	background: var(--background);
+	background: var(--primary-bg);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -26,7 +33,7 @@ html {
 }
 
 a {
-	color: var(--primary);
+	color: var(--primary-fg);
 	text-decoration: none;
 }
 
@@ -72,17 +79,22 @@ a:hover {
 
 div.error {
 	padding: 0 24px 24px;
-	background-color: #fddcdc;
-	border: 1px solid #6e2828;
+	background-color: var(--error-bg);
+	border: 1px solid var(--error-fg);
 	font-weight: 700;
 }
 
 /** DASHBOARD **/
 
+.rounded-panel {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	border-radius: 6px;
+}
+
 #migration-notice {
 	padding: 24px;
-	background-color: #fddcdc;
-	border: 1px solid #6e2828;
+	background-color: var(--error-bg);
+	border: 1px solid var(--error-fg);
 	margin-bottom: 24px;
 	line-height: 1.618;
 }
@@ -106,8 +118,6 @@ div.error {
 	padding: 12px;
 	margin-bottom: 24px;
 	height: 136px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	border-radius: 6px;
 	display: block;
 }
 
@@ -232,7 +242,7 @@ tr {
 
 hr {
 	border: 0;
-	border-top: 1px solid var(--primary);
+	border-top: 1px solid var(--primary-fg);
 }
 
 img,
@@ -279,6 +289,13 @@ summary {
 
 /** MUSIC STATS **/
 
+#now-playing {
+	background-color: var(--secondary-bg);
+	color: var(--secondary-fg);
+	padding: 24px;
+	border: 1px solid var(--secondary-fg);
+}
+
 table td {
 	padding: 4px 8px 4px 0;
 	white-space: nowrap;
@@ -305,8 +322,8 @@ table td {
 	border-radius: 6px;
 	min-width: fit-content;
 	display: block;
-	color: var(--background);
-	background-color: var(--primary);
+	color: var(--primary-bg);
+	background-color: var(--primary-fg);
 }
 
 /** PAGINATION **/
