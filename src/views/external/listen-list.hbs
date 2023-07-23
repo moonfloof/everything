@@ -10,6 +10,7 @@
 		<hr/>
 	{{/if}}
 
+	{{#xif pagination.page '==' 0}}
 	<h3>Most scrobbled artists ({{days}} days)</h3>
 
 	<form action="/music" method="get" name="days">
@@ -40,13 +41,16 @@
 		{{/each}}
 	</table>
 	{{else}}
-	<div class="error">
+	<div class="error rounded-panel">
 		<p class="lead">I haven't listened to any music within the last {{days}} days! 😭</p>
 	</div>
 	{{/if}}
 
 	<h3>Scrobble count by day</h3>
 	{{{svg}}}
+
+	<hr/>
+	{{/xif}}
 
 	{{#each listens as |listen| }}
 		{{> listen data=listen }}
