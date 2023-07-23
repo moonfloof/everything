@@ -1,4 +1,4 @@
-# Everything (Self-Quantified Data Tracker)
+# Everything (Quantified-Self Data Tracker)
 
 Taking ownership of my data is important to me. While I can't get the very
 granular details that the likes of Google and TikTok can (e.g. watch time of
@@ -40,7 +40,8 @@ better way to do it).
 
 Data is entered using the internal CRUD API.
 
-* **Health** - All hidden from public view except sleep.
+* **Health** - All hidden from public view except sleep, which is heavily
+  aggregated.
   * Sleep
   * Time-tracking
   * Steps

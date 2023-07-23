@@ -11,9 +11,9 @@
 	<ul>
 	{{#each notes}}
 		<li class="dashboard--panel__li">
-			<strong>
+			<span>
 				{{emoji}} {{#if title}}{{title}}{{else}}{{summary}}{{/if}}
-			</strong>
+			</span>
 			<small>
 				<a href="/note/{{id}}">{{timeago}}</a>
 			</small>
@@ -23,7 +23,7 @@
 {{/dashpanel}}
 
 <div id="dashboard--panels">
-	{{#> dashpanel title="listening (7 days)" link="music" }}
+	{{#> dashpanel title="listening <small>(7 days)</small>" link="music" }}
 		<div class="dashboard--panel--meta">
 			<div class="dashboard--panel--meta__row">
 				<span>fav artist</span>
@@ -49,7 +49,7 @@
 		</div>
 	{{/dashpanel}}
 
-	{{#> dashpanel title="gaming (7 days)" link="games" }}
+	{{#> dashpanel title="gaming <small>(7 days)</small>" link="games" }}
 		<div class="dashboard--panel--meta">
 			<div class="dashboard--panel--meta__row">
 				<span>total playtime</span>
