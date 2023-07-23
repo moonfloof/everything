@@ -31,12 +31,12 @@ export function externalRoot () {
 	return process.env.TOMBOIS_SERVER_EXTERNAL_URI;
 }
 
-export function name () {
+export function person () {
 	return process.env.TOMBOIS_PERSON_NAME;
 }
 
 export const helpers = {
 	xif,
 	externalRoot,
-	name,
+	person,
 };
