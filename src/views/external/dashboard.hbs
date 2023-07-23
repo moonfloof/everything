@@ -23,31 +23,31 @@
 {{/dashpanel}}
 
 <div id="dashboard--panels">
-	{{#if sleep}}
+	{{#if sleepStats}}
 		{{#> dashpanel title="sleeping" }}
 			<div class="dashboard--panel--meta">
 				<div class="dashboard--panel--meta__row">
 					<span>average bed time</span>
 					<span>
-						<strong>{{sleepStats.averageSleepHuman}}</strong>
+						<strong>{{sleepStats.averageSleepStartHuman}}</strong>
 					</span>
 				</div>
 				<div class="dashboard--panel--meta__row">
 					<span>average wake time</span>
 					<span>
-						<strong>{{sleepStats.averageWakeHuman}}</strong>
+						<strong>{{sleepStats.averageSleepEndHuman}}</strong>
 					</span>
 				</div>
 				<div class="dashboard--panel--meta__row">
-					<span>longest sleep</span>
+					<span>average sleep</span>
 					<span>
-						<strong>{{sleepStats.longestHuman}}</strong>
+						<strong>{{sleepStats.averageDurationHuman}}</strong>
 					</span>
 				</div>
 				<div class="dashboard--panel--meta__row">
-					<span>shortest sleep</span>
+					<span>shortest &amp; longest</span>
 					<span>
-						<strong>{{sleepStats.shortestHuman}}</strong>
+						<strong>{{sleepStats.shortestHuman}} - {{sleepStats.longestHuman}}</strong>
 					</span>
 				</div>
 			</div>

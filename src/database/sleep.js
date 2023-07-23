@@ -115,11 +115,12 @@ export function getSleepStats () {
 		longestHuman: '',
 		shortest: 100,
 		shortestHuman: '',
-		totalSleep: 0,
-		totalWake: 0,
+		cumulativeSleepStart: 0,
+		cumulativeSleepEnd: 0,
+		cumulativeDuration: 0,
 	};
 
-	const sleep = getSleepCycles({ days: 10 }).slice(0, 10);
+	const sleep = getSleepCycles({ days: 100 }).slice(0, 10);
 
 	if (sleep.length === 0) return emptyStats;
 
@@ -139,20 +140,23 @@ export function getSleepStats () {
 			newAcc.shortestHuman = cur.duration;
 		}
 
-		newAcc.totalSleep += cur.startTimeNormalised;
-		newAcc.totalWake += cur.startTimeNormalised + cur.durationNumber;
+		newAcc.cumulativeSleepStart += cur.startTimeNormalised;
+		newAcc.cumulativeSleepEnd += cur.startTimeNormalised + cur.durationNumber;
+		newAcc.cumulativeDuration += cur.durationNumber;
 
 		return newAcc;
 	}, emptyStats);
 
-	const averageSleep = stats.totalSleep * 360000;
-	const averageWake = stats.totalWake * 360000;
+	const averageSleep = (stats.cumulativeSleepStart / sleep.length) * hourMs;
+	const averageWake = (stats.cumulativeSleepEnd / sleep.length) * hourMs;
+	const averageDuration = (stats.cumulativeDuration / sleep.length) * hourMs;
 
 	// Use today for the correct timezone
 	const today = getStartOfDay().getTime();
 
-	stats.averageSleepHuman = formatTime(new Date(today + averageSleep), false);
-	stats.averageWakeHuman = formatTime(new Date(today + averageWake), false);
+	stats.averageSleepStartHuman = formatTime(new Date(today + averageSleep), false);
+	stats.averageSleepEndHuman = formatTime(new Date(today + averageWake), false);
+	stats.averageDurationHuman = prettyDuration(averageDuration);
 
 	return stats;
 }
