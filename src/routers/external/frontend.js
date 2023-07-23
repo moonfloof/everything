@@ -32,7 +32,7 @@ import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import getCache from '../../lib/middleware/cachePage.js';
 import addMissingDates from '../../lib/addMissingDates.js';
-import { prettyDate, shortDate } from '../../lib/formatDate.js';
+import { formatTime, prettyDate, shortDate } from '../../lib/formatDate.js';
 
 const router = express.Router();
 
@@ -108,6 +108,7 @@ router.get('/music', getCache(), (req, res) => {
 		days,
 		dayOptions,
 		canonicalUrl: getCanonicalUrl(req),
+		title: 'listens to music',
 		description,
 	});
 });
@@ -119,10 +120,12 @@ router.get('/music/:id', (req, res) => {
 		throw new NotFoundError('Listen not found');
 	}
 
-	const description = `I listened to '${listen.title}' by ${listen.artist} on ${prettyDate(new Date(listen.created_at))}`;
+	const at = new Date(listen.created_at);
+	const description = `I listened to '${listen.title}' by ${listen.artist} on ${prettyDate(at)} at ${formatTime(at, false)}`;
 
 	res.render('external/listen-single', {
 		listen,
+		title: 'listened to...',
 		description,
 		canonicalUrl: getCanonicalUrl(req),
 	});
@@ -139,6 +142,7 @@ router.get('/youtube', getCache(), (req, res) => {
 	res.render('external/youtubelike-list', {
 		youtubeLikes,
 		pagination,
+		title: 'watches YouTube',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -154,6 +158,7 @@ router.get('/youtube/:id', (req, res) => {
 
 	res.render('external/youtubelike-single', {
 		youtubeLike,
+		title: 'watched...',
 		description,
 		canonicalUrl: getCanonicalUrl(req),
 	});
@@ -177,6 +182,7 @@ router.get('/games', getCache(), (req, res) => {
 		gameActivity,
 		svg,
 		pagination,
+		title: 'plays video games',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -193,6 +199,7 @@ router.get('/game/:id', (req, res) => {
 	res.render('external/game-single', {
 		gameActivity,
 		description,
+		title: 'played...',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -208,6 +215,7 @@ router.get('/tv', getCache(), (req, res) => {
 	res.render('external/tv-list', {
 		episodes,
 		pagination,
+		title: 'watches TV',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -224,6 +232,7 @@ router.get('/tv/:id', (req, res) => {
 	res.render('external/tv-single', {
 		episode,
 		description,
+		title: 'watched...',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -239,6 +248,7 @@ router.get('/films', getCache(), (req, res) => {
 	res.render('external/film-list', {
 		films,
 		pagination,
+		title: 'watches films',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -255,6 +265,7 @@ router.get('/film/:id', (req, res) => {
 	res.render('external/film-single', {
 		film,
 		description,
+		title: 'watched...',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -270,6 +281,7 @@ router.get('/books', getCache(), (req, res) => {
 	res.render('external/book-list', {
 		books,
 		pagination,
+		title: 'reads books',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -289,6 +301,10 @@ router.get('/book/:id', (req, res) => {
 		? 'I finished reading'
 		: `I am ${percentageComplete}% through reading`;
 
+	const prefixTitle = percentageComplete === 100
+		? 'read...'
+		: 'is reading...';
+
 	const suffix = percentageComplete === 100
 		? ` on ${prettyDate(new Date(book.completed_at))}`
 		: '';
@@ -298,6 +314,7 @@ router.get('/book/:id', (req, res) => {
 	res.render('external/book-single', {
 		book,
 		description,
+		title: prefixTitle,
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -325,6 +342,7 @@ router.get('/notes', getCache(), (req, res) => {
 	res.render('external/note-list', {
 		notes,
 		pagination,
+		title: 'rambles',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -339,7 +357,7 @@ router.get('/note/:id', (req, res) => {
 	res.render('external/note-single', {
 		note,
 		description: note.summary,
-		title: note.title || note.summary,
+		title: note.title || 'rambled...',
 		canonicalUrl: getCanonicalUrl(req),
 	});
 });
@@ -367,7 +385,11 @@ router.get('/feed', getCache(), async (req, res) => {
 
 	entries.sort((a, b) => b.created_at - a.created_at);
 
-	res.render('external/feed', { entries });
+	res.render('external/feed', {
+		entries,
+		title: ' / The Everything Feed',
+		description: 'Everything I\'ve done from the last seven days, on one page!',
+	});
 });
 
 // NOT FOUND

@@ -102,8 +102,6 @@ export function getGameActivity (parameters) {
  * @param {number} [page]
  */
 export function getGameActivityByDay (days = 7) {
-	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
-
 	const statement = getStatement(
 		'getGameActivityByDay',
 		`SELECT * FROM games
@@ -112,7 +110,9 @@ export function getGameActivityByDay (days = 7) {
 	);
 
 	return statement
-		.all({ created_at })
+		.all({
+			created_at: new Date(Date.now() - (days * dayMs)).toISOString(),
+		})
 		.map(row => ({
 			...row,
 			duration: prettyDuration(row.playtime_mins * minuteMs),
