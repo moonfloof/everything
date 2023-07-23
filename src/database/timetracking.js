@@ -2,6 +2,20 @@ import { v4 as uuid } from 'uuid';
 import { calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
+export const categoryValues = [
+	'Stop Current',
+	'Toilet',
+	'Cooking/Eating',
+	'Work',
+	'Leisure',
+	'Productive',
+	'Distraction',
+	'Social',
+	'Hygiene',
+	'Housework',
+	'Exercise',
+];
+
 function insertNewRecord (category, created_at, device_id) {
 	const statement = getStatement(
 		'insertTimeTracking',
