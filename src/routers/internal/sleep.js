@@ -1,6 +1,7 @@
 import express from 'express';
 import { countSleepCycles, deleteSleepCycle, getSleepCycles, insertSleepCycle, updateSleepCycle } from '../../database/sleep.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
+import { DEFAULT_DAYS } from '../../database/constants.js';
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router.get('/', (req, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countSleepCycles());
 
-	const sleep = getSleepCycles({ page });
+	const sleep = getSleepCycles({ page, days: DEFAULT_DAYS });
 
 	res.render('internal/sleep', { sleep, pagination });
 });

@@ -1,17 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
-import {
-	dayMs,
-	hourMs,
-	formatTime,
-	prettyDate,
-	prettyDuration,
-	shortDate,
-	getStartOfDay,
-	daySecs,
-} from '../lib/formatDate.js';
-import { calculateGetParameters } from './constants.js';
+import { dayMs, hourMs, formatTime, prettyDate, prettyDuration, shortDate, getStartOfDay } from '../lib/formatDate.js';
+import { DEFAULT_DAYS, calculateGetParameters } from './constants.js';
 
 function insertNewRecord (timestamp, device_id) {
 	const statement = getStatement(
@@ -83,7 +74,7 @@ export function getSleepCycles (parameters) {
 	return statement
 		.all({
 			...calculateGetParameters(parameters),
-			started_at: new Date(Date.now() - (parameters.days * daySecs)).toISOString(),
+			started_at: new Date(Date.now() - ((parameters.days || DEFAULT_DAYS) * dayMs)).toISOString(),
 		})
 		.map(row => {
 			const started_at = new Date(row.started_at);
