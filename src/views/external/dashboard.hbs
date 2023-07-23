@@ -23,38 +23,7 @@
 {{/dashpanel}}
 
 <div id="dashboard--panels">
-	{{#if sleepStats}}
-		{{#> dashpanel title="sleeping" }}
-			<div class="dashboard--panel--meta">
-				<div class="dashboard--panel--meta__row">
-					<span>average bed time</span>
-					<span>
-						<strong>{{sleepStats.averageSleepStartHuman}}</strong>
-					</span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>average wake time</span>
-					<span>
-						<strong>{{sleepStats.averageSleepEndHuman}}</strong>
-					</span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>average sleep</span>
-					<span>
-						<strong>{{sleepStats.averageDurationHuman}}</strong>
-					</span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>shortest &amp; longest</span>
-					<span>
-						<strong>{{sleepStats.shortestHuman}} - {{sleepStats.longestHuman}}</strong>
-					</span>
-				</div>
-			</div>
-		{{/dashpanel}}
-	{{/if}}
-
-	{{#> dashpanel title="listening" link="music" }}
+	{{#> dashpanel title="listening (7 days)" link="music" }}
 		<div class="dashboard--panel--meta">
 			<div class="dashboard--panel--meta__row">
 				<span>fav artist</span>
@@ -80,7 +49,7 @@
 		</div>
 	{{/dashpanel}}
 
-	{{#> dashpanel title="gaming" link="games" }}
+	{{#> dashpanel title="gaming (7 days)" link="games" }}
 		<div class="dashboard--panel--meta">
 			<div class="dashboard--panel--meta__row">
 				<span>total playtime</span>
@@ -160,6 +129,37 @@
 				</li>
 			{{/each}}
 			</ul>
+		{{/dashpanel}}
+	{{/if}}
+
+	{{#if sleepStats}}
+		{{#> dashpanel title="sleeping" }}
+			<div class="dashboard--panel--meta">
+				<div class="dashboard--panel--meta__row">
+					<span>average bed time</span>
+					<span>
+						<strong>{{sleepStats.averageSleepStartHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>average wake time</span>
+					<span>
+						<strong>{{sleepStats.averageSleepEndHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>average sleep</span>
+					<span>
+						<strong>{{sleepStats.averageDurationHuman}}</strong>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>shortest &amp; longest</span>
+					<span>
+						<strong>{{sleepStats.shortestHuman}} - {{sleepStats.longestHuman}}</strong>
+					</span>
+				</div>
+			</div>
 		{{/dashpanel}}
 	{{/if}}
 
