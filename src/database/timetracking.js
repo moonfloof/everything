@@ -14,6 +14,8 @@ export const categoryValues = [
 	'Hygiene',
 	'Housework',
 	'Exercise',
+	'Travel',
+	'Meeting',
 ];
 
 function insertNewRecord (category, created_at, device_id) {
