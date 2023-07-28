@@ -92,6 +92,7 @@ export function getNotes (parameters) {
 			...row,
 			emoji: entryTypeEmojiMap[row.type || 'note'],
 			timeago: timeago.format(new Date(row.created_at)),
+			syndication: row.syndication_json ? JSON.parse(row.syndication_json) : null,
 
 			// ⚠ Note: I would not normally rely on regex like this.
 			// It's unsafe, but considering the *only* content stored in

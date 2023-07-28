@@ -57,6 +57,18 @@
 	{{/if}}
 	{{/xif}}
 
+	{{#if data.syndication}}
+	<div class="row">
+		<div class="left">🔗</div>
+		<div class="right">
+			Originally posted on:
+			{{#each data.syndication as |site|}}
+				<strong><a href="{{site.url}}" target="_blank" class="u-syndication">{{site.name}}</a></strong>&nbsp;&nbsp;
+			{{/each}}
+		</div>
+	</div>
+	{{/if}}
+
 	<div class="row">
 		<span class="left"></span>
 		<time
