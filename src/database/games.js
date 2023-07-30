@@ -1,8 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { dayMs, getStartOfDay, isoDuration, minuteMs, prettyDuration, shortDate } from '../lib/formatDate.js';
+import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
+import { getGameAchievementsForSession } from './gameachievements.js';
 
 export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, created_at) {
 	const id = uuid();
@@ -16,7 +17,7 @@ export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, 
 		($id, $name, $playtime_mins, $url, $created_at, $updated_at, $device_id)`,
 	);
 
-	return statement.run({
+	const result = statement.run({
 		id,
 		name,
 		playtime_mins,
@@ -25,6 +26,11 @@ export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, 
 		updated_at,
 		device_id,
 	});
+
+	return {
+		...result,
+		id,
+	};
 }
 
 export function updateActivity (name, playtime_mins, url, device_id, intervalDuration) {
@@ -37,16 +43,14 @@ export function updateActivity (name, playtime_mins, url, device_id, intervalDur
 	const row = selectStatement.get({ name });
 
 	if (row === undefined) {
-		insertNewGameActivity(name, device_id, playtime_mins, url);
-		return;
+		return insertNewGameActivity(name, device_id, playtime_mins, url);
 	}
 
 	const lastUpdated = new Date(row.updated_at).getTime();
 	const lastCheck = Date.now() - intervalDuration - (playtime_mins * minuteMs) - minuteMs;
 
 	if (lastUpdated < lastCheck) {
-		insertNewGameActivity(name, device_id, playtime_mins, url);
-		return;
+		return insertNewGameActivity(name, device_id, playtime_mins, url);
 	}
 
 	const updateStatement = getStatement(
@@ -57,11 +61,16 @@ export function updateActivity (name, playtime_mins, url, device_id, intervalDur
 		WHERE id = $id`,
 	);
 
-	updateStatement.run({
+	const result = updateStatement.run({
 		id: row.id,
 		playtime_mins: row.playtime_mins + playtime_mins,
 		updated_at: new Date().toISOString(),
 	});
+
+	return {
+		id: row.id,
+		...result,
+	};
 }
 
 /**
@@ -85,13 +94,22 @@ export function getGameActivity (parameters) {
 
 	return statement
 		.all(calculateGetParameters(parameters))
-		.map(row => ({
-			...row,
-			duration: prettyDuration(row.playtime_mins * minuteMs),
-			durationNumber: row.playtime_mins / 60,
-			durationIso: isoDuration(row.playtime_mins * minuteMs),
-			timeago: timeago.format(new Date(row.created_at)),
-		}));
+		.map(row => {
+			const achievements = getGameAchievementsForSession(row.id);
+			const achievementText = achievements.length === 1
+				? 'achievement'
+				: 'achievements';
+
+			return {
+				...row,
+				duration: prettyDuration(row.playtime_mins * minuteMs),
+				durationNumber: row.playtime_mins / 60,
+				durationIso: isoDuration(row.playtime_mins * minuteMs),
+				timeago: timeago.format(new Date(row.created_at)),
+				achievements,
+				achievementText,
+			};
+		});
 }
 
 /**

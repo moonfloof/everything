@@ -20,6 +20,24 @@
 			</data>
 		</span>
 	</div>
+	{{#if data.achievements}}
+	<div class="row game-achievements--container">
+		<span class="left"></span>
+		<div class="right">
+			<p>Got <strong>{{data.achievements.length}}</strong> {{data.achievementText}}</p>
+			<ul class="game-achievements--list">
+			{{#each data.achievements as |achievement|}}
+				<li>
+					<strong>{{achievement.name}}</strong>
+					{{#if achievement.description}}
+					<br/>{{achievement.description}}
+					{{/if}}
+				</li>
+			{{/each}}
+			</ul>
+		</div>
+	</div>
+	{{/if}}
 	<div class="row">
 		<span class="left"></span>
 		<time

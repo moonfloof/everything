@@ -210,7 +210,6 @@ div.error {
 .page--data h2,
 .page--data h3,
 .page--data p,
-.page--data ul,
 .page--data hr,
 .page--data svg,
 .page--data table,
@@ -331,6 +330,22 @@ table td {
 	display: block;
 	color: var(--primary-bg);
 	background-color: var(--primary-fg);
+}
+
+/** GAME ACHIEVEMENTS **/
+
+.game-achievements--container {
+	font-size: 14px;
+	margin-top: 8px;
+}
+
+.game-achievements--list {
+	margin-left: 20px;
+	list-style: '🏆' outside;
+}
+
+.game-achievements--list li {
+	padding-left: 8px;
 }
 
 /** PAGINATION **/
