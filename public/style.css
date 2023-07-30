@@ -91,19 +91,26 @@ div.error {
 	border-radius: 6px;
 }
 
-#migration-notice {
-	padding: 24px;
-	background-color: var(--error-bg);
-	border: 1px solid var(--error-fg);
+#dashboard--lead__container {
+	padding: 12px;
+	background-color: var(--secondary-bg);
+	border: 2px solid var(--secondary-fg);
 	margin-bottom: 24px;
 	line-height: 1.618;
+	display: flex;
+	align-items: flex-start;
 }
 
-.dashboard--lead {
-	margin: 0 0 24px 0;
+#dashboard--lead__img {
+	width: 64px;
+	min-width: 64px;
+	border-radius: 32px;
+	margin-right: 12px;
+}
+
+#dashboard--lead__text {
 	padding: 0;
 	font-size: 14px;
-	line-height: 22px;
 }
 
 #dashboard--panels {
@@ -396,6 +403,10 @@ select {
 	}
 
 	#header--right {
+		display: none;
+	}
+
+	#dashboard--lead__img {
 		display: none;
 	}
 
