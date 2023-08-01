@@ -1,7 +1,6 @@
 import express from 'express';
 import { validateDevice } from '../../database/devices.js';
 import { insertFood } from '../../database/food.js';
-import { insertSleepCycle } from '../../database/sleep.js';
 import { insertSteps } from '../../database/steps.js';
 import { insertTimeTracking } from '../../database/timetracking.js';
 import { insertWeight } from '../../database/weight.js';
@@ -11,8 +10,6 @@ import { trimStrings } from '../../lib/middleware/trimStrings.js';
 const log = new Logger('Health');
 
 const router = express.Router();
-
-router.use(trimStrings);
 
 const validateAuth = (req, res, next) => {
 	try {
@@ -27,21 +24,16 @@ const validateAuth = (req, res, next) => {
 	}
 };
 
-router.post('/sleep', validateAuth, (req, res) => {
+router.use(trimStrings);
+router.use(validateAuth);
+
+router.post('/steps', (req, res) => {
 	try {
-		const { createdAt, type, stepsToday } = req.body;
+		const { createdAt, steps } = req.body;
 
-		log.info(`${type} at '${createdAt}'`);
+		log.info(`Steps: ${steps} at '${createdAt}`);
 
-		const isSleep = type?.toLowerCase() === 'sleep';
-		insertSleepCycle(createdAt, isSleep, req.deviceId);
-
-		// This gets logged in the "sleep" API request because
-		// this request gets sent once per day when no more steps will
-		// be taken. It's the perfect opportunity.
-		if (stepsToday && isSleep) {
-			insertSteps(stepsToday, createdAt, req.deviceId);
-		}
+		insertSteps(steps, createdAt, req.deviceId);
 
 		res.send({ status: 'ok' });
 	} catch (err) {
@@ -50,7 +42,7 @@ router.post('/sleep', validateAuth, (req, res) => {
 	}
 });
 
-router.post('/weight', validateAuth, (req, res) => {
+router.post('/weight', (req, res) => {
 	try {
 		const { createdAt, weightKgs } = req.body;
 
@@ -64,12 +56,12 @@ router.post('/weight', validateAuth, (req, res) => {
 	}
 });
 
-router.post('/time', validateAuth, (req, res) => {
+router.post('/time', (req, res) => {
 	try {
-		const { createdAt, category } = req.body;
+		const { createdAt, endedAt, category } = req.body;
 
 		log.info(`Time: ${category} started at ${createdAt}`);
-		insertTimeTracking(category, createdAt, req.deviceId);
+		insertTimeTracking(category, createdAt, endedAt, req.deviceId);
 
 		res.send({ status: 'ok' });
 	} catch (err) {
@@ -78,7 +70,7 @@ router.post('/time', validateAuth, (req, res) => {
 	}
 });
 
-router.post('/food', validateAuth, (req, res) => {
+router.post('/food', (req, res) => {
 	try {
 		const { createdAt, name, type } = req.body;
 

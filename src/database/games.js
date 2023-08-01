@@ -54,7 +54,7 @@ export function updateActivity (name, playtime_mins, url, device_id, intervalDur
 	}
 
 	const updateStatement = getStatement(
-		'updateGameActivity',
+		'updateGameActivityInternal',
 		`UPDATE games
 		SET playtime_mins = $playtime_mins,
 		    updated_at = $updated_at

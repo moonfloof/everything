@@ -25,11 +25,12 @@ router.get('/', (req, res) => {
 // CRUD
 
 router.post('/', (req, res) => {
-	const { category, created_at } = req.body;
+	const { category, created_at, ended_at } = req.body;
 
 	insertTimeTracking(
 		category,
-		new Date(created_at || Date.now()).toISOString(),
+		created_at || Date.now(),
+		ended_at,
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	);
 

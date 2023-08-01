@@ -2,86 +2,94 @@ import { v4 as uuid } from 'uuid';
 import { calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
-export const categoryValues = [
-	'Stop Current',
-	'Toilet',
-	'Cooking/Eating',
-	'Work',
-	'Leisure',
-	'Productive',
-	'Distraction',
-	'Social',
-	'Hygiene',
-	'Housework',
-	'Exercise',
-	'Travel',
-	'Meeting',
-];
+export const CATEGORIES = {
+	STOP: 'Stop Current',
+	TOILET: 'Toilet',
+	COOKING: 'Cooking/Eating',
+	WORK: 'Work',
+	LEISURE: 'Leisure',
+	PRODUCTIVE: 'Productive',
+	DISTRACTION: 'Distraction',
+	SOCIAL: 'Social',
+	HYGIENE: 'Hygiene',
+	HOUSEWORK: 'Housework',
+	EXERCISE: 'Exercise',
+	TRAVEL: 'Travel',
+	MEETING: 'Meeting',
+	SLEEP: 'Sleep',
+	NAP: 'Nap',
+};
 
-function insertNewRecord (category, created_at, device_id) {
+export const categoryValues = Object.values(CATEGORIES);
+
+/**
+ * @param {string} category
+ * @param {string} created_at
+ * @param {string} ended_at
+ * @param {string} device_id
+ */
+function insertNewRecord (category, created_at, ended_at, device_id) {
 	const statement = getStatement(
 		'insertTimeTracking',
 		`INSERT INTO timetracking
-		(id, category, created_at, duration_secs, device_id)
+		(id, category, created_at, ended_at, device_id)
 		VALUES
-		($id, $category, $created_at, 0, $device_id)`,
+		($id, $category, $created_at, $ended_at, $device_id)`,
 	);
 
 	return statement.run({
 		id: uuid(),
 		category,
 		created_at: new Date(created_at).toISOString(),
+		ended_at: ended_at ? new Date(ended_at).toISOString() : null,
 		device_id,
 	});
 }
 
-function endTimeTrackingSession (id, created_at, timestamp) {
+/**
+ * @param {string} id
+ * @param {string} ended_at
+ */
+function endTimeTrackingSession (id, ended_at) {
 	const updateStatement = getStatement(
 		'endTimeTrackingSession',
 		`UPDATE timetracking
-		SET
-			ended_at = $ended_at,
-			duration_secs = $duration_secs
+		SET ended_at = $ended_at
 		WHERE id = $id`,
 	);
 
-	const started_at = new Date(created_at);
-	const ended_at = new Date(timestamp);
-
-	const duration_secs = (ended_at - started_at) / 1000;
-
 	updateStatement.run({
 		id,
-		duration_secs,
-		ended_at: ended_at.toISOString(),
+		ended_at: new Date(ended_at).toISOString(),
 	});
 }
 
 /**
  * @export
  * @param {string} category
- * @param {string} timestamp
+ * @param {string} created_at
+ * @param {string} ended_at
  * @param {string} device_id
  * @return {void}
  */
-export function insertTimeTracking (category, created_at, device_id) {
+export function insertTimeTracking (category, created_at, ended_at, device_id) {
 	const selectStatement = getStatement(
 		'selectTimeTracking',
-		`SELECT * FROM timetracking
+		`SELECT id FROM timetracking
 		WHERE ended_at IS NULL
 		ORDER BY created_at DESC
 		LIMIT 1`,
 	);
 
-	const row = selectStatement.get();
-
-	if (row !== undefined) {
-		endTimeTrackingSession(row.id, row.created_at, created_at);
+	// End the previous event, if there is one unfinished
+	const eventWithoutEnd = selectStatement.get();
+	if (eventWithoutEnd && !ended_at) {
+		endTimeTrackingSession(eventWithoutEnd.id, created_at);
 	}
 
 	if (category.toLowerCase().startsWith('stop')) return;
 
-	insertNewRecord(category, created_at, device_id);
+	insertNewRecord(category, created_at, ended_at, device_id);
 }
 
 /**
@@ -132,21 +140,14 @@ export function updateTimeTracking (id, category, created_at, ended_at) {
 		`UPDATE timetracking
 		SET category = $category,
 		    created_at = $created_at,
-		    ended_at = $ended_at,
-		    duration_secs = $duration_secs
+		    ended_at = $ended_at
 		WHERE id = $id`,
 	);
-
-	const ended_at_date = new Date(ended_at || Date.now());
-	const created_at_date = new Date(created_at);
-
-	const duration_secs = (ended_at_date - created_at_date) / 1000;
 
 	return statement.run({
 		id,
 		category,
 		created_at,
-		ended_at: ended_at_date.toISOString(),
-		duration_secs,
+		ended_at: new Date(ended_at || Date.now()).toISOString(),
 	});
 }
