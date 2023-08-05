@@ -62,12 +62,25 @@ Data is entered using the internal CRUD API.
 
 ## Installation
 
-* Create a SQLite database, running all the migrations in order of date inside
-  the `migrations` folder
+### Prerequisites
+
+* Create a SQLite database file, running all the migrations in order of date
+  inside the `migrations` folder
 * Add at least one device to the `devices` table (where `id` is a UUID)
-* `npm install`
 * Copy `.env.template` to `.env` and modify values as you see fit. **Most of the
-  setup instructions appear in this file**, as they are specific to each service
-  you'd like to track.
+  setup instructions you'll need already appear within the .env file**, as they
+  are specific to each service you'd like to track.
+
+### Running NPM on bare metal
+
+* `npm install`
 * `npm run start:production` (or your preferred way of managing node 
   applications, eg. `forever`, `pm2`, etc)
+
+### Running via Docker
+
+The `Dockerfile` and `docker-compose.yml` have been set up in such a way that
+you should only need to edit the `.env` file to make configuration changes. As
+such, all that's required is:
+
+* `docker compose up -d`

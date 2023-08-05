@@ -130,5 +130,5 @@ psd
 thumb
 sketch
 
-data/
+data/*.json
 *.db
