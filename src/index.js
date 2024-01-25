@@ -11,6 +11,7 @@ import { pollForLikedVideos } from './adapters/youtube.js';
 import { pollForGameActivity } from './adapters/steam.js';
 import { pollForCacheDeletion } from './lib/middleware/cachePage.js';
 import { pollForFilmActivity } from './adapters/letterboxd.js';
+import { pollForPsnActivity } from './adapters/psn.js';
 
 const log = new Logger('http');
 
@@ -22,6 +23,7 @@ pollForLikedVideos();
 pollForGameActivity();
 pollForCacheDeletion();
 pollForFilmActivity();
+pollForPsnActivity();
 
 // Start servers
 appExternal();
