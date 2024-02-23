@@ -22,11 +22,14 @@ better way to do it).
   [Overland API](https://github.com/aaronpk/Overland-iOS#api) by
   [Aaron Parecki](https://aaronparecki.com/). Also updates latest phone battery.
 * **Scrobbles** - Custom implementation of the
-  [ListenBrainz API](https://listenbrainz-server.readthedocs.io/en/latest/dev/api.html), point your scrobbler to `/api/listenbrainz`
+  [ListenBrainz API](https://listenbrainz-server.readthedocs.io/en/latest/dev/api.html),
+  by pointing your scrobbler to `/api/listenbrainz`.
 * **YouTube Likes** - Polls the
   [Google API](https://developers.google.com/youtube/v3/) to get newly liked
-  videos, or automate POST requests using IFTTT (I have found the former to be
-  quite flaky, so rely on IFTTT).
+  videos, automate POST requests using IFTTT, Zapier or equivalent, or by
+  posting a message in Discord.  
+  By default, the Google API limits refresh tokens to 7 days, so I've found this
+  to be unreliable.
 * **Steam game activity** - Polls the
   [Steam Web API](https://developer.valvesoftware.com/wiki/Steam_Web_API) to get
   recently played games
@@ -58,7 +61,25 @@ Data is entered using the internal CRUD API.
   and making a POST request to `/api/bookmarks` with a JSON body containing
   `apiKey`, `title`, `url` as properties.
 
----
+## Discord Bot
+
+By providing `TOMBOIS_DISCORD_TOKEN` and `TOMBOIS_DISCORD_CHANNELID` environment
+variables, and creating a custom Discord bot to join a personal server, you can
+have a quick way to post data to the site, which also works quite well with
+automation services who are restricting webhooks behind a paywall (but haven't
+yet made Discord a paid feature).
+
+It currently supports these commands, following this format:
+
+* **YouTube:**  
+  Usage: `youtube <URL> [optional date/time, in ISO format]`  
+  Examples:
+  * `youtube https://www.youtube.com/watch?v=Ku6nJjmEeaw`
+  * `youtube https://youtu.be/BpfXVC9lQnk 2024-02-23T10:45:20.000Z`
+* **Bookmarks:**  
+  Usage: `bookmark <URL> <TITLE>`  
+  Example:
+  * `bookmark https://floof.fm moonfloof`
 
 ## Installation
 
