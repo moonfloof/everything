@@ -12,6 +12,7 @@ import { pollForGameActivity } from './adapters/steam.js';
 import { pollForCacheDeletion } from './lib/middleware/cachePage.js';
 import { pollForFilmActivity } from './adapters/letterboxd.js';
 import { pollForPsnActivity } from './adapters/psn.js';
+import { getDiscordClient } from './adapters/discord.js';
 
 const log = new Logger('http');
 
@@ -28,6 +29,9 @@ pollForPsnActivity();
 // Start servers
 appExternal();
 appInternal();
+
+// Start Discord bot
+getDiscordClient();
 
 process.on('exit', async () => {
 	log.info('Exiting - closing database');

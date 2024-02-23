@@ -27,7 +27,7 @@ router.post('/like', async (req, res) => {
 
 		insertYouTubeLike(
 			url,
-			title,
+			details?.snippet?.title || title,
 			details?.snippet?.channelTitle || 'N/A',
 			deviceId,
 		);
