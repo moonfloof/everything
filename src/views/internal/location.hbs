@@ -62,17 +62,19 @@
 
 	const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 		maxZoom: 17,
-		attribution: "&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>"
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	}).addTo(map);
 
 	{{{points}}}.forEach(point => {
 		L.marker(point.latlng, { title: point.title }).addTo(map);
 	});
 
+	const paths = {{{paths}}};
+
 	if ("{{{format}}}" === "heatmap") {
-		L.heatLayer({{{paths}}}, { radius: 10 }).addTo(map);
+		L.heatLayer(paths, { radius: 10 }).addTo(map);
 	} else {
-		const lines = L.polyline({{{paths}}}, { color: "red" }).addTo(map);
+		const lines = L.polyline(paths, { color: "red" }).addTo(map);
 		map.fitBounds(lines.getBounds());
 	}
 
