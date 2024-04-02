@@ -20,6 +20,7 @@ import scrobble from './routers/internal/scrobble.js';
 import tv from './routers/internal/tv.js';
 import films from './routers/internal/films.js';
 import books from './routers/internal/books.js';
+import location from './routers/internal/location.js';
 
 const log = new Logger('server-int');
 
@@ -44,6 +45,7 @@ app.use('/tv', tv);
 app.use('/films', films);
 app.use('/books', books);
 app.use('/notes', notes);
+app.use('/location', location);
 app.use('/', frontend);
 
 // eslint-disable-next-line no-unused-vars

@@ -1,0 +1,38 @@
+</div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+	#map {
+		width: 100%;
+		height: 100%;
+		max-width: 100vw;
+		max-height: 100vh;
+	}
+	.fullwidth {
+		width: 100%;
+		height: calc(100vh - 200px);
+	}
+	svg {height: auto; width: auto}
+	@media (max-width: 1280px) {
+
+	}
+</style>
+<div class="fullwidth">
+<div id="map"></div>
+<script>
+	const map = L.map('map').setView([{{{avgLat}}}, {{{avgLong}}}], 9);
+
+	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 17,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+
+	{{{points}}}.forEach(point => {
+		L.marker(point.latlng, { title: point.title }).addTo(map);
+	});
+
+	const lines = L.polyline({{{paths}}}, { color: 'red' }).addTo(map);
+	map.fitBounds(lines.getBounds());
+</script>
+</div>
+<div class="container" style="padding: 0 !important">
