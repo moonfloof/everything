@@ -38,3 +38,15 @@ export function getLatestCity () {
 
 	return statement.get({ created_at })?.city;
 }
+
+export function getLocationHistory (date_start, date_end) {
+	const statement = getStatement(
+		'getLocationHistory',
+		`SELECT lat, long, city FROM location
+		WHERE created_at >= $date_start AND
+		      created_at <= $date_end
+		ORDER BY created_at ASC`,
+	);
+
+	return statement.all({ date_start, date_end });
+}
