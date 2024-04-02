@@ -402,6 +402,7 @@ textarea.right {
 }
 
 input[type="submit"],
+input[type="date"],
 select {
 	padding: 6px 12px;
 }
