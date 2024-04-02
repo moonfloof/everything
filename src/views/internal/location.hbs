@@ -1,6 +1,7 @@
 </div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
 <style>
 	#map {
 		width: 100%;
@@ -31,8 +32,10 @@
 		L.marker(point.latlng, { title: point.title }).addTo(map);
 	});
 
-	const lines = L.polyline({{{paths}}}, { color: 'red' }).addTo(map);
-	map.fitBounds(lines.getBounds());
+	//const lines = L.polyline({{{paths}}}, { color: 'red' }).addTo(map);
+	//map.fitBounds(lines.getBounds());
+
+	L.heatLayer({{{paths}}}, { radius: 10 }).addTo(map);
 </script>
 </div>
 <div class="container" style="padding: 0 !important">
