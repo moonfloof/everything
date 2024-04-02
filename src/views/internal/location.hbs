@@ -3,39 +3,79 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
 <style>
-	#map {
-		width: 100%;
-		height: 100%;
-		max-width: 100vw;
-		max-height: 100vh;
-	}
 	.fullwidth {
+		position: relative;
 		width: 100%;
 		height: calc(100vh - 200px);
 	}
-	svg {height: auto; width: auto}
-	@media (max-width: 1280px) {
 
+	#map {
+		position: absolute;
+		width: 100%;
+		height: calc(100% - 16px);
+	}
+
+	form {
+		margin-top: -32px;
+		padding: 0 16px 16px 16px;
+	}
+
+	input,
+	select {
+		margin-right: 16px;
+	}
+
+	svg {
+		height: auto;
+		width: auto;
+	}
+
+	@media (max-width: 660px) {
+		label {
+			display: block;
+			margin-top: 8px;
+		}
 	}
 </style>
 <div class="fullwidth">
+<form method="get" action="" class="">
+	<label for="input-format">Format:</label>
+	<select id="input-format" name="format">
+		{{#each formatOptions as |option|}}
+			<option
+				{{#if option.selected}}selected{{/if}}
+				value="{{option.value}}"
+			>{{option.value}}</option>
+		{{/each}}
+	</select>
+
+	<label for="input-datestart">Date Start:</label>
+	<input id="input-datestart" type="date" name="date_start" value="{{date_start}}" max="{{dateToday}}" />
+
+	<label for="input-dateend">Date End:</label>
+	<input id="input-dateend" type="date" name="date_end" value="{{date_end}}" max="{{dateToday}}" />
+	<input type="submit" value="Go" />
+</form>
 <div id="map"></div>
 <script>
-	const map = L.map('map').setView([{{{avgLat}}}, {{{avgLong}}}], 9);
+	const map = L.map("map").setView([{{{avgLat}}}, {{{avgLong}}}], 9);
 
-	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 		maxZoom: 17,
-		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		attribution: "&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>"
 	}).addTo(map);
 
 	{{{points}}}.forEach(point => {
 		L.marker(point.latlng, { title: point.title }).addTo(map);
 	});
 
-	//const lines = L.polyline({{{paths}}}, { color: 'red' }).addTo(map);
-	//map.fitBounds(lines.getBounds());
+	if ("{{{format}}}" === "heatmap") {
+		L.heatLayer({{{paths}}}, { radius: 10 }).addTo(map);
+	} else {
+		const lines = L.polyline({{{paths}}}, { color: "red" }).addTo(map);
+		map.fitBounds(lines.getBounds());
+	}
 
-	L.heatLayer({{{paths}}}, { radius: 10 }).addTo(map);
 </script>
 </div>
 <div class="container" style="padding: 0 !important">
