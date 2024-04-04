@@ -407,6 +407,18 @@ select {
 	padding: 6px 12px;
 }
 
+[data-tooltip]:hover::after {
+	display: block;
+	position: absolute;
+	content: attr(data-tooltip);
+	border: 2px solid var(--primary-fg);
+	border-radius: 6px;
+	background-color: var(--primary-bg);
+	color: var(--primary-fg);
+	padding: 4px 8px;
+	z-index: 10000;
+}
+
 @media (max-width: 660px) {
 	.container {
 		padding: 48px 24px;

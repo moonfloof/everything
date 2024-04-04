@@ -98,6 +98,7 @@ router.get('/', (req, res) => {
 		avgLong,
 		paths: JSON.stringify(paths),
 		points: JSON.stringify(points),
+		pointsTotal: location.length,
 		format,
 		dateToday: formatDate(new Date()),
 		date_start,
