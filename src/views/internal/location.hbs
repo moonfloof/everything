@@ -30,6 +30,11 @@
 		width: auto;
 	}
 
+	.tooltip-info {
+		cursor: pointer;
+		padding: 1px 4px;
+	}
+
 	@media (max-width: 660px) {
 		label {
 			display: block;
@@ -38,7 +43,9 @@
 	}
 </style>
 <div class="fullwidth">
-<form method="get" action="" class="">
+<form method="get" action="">
+	<span class="tooltip-info" data-tooltip="{{pointsTotal}} location entries">📈</span>
+
 	<label for="input-format">Format:</label>
 	<select id="input-format" name="format">
 		{{#each formatOptions as |option|}}
