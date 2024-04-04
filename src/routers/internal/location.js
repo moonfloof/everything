@@ -22,11 +22,14 @@ router.get('/', (req, res) => {
 		throw new Error('Date Start and End must be an ISO date formatted string (eg. "2024-01-02"');
 	}
 
-	if (new Date(date_end) < new Date(date_start)) {
+	const dateStartDate = new Date(date_start);
+	const dateEndDate = new Date(date_end);
+
+	if (dateEndDate < dateStartDate) {
 		throw new Error('Date End cannot be before Date Start');
 	}
 
-	const location = getLocationHistory(date_start, date_end);
+	const location = getLocationHistory(dateStartDate, dateEndDate);
 
 	const avgLat = location.reduce((acc, cur) => acc + cur.lat, 0) / location.length;
 	const avgLong = location.reduce((acc, cur) => acc + cur.long, 0) / location.length;
