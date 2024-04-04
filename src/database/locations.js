@@ -39,6 +39,10 @@ export function getLatestCity () {
 	return statement.get({ created_at })?.city;
 }
 
+/**
+ * @param {Date} date_start
+ * @param {Date} date_end
+ */
 export function getLocationHistory (date_start, date_end) {
 	const statement = getStatement(
 		'getLocationHistory',
@@ -48,5 +52,8 @@ export function getLocationHistory (date_start, date_end) {
 		ORDER BY created_at ASC`,
 	);
 
-	return statement.all({ date_start, date_end });
+	return statement.all({
+		date_start: date_start.toISOString(),
+		date_end: new Date(date_end.getTime() + dayMs).toISOString(),
+	});
 }
