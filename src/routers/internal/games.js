@@ -1,5 +1,16 @@
 import express from 'express';
-import { countGameActivity, deleteGameActivity, getGameActivity, insertNewGameActivity, updateGameActivity } from '../../database/games.js';
+import {
+	countGameActivity,
+	deleteGameActivity,
+	getGameActivity,
+	insertNewGameActivity,
+	updateGameActivity,
+} from '../../database/games.js';
+import {
+	deleteGameAchievement,
+	insertNewGameAchievement,
+	updateGameAchievement,
+} from '../../database/gameachievements.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -43,6 +54,60 @@ router.post('/:id', (req, res) => {
 	}
 
 	res.redirect('/games');
+});
+
+// Modify Achievements
+
+router.get('/:id/achievements', (req, res) => {
+	const { id } = req.params;
+
+	const [ game ] = getGameActivity({ id });
+
+	if (!game) {
+		res.redirect('/games');
+		return;
+	}
+
+	res.render('internal/game-achievements', { id, game, achievements: game.achievements.length });
+});
+
+router.post('/:game_id/achievements', (req, res) => {
+	const { game_id } = req.params;
+	const { id, crudType, name, description, created_at } = req.body;
+
+	const [ game ] = getGameActivity({ id: game_id });
+
+	if (!game) {
+		res.redirect(`/games/${game_id}/achievements`);
+		return;
+	}
+
+	switch (crudType) {
+		case 'new':
+			insertNewGameAchievement(
+				name,
+				description,
+				game.name,
+				game_id,
+				process.env.TOMBOIS_DEFAULT_DEVICE_ID,
+				created_at,
+			);
+			break;
+
+		case 'delete':
+			deleteGameAchievement(id);
+			break;
+
+		case 'update':
+			updateGameAchievement(id, name, description, created_at);
+			break;
+
+		default:
+			// Do nothing
+			break;
+	}
+
+	res.redirect(`/games/${game_id}/achievements`);
 });
 
 export default router;

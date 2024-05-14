@@ -11,6 +11,17 @@
 			{{> internal/crudRow emoji="🕙" name="updated_at" value=data.updated_at }}
 		{{/if}}
 
+		{{#if data.id}}
+		<div class="row">
+			<div class="left">🏆</div>
+			<div class="right">
+				<a href="/games/{{data.id}}/achievements">
+					Edit Achievements
+				</a>
+			</div>
+		</div>
+		{{/if}}
+
 		{{> internal/crudSubmit }}
 	</div>
 </form>
