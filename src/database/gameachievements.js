@@ -60,7 +60,7 @@ export function getGameAchievement (parameters) {
 export function getGameAchievementsForSession (game_id) {
 	const statement = getStatement(
 		'getGameAchievementsForSession',
-		`SELECT name, description, created_at FROM gameachievements
+		`SELECT id, name, description, created_at FROM gameachievements
 		WHERE game_id = $game_id
 		ORDER BY created_at ASC`,
 	);
@@ -86,24 +86,20 @@ export function deleteGameAchievement (id) {
 	return statement.run({ id });
 }
 
-export function updateGameAchievement (id, name, playtime_mins, url, created_at, updated_at) {
+export function updateGameAchievement (id, name, description, created_at) {
 	const statement = getStatement(
 		'updateGameAchievement',
 		`UPDATE gameachievements
 		SET name = $name,
-		    playtime_mins = $playtime_mins,
-		    url = $url,
+		    description = $description,
 		    created_at = $created_at,
-		    updated_at = $updated_at
 		WHERE id = $id`,
 	);
 
 	return statement.run({
 		id,
 		name,
-		playtime_mins: Number(playtime_mins),
-		url,
+		description,
 		created_at,
-		updated_at,
 	});
 }

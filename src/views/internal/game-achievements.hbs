@@ -1,0 +1,15 @@
+
+{{> pageHeader title="Game Achievements" url="/games" }}
+
+<p class="sectioncontainer">
+	Editing <strong>{{achievements}}</strong> achievements for
+	<strong>{{game.name}}</strong> session, which lasted
+	<strong>{{game.duration}}</strong>.
+</p>
+
+{{> internal/game-achievement game_id=id }}
+<hr />
+
+{{#each game.achievements as |achievement| }}
+	{{> internal/game-achievement game_id=../id data=achievement }}
+{{/each}}

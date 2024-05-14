@@ -1,0 +1,14 @@
+<form method="POST" action="/games/{{game_id}}/achievements">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id }}
+		<input type="hidden" name="id" value="{{data.id}}" />
+
+		{{> internal/crudRow emoji="🎮" name="name" value=data.name }}
+		{{> internal/crudRow emoji="📓" name="description" value=data.description }}
+		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+		{{#unless data.id}}
+			<input type="hidden" name="crudType" value="new" />
+		{{/unless}}
+		{{> internal/crudSubmit }}
+	</div>
+</form>
