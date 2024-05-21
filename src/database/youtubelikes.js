@@ -3,6 +3,14 @@ import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { calculateGetParameters } from './constants.js';
 
+/**
+ * @param {string} url
+ * @param {string} title
+ * @param {string} channel
+ * @param {string} device_id
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertYouTubeLike (url, title, channel, device_id, created_at) {
 	const statement = getStatement(
 		'insertYouTubeLike',
@@ -49,6 +57,7 @@ export function getLikes (parameters) {
 		}));
 }
 
+/** @return {number} */
 export function countYouTubeLikes () {
 	const statement = getStatement(
 		'countYouTubeLikes',
@@ -58,6 +67,10 @@ export function countYouTubeLikes () {
 	return statement.get().total;
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteYouTubeLike (id) {
 	const statement = getStatement(
 		'deleteYouTubeLike',
@@ -67,6 +80,14 @@ export function deleteYouTubeLike (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} url
+ * @param {string} title
+ * @param {string} channel
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateYouTubeLike (id, url, title, channel, created_at) {
 	const statement = getStatement(
 		'updateYouTubeLike',

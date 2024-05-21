@@ -4,6 +4,15 @@ import timeago from '../adapters/timeago.js';
 import { isoDuration, minuteMs, prettyDuration } from '../lib/formatDate.js';
 import { calculateGetParameters } from './constants.js';
 
+/**
+ * @param {string} name
+ * @param {string} description
+ * @param {string} game_name
+ * @param {string} game_id
+ * @param {string} device_id
+ * @param {string} created_at
+ * @returns {import('better-sqlite3').RunResult}
+ */
 export function insertNewGameAchievement (name, description, game_name, game_id, device_id, created_at) {
 	const id = uuid();
 
@@ -68,6 +77,7 @@ export function getGameAchievementsForSession (game_id) {
 	return statement.all({ game_id });
 }
 
+/** @return {number} */
 export function countGameAchievement () {
 	const statement = getStatement(
 		'countGameAchievement',
@@ -77,6 +87,10 @@ export function countGameAchievement () {
 	return statement.get().total;
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteGameAchievement (id) {
 	const statement = getStatement(
 		'deleteGameAchievement',
@@ -86,6 +100,13 @@ export function deleteGameAchievement (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {string} description
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateGameAchievement (id, name, description, created_at) {
 	const statement = getStatement(
 		'updateGameAchievement',

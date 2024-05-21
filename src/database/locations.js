@@ -2,6 +2,14 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import { dayMs } from '../lib/formatDate.js';
 
+/**
+ * @param {number} lat
+ * @param {number} long
+ * @param {string} city
+ * @param {string} created_at
+ * @param {string} device_id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertLocation (lat, long, city, created_at, device_id) {
 	const id = uuid();
 
@@ -23,6 +31,7 @@ export function insertLocation (lat, long, city, created_at, device_id) {
 	});
 }
 
+/** @return {string|undefined} */
 export function getLatestCity () {
 	const statement = getStatement(
 		'getLatestCity',

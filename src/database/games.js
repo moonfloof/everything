@@ -5,6 +5,14 @@ import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
 import { getGameAchievementsForSession } from './gameachievements.js';
 
+/**
+ * @param {string} name
+ * @param {string} device_id
+ * @param {number} [playtime_mins=0]
+ * @param {string} url
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, created_at) {
 	const id = uuid();
 	const updated_at = new Date().toISOString();
@@ -33,6 +41,14 @@ export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, 
 	};
 }
 
+/**
+ * @param {string} name
+ * @param {number} playtime_mins
+ * @param {string} url
+ * @param {string} device_id
+ * @param {number} intervalDuration
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateActivity (name, playtime_mins, url, device_id, intervalDuration) {
 	const selectStatement = getStatement(
 		'getGameActivityByName',
@@ -143,6 +159,7 @@ export function getGameActivityByDay (days = 7) {
  * Fetch total duration of games played from the last two weeks
  *
  * @export
+ * @param {number} [days=14]
  * @return {object[]}
  */
 export function getGameActivityGroupedByDay (days = 14) {
@@ -229,6 +246,7 @@ export function getGameStats () {
 	return stats;
 }
 
+/** @return {number} */
 export function countGameActivity () {
 	const statement = getStatement(
 		'countGameActivity',
@@ -238,6 +256,10 @@ export function countGameActivity () {
 	return statement.get().total;
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteGameActivity (id) {
 	const statement = getStatement(
 		'deleteGameActivity',
@@ -247,6 +269,15 @@ export function deleteGameActivity (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {number} playtime_mins
+ * @param {string} url
+ * @param {string} created_at
+ * @param {string} updated_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateGameActivity (id, name, playtime_mins, url, created_at, updated_at) {
 	const statement = getStatement(
 		'updateGameActivity',

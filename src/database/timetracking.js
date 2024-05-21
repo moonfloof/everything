@@ -27,6 +27,7 @@ export const categoryValues = Object.values(CATEGORIES);
  * @param {string} created_at
  * @param {string} ended_at
  * @param {string} device_id
+ * @returns {import('better-sqlite3').RunResult}
  */
 function insertNewRecord (category, created_at, ended_at, device_id) {
 	const statement = getStatement(
@@ -49,6 +50,7 @@ function insertNewRecord (category, created_at, ended_at, device_id) {
 /**
  * @param {string} id
  * @param {string} ended_at
+ * @returns {import('better-sqlite3').RunResult}
  */
 function endTimeTrackingSession (id, ended_at) {
 	const updateStatement = getStatement(
@@ -93,7 +95,6 @@ export function insertTimeTracking (category, created_at, ended_at, device_id) {
 }
 
 /**
- * @export
  * @param {object} parameters
  * @param {string} [parameters.id]
  * @param {number} [parameters.page]
@@ -112,6 +113,7 @@ export function getTimeTracking (parameters) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
+/** @return {number} */
 export function countTimeTracking () {
 	const statement = getStatement(
 		'countTimeTracking',
@@ -121,6 +123,10 @@ export function countTimeTracking () {
 	return statement.get().total;
 }
 
+/**
+ * @param {string} id
+ * @returns {import('better-sqlite3').RunResult}
+ */
 export function deleteTimeTracking (id) {
 	const statement = getStatement(
 		'deleteTimeTracking',
@@ -130,6 +136,13 @@ export function deleteTimeTracking (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} category
+ * @param {string} created_at
+ * @param {string} ended_at
+ * @returns {import('better-sqlite3').RunResult}
+ */
 export function updateTimeTracking (id, category, created_at, ended_at) {
 	if (category?.toLowerCase().startsWith('stop')) {
 		return;

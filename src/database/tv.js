@@ -7,9 +7,9 @@ import { calculateGetParameters } from './constants.js';
  * @export
  * @param {string} series_title
  * @param {string} episode_title
- * @param {Date}   created_at
+ * @param {string} created_at
  * @param {string} device_id
- * @return {Promise<any>}
+ * @return {import('better-sqlite3').RunResult}
  */
 export function insertEpisode (series_title, episode_title, created_at, device_id) {
 	const id = uuid();
@@ -58,6 +58,10 @@ export function getEpisodes (parameters) {
 		}));
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteEpisode (id) {
 	const statement = getStatement(
 		'deleteEpisode',
@@ -66,6 +70,13 @@ export function deleteEpisode (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} series_title
+ * @param {string} episode_title
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateEpisode (id, series_title, episode_title, created_at) {
 	const statement = getStatement(
 		'updateEpisode',
@@ -84,6 +95,7 @@ export function updateEpisode (id, series_title, episode_title, created_at) {
 	});
 }
 
+/** @return {number} */
 export function countEpisodes () {
 	const statement = getStatement(
 		'countEpisodes',

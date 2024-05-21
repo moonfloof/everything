@@ -2,6 +2,12 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
 
+/**
+ * @param {number} weight_kgs
+ * @param {string} created_at
+ * @param {string} device_id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertWeight (weight_kgs, created_at, device_id) {
 	const statement = getStatement(
 		'insertWeight',
@@ -41,6 +47,7 @@ export function getWeight (parameters) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
+/** @return {number} */
 export function countWeight () {
 	const statement = getStatement(
 		'countWeight',
@@ -50,6 +57,10 @@ export function countWeight () {
 	return statement.get().total;
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteWeight (id) {
 	const statement = getStatement(
 		'deleteWeight',
@@ -59,6 +70,12 @@ export function deleteWeight (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {number} weight_kgs
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateWeight (id, weight_kgs, created_at) {
 	const statement = getStatement(
 		'updateWeight',

@@ -9,6 +9,14 @@ const log = new Logger('Overland');
 
 const router = express.Router();
 
+/**
+ * @typedef {object} Location
+ * @prop {object} properties
+ * @prop {number} properties.timestamp
+ * @prop {object} geometry
+ * @prop {number[]} geometry.coordinates
+ */
+
 // Overland
 router.post('/overland', async (req, res) => {
 	try {
@@ -24,7 +32,8 @@ router.post('/overland', async (req, res) => {
 			throw new Error('Please send at least one location');
 		}
 
-		const { locations } = req.body;
+		/** @type {Location[]} */
+		const locations = req.body.locations;
 
 		log.debug(`Received ${locations.length} locations to process`);
 

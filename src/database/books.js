@@ -24,7 +24,7 @@ import { prettyDate } from '../lib/formatDate.js';
 /**
  * @export
  * @param {Book} book
- * @return {*}
+ * @returns {import('better-sqlite3').RunResult}
  */
 export function insertBook (book) {
 	const id = uuid();
@@ -93,6 +93,7 @@ export function getBooks (parameters) {
 /**
  * @export
  * @param {string} id
+ * @returns {import('better-sqlite3').RunResult}
  */
 export function deleteBook (id) {
 	const statement = getStatement(
@@ -107,6 +108,7 @@ export function deleteBook (id) {
  * @export
  * @param {string} id
  * @param {Book} book
+ * @returns {import('better-sqlite3').RunResult}
  */
 export function updateBook (id, book) {
 	const statement = getStatement(
