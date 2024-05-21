@@ -334,7 +334,8 @@ table td {
 
 /** GAME ACHIEVEMENTS **/
 
-.game-achievements--container {
+.game-achievements--container,
+.listen-compact--tracklist {
 	font-size: 14px;
 	margin-top: 8px;
 }

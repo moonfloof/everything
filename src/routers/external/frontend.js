@@ -376,9 +376,33 @@ router.get('/feed', getCache(), async (req, res) => {
 		data,
 	}));
 
+	const groupListens = (listens) => listens.reduce((albums, listen) => {
+		if (
+			albums.length === 0 ||
+			albums[albums.length - 1].album !== listen.album ||
+			albums[albums.length - 1].artist !== listen.artist
+		) {
+			albums.push({
+				artist: listen.artist,
+				album: listen.album,
+				created_at: listen.created_at,
+				timeago: listen.timeago,
+				tracks: [ { title: listen.title, id: listen.id } ],
+				count: 1,
+				countText: 'song',
+			});
+			return albums;
+		}
+
+		albums[albums.length - 1].tracks.push({ title: listen.title, id: listen.id });
+		albums[albums.length - 1].count += 1;
+		albums[albums.length - 1].countText = 'songs';
+		return albums;
+	}, []);
+
 	let entries = (await Promise.all([
 		typeMap('game', getGameActivity(parameters)),
-		typeMap('listen', getListens(parameters)),
+		typeMap('listen', groupListens(getListens(parameters))),
 		typeMap('note', getNotes({ ...parameters, status: 'public' })),
 		typeMap('episode', getEpisodes(parameters)),
 		typeMap('film', getFilms(parameters)),
