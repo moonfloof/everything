@@ -1,15 +1,23 @@
 <div class="sectioncontainer h-entry">
 	<div class="u-listen-of h-cite">
-	<div class="row">
-		<span class="left">🎵</span>
-		<span class="right">
-			<strong class="p-name">{{data.title}}</strong>
-			<small>
-				from <strong class="right p-publication">{{data.album}}</strong>
+		<div class="row">
+			<span class="left">🎵</span>
+			<span class="right">
+				<strong><span class="p-publication">{{data.album}}</span></strong>
 				by <strong class="right p-author">{{data.artist}}</strong>
-			</small>
-		</span>
-	</div>
+			</span>
+		</div>
+		<div class="row">
+			<span class="left"></span>
+			<div class="right">
+				Listened to <strong>{{data.count}}</strong> {{data.countText}}:
+				<ul class="right listen-compact--tracklist">
+				{{#each data.tracks as |track|}}
+					<li><a href="/music/{{track.id}}"><strong>{{track.title}}</strong></a></li>
+				{{/each}}
+				</ul>
+			</div>
+		</div>
 	</div>
 	<div class="row">
 		<span class="left"></span>
@@ -18,11 +26,7 @@
 			datetime="{{data.created_at}}"
 			class="right dt-published"
 		>
-			<small>
-				<a href="/music/{{data.id}}" class="u-url u-uid">
-					{{data.timeago}}
-				</a>
-			</small>
+			<small>{{data.timeago}}</small>
 		</time>
 	</div>
 
