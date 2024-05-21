@@ -2,6 +2,13 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
 
+/**
+ * @param {string} title
+ * @param {string} url
+ * @param {string} device_id
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertBookmark (title, url, device_id, created_at) {
 	const statement = getStatement(
 		'insertBookmark',
@@ -43,6 +50,7 @@ export function getBookmarks (parameters) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
+/** @return {number} */
 export function countBookmarks () {
 	const statement = getStatement(
 		'countBookmarks',
@@ -52,6 +60,10 @@ export function countBookmarks () {
 	return statement.get().total;
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteBookmark (id) {
 	const statement = getStatement(
 		'deleteBookmark',
@@ -61,6 +73,13 @@ export function deleteBookmark (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} title
+ * @param {string} url
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateBookmark (id, title, url, created_at) {
 	const statement = getStatement(
 		'updateBookmark',

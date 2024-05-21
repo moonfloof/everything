@@ -19,9 +19,7 @@ export default class Logger {
 		this._label = label;
 	}
 
-	/**
-	 * @param {string} currentLevel Level used by the logging function
-	 */
+	/** @param {string} currentLevel Level used by the logging function */
 	static atLevel (currentLevel) {
 		const targetLevel = levels[process.env.LOG_LEVEL] !== undefined
 			? process.env.LOG_LEVEL

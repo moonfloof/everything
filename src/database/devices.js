@@ -26,6 +26,12 @@ export function getDevices () {
 	return statement.all();
 }
 
+/**
+ * @param {string} id
+ * @param {number} battery_level
+ * @param {string} battery_status
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateDevice (id, battery_level, battery_status) {
 	const statement = getStatement(
 		'updateDevice',

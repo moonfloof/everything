@@ -2,6 +2,15 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
 
+/**
+ * @param {number} amount
+ * @param {string} merchant
+ * @param {string} category
+ * @param {string} currency
+ * @param {string} created_at
+ * @param {string} device_id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertPurchase (amount, merchant, category, currency, created_at, device_id) {
 	const statement = getStatement(
 		'insertPurchase',
@@ -22,6 +31,7 @@ export function insertPurchase (amount, merchant, category, currency, created_at
 	});
 }
 
+/** @return {number} */
 export function countPurchases () {
 	const statement = getStatement(
 		'countPurchases',
@@ -53,6 +63,10 @@ export function getPurchases (parameters) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deletePurchase (id) {
 	const statement = getStatement(
 		'deletePurchase',
@@ -62,6 +76,15 @@ export function deletePurchase (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {number} amount
+ * @param {string} currency
+ * @param {string} merchant
+ * @param {string} category
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updatePurchase (id, amount, currency, merchant, category, created_at) {
 	const statement = getStatement(
 		'updatePurchase',

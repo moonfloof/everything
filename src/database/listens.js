@@ -5,6 +5,19 @@ import { calculateGetParameters } from './constants.js';
 import { dayMs, shortDate } from '../lib/formatDate.js';
 
 /**
+ * @typedef {object} Listen
+ * @prop {string} id             Primary key stored as UUID
+ * @prop {string} artist
+ * @prop {string} album
+ * @prop {string} title
+ * @prop {number} [tracknumber]  Usually not provided by scrobblers
+ * @prop {number} [release_year] See above
+ * @prop {string} [genre]        See above
+ * @prop {string} created_at     ISO timestamp
+ * @prop {string} timeago        Relative timestamp (eg. "3 hours ago")
+ */
+
+/**
  * @export
  * @param {string} artist
  * @param {string} album
@@ -14,7 +27,7 @@ import { dayMs, shortDate } from '../lib/formatDate.js';
  * @param {string} [genre]
  * @param {Date}   created_at
  * @param {string} device_id
- * @return {Promise<any>}
+ * @returns {import('better-sqlite3').RunResult}
  */
 export function insertScrobble (artist, album, title, tracknumber, year, genre, created_at, device_id) {
 	const id = uuid();
@@ -67,6 +80,41 @@ export function getListens (parameters) {
 		}));
 }
 
+/**
+ * @param {Listen[]} listens
+ */
+export function groupListens (listens) {
+	return listens.reduce((albums, listen) => {
+		if (
+			albums.length === 0 ||
+			albums[albums.length - 1].album !== listen.album ||
+			albums[albums.length - 1].artist !== listen.artist
+		) {
+			albums.push({
+				artist: listen.artist,
+				album: listen.album,
+				created_at: listen.created_at,
+				ended_at: listen.created_at,
+				timeago: listen.timeago,
+				tracks: [ { title: listen.title, id: listen.id } ],
+				count: 1,
+				countText: 'song',
+			});
+			return albums;
+		}
+
+		albums[albums.length - 1].tracks.push({ title: listen.title, id: listen.id });
+		albums[albums.length - 1].count += 1;
+		albums[albums.length - 1].countText = 'songs';
+		albums[albums.length - 1].created_at = listen.created_at;
+		return albums;
+	}, []);
+}
+
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteListen (id) {
 	const statement = getStatement(
 		'deleteListen',
@@ -75,6 +123,17 @@ export function deleteListen (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} artist
+ * @param {string} album
+ * @param {string} title
+ * @param {number} tracknumber
+ * @param {number} release_year
+ * @param {string} genre
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateListen (id, artist, album, title, tracknumber, release_year, genre, created_at) {
 	const statement = getStatement(
 		'updateListen',
@@ -101,6 +160,7 @@ export function updateListen (id, artist, album, title, tracknumber, release_yea
 	});
 }
 
+/** @returns {number} */
 export function countListens () {
 	const statement = getStatement(
 		'countListens',

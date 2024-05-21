@@ -13,7 +13,7 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} watched_at
  * @param {string} created_at
  * @param {string} device_id
- * @return {Promise<any>}
+ * @returns {import('better-sqlite3').RunResult}
  */
 export function insertFilm (title, year, rating, review, url, watched_at, created_at, device_id) {
 	const id = uuid();
@@ -66,6 +66,10 @@ export function getFilms (parameters) {
 		}));
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteFilm (id) {
 	const statement = getStatement(
 		'deleteFilm',
@@ -83,6 +87,7 @@ export function deleteFilm (id) {
  * @param {string} url
  * @param {string} watched_at
  * @param {string} created_at
+ * @returns {import('better-sqlite3').RunResult}
  */
 export function updateFilm (id, title, year, rating, review, url, watched_at, created_at) {
 	const statement = getStatement(
@@ -110,9 +115,7 @@ export function updateFilm (id, title, year, rating, review, url, watched_at, cr
 	});
 }
 
-/**
- * @return {number} Number of films recorded in database
- */
+/** @return {number} Number of films recorded in database */
 export function countFilms () {
 	const statement = getStatement(
 		'countFilms',

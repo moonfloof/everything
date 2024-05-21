@@ -24,6 +24,18 @@ export const entryStatusValues = [
 	'private',
 ];
 
+/**
+ * @param {string} description
+ * @param {string} [title]
+ * @param {string} [type]
+ * @param {string} [status]
+ * @param {string} [url]
+ * @param {string} [syndication_json]
+ * @param {string} [created_at]
+ * @param {string} [updated_at]
+ * @param {string} [device_id]
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertNote (
 	description,
 	title = null,
@@ -57,6 +69,10 @@ export function insertNote (
 	});
 }
 
+/**
+ * @param {string} [status]
+ * @return {number}
+ */
 export function countNotes (status = 'public') {
 	const statement = getStatement(
 		'countNotes',
@@ -102,6 +118,10 @@ export function getNotes (parameters) {
 		}));
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteNote (id) {
 	const statement = getStatement(
 		'deleteNote',
@@ -111,6 +131,18 @@ export function deleteNote (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} description
+ * @param {string} title
+ * @param {string} type
+ * @param {string} status
+ * @param {string} url
+ * @param {string} syndication_json
+ * @param {string} created_at
+ * @param {string} [updated_at]
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateNote (
 	id,
 	description,

@@ -3,6 +3,12 @@ import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
 import { dayMs, formatDate } from '../lib/formatDate.js';
 
+/**
+ * @param {number} step_count_total
+ * @param {string} created_at
+ * @param {string} device_id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertSteps (step_count_total, created_at, device_id) {
 	const statement = getStatement(
 		'insertSteps',
@@ -37,8 +43,7 @@ export function getSteps (parameters) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all(calculateGetParameters(parameters));
+	return statement.all(calculateGetParameters(parameters));
 }
 
 export function getStepsYesterday () {
@@ -54,6 +59,7 @@ export function getStepsYesterday () {
 	return statement.all({ created_at: formatDate(yesterday) });
 }
 
+/** @return {number} */
 export function countSteps () {
 	const statement = getStatement(
 		'countSteps',
@@ -63,6 +69,10 @@ export function countSteps () {
 	return statement.get().total;
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteSteps (id) {
 	const statement = getStatement(
 		'deleteSteps',
@@ -72,6 +82,12 @@ export function deleteSteps (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {number} step_count_total
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateSteps (id, step_count_total, created_at) {
 	const statement = getStatement(
 		'updateSteps',

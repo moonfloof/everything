@@ -100,25 +100,15 @@ export function prettyDuration (durationMs) {
 	const hoursRounded = Math.floor(hoursTotal);
 	const minutes = Math.round((hoursTotal - hoursRounded) * 60);
 
-	// const hourUnit = hoursRounded === 1
-	// 	? 'hour'
-	// 	: 'hours';
-
-	// const minuteUnit = minutes === 1
-	// 	? 'minute'
-	// 	: 'minutes';
-
-	const hourUnit = 'h';
-	const minuteUnit = 'm';
-
 	// Convert into string
 	const duration = hoursRounded > 0
-		? `${hoursRounded}${hourUnit} ${minutes}${minuteUnit}`
-		: `${minutes}${minuteUnit}`;
+		? `${hoursRounded}h ${minutes}m`
+		: `${minutes}m`;
 
 	return duration;
 }
 
+/** @param {number} durationMs */
 export function isoDuration (durationMs) {
 	// 60 mins * 60 secs * 1000 ms
 	const hoursTotal = durationMs / 3600000;
@@ -147,7 +137,6 @@ export function getStartOfDay (date = new Date()) {
 /**
  * @param {Date} dateA
  * @param {Date} dateB
- * @returns {boolean}
  */
 export function isSameDate (dateA, dateB) {
 	const yearSame = dateA.getFullYear() === dateB.getFullYear();

@@ -2,6 +2,13 @@ import { v4 as uuid } from 'uuid';
 import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
 
+/**
+ * @param {string} name
+ * @param {string} type
+ * @param {string} created_at
+ * @param {string} device_id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function insertFood (name, type, created_at, device_id) {
 	const statement = getStatement(
 		'insertFood',
@@ -40,6 +47,7 @@ export function getFood (parameters) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
+/** @return {number} */
 export function countFood () {
 	const statement = getStatement(
 		'countFood',
@@ -49,6 +57,10 @@ export function countFood () {
 	return statement.get().total;
 }
 
+/**
+ * @param {string} id
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function deleteFood (id) {
 	const statement = getStatement(
 		'deleteFood',
@@ -58,6 +70,13 @@ export function deleteFood (id) {
 	return statement.run({ id });
 }
 
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {string} type
+ * @param {string} created_at
+ * @return {import('better-sqlite3').RunResult}
+ */
 export function updateFood (id, name, type, created_at) {
 	const statement = getStatement(
 		'updateFood',
