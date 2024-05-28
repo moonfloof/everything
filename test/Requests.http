@@ -1,0 +1,170 @@
+@baseUrl={{$dotenv TOMBOIS_SERVER_EXTERNAL_URI}}
+@apiKey={{$dotenv TOMBOIS_TEST_APIKEY}}
+
+###
+
+GET {{baseUrl}}/api/listenbrainz/1/validate-token?token={{apiKey}}
+
+###
+
+POST {{baseUrl}}/api/youtube/like
+Content-Type: application/json
+
+{
+	"apiKey": "{{apiKey}}",
+	"url": "https://www.youtube.com/watch?v=q1gZeZYweb8",
+	"title": "Space"
+}
+
+###
+
+POST {{baseUrl}}/api/bookmarks
+Content-Type: application/json
+
+{
+	"apiKey": "{{apiKey}}",
+	"url": "https://floof.fm/",
+	"title": "moonfloof"
+}
+
+###
+
+POST {{baseUrl}}/api/health/sleep
+Authorization: {{apiKey}}
+Content-Type: application/json
+
+{
+	"type": "sleep",
+	"createdAt": "{{$datetime iso8601}}"
+}
+
+###
+
+POST {{baseUrl}}/api/health/weight
+Authorization: {{apiKey}}
+Content-Type: application/json
+
+{
+	"weightKgs": 10.0,
+	"createdAt": "{{$datetime iso8601}}"
+}
+
+###
+
+POST {{baseUrl}}/api/device/battery
+Authorization: {{apiKey}}
+Content-Type: application/json
+
+{
+	"battery_level": 56,
+	"battery_state": "charging"
+}
+
+###
+
+POST {{baseUrl}}/api/device/overland?apiKey={{apiKey}}
+Content-Type: application/json
+
+{
+	"locations": [
+		{ "geometry": { "coordinates": [-6.34523,57.68163]}, "properties": { "timestamp": "{{$datetime iso8601 -1 s}}" } },
+		{ "geometry": { "coordinates": [-6.34493,57.68196]}, "properties": { "timestamp": "{{$datetime iso8601 -2 s}}" } },
+		{ "geometry": { "coordinates": [-6.34472,57.68203]}, "properties": { "timestamp": "{{$datetime iso8601 -3 s}}" } },
+		{ "geometry": { "coordinates": [-6.34403,57.68204]}, "properties": { "timestamp": "{{$datetime iso8601 -4 s}}" } }
+	]
+}
+
+### LISTENBRAINZ - Post new scrobbles
+
+POST {{baseUrl}}/api/listenbrainz/1/submit-listens
+Authorization: token {{apiKey}}
+
+{
+	"listen_type": "single",
+	"payload": [
+		{
+			"track_metadata": {
+				"artist_name": "TWICE",
+				"track_name": "Changing!",
+				"release_name": "&TWICE"
+			},
+			"listened_at": {{$timestamp}}
+		},
+		{
+			"track_metadata": {
+				"artist_name": "TWICE",
+				"track_name": "Alcohol-Free",
+				"release_name": "Taste of Love"
+			},
+			"listened_at": {{$timestamp -3 m}}
+		},
+		{
+			"track_metadata": {
+				"artist_name": "TWICE",
+				"track_name": "Baby Blue Love",
+				"release_name": "Taste of Love"
+			},
+			"listened_at": {{$timestamp -6 m}}
+		}
+	]
+}
+
+### LISTENBRAINZ - Set "now playing"
+
+POST {{baseUrl}}/api/listenbrainz/1/submit-listens
+Authorization: token {{apiKey}}
+
+{
+	"listen_type": "playing_now",
+	"payload": [
+		{
+			"track_metadata": {
+				"artist_name": "TomboFry",
+				"track_name": "Floating Amongst the Stars",
+				"release_name": "Floating Amongst the Stars"
+			}
+		}
+	]
+}
+
+### YOUTUBE - Add a new liked video
+
+POST {{baseUrl}}/api/youtube/like
+Content-Type: application/json
+
+{
+	"apiKey": "{{apiKey}}",
+	"title": "Floating Amongst the Stars (Lyric Video)",
+	"url": "https://www.youtube.com/watch?v=4Q0p2WnVvMU"
+}
+
+### SONARR - Get all series
+
+@sonarUrl={{$dotenv TOMBOIS_SONARR_URL}}
+@sonarApiKey={{$dotenv TOMBOIS_SONARR_APIKEY}}
+
+GET {{sonarUrl}}api/v3/series
+X-Api-Key: {{sonarApiKey}}
+
+### SONARR - Get episodes for a series
+
+GET {{sonarUrl}}api/v3/episode?seriesId=2
+X-Api-Key: {{sonarApiKey}}
+
+### STEAM - Get user's achievements for a given game
+
+@steamApiKey={{$dotenv TOMBOIS_STEAM_APIKEY}}
+@steamUserId={{$dotenv TOMBOIS_STEAM_USERID}}
+@steamGameId=224760
+
+GET http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid={{steamGameId}}&key={{steamApiKey}}&steamid={{steamUserId}}&format=json&l=en
+Content-Type: application/json
+Accept: application/json
+
+### STEAM - Get all recently played games
+
+GET https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key={{steamApiKey}}&steamid={{steamUserId}}&format=json&l=en
+Content-Type: application/json
+Accept: application/json
+
+###
