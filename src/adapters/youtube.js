@@ -8,8 +8,11 @@ import { minuteMs } from '../lib/formatDate.js';
 const log = new Logger('YouTube');
 
 let client = null;
-let accessToken = null;
-let refreshToken = null;
+let googleAuth = {
+	accessToken: null,
+	refreshToken: null,
+	accessTokenExpiryDate: null,
+};
 let youtubeLikes = [];
 
 const storagePath = () => path.resolve(process.env.TOMBOIS_GOOGLE_TOKENFILE);
@@ -27,9 +30,12 @@ const getClient = () => {
 	});
 
 	client.on('tokens', tokens => {
-		accessToken = tokens.access_token;
-		refreshToken = tokens.refresh_token;
+		log.info('Retrieved tokens, updating cache.');
+		googleAuth.accessToken = tokens.access_token;
+		googleAuth.refreshToken = tokens.refresh_token;
 		saveTokensToDisk();
+
+		client.setCredentials(tokens);
 		google.options({ auth: client });
 	});
 
@@ -50,29 +56,29 @@ const loadTokensFromDisk = () => {
 	log.info('Loading tokens and cache data from disk');
 	if (fs.existsSync(storagePath()) === false) {
 		log.debug('Token file does not exist, providing defaults');
-		accessToken = null;
-		refreshToken = null;
+		googleAuth.accessToken = null;
+		googleAuth.refreshToken = null;
+		googleAuth.accessTokenExpiryDate = null;
 		youtubeLikes = [];
 		return;
 	}
 
 	const contents = JSON.parse(fs.readFileSync(storagePath()).toString());
 
-	accessToken = contents.accessToken;
-	refreshToken = contents.refreshToken;
+	googleAuth = contents.googleAuth;
 	youtubeLikes = contents.youtubeLikes || [];
 
 	log.debug('Setting client credentials');
 	getClient().setCredentials({
-		access_token: contents.accessToken,
-		refresh_token: contents.refreshToken,
+		access_token: googleAuth.accessToken,
+		refresh_token: googleAuth.refreshToken,
 	});
 	google.options({ auth: getClient() });
 };
 
 const saveTokensToDisk = () => {
 	log.info('Saving tokens and cache data to disk');
-	const str = JSON.stringify({ accessToken, refreshToken, youtubeLikes }, null, 2);
+	const str = JSON.stringify({ googleAuth, youtubeLikes }, null, 2);
 	fs.writeFileSync(storagePath(), str);
 };
 
@@ -80,8 +86,10 @@ export const retrieveAccessToken = async (authCode) => {
 	log.info('Fetching access token based on auth code');
 	const { tokens } = await getClient().getToken(authCode);
 
-	accessToken = tokens.access_token;
-	refreshToken = tokens.refresh_token;
+	googleAuth.accessToken = tokens.access_token;
+	googleAuth.refreshToken = tokens.refresh_token;
+	googleAuth.accessTokenExpiryDate = tokens.expiry_date;
+
 	saveTokensToDisk();
 
 	getClient().setCredentials(tokens);
@@ -99,9 +107,13 @@ export const pollForLikedVideos = () => {
 	const fetchVideos = async () => {
 		log.info('Polling YouTube for liked videos');
 		try {
-			if (accessToken === null) {
+			if (googleAuth.accessToken === null) {
 				log.debug('No token provided, skipping.');
 				return;
+			}
+
+			if (googleAuth.accessTokenExpiryDate < Date.now()) {
+				log.info('Access token has expired. Using refresh token.');
 			}
 
 			const youtube = google.youtube('v3');
@@ -125,7 +137,7 @@ export const pollForLikedVideos = () => {
 				const video = newVideos[i];
 				const url = `https://www.youtube.com/watch?v=${video.id}`;
 
-				await insertYouTubeLike(
+				insertYouTubeLike(
 					url,
 					video.snippet.title,
 					video.snippet.channelTitle,
@@ -138,8 +150,9 @@ export const pollForLikedVideos = () => {
 		} catch (err) {
 			console.error(err);
 			if (err.code === 401) {
-				accessToken = null;
-				refreshToken = null;
+				googleAuth.accessToken = null;
+				googleAuth.accessTokenExpiryDate = null;
+				googleAuth.refreshToken = null;
 				saveTokensToDisk();
 			}
 		}
