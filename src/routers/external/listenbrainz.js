@@ -112,7 +112,7 @@ router.post('/1/submit-listens', (req, res) => {
 
 		res.send({ status: 'ok' });
 	} catch (err) {
-		console.error(err);
+		log.error(err);
 		res.status(500).send({
 			status: 'error',
 			code: 500,
