@@ -131,6 +131,7 @@ export const pollForGameActivity = () => {
 		TOMBOIS_STEAM_POLL_INTERVAL: pollIntervalMinutes,
 		TOMBOIS_STEAM_APIKEY: apiKey,
 		TOMBOIS_STEAM_USERID: userId,
+		TOMBOIS_STEAM_DEVICE_ID: steamDeviceId,
 		TOMBOIS_DEFAULT_DEVICE_ID: deviceId,
 	} = process.env;
 
@@ -184,7 +185,7 @@ export const pollForGameActivity = () => {
 				game.name,
 				game.newPlaytime,
 				`https://store.steampowered.com/app/${game.appid}/`,
-				deviceId,
+				steamDeviceId || deviceId,
 				intervalMs,
 			);
 
@@ -196,7 +197,7 @@ export const pollForGameActivity = () => {
 					achievement.description,
 					game.name,
 					activity.id,
-					deviceId,
+					steamDeviceId || deviceId,
 				);
 			});
 		}
