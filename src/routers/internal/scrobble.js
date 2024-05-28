@@ -1,5 +1,8 @@
 import express from 'express';
 import { getAllAlbums, getAlbumTracks, scrobbleTrack } from '../../adapters/subsonic.js';
+import Logger from '../../lib/logger.js';
+
+const log = new Logger('ListenBrainz');
 
 const router = express.Router();
 
@@ -25,7 +28,7 @@ router.get('/', async (_req, res) => {
 		// Step 3: Send to server
 		res.render('internal/scrobble', { albumlist });
 	} catch (err) {
-		console.error(err);
+		log.error(err);
 		res.redirect('/');
 	}
 });
@@ -49,7 +52,7 @@ router.post('/', async (req, res) => {
 			await scrobbleTrack(song.id, now);
 		}
 	} catch (err) {
-		console.error(err);
+		log.error(err);
 	}
 
 	// Step 3: Redirect to listens page

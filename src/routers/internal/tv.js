@@ -3,6 +3,9 @@ import { getSeriesList, getEpisodeList, getEpisode } from '../../adapters/sonarr
 import { countEpisodes, deleteEpisode, getEpisodes, insertEpisode, updateEpisode } from '../../database/tv.js';
 import { padString } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
+import Logger from '../../lib/logger.js';
+
+const log = new Logger('tv');
 
 const router = express.Router();
 
@@ -25,7 +28,7 @@ router.get('/', async (_req, res) => {
 
 		res.render('internal/tv-series', { seriesList });
 	} catch (err) {
-		console.error(err);
+		log.error(err);
 		res.redirect('/');
 	}
 });
@@ -36,7 +39,7 @@ router.get('/episode', async (req, res) => {
 
 		res.render('internal/tv-episode', { episodeList });
 	} catch (err) {
-		console.error(err);
+		log.error(err);
 		res.redirect('/');
 	}
 });
@@ -56,9 +59,11 @@ router.post('/episode', async (req, res) => {
 			process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 		);
 
+		log.info(`Logged episode '${episodeTitle}' from '${seriesTitle}'`);
+
 		res.redirect('/tv/list');
 	} catch (err) {
-		console.error(err);
+		log.error(err);
 		res.redirect('/');
 	}
 });
@@ -72,6 +77,8 @@ router.post('/', (req, res) => {
 		created_at || new Date().toISOString(),
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	);
+
+	log.info(`Logged episode '${episode_title}' from '${series_title}'`);
 
 	res.redirect('/tv/list');
 });
