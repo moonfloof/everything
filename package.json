@@ -13,7 +13,7 @@
 	"author": "moonfloof <git@moonfloof.com>",
 	"license": "AGPL-3.0-or-later",
 	"dependencies": {
-		"@tombofry/stdlib": "^0.10.0",
+		"@tombofry/stdlib": "^0.10.1",
 		"better-sqlite3": "10.0",
 		"discord.js": "^14.14.1",
 		"dotenv": "^16.3.1",
