@@ -1,6 +1,7 @@
 import express from 'express';
 import { countYouTubeLikes, getLikes, deleteYouTubeLike, updateYouTubeLike, insertYouTubeLike } from '../../database/youtubelikes.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
+import { getYouTubeVideoSnippet } from '../../adapters/youtube.js';
 
 const router = express.Router();
 
@@ -17,8 +18,15 @@ router.get('/', (req, res) => {
 
 // CRUD
 
-router.post('/', (req, res) => {
-	const { url, title, channel, created_at } = req.body;
+router.post('/', async (req, res) => {
+	const { url, created_at } = req.body;
+	let { title, channel } = req.body;
+
+	if (!title || !channel) {
+		const snippet = await getYouTubeVideoSnippet(url);
+		title = snippet?.snippet?.title;
+		channel = snippet?.snippet?.channelTitle || 'N/A';
+	}
 
 	insertYouTubeLike(
 		url,
