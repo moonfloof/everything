@@ -134,13 +134,10 @@ export const pollForLikedVideos = () => {
 			log.debug(`Found ${newVideos.length} new videos`);
 
 			for (let i = newVideos.length - 1; i >= 0; i--) {
-				const video = newVideos[i];
-				const url = `https://www.youtube.com/watch?v=${video.id}`;
-
 				insertYouTubeLike(
-					url,
-					video.snippet.title,
-					video.snippet.channelTitle,
+					newVideos[i].id,
+					newVideos[i].snippet.title,
+					newVideos[i].snippet.channelTitle,
 					process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 				);
 			}
@@ -168,10 +165,7 @@ export const getYouTubeVideoSnippet = async (url) => {
 		return {};
 	}
 
-	const videoId = new URL(url).searchParams.get('v');
-	if (videoId === null || typeof videoId !== 'string') {
-		throw new Error('Not a valid YouTube URL');
-	}
+	const videoId = validateYouTubeUrl(url);
 
 	const youtube = google.youtube({
 		version: 'v3',
@@ -188,4 +182,27 @@ export const getYouTubeVideoSnippet = async (url) => {
 	}
 
 	return response.data.items[0];
+};
+
+/**
+ * @param {string} url
+ * @returns {string} Returns the ID if valid, throws if not
+ * @throws {Error}
+ */
+export const validateYouTubeUrl = (url) => {
+	const youtubeValidUrls = /(youtube\.com|youtu\.be\/[\w-]{11,})/i;
+	if (!youtubeValidUrls.test(url)) {
+		throw new Error('Not a valid YouTube URL');
+	}
+
+	if (url.includes('youtu.be')) {
+		return url.split('youtu.be/')[1];
+	}
+
+	const id = new URL(url).searchParams.get('v');
+	if (id === null || typeof id !== 'string') {
+		throw new Error('Not a valid YouTube URL');
+	}
+
+	return id;
 };

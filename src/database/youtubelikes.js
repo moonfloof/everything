@@ -11,18 +11,18 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertYouTubeLike (url, title, channel, device_id, created_at) {
+export function insertYouTubeLike (video_id, title, channel, device_id, created_at) {
 	const statement = getStatement(
 		'insertYouTubeLike',
 		`INSERT INTO youtubelikes
-		(id, url, title, channel, device_id, created_at)
+		(id, video_id, title, channel, device_id, created_at)
 		VALUES
-		($id, $url, $title, $channel, $device_id, $created_at)`,
+		($id, $video_id, $title, $channel, $device_id, $created_at)`,
 	);
 
 	return statement.run({
 		id: uuid(),
-		url,
+		video_id,
 		title,
 		channel,
 		device_id,
@@ -53,6 +53,7 @@ export function getLikes (parameters) {
 		.all(calculateGetParameters(parameters))
 		.map(row => ({
 			...row,
+			url: 'https://www.youtube.com/watch?v=' + row.video_id,
 			timeago: timeago.format(new Date(row.created_at)),
 		}));
 }
@@ -82,17 +83,17 @@ export function deleteYouTubeLike (id) {
 
 /**
  * @param {string} id
- * @param {string} url
+ * @param {string} video_id
  * @param {string} title
  * @param {string} channel
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateYouTubeLike (id, url, title, channel, created_at) {
+export function updateYouTubeLike (id, video_id, title, channel, created_at) {
 	const statement = getStatement(
 		'updateYouTubeLike',
 		`UPDATE youtubelikes
-		SET url = $url,
+		SET video_id = $video_id,
 		    title = $title,
 		    channel = $channel,
 		    created_at = $created_at
@@ -101,7 +102,7 @@ export function updateYouTubeLike (id, url, title, channel, created_at) {
 
 	return statement.run({
 		id,
-		url,
+		video_id,
 		title,
 		channel,
 		created_at: new Date(created_at || Date.now()).toISOString(),

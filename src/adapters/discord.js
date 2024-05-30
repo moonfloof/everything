@@ -50,13 +50,10 @@ async function commandYouTube (args, message) {
 		return;
 	}
 
-	const youtubeValidUrls = /(youtube\.com|youtu\.be)/i;
-	if (!youtubeValidUrls.test(args[0])) return;
-
 	const details = await getYouTubeVideoSnippet(args[0]);
 
 	insertYouTubeLike(
-		args[0],
+		details?.id,
 		details?.snippet?.title,
 		details?.snippet?.channelTitle || 'N/A',
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
