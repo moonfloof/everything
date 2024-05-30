@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
 		req.body.status || 'public',
 		req.body.url || null,
 		req.body.syndication_json,
-		req.body.created_at || new Date().toISOString(),
+		req.body.created_at,
 	);
 
 	res.redirect('/notes');
@@ -59,7 +59,6 @@ router.post('/:entryId', (req, res) => {
 				req.body.url || null,
 				req.body.syndication_json?.replace(/\t+/g, '') || null,
 				req.body.created_at,
-				req.body.updated_at,
 			);
 			break;
 

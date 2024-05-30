@@ -104,6 +104,6 @@ export function updateYouTubeLike (id, url, title, channel, created_at) {
 		url,
 		title,
 		channel,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }

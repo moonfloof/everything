@@ -48,7 +48,7 @@ export function insertScrobble (artist, album, title, tracknumber, year, genre, 
 		tracknumber,
 		year,
 		genre,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		device_id,
 	});
 }
@@ -156,7 +156,7 @@ export function updateListen (id, artist, album, title, tracknumber, release_yea
 		tracknumber,
 		release_year,
 		genre,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }
 

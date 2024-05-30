@@ -22,7 +22,7 @@ export function insertFood (name, type, created_at, device_id) {
 		id: uuid(),
 		name,
 		type,
-		created_at: new Date(created_at).toISOString(),
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		device_id,
 	});
 }
@@ -91,6 +91,6 @@ export function updateFood (id, name, type, created_at) {
 		id,
 		name,
 		type,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }

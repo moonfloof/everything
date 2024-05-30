@@ -33,8 +33,8 @@ export function insertFilm (title, year, rating, review, url, watched_at, create
 		rating,
 		review,
 		url,
-		watched_at,
-		created_at,
+		watched_at: new Date(watched_at || Date.now()).toISOString(),
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		device_id,
 	});
 }
@@ -110,8 +110,8 @@ export function updateFilm (id, title, year, rating, review, url, watched_at, cr
 		rating,
 		review,
 		url,
-		watched_at,
-		created_at,
+		watched_at: new Date(watched_at || Date.now()).toISOString(),
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }
 

@@ -20,7 +20,7 @@ export function insertWeight (weight_kgs, created_at, device_id) {
 	return statement.run({
 		id: uuid(),
 		weight_kgs,
-		created_at: new Date(created_at).toISOString(),
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		device_id,
 	});
 }
@@ -88,6 +88,6 @@ export function updateWeight (id, weight_kgs, created_at) {
 	return statement.run({
 		id,
 		weight_kgs,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }

@@ -44,7 +44,6 @@ export function insertNote (
 	url = null,
 	syndication_json = null,
 	created_at = null,
-	updated_at = new Date().toISOString(),
 	device_id = process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 ) {
 	const statement = getStatement(
@@ -63,8 +62,8 @@ export function insertNote (
 		status,
 		url,
 		syndication_json,
-		created_at,
-		updated_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
+		updated_at: new Date().toISOString(),
 		device_id,
 	});
 }
@@ -152,7 +151,6 @@ export function updateNote (
 	url,
 	syndication_json,
 	created_at,
-	updated_at = new Date().toISOString(),
 ) {
 	const statement = getStatement(
 		'updateNote',
@@ -176,7 +174,7 @@ export function updateNote (
 		status,
 		url,
 		syndication_json,
-		created_at,
-		updated_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
+		updated_at: new Date().toISOString(),
 	});
 }
