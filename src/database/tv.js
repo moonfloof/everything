@@ -26,7 +26,7 @@ export function insertEpisode (series_title, episode_title, created_at, device_i
 		id,
 		series_title,
 		episode_title,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		device_id,
 	});
 }
@@ -91,7 +91,7 @@ export function updateEpisode (id, series_title, episode_title, created_at) {
 		id,
 		series_title,
 		episode_title,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }
 

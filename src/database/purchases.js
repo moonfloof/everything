@@ -26,7 +26,7 @@ export function insertPurchase (amount, merchant, category, currency, created_at
 		merchant,
 		category,
 		currency,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		device_id,
 	});
 }
@@ -103,6 +103,6 @@ export function updatePurchase (id, amount, currency, merchant, category, create
 		currency,
 		merchant,
 		category,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }

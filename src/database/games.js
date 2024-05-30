@@ -15,8 +15,6 @@ import { getGameAchievementsForSession } from './gameachievements.js';
  */
 export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, created_at) {
 	const id = uuid();
-	const updated_at = new Date().toISOString();
-
 	const statement = getStatement(
 		'insertGameActivity',
 		`INSERT INTO games
@@ -30,8 +28,8 @@ export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, 
 		name,
 		playtime_mins,
 		url,
-		created_at: created_at || new Date(Date.now() - (playtime_mins * minuteMs)).toISOString(),
-		updated_at,
+		created_at: new Date(created_at || (Date.now() - (playtime_mins * minuteMs))).toISOString(),
+		updated_at: new Date().toISOString(),
 		device_id,
 	});
 
@@ -278,7 +276,7 @@ export function deleteGameActivity (id) {
  * @param {string} updated_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateGameActivity (id, name, playtime_mins, url, created_at, updated_at) {
+export function updateGameActivity (id, name, playtime_mins, url, created_at) {
 	const statement = getStatement(
 		'updateGameActivity',
 		`UPDATE games
@@ -295,7 +293,7 @@ export function updateGameActivity (id, name, playtime_mins, url, created_at, up
 		name,
 		playtime_mins: Number(playtime_mins),
 		url,
-		created_at,
-		updated_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
+		updated_at: new Date().toISOString(),
 	});
 }

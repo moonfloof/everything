@@ -31,7 +31,6 @@ router.post('/', (req, res) => {
 		started_at,
 		completed_at,
 		created_at,
-		updated_at,
 	} = req.body;
 
 	insertBook({
@@ -43,10 +42,9 @@ router.post('/', (req, res) => {
 		genre,
 		pages_total: pages_total ? Number(pages_total): null,
 		pages_progress: pages_progress ? Number(pages_progress): null,
-		started_at: started_at || formatDate(new Date()),
-		completed_at: completed_at,
-		created_at: created_at || new Date().toISOString(),
-		updated_at: updated_at || new Date().toISOString(),
+		started_at,
+		completed_at,
+		created_at,
 		device_id: process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	});
 
@@ -92,10 +90,9 @@ router.post('/:id', (req, res) => {
 				genre,
 				pages_total: pages_total ? Number(pages_total): null,
 				pages_progress: pages_progress ? Number(pages_progress): null,
-				started_at: started_at || formatDate(new Date()),
+				started_at,
 				completed_at: completed_calculated,
-				created_at: created_at || new Date().toISOString(),
-				updated_at: new Date().toISOString(),
+				created_at,
 			});
 			break;
 

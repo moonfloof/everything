@@ -26,7 +26,7 @@ export function insertLocation (lat, long, city, created_at, device_id) {
 		lat,
 		long,
 		city,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		device_id,
 	});
 }

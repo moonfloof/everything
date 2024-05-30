@@ -41,7 +41,7 @@ function insertNewRecord (category, created_at, ended_at, device_id) {
 	return statement.run({
 		id: uuid(),
 		category,
-		created_at: new Date(created_at).toISOString(),
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		ended_at: ended_at ? new Date(ended_at).toISOString() : null,
 		device_id,
 	});
@@ -62,7 +62,7 @@ function endTimeTrackingSession (id, ended_at) {
 
 	updateStatement.run({
 		id,
-		ended_at: new Date(ended_at).toISOString(),
+		ended_at: new Date(ended_at || Date.now()).toISOString(),
 	});
 }
 
@@ -160,7 +160,7 @@ export function updateTimeTracking (id, category, created_at, ended_at) {
 	return statement.run({
 		id,
 		category,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 		ended_at: new Date(ended_at || Date.now()).toISOString(),
 	});
 }

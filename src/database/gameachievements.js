@@ -121,6 +121,6 @@ export function updateGameAchievement (id, name, description, created_at) {
 		id,
 		name,
 		description,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }

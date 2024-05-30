@@ -16,6 +16,7 @@ import { prettyDate } from '../lib/formatDate.js';
  * @property {number} [rating]
  * @property {string} [url]
  * @property {string} created_at
+ * @property {string} updated_at
  * @property {string} started_at
  * @property {string} [completed_at]
  * @property {string} device_id
@@ -40,6 +41,10 @@ export function insertBook (book) {
 	return statement.run({
 		id,
 		...book,
+		started_at: new Date(book.started_at || Date.now()).toISOString(),
+		completed_at: book.completed_at ? new Date(book.completed_at).toISOString() : null,
+		created_at: new Date(book.created_at || Date.now()).toISOString(),
+		updated_at: new Date().toISOString(),
 	});
 }
 
@@ -132,6 +137,10 @@ export function updateBook (id, book) {
 	return statement.run({
 		id,
 		...book,
+		started_at: new Date(book.started_at || Date.now()).toISOString(),
+		completed_at: book.completed_at ? new Date(book.completed_at).toISOString() : null,
+		created_at: new Date(book.created_at || Date.now()).toISOString(),
+		updated_at: new Date().toISOString(),
 	});
 }
 

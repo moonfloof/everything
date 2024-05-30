@@ -100,6 +100,6 @@ export function updateSteps (id, step_count_total, created_at) {
 	return statement.run({
 		id,
 		step_count_total,
-		created_at,
+		created_at: new Date(created_at || Date.now()).toISOString(),
 	});
 }
