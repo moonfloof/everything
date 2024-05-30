@@ -27,18 +27,18 @@ Content-Type: application/json
 	"title": "moonfloof"
 }
 
-###
+### Time Tracking
 
-POST {{baseUrl}}/api/health/sleep
+POST {{baseUrl}}/api/health/time
 Authorization: {{apiKey}}
 Content-Type: application/json
 
 {
-	"type": "sleep",
+	"category": "sleep",
 	"createdAt": "{{$datetime iso8601}}"
 }
 
-###
+### Weight Logging
 
 POST {{baseUrl}}/api/health/weight
 Authorization: {{apiKey}}
