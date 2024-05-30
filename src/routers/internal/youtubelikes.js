@@ -1,7 +1,7 @@
 import express from 'express';
 import { countYouTubeLikes, getLikes, deleteYouTubeLike, updateYouTubeLike, insertYouTubeLike } from '../../database/youtubelikes.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
-import { getYouTubeVideoSnippet } from '../../adapters/youtube.js';
+import { getYouTubeVideoSnippet, validateYouTubeUrl } from '../../adapters/youtube.js';
 
 const router = express.Router();
 
@@ -22,6 +22,8 @@ router.post('/', async (req, res) => {
 	const { url, created_at } = req.body;
 	let { title, channel } = req.body;
 
+	const id = validateYouTubeUrl(url);
+
 	if (!title || !channel) {
 		const snippet = await getYouTubeVideoSnippet(url);
 		title = snippet?.snippet?.title;
@@ -29,7 +31,7 @@ router.post('/', async (req, res) => {
 	}
 
 	insertYouTubeLike(
-		url,
+		id,
 		title,
 		channel,
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
@@ -42,6 +44,7 @@ router.post('/', async (req, res) => {
 router.post('/:id', (req, res) => {
 	const { id } = req.params;
 	const { crudType, url, title, channel, created_at } = req.body;
+	const videoId = validateYouTubeUrl(url);
 
 	switch (crudType) {
 		case 'delete':
@@ -49,7 +52,7 @@ router.post('/:id', (req, res) => {
 			break;
 
 		case 'update':
-			updateYouTubeLike(id, url, title, channel, created_at);
+			updateYouTubeLike(id, videoId, title, channel, created_at);
 			break;
 
 		default:
