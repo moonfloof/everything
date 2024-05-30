@@ -368,7 +368,7 @@ router.get('/note/:id', (req, res) => {
 
 // GLOBAL FEED
 
-router.get('/feed', getCache(), async (req, res) => {
+router.get('/feed', getCache(), async (_req, res) => {
 	const parameters = { limit: 1000, days: 7 };
 
 	const typeMap = (type, entries) => entries.map(data => ({
