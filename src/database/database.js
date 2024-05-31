@@ -7,7 +7,7 @@ const statements = {};
  * @export
  * @returns {Database.Database}
  */
-export function getDatabase () {
+export function getDatabase() {
 	if (db !== null) return db;
 
 	db = new Database(process.env.TOMBOIS_SQLITE_LOCATION);
@@ -21,7 +21,7 @@ export function getDatabase () {
  * @param {string} statement
  * @return {Database.Statement}
  */
-export function getStatement (name, statement) {
+export function getStatement(name, statement) {
 	if (statements[name] !== undefined) {
 		return statements[name];
 	}

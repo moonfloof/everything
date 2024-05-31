@@ -1,7 +1,7 @@
-import path from 'path';
+import path from 'node:path';
+import { logEntry, rawBody } from '@tombofry/stdlib/src/express/index.js';
 import express from 'express';
 import { engine } from 'express-handlebars';
-import { rawBody, logEntry } from '@tombofry/stdlib/src/express/index.js';
 import formBodyParser from './formParser.js';
 import { helpers } from './handlebarsExtensions.js';
 
@@ -11,12 +11,16 @@ const appCreate = () => {
 	app.use((req, _res, next) => {
 		try {
 			req.body = JSON.parse(req.rawBody);
-		} catch (err) { /* Do nothing */ }
+		} catch (err) {
+			/* Do nothing */
+		}
 		try {
 			if (!req.body) {
 				req.body = formBodyParser(req.rawBody);
 			}
-		} catch (err) { /* do nothing */ console.error(err); }
+		} catch (err) {
+			/* do nothing */ console.error(err);
+		}
 
 		next();
 	});

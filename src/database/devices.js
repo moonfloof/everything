@@ -1,10 +1,7 @@
 import { getStatement } from './database.js';
 
-export function validateDevice (api_key) {
-	const statement = getStatement(
-		'validateDevice',
-		'SELECT * FROM devices WHERE api_key = $api_key LIMIT 1',
-	);
+export function validateDevice(api_key) {
+	const statement = getStatement('validateDevice', 'SELECT * FROM devices WHERE api_key = $api_key LIMIT 1');
 
 	const device = statement.get({ api_key });
 
@@ -15,7 +12,7 @@ export function validateDevice (api_key) {
 	return device;
 }
 
-export function getDevices () {
+export function getDevices() {
 	const statement = getStatement(
 		'getDevices',
 		`SELECT id, description, battery_level, battery_status
@@ -32,7 +29,7 @@ export function getDevices () {
  * @param {string} battery_status
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateDevice (id, battery_level, battery_status) {
+export function updateDevice(id, battery_level, battery_status) {
 	const statement = getStatement(
 		'updateDevice',
 		`UPDATE devices

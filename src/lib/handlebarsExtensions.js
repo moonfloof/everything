@@ -5,33 +5,32 @@
  * @example <caption>Or</caption>
  * {{#xif url '||' description}}
  */
-export function xif (v1, operator, v2, options) {
+export function xif(v1, operator, v2, options) {
 	switch (operator) {
 		case '!=':
-			return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+			return v1 !== v2 ? options.fn(this) : options.inverse(this);
 		case '<':
-			return (v1 < v2) ? options.fn(this) : options.inverse(this);
+			return v1 < v2 ? options.fn(this) : options.inverse(this);
 		case '<=':
-			return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+			return v1 <= v2 ? options.fn(this) : options.inverse(this);
 		case '>':
-			return (v1 > v2) ? options.fn(this) : options.inverse(this);
+			return v1 > v2 ? options.fn(this) : options.inverse(this);
 		case '>=':
-			return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+			return v1 >= v2 ? options.fn(this) : options.inverse(this);
 		case '&&':
-			return (v1 && v2) ? options.fn(this) : options.inverse(this);
+			return v1 && v2 ? options.fn(this) : options.inverse(this);
 		case '||':
-			return (v1 || v2) ? options.fn(this) : options.inverse(this);
-		case '==':
+			return v1 || v2 ? options.fn(this) : options.inverse(this);
 		default:
-			return (v1 === v2) ? options.fn(this) : options.inverse(this);
+			return v1 === v2 ? options.fn(this) : options.inverse(this);
 	}
 }
 
-export function externalRoot () {
+export function externalRoot() {
 	return process.env.TOMBOIS_SERVER_EXTERNAL_URI;
 }
 
-export function person () {
+export function person() {
 	return process.env.TOMBOIS_PERSON_NAME;
 }
 

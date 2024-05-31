@@ -1,4 +1,4 @@
-import util from 'util';
+import util from 'node:util';
 import { formatDateTime } from './formatDate.js';
 
 const levels = {
@@ -15,58 +15,51 @@ const formats = {
 };
 
 export default class Logger {
-	constructor (label) {
+	constructor(label) {
 		this._label = label;
 	}
 
 	/** @param {string} currentLevel Level used by the logging function */
-	static atLevel (currentLevel) {
-		const targetLevel = levels[process.env.LOG_LEVEL] !== undefined
-			? process.env.LOG_LEVEL
-			: 'debug';
+	static atLevel(currentLevel) {
+		const activeLevel = currentLevel || 'debug';
+		const targetLevel = levels[process.env.LOG_LEVEL] !== undefined ? process.env.LOG_LEVEL : 'debug';
 
-		if (levels[currentLevel] === undefined) {
-			currentLevel = 'debug';
-		}
-
-		return levels[currentLevel] >= levels[targetLevel];
+		return levels[activeLevel] >= levels[targetLevel];
 	}
 
 	/**
 	 * @param {string} level One of debug, info, warn, error
 	 * @param {any[]}  args  Items to print
 	 */
-	format (level, args) {
+	format(level, args) {
 		const timestamp = formatDateTime(new Date());
-		const argTypes = args
-			.map(a => formats[typeof a] || formats.default)
-			.join(' ');
+		const argTypes = args.map(a => formats[typeof a] || formats.default).join(' ');
 		const formatted = util.format(argTypes, ...args);
 
 		return `[${timestamp}] [${this._label}] [${level}] ${formatted}`;
 	}
 
-	log (...args) {
+	log(...args) {
 		if (!Logger.atLevel('debug')) return;
 		console.debug(this.format('debug', args));
 	}
 
-	debug (...args) {
+	debug(...args) {
 		if (!Logger.atLevel('debug')) return;
 		console.debug(this.format('debug', args));
 	}
 
-	info (...args) {
+	info(...args) {
 		if (!Logger.atLevel('info')) return;
 		console.info(this.format('info', args));
 	}
 
-	warn (...args) {
+	warn(...args) {
 		if (!Logger.atLevel('warn')) return;
 		console.warn(this.format('warn', args));
 	}
 
-	error (...args) {
+	error(...args) {
 		if (!Logger.atLevel('error')) return;
 		console.error(this.format('error', args));
 	}

@@ -15,7 +15,7 @@ export const weekMs = weekSecs * 1000;
  * @param {number} length
  * @param {string} pad
  */
-export function padString (str, length, pad = '0') {
+export function padString(str, length, pad = '0') {
 	let newStr = str.toString();
 	while (newStr.length < length) {
 		newStr = `${pad}${newStr}`;
@@ -24,7 +24,7 @@ export function padString (str, length, pad = '0') {
 }
 
 /** @param {Date} date */
-export function formatTime (date, includeSeconds = true) {
+export function formatTime(date, includeSeconds = true) {
 	const hour = padString(date.getHours(), 2);
 	const mins = padString(date.getMinutes(), 2);
 	const secs = padString(date.getSeconds(), 2);
@@ -39,7 +39,7 @@ export function formatTime (date, includeSeconds = true) {
 }
 
 /** @param {Date} date */
-export function formatDate (date) {
+export function formatDate(date) {
 	const year = padString(date.getFullYear(), 4);
 	const mon = padString(date.getMonth() + 1, 2);
 	const day = padString(date.getDate(), 2);
@@ -48,7 +48,7 @@ export function formatDate (date) {
 }
 
 /** @param {Date} date */
-export function formatDateTime (date) {
+export function formatDateTime(date) {
 	return `${formatDate(date)} ${formatTime(date)}`;
 }
 
@@ -68,7 +68,7 @@ const months = [
 ];
 
 /** @param {Date} date */
-export function prettyDate (date) {
+export function prettyDate(date) {
 	const year = padString(date.getFullYear(), 4);
 	const month = months[date.getMonth()];
 	const day = date.getDate();
@@ -81,7 +81,7 @@ export function prettyDate (date) {
 }
 
 /** @param {Date} date */
-export function shortDate (date) {
+export function shortDate(date) {
 	const day = padString(date.getDate(), 2);
 	const month = padString(date.getMonth() + 1, 2);
 
@@ -92,7 +92,7 @@ export function shortDate (date) {
  * @param {number} durationMs
  * @returns {string}
  */
-export function prettyDuration (durationMs) {
+export function prettyDuration(durationMs) {
 	// 60 mins * 60 secs * 1000 ms
 	const hoursTotal = durationMs / 3600000;
 
@@ -101,15 +101,13 @@ export function prettyDuration (durationMs) {
 	const minutes = Math.round((hoursTotal - hoursRounded) * 60);
 
 	// Convert into string
-	const duration = hoursRounded > 0
-		? `${hoursRounded}h ${minutes}m`
-		: `${minutes}m`;
+	const duration = hoursRounded > 0 ? `${hoursRounded}h ${minutes}m` : `${minutes}m`;
 
 	return duration;
 }
 
 /** @param {number} durationMs */
-export function isoDuration (durationMs) {
+export function isoDuration(durationMs) {
 	// 60 mins * 60 secs * 1000 ms
 	const hoursTotal = durationMs / 3600000;
 
@@ -120,17 +118,17 @@ export function isoDuration (durationMs) {
 	let output = 'PT';
 
 	if (hoursRounded > 0) {
-		output += padString(hoursRounded, 2) + 'H';
+		output += `${padString(hoursRounded, 2)}H`;
 	}
 
 	if (minutes > 0) {
-		output += padString(minutes, 2) + 'M';
+		output += `${padString(minutes, 2)}M`;
 	}
 
 	return output;
 }
 
-export function getStartOfDay (date = new Date()) {
+export function getStartOfDay(date = new Date()) {
 	return new Date(`${formatDate(date)}T00:00:00.000Z`);
 }
 
@@ -138,7 +136,7 @@ export function getStartOfDay (date = new Date()) {
  * @param {Date} dateA
  * @param {Date} dateB
  */
-export function isSameDate (dateA, dateB) {
+export function isSameDate(dateA, dateB) {
 	const yearSame = dateA.getFullYear() === dateB.getFullYear();
 	if (yearSame === false) return false;
 

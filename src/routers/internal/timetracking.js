@@ -1,11 +1,11 @@
 import express from 'express';
 import {
+	categoryValues,
 	countTimeTracking,
 	deleteTimeTracking,
 	getTimeTracking,
 	insertTimeTracking,
 	updateTimeTracking,
-	categoryValues,
 } from '../../database/timetracking.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
@@ -27,12 +27,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
 	const { category, created_at, ended_at } = req.body;
 
-	insertTimeTracking(
-		category,
-		created_at || Date.now(),
-		ended_at,
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+	insertTimeTracking(category, created_at || Date.now(), ended_at, process.env.TOMBOIS_DEFAULT_DEVICE_ID);
 
 	res.redirect('/timetracking');
 });

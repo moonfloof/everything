@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import { dayMs } from '../lib/formatDate.js';
+import { getStatement } from './database.js';
 
 /**
  * @param {number} lat
@@ -10,7 +10,7 @@ import { dayMs } from '../lib/formatDate.js';
  * @param {string} device_id
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertLocation (lat, long, city, created_at, device_id) {
+export function insertLocation(lat, long, city, created_at, device_id) {
 	const id = uuid();
 
 	const statement = getStatement(
@@ -32,7 +32,7 @@ export function insertLocation (lat, long, city, created_at, device_id) {
 }
 
 /** @return {string|undefined} */
-export function getLatestCity () {
+export function getLatestCity() {
 	const statement = getStatement(
 		'getLatestCity',
 		`SELECT city FROM location
@@ -43,7 +43,7 @@ export function getLatestCity () {
 	);
 
 	// Only return city if the data comes from the last two days
-	const created_at = new Date(Date.now() - (2 * dayMs)).toISOString();
+	const created_at = new Date(Date.now() - 2 * dayMs).toISOString();
 
 	return statement.get({ created_at })?.city;
 }
@@ -51,8 +51,9 @@ export function getLatestCity () {
 /**
  * @param {Date} date_start
  * @param {Date} date_end
+ * @returns {{lat: number, long: number, city: string|null}[]}
  */
-export function getLocationHistory (date_start, date_end) {
+export function getLocationHistory(date_start, date_end) {
 	const statement = getStatement(
 		'getLocationHistory',
 		`SELECT lat, long, city FROM location

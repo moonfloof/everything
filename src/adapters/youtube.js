@@ -1,9 +1,9 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { google } from 'googleapis';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
-import Logger from '../lib/logger.js';
 import { minuteMs } from '../lib/formatDate.js';
+import Logger from '../lib/logger.js';
 
 const log = new Logger('YouTube');
 
@@ -26,7 +26,7 @@ const getClient = () => {
 	client = new google.auth.OAuth2({
 		clientId: process.env.TOMBOIS_GOOGLE_CLIENTID,
 		clientSecret: process.env.TOMBOIS_GOOGLE_CLIENTSECRET,
-		redirectUri: process.env.TOMBOIS_SERVER_EXTERNAL_URI + '/api/youtube/callback',
+		redirectUri: `${process.env.TOMBOIS_SERVER_EXTERNAL_URI}/api/youtube/callback`,
 	});
 
 	client.on('tokens', tokens => {
@@ -46,9 +46,7 @@ export const generateAuthUrl = () => {
 	log.info('Generating auth URL');
 	return getClient().generateAuthUrl({
 		access_type: 'offline',
-		scope: [
-			'https://www.googleapis.com/auth/youtube.readonly',
-		],
+		scope: ['https://www.googleapis.com/auth/youtube.readonly'],
 	});
 };
 
@@ -82,7 +80,7 @@ const saveTokensToDisk = () => {
 	fs.writeFileSync(storagePath(), str);
 };
 
-export const retrieveAccessToken = async (authCode) => {
+export const retrieveAccessToken = async authCode => {
 	log.info('Fetching access token based on auth code');
 	const { tokens } = await getClient().getToken(authCode);
 
@@ -118,14 +116,12 @@ export const pollForLikedVideos = () => {
 
 			const youtube = google.youtube('v3');
 			const { data } = await youtube.videos.list({
-				part: [ 'snippet' ],
+				part: ['snippet'],
 				maxResults: 10,
 				myRating: 'like',
 			});
 
-			const newVideos = data.items.filter(item => (
-				!youtubeLikes.find(id => item.id === id)
-			));
+			const newVideos = data.items.filter(item => !youtubeLikes.find(id => item.id === id));
 
 			if (newVideos.length === 0) {
 				return;
@@ -158,7 +154,7 @@ export const pollForLikedVideos = () => {
 	setInterval(fetchVideos, intervalMs);
 };
 
-export const getYouTubeVideoSnippet = async (url) => {
+export const getYouTubeVideoSnippet = async url => {
 	const auth = process.env.TOMBOIS_GOOGLE_APIKEY;
 
 	if (auth === undefined || auth.length === 0) {
@@ -173,8 +169,8 @@ export const getYouTubeVideoSnippet = async (url) => {
 	});
 
 	const response = await youtube.videos.list({
-		part: [ 'snippet' ],
-		id: [ videoId ],
+		part: ['snippet'],
+		id: [videoId],
 	});
 
 	if (response?.data?.items?.length !== 1) {
@@ -189,7 +185,7 @@ export const getYouTubeVideoSnippet = async (url) => {
  * @returns {string} Returns the ID if valid, throws if not
  * @throws {Error}
  */
-export const validateYouTubeUrl = (url) => {
+export const validateYouTubeUrl = url => {
 	const youtubeValidUrls = /(youtube\.com|youtu\.be\/[\w-]{11,})/i;
 	if (!youtubeValidUrls.test(url)) {
 		throw new Error('Not a valid YouTube URL');

@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @param {number} amount
@@ -11,7 +11,7 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} device_id
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertPurchase (amount, merchant, category, currency, created_at, device_id) {
+export function insertPurchase(amount, merchant, category, currency, created_at, device_id) {
 	const statement = getStatement(
 		'insertPurchase',
 		`INSERT INTO purchases
@@ -32,11 +32,8 @@ export function insertPurchase (amount, merchant, category, currency, created_at
 }
 
 /** @return {number} */
-export function countPurchases () {
-	const statement = getStatement(
-		'countPurchases',
-		'SELECT COUNT(*) as total FROM purchases',
-	);
+export function countPurchases() {
+	const statement = getStatement('countPurchases', 'SELECT COUNT(*) as total FROM purchases');
 
 	return statement.get().total;
 }
@@ -51,7 +48,7 @@ export function countPurchases () {
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getPurchases (parameters) {
+export function getPurchases(parameters) {
 	const statement = getStatement(
 		'getPurchases',
 		`SELECT * FROM purchases
@@ -67,11 +64,8 @@ export function getPurchases (parameters) {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deletePurchase (id) {
-	const statement = getStatement(
-		'deletePurchase',
-		'DELETE FROM purchases WHERE id = $id',
-	);
+export function deletePurchase(id) {
+	const statement = getStatement('deletePurchase', 'DELETE FROM purchases WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -85,7 +79,7 @@ export function deletePurchase (id) {
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updatePurchase (id, amount, currency, merchant, category, created_at) {
+export function updatePurchase(id, amount, currency, merchant, category, created_at) {
 	const statement = getStatement(
 		'updatePurchase',
 		`UPDATE purchases

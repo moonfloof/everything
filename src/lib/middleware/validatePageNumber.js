@@ -1,6 +1,6 @@
 import { MAX_PAGE } from '../../database/constants.js';
 
-export function validatePageNumber (isInternal = false) {
+export function validatePageNumber(isInternal = false) {
 	/**
 	 * @param {import('express').Request} req
 	 * @param {import('express').Response} _res

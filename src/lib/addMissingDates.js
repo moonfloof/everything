@@ -1,7 +1,7 @@
 import { RECORDS_PER_PAGE } from '../database/constants.js';
 import { dayMs, getStartOfDay, isSameDate } from './formatDate.js';
 
-function getElementValue (valueEmpty, dateInProgress) {
+function getElementValue(valueEmpty, dateInProgress) {
 	if (typeof valueEmpty === 'function') {
 		return valueEmpty(dateInProgress);
 	}
@@ -10,15 +10,11 @@ function getElementValue (valueEmpty, dateInProgress) {
 
 /**
  *
- * @param {Object[]} dateArray
+ * @param {Record<string, any>[]} input
  * @param {string}   [dateKey]
  * @param {Object}   [valueEmpty]
  */
-export default function addMissingDates (
-	input,
-	dateKey = 'created_at',
-	valueEmpty = { y: 0, min: 0, max: 0 },
-) {
+export default function addMissingDates(input, dateKey = 'created_at', valueEmpty = { y: 0, min: 0, max: 0 }) {
 	if (Array.isArray(input) === false || input.length <= 1) {
 		return [];
 	}

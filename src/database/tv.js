@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @export
@@ -11,7 +11,7 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} device_id
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertEpisode (series_title, episode_title, created_at, device_id) {
+export function insertEpisode(series_title, episode_title, device_id, created_at) {
 	const id = uuid();
 
 	const statement = getStatement(
@@ -41,7 +41,7 @@ export function insertEpisode (series_title, episode_title, created_at, device_i
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getEpisodes (parameters) {
+export function getEpisodes(parameters) {
 	const statement = getStatement(
 		'getEpisodes',
 		`SELECT * FROM tv
@@ -50,23 +50,18 @@ export function getEpisodes (parameters) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all(calculateGetParameters(parameters))
-		.map(row => ({
-			...row,
-			timeago: timeago.format(new Date(row.created_at)),
-		}));
+	return statement.all(calculateGetParameters(parameters)).map(row => ({
+		...row,
+		timeago: timeago.format(new Date(row.created_at)),
+	}));
 }
 
 /**
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteEpisode (id) {
-	const statement = getStatement(
-		'deleteEpisode',
-		'DELETE FROM tv WHERE id = $id',
-	);
+export function deleteEpisode(id) {
+	const statement = getStatement('deleteEpisode', 'DELETE FROM tv WHERE id = $id');
 	return statement.run({ id });
 }
 
@@ -77,7 +72,7 @@ export function deleteEpisode (id) {
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateEpisode (id, series_title, episode_title, created_at) {
+export function updateEpisode(id, series_title, episode_title, created_at) {
 	const statement = getStatement(
 		'updateEpisode',
 		`UPDATE tv
@@ -96,11 +91,8 @@ export function updateEpisode (id, series_title, episode_title, created_at) {
 }
 
 /** @return {number} */
-export function countEpisodes () {
-	const statement = getStatement(
-		'countEpisodes',
-		'SELECT COUNT(*) as total FROM tv',
-	);
+export function countEpisodes() {
+	const statement = getStatement('countEpisodes', 'SELECT COUNT(*) as total FROM tv');
 
 	return statement.get().total;
 }

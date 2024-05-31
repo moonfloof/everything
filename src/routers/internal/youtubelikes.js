@@ -1,7 +1,13 @@
 import express from 'express';
-import { countYouTubeLikes, getLikes, deleteYouTubeLike, updateYouTubeLike, insertYouTubeLike } from '../../database/youtubelikes.js';
-import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { getYouTubeVideoSnippet, validateYouTubeUrl } from '../../adapters/youtube.js';
+import {
+	countYouTubeLikes,
+	deleteYouTubeLike,
+	getLikes,
+	insertYouTubeLike,
+	updateYouTubeLike,
+} from '../../database/youtubelikes.js';
+import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
 
@@ -30,13 +36,7 @@ router.post('/', async (req, res) => {
 		channel = snippet?.snippet?.channelTitle || 'N/A';
 	}
 
-	insertYouTubeLike(
-		id,
-		title,
-		channel,
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-		created_at,
-	);
+	insertYouTubeLike(id, title, channel, process.env.TOMBOIS_DEFAULT_DEVICE_ID, created_at);
 
 	res.redirect('/youtubelikes');
 });

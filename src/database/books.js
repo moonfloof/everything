@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { calculateGetParameters } from './constants.js';
 import { prettyDate } from '../lib/formatDate.js';
+import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @typedef {object} Book
@@ -20,14 +20,14 @@ import { prettyDate } from '../lib/formatDate.js';
  * @property {string} started_at
  * @property {string} [completed_at]
  * @property {string} device_id
-*/
+ */
 
 /**
  * @export
  * @param {Book} book
  * @returns {import('better-sqlite3').RunResult}
  */
-export function insertBook (book) {
+export function insertBook(book) {
 	const id = uuid();
 
 	const statement = getStatement(
@@ -58,7 +58,7 @@ export function insertBook (book) {
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getBooks (parameters) {
+export function getBooks(parameters) {
 	const statement = getStatement(
 		'getBooks',
 		`SELECT * FROM books
@@ -67,32 +67,32 @@ export function getBooks (parameters) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all(calculateGetParameters(parameters))
-		.map(row => {
-			let progress = null;
-			let status = 'to-read';
+	return statement.all(calculateGetParameters(parameters)).map(row => {
+		let progress = null;
+		let status = 'to-read';
 
-			if (row.pages_total !== null) {
-				const finished = row.pages_total === row.pages_progress;
-				const percent = Math.round((row.pages_progress / row.pages_total) * 100);
+		if (row.pages_total !== null) {
+			const finished = row.pages_total === row.pages_progress;
+			const percent = Math.round((row.pages_progress / row.pages_total) * 100);
 
-				progress = `read ${percent}% <small>(${row.pages_progress || 0} / ${row.pages_total} pages)</small>`;
-				status = 'reading';
+			progress = `read ${percent}% <small>(${row.pages_progress || 0} / ${
+				row.pages_total
+			} pages)</small>`;
+			status = 'reading';
 
-				if (finished) {
-					progress = `completed on ${prettyDate(new Date(row.completed_at))}`;
-					status = 'finished';
-				}
+			if (finished) {
+				progress = `completed on ${prettyDate(new Date(row.completed_at))}`;
+				status = 'finished';
 			}
+		}
 
-			return {
-				...row,
-				progress,
-				status,
-				timeago: timeago.format(new Date(row.updated_at || row.created_at)),
-			};
-		});
+		return {
+			...row,
+			progress,
+			status,
+			timeago: timeago.format(new Date(row.updated_at || row.created_at)),
+		};
+	});
 }
 
 /**
@@ -100,11 +100,8 @@ export function getBooks (parameters) {
  * @param {string} id
  * @returns {import('better-sqlite3').RunResult}
  */
-export function deleteBook (id) {
-	const statement = getStatement(
-		'deleteBook',
-		'DELETE FROM books WHERE id = $id',
-	);
+export function deleteBook(id) {
+	const statement = getStatement('deleteBook', 'DELETE FROM books WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -115,7 +112,7 @@ export function deleteBook (id) {
  * @param {Book} book
  * @returns {import('better-sqlite3').RunResult}
  */
-export function updateBook (id, book) {
+export function updateBook(id, book) {
 	const statement = getStatement(
 		'updateBook',
 		`UPDATE books
@@ -147,11 +144,8 @@ export function updateBook (id, book) {
 /**
  * @return {number} Number of books recorded in database
  */
-export function countBooks () {
-	const statement = getStatement(
-		'countBooks',
-		'SELECT COUNT(*) as total FROM books',
-	);
+export function countBooks() {
+	const statement = getStatement('countBooks', 'SELECT COUNT(*) as total FROM books');
 
 	return statement.get().total;
 }

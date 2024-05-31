@@ -1,16 +1,16 @@
 import express from 'express';
 import {
+	deleteGameAchievement,
+	insertNewGameAchievement,
+	updateGameAchievement,
+} from '../../database/gameachievements.js';
+import {
 	countGameActivity,
 	deleteGameActivity,
 	getGameActivity,
 	insertNewGameActivity,
 	updateGameActivity,
 } from '../../database/games.js';
-import {
-	deleteGameAchievement,
-	insertNewGameAchievement,
-	updateGameAchievement,
-} from '../../database/gameachievements.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -61,7 +61,7 @@ router.post('/:id', (req, res) => {
 router.get('/:id/achievements', (req, res) => {
 	const { id } = req.params;
 
-	const [ game ] = getGameActivity({ id });
+	const [game] = getGameActivity({ id });
 
 	if (!game) {
 		res.redirect('/games');
@@ -75,7 +75,7 @@ router.post('/:game_id/achievements', (req, res) => {
 	const { game_id } = req.params;
 	const { id, crudType, name, description, created_at } = req.body;
 
-	const [ game ] = getGameActivity({ id: game_id });
+	const [game] = getGameActivity({ id: game_id });
 
 	if (!game) {
 		res.redirect(`/games/${game_id}/achievements`);

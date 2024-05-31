@@ -35,12 +35,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
 	const { name, type, created_at } = req.body;
 
-	insertFood(
-		name,
-		type,
-		created_at || new Date().toISOString(),
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+	insertFood(name, type, created_at, process.env.TOMBOIS_DEFAULT_DEVICE_ID);
 
 	res.redirect('/food');
 });

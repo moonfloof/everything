@@ -1,28 +1,27 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
-import { calculateGetParameters } from './constants.js';
 import timeago from '../adapters/timeago.js';
+import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
-export const entryTypeValues = [
-	'note',
-	'post',
-	'audio',
-	'video',
-	'photo',
-];
-
-export const entryTypeEmojiMap = {
-	note: '💬',
-	post: '📰',
-	audio: '🎵',
-	video: '🎥',
-	photo: '📸',
+export const ENTRY_TYPES = {
+	NOTE: /** @type {const} */ ('note'),
+	POST: /** @type {const} */ ('post'),
+	AUDIO: /** @type {const} */ ('audio'),
+	VIDEO: /** @type {const} */ ('video'),
+	PHOTO: /** @type {const} */ ('photo'),
 };
 
-export const entryStatusValues = [
-	'public',
-	'private',
-];
+export const entryTypeValues = Object.values(ENTRY_TYPES);
+
+export const entryTypeEmojiMap = {
+	[ENTRY_TYPES.NOTE]: /** @type {const} */ ('💬'),
+	[ENTRY_TYPES.POST]: /** @type {const} */ ('📰'),
+	[ENTRY_TYPES.AUDIO]: /** @type {const} */ ('🎵'),
+	[ENTRY_TYPES.VIDEO]: /** @type {const} */ ('🎥'),
+	[ENTRY_TYPES.PHOTO]: /** @type {const} */ ('📸'),
+};
+
+export const entryStatusValues = ['public', 'private'];
 
 /**
  * @param {string} description
@@ -36,10 +35,10 @@ export const entryStatusValues = [
  * @param {string} [device_id]
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertNote (
+export function insertNote(
 	description,
 	title = null,
-	type = 'note',
+	type = ENTRY_TYPES.NOTE,
 	status = 'public',
 	url = null,
 	syndication_json = null,
@@ -72,11 +71,8 @@ export function insertNote (
  * @param {string} [status]
  * @return {number}
  */
-export function countNotes (status = 'public') {
-	const statement = getStatement(
-		'countNotes',
-		'SELECT COUNT(*) as total FROM entries WHERE status LIKE $status',
-	);
+export function countNotes(status = 'public') {
+	const statement = getStatement('countNotes', 'SELECT COUNT(*) as total FROM entries WHERE status LIKE $status');
 
 	return statement.get({ status: status || '%' }).total;
 }
@@ -89,7 +85,7 @@ export function countNotes (status = 'public') {
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getNotes (parameters) {
+export function getNotes(parameters) {
 	const statement = getStatement(
 		'getNotes',
 		`SELECT * FROM entries
@@ -105,7 +101,7 @@ export function getNotes (parameters) {
 		})
 		.map(row => ({
 			...row,
-			emoji: entryTypeEmojiMap[row.type || 'note'],
+			emoji: entryTypeEmojiMap[row.type || ENTRY_TYPES.NOTE],
 			timeago: timeago.format(new Date(row.created_at)),
 			syndication: row.syndication_json ? JSON.parse(row.syndication_json) : null,
 
@@ -121,11 +117,8 @@ export function getNotes (parameters) {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteNote (id) {
-	const statement = getStatement(
-		'deleteNote',
-		'DELETE FROM entries WHERE id = $id',
-	);
+export function deleteNote(id) {
+	const statement = getStatement('deleteNote', 'DELETE FROM entries WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -142,16 +135,7 @@ export function deleteNote (id) {
  * @param {string} [updated_at]
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateNote (
-	id,
-	description,
-	title,
-	type,
-	status,
-	url,
-	syndication_json,
-	created_at,
-) {
+export function updateNote(id, description, title, type, status, url, syndication_json, created_at) {
 	const statement = getStatement(
 		'updateNote',
 		`UPDATE entries

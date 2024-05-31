@@ -1,5 +1,5 @@
-import express from 'express';
 import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
+import express from 'express';
 
 const router = express.Router();
 
@@ -11,6 +11,8 @@ router.get('/', (_req, res) => {
 
 // NOT FOUND
 
-router.get('*', () => { throw new NotFoundError('Page Not Found'); });
+router.get('*', () => {
+	throw new NotFoundError('Page Not Found');
+});
 
 export default router;

@@ -5,7 +5,7 @@ let geocoder = null;
 /**
  * @returns {NodeGeocoder.Geocoder}
  */
-export function getGeocoder () {
+export function getGeocoder() {
 	if (geocoder !== null) return geocoder;
 
 	geocoder = NodeGeocoder({

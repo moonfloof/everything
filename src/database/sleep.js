@@ -1,7 +1,7 @@
-import { getStatement } from './database.js';
 import TimeAgo from '../adapters/timeago.js';
-import { dayMs, hourMs, formatTime, prettyDate, prettyDuration, shortDate, getStartOfDay } from '../lib/formatDate.js';
+import { dayMs, formatTime, getStartOfDay, hourMs, prettyDate, prettyDuration, shortDate } from '../lib/formatDate.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 import { CATEGORIES } from './timetracking.js';
 
 /**
@@ -14,7 +14,7 @@ import { CATEGORIES } from './timetracking.js';
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getSleepCycles (parameters) {
+export function getSleepCycles(parameters) {
 	const statement = getStatement(
 		'getSleepCycles',
 		`SELECT * FROM timetracking
@@ -26,42 +26,40 @@ export function getSleepCycles (parameters) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all(calculateGetParameters(parameters))
-		.map(row => {
-			const created_at = new Date(row.created_at);
-			const ended_at = row.ended_at ? new Date(row.ended_at) : null;
-			const timeago = TimeAgo.format(created_at);
+	return statement.all(calculateGetParameters(parameters)).map(row => {
+		const created_at = new Date(row.created_at);
+		const ended_at = row.ended_at ? new Date(row.ended_at) : null;
+		const timeago = TimeAgo.format(created_at);
 
-			const startTimeMs = (created_at.getTime() % dayMs);
-			const twelveHours = 12 * hourMs;
-			const startTimeNormalised = (((startTimeMs + twelveHours) % dayMs) - twelveHours) / hourMs;
+		const startTimeMs = created_at.getTime() % dayMs;
+		const twelveHours = 12 * hourMs;
+		const startTimeNormalised = (((startTimeMs + twelveHours) % dayMs) - twelveHours) / hourMs;
 
-			let duration = null;
-			let durationNumber = 0;
+		let duration = null;
+		let durationNumber = 0;
 
-			if (ended_at !== null) {
-				// Difference between start and end, in milliseconds
-				const diff = ended_at - created_at;
-				duration = prettyDuration(diff);
+		if (ended_at !== null) {
+			// Difference between start and end, in milliseconds
+			const diff = ended_at - created_at;
+			duration = prettyDuration(diff);
 
-				// Hours as a decimal (eg. `7.56`)
-				durationNumber = diff / 3600000;
-			}
+			// Hours as a decimal (eg. `7.56`)
+			durationNumber = diff / 3600000;
+		}
 
-			return {
-				...row,
-				timeago,
-				duration,
-				durationNumber,
-				startTimeNormalised,
-				dateFull: prettyDate(ended_at ?? created_at),
-				dateShort: shortDate(ended_at ?? created_at),
-			};
-		});
+		return {
+			...row,
+			timeago,
+			duration,
+			durationNumber,
+			startTimeNormalised,
+			dateFull: prettyDate(ended_at ?? created_at),
+			dateShort: shortDate(ended_at ?? created_at),
+		};
+	});
 }
 
-export function getSleepStats () {
+export function getSleepStats() {
 	const emptyStats = {
 		longest: 0,
 		longestHuman: '',
@@ -72,36 +70,34 @@ export function getSleepStats () {
 		cumulativeDuration: 0,
 	};
 
-	const sleep = getSleepCycles({ days: 100 }).slice(0, 10);
+	const sleepCycles = getSleepCycles({ days: 100 }).slice(0, 10);
 
-	if (sleep.length === 0) return emptyStats;
+	if (sleepCycles.length === 0) return emptyStats;
 
-	const stats = sleep.reduce((acc, cur) => {
-		let newAcc = { ...acc };
-
+	const stats = sleepCycles.reduce((stats, sleep) => {
 		// Skip currently sleeping
-		if (cur.durationNumber === 0) return newAcc;
+		if (sleep.durationNumber === 0) return stats;
 
-		if (cur.durationNumber > acc.longest) {
-			newAcc.longest = cur.durationNumber;
-			newAcc.longestHuman = cur.duration;
+		if (sleep.durationNumber > stats.longest) {
+			stats.longest = sleep.durationNumber;
+			stats.longestHuman = sleep.duration;
 		}
 
-		if (cur.durationNumber < acc.shortest) {
-			newAcc.shortest = cur.durationNumber;
-			newAcc.shortestHuman = cur.duration;
+		if (sleep.durationNumber < stats.shortest) {
+			stats.shortest = sleep.durationNumber;
+			stats.shortestHuman = sleep.duration;
 		}
 
-		newAcc.cumulativeSleepStart += cur.startTimeNormalised;
-		newAcc.cumulativeSleepEnd += cur.startTimeNormalised + cur.durationNumber;
-		newAcc.cumulativeDuration += cur.durationNumber;
+		stats.cumulativeSleepStart += sleep.startTimeNormalised;
+		stats.cumulativeSleepEnd += sleep.startTimeNormalised + sleep.durationNumber;
+		stats.cumulativeDuration += sleep.durationNumber;
 
-		return newAcc;
+		return stats;
 	}, emptyStats);
 
-	const averageSleep = (stats.cumulativeSleepStart / sleep.length) * hourMs;
-	const averageWake = (stats.cumulativeSleepEnd / sleep.length) * hourMs;
-	const averageDuration = (stats.cumulativeDuration / sleep.length) * hourMs;
+	const averageSleep = (stats.cumulativeSleepStart / sleepCycles.length) * hourMs;
+	const averageWake = (stats.cumulativeSleepEnd / sleepCycles.length) * hourMs;
+	const averageDuration = (stats.cumulativeDuration / sleepCycles.length) * hourMs;
 
 	// Use today for the correct timezone
 	const today = getStartOfDay().getTime();

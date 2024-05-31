@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
-import { calculateGetParameters } from './constants.js';
 import { dayMs, formatDate } from '../lib/formatDate.js';
+import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @param {number} step_count_total
@@ -9,7 +9,7 @@ import { dayMs, formatDate } from '../lib/formatDate.js';
  * @param {string} device_id
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertSteps (step_count_total, created_at, device_id) {
+export function insertSteps(step_count_total, created_at, device_id) {
 	const statement = getStatement(
 		'insertSteps',
 		`INSERT INTO steps
@@ -34,7 +34,7 @@ export function insertSteps (step_count_total, created_at, device_id) {
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getSteps (parameters) {
+export function getSteps(parameters) {
 	const statement = getStatement(
 		'getSteps',
 		`SELECT * FROM steps
@@ -46,7 +46,7 @@ export function getSteps (parameters) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
-export function getStepsYesterday () {
+export function getStepsYesterday() {
 	const statement = getStatement(
 		'getStepsYesterday',
 		`SELECT * FROM steps
@@ -60,11 +60,8 @@ export function getStepsYesterday () {
 }
 
 /** @return {number} */
-export function countSteps () {
-	const statement = getStatement(
-		'countSteps',
-		'SELECT COUNT(*) as total FROM steps',
-	);
+export function countSteps() {
+	const statement = getStatement('countSteps', 'SELECT COUNT(*) as total FROM steps');
 
 	return statement.get().total;
 }
@@ -73,11 +70,8 @@ export function countSteps () {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteSteps (id) {
-	const statement = getStatement(
-		'deleteSteps',
-		'DELETE FROM steps WHERE id = $id',
-	);
+export function deleteSteps(id) {
+	const statement = getStatement('deleteSteps', 'DELETE FROM steps WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -88,7 +82,7 @@ export function deleteSteps (id) {
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateSteps (id, step_count_total, created_at) {
+export function updateSteps(id, step_count_total, created_at) {
 	const statement = getStatement(
 		'updateSteps',
 		`UPDATE steps

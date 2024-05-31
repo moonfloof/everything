@@ -1,8 +1,4 @@
-const allowedIps = [
-	'127.0.0.1',
-	'192.168.1.',
-];
-
+const allowedIps = ['127.0.0.1', '192.168.1.'];
 
 /**
  * @param {import('express').Request} req

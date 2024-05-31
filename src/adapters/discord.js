@@ -1,8 +1,8 @@
 import { Client } from 'discord.js';
-import { getYouTubeVideoSnippet } from './youtube.js';
-import { insertYouTubeLike } from '../database/youtubelikes.js';
 import { insertBookmark } from '../database/bookmarks.js';
+import { insertYouTubeLike } from '../database/youtubelikes.js';
 import Logger from '../lib/logger.js';
+import { getYouTubeVideoSnippet } from './youtube.js';
 
 const log = new Logger('discord');
 
@@ -12,7 +12,7 @@ let client = null;
 /**
  * @returns {Client|null}
  */
-export function getDiscordClient () {
+export function getDiscordClient() {
 	if (!process.env.TOMBOIS_DISCORD_TOKEN || !process.env.TOMBOIS_DISCORD_CHANNELID) {
 		log.warn('No token or channel ID provided, bot will not be enabled');
 		return null;
@@ -21,12 +21,8 @@ export function getDiscordClient () {
 	if (client !== null) return client;
 
 	client = new Client({
-		partials: [ 'MESSAGE', 'USER', 'CHANNEL' ],
-		intents: [
-			'Guilds',
-			'GuildMessages',
-			'MessageContent',
-		],
+		partials: ['MESSAGE', 'USER', 'CHANNEL'],
+		intents: ['Guilds', 'GuildMessages', 'MessageContent'],
 	});
 
 	client.on('ready', () => {
@@ -44,7 +40,7 @@ export function getDiscordClient () {
  * @param {string[]} args
  * @param {import('discord.js').Message} message
  */
-async function commandYouTube (args, message) {
+async function commandYouTube(args, message) {
 	if (args[0] === 'help') {
 		await message.reply('Usage: `youtube <URL> [liked date/time]`');
 		return;
@@ -65,13 +61,13 @@ async function commandYouTube (args, message) {
  * @param {string[]} args
  * @param {import('discord.js').Message} message
  */
-async function commandBookmark (args, message) {
+async function commandBookmark(args, message) {
 	if (args[0] === 'help') {
 		await message.reply('Usage: `bookmark <URL> <TITLE>`');
 		return;
 	}
 
-	const [ url, ...titleParts ] = args;
+	const [url, ...titleParts] = args;
 	const title = titleParts.join(' ').trim();
 
 	if (!url || !title) {
@@ -86,18 +82,23 @@ async function commandBookmark (args, message) {
 /**
  * @param {import('discord.js').Message} message
  */
-async function handleMessage (message) {
+async function handleMessage(message) {
 	if (message.channel.id !== process.env.TOMBOIS_DISCORD_CHANNELID) return;
 	if (message.author.tag === getDiscordClient()?.user.tag) return;
 	if (message.partial) return;
 	if (!message.content) return;
 
-	const [ command, ...args ] = message.content.split(' ');
+	const [command, ...args] = message.content.split(' ');
 	try {
 		switch (command) {
-			case 'youtube': commandYouTube(args, message); break;
-			case 'bookmark': commandBookmark(args, message); break;
-			default: return;
+			case 'youtube':
+				commandYouTube(args, message);
+				break;
+			case 'bookmark':
+				commandBookmark(args, message);
+				break;
+			default:
+				return;
 		}
 
 		await message.react('👍');

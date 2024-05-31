@@ -1,6 +1,6 @@
 import express from 'express';
-import { validateDevice } from '../../database/devices.js';
 import { insertBookmark } from '../../database/bookmarks.js';
+import { validateDevice } from '../../database/devices.js';
 import Logger from '../../lib/logger.js';
 
 const log = new Logger('Bookmarks');

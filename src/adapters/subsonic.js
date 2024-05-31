@@ -1,5 +1,5 @@
+import crypto from 'node:crypto';
 import phin from 'phin';
-import crypto from 'crypto';
 
 import dotenv from 'dotenv';
 
@@ -32,8 +32,7 @@ const getBaseParams = () => {
 };
 
 const checkEnvironment = () => {
-	return !process.env.TOMBOIS_SUBSONIC_URL ||
-		!process.env.TOMBOIS_SUBSONIC_USERNAME;
+	return !process.env.TOMBOIS_SUBSONIC_URL || !process.env.TOMBOIS_SUBSONIC_USERNAME;
 };
 
 export const getAlbumList = async (page = 0) => {
@@ -70,7 +69,7 @@ export const getAllAlbums = async () => {
 	return albums;
 };
 
-export const getAlbumTracks = async (albumId) => {
+export const getAlbumTracks = async albumId => {
 	if (checkEnvironment()) return null;
 
 	const params = new URLSearchParams({

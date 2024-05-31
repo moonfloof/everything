@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllAlbums, getAlbumTracks, scrobbleTrack } from '../../adapters/subsonic.js';
+import { getAlbumTracks, getAllAlbums, scrobbleTrack } from '../../adapters/subsonic.js';
 import Logger from '../../lib/logger.js';
 
 const log = new Logger('ListenBrainz');
@@ -14,8 +14,12 @@ router.get('/', async (_req, res) => {
 		albumlistRaw.sort((a, b) => {
 			const al = `${a.artist}${a.name}`.toLowerCase();
 			const bl = `${b.artist}${b.name}`.toLowerCase();
-			if (al < bl) { return -1; }
-			if (al > bl) { return 1; }
+			if (al < bl) {
+				return -1;
+			}
+			if (al > bl) {
+				return 1;
+			}
 			return 0;
 		});
 

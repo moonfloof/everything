@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import Logger from './lib/logger.js';
 import { getDatabase } from './database/database.js';
+import Logger from './lib/logger.js';
 
 // Servers
 import appExternal from './app-external.js';

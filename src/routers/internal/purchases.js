@@ -1,6 +1,12 @@
 import express from 'express';
 
-import { countPurchases, deletePurchase, getPurchases, insertPurchase, updatePurchase } from '../../database/purchases.js';
+import {
+	countPurchases,
+	deletePurchase,
+	getPurchases,
+	insertPurchase,
+	updatePurchase,
+} from '../../database/purchases.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -21,14 +27,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
 	const { amount, currency, merchant, category, created_at } = req.body;
 
-	insertPurchase(
-		amount,
-		merchant,
-		category,
-		currency,
-		created_at || new Date().toISOString(),
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+	insertPurchase(amount, merchant, category, currency, created_at, process.env.TOMBOIS_DEFAULT_DEVICE_ID);
 
 	res.redirect('/purchases');
 });
