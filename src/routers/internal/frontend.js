@@ -9,10 +9,4 @@ router.get('/', (_req, res) => {
 	res.render('internal/index');
 });
 
-// NOT FOUND
-
-router.get('*', () => {
-	throw new NotFoundError('Page Not Found');
-});
-
 export default router;

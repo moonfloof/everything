@@ -31,6 +31,7 @@ app.use(trimStrings);
 app.use(validatePageNumber(true));
 
 // Set up routers
+app.use('/', frontend);
 app.use('/bookmarks', bookmarks);
 app.use('/books', books);
 app.use('/films', films);
@@ -46,7 +47,10 @@ app.use('/timetracking', timetracking);
 app.use('/tv', tv);
 app.use('/weight', weight);
 app.use('/youtubelikes', youtubelikes);
-app.use('/', frontend);
+
+app.get('*', () => {
+	throw new NotFoundError('Page Not Found');
+});
 
 app.use((err, req, res, _next) => {
 	log.error(err.message, err.code, req.originalUrl);
