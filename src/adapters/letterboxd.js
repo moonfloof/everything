@@ -1,11 +1,11 @@
-import sax from 'sax';
-import phin from 'phin';
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import dotenv from 'dotenv';
+import phin from 'phin';
+import sax from 'sax';
+import { insertFilm } from '../database/films.js';
 import { formatDate } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
-import { insertFilm } from '../database/films.js';
 
 dotenv.config();
 
@@ -54,7 +54,7 @@ const saveFilmsToDisk = () => {
 	fs.writeFileSync(storagePath(), str);
 };
 
-const fetchLetterboxdFeed = async (username) => {
+const fetchLetterboxdFeed = async username => {
 	const response = await phin({
 		url: `https://letterboxd.com/${username}/rss/`,
 		parse: 'string',
@@ -65,58 +65,59 @@ const fetchLetterboxdFeed = async (username) => {
 /**
  * @param {string} feed
  * @returns {Promise<LetterboxdFilm[]>}
-*/
-const parseFeed = async (feed) => new Promise((resolve, reject) => {
-	const parser = sax.parser(true, { lowercase: true, trim: true });
-	const items = [];
-	let currentIndex = -1;
-	let currentTag = '';
-	let writingItem = false;
+ */
+const parseFeed = async feed =>
+	new Promise((resolve, reject) => {
+		const parser = sax.parser(true, { lowercase: true, trim: true });
+		const items = [];
+		let currentIndex = -1;
+		let currentTag = '';
+		let writingItem = false;
 
-	parser.onopentag = (node) => {
-		currentTag = node.name;
+		parser.onopentag = node => {
+			currentTag = node.name;
 
-		if (currentTag.includes(':')) {
-			currentTag = currentTag.split(':')[1];
-		}
+			if (currentTag.includes(':')) {
+				currentTag = currentTag.split(':')[1];
+			}
 
-		if (node.name === 'item') {
-			writingItem = true;
-			currentIndex += 1;
-			items.push({});
-		}
-	};
+			if (node.name === 'item') {
+				writingItem = true;
+				currentIndex += 1;
+				items.push({});
+			}
+		};
 
-	parser.ontext = text => {
-		if (!writingItem) return;
-		if (text === '') return;
+		parser.ontext = text => {
+			if (!writingItem) return;
+			if (text === '') return;
 
-		let value = text;
+			let value = text;
 
-		if (currentTag.includes('Date')) {
-			value = new Date(value);
-		} else if (!isNaN(parseInt(value, 10))) {
-			value = Number(value);
-		}
+			if (currentTag.includes('Date')) {
+				value = new Date(value);
+			} else if (!Number.isNaN(Number.parseInt(value, 10))) {
+				value = Number(value);
+			}
 
-		items[currentIndex][currentTag] = value;
-	};
+			items[currentIndex][currentTag] = value;
+		};
 
-	parser.oncdata = text => {
-		items[currentIndex][currentTag] = text.trim();
-	};
+		parser.oncdata = text => {
+			items[currentIndex][currentTag] = text.trim();
+		};
 
-	parser.onclosetag = node => {
-		if (node !== 'item') return;
+		parser.onclosetag = node => {
+			if (node !== 'item') return;
 
-		writingItem = false;
-	};
+			writingItem = false;
+		};
 
-	parser.onend = () => resolve(items);
-	parser.onerror = (err) => reject(err);
+		parser.onend = () => resolve(items);
+		parser.onerror = err => reject(err);
 
-	parser.write(feed).close();
-});
+		parser.write(feed).close();
+	});
 
 export const fetchFilms = () => {
 	const intervalSecs = Number(process.env.TOMBOIS_LETTERBOXD_POLL_INTERVAL_SECS) ?? 86400;
@@ -135,9 +136,9 @@ export const fetchFilms = () => {
 		const feed = await fetchLetterboxdFeed(username);
 		const newActivity = (await parseFeed(feed)).reverse();
 
-		newActivity.forEach(film => {
+		for (const film of newActivity) {
 			// Skip films older than double the interval
-			if (film.watchedDate.getTime() < Date.now() - (intervalMs * 2)) {
+			if (film.watchedDate.getTime() < Date.now() - intervalMs * 2) {
 				return;
 			}
 
@@ -165,7 +166,7 @@ export const fetchFilms = () => {
 				film.pubDate.toISOString(),
 				deviceId,
 			);
-		});
+		}
 
 		filmActivity = newActivity;
 

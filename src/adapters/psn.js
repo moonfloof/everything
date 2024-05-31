@@ -1,12 +1,12 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
-import { updateActivity } from '../database/games.js';
 import { insertNewGameAchievement } from '../database/gameachievements.js';
+import { updateActivity } from '../database/games.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 
-import { createRequire } from 'module';
+import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const psnApi = require('psn-api');
 const {
@@ -86,11 +86,11 @@ const saveGamesToDisk = () => {
 };
 
 /** @param {import('psn-api').AuthTokensResponse} auth */
-const convertPsnAuth = (auth) => {
+const convertPsnAuth = auth => {
 	return {
 		...auth,
-		accessTokenExpiryDate: new Date(Date.now() + (auth.expiresIn * 1000)),
-		refreshTokenExpiryDate: new Date(Date.now() + (auth.refreshTokenExpiresIn * 1000)),
+		accessTokenExpiryDate: new Date(Date.now() + auth.expiresIn * 1000),
+		refreshTokenExpiryDate: new Date(Date.now() + auth.refreshTokenExpiresIn * 1000),
 	};
 };
 
@@ -103,7 +103,9 @@ const authenticateApi = async () => {
 
 		// Refresh token HAS expired
 		if ((authentication.refreshTokenExpiryDate?.getTime() || 0) - Date.now() < 0) {
-			throw new Error('Cannot generate new PSN credentials. Please provide a new NPSSO and restart the server');
+			throw new Error(
+				'Cannot generate new PSN credentials. Please provide a new NPSSO and restart the server',
+			);
 		}
 
 		log.info('Access token has expired - fetching a new one.');
@@ -132,18 +134,18 @@ const authenticateApi = async () => {
  *
  * @param {*} game
  */
-const compareTrophies = async (game) => {
+const compareTrophies = async game => {
 	const gameName = game.titleName.replace(/[^a-zA-Z0-9]*/g, '');
 	let id = gameIdMap[gameName];
 	if (!gameIdMap[gameName]) {
 		log.debug('Fetching recently played games');
 		const response = await getUserTitles(authentication, 'me');
-		response.trophyTitles.forEach(title => {
+		for (const title of response.trophyTitles) {
 			const titleName = title.trophyTitleName.replace(/[^a-zA-Z0-9]*/g, '');
 			if (!gameIdMap[titleName]) {
 				gameIdMap[titleName] = title.npCommunicationId;
 			}
-		});
+		}
 
 		id = gameIdMap[gameName];
 		if (!id) {
@@ -155,7 +157,7 @@ const compareTrophies = async (game) => {
 	let options = undefined;
 	if (game.format !== 'PS5') options = { npServiceName: 'trophy' };
 
-	log.debug('Fetching user trophies for ' + game.titleName);
+	log.debug(`Fetching user trophies for ${game.titleName}`);
 	const response = await getUserTrophiesEarnedForTitle(authentication, 'me', id, 'all', options);
 	const remoteTrophies = response.trophies;
 
@@ -163,11 +165,12 @@ const compareTrophies = async (game) => {
 		// Skip achievements the first time they are loaded
 		if (trophies[id] === undefined) return false;
 
-		return trophies[id].user.some(localAchievement => (
-			localAchievement.trophyId === remoteTrophy.trophyId &&
-			!localAchievement.earned &&
-			remoteTrophy.earned === true
-		));
+		return trophies[id].user.some(
+			localAchievement =>
+				localAchievement.trophyId === remoteTrophy.trophyId &&
+				!localAchievement.earned &&
+				remoteTrophy.earned === true,
+		);
 	});
 
 	if (!trophies[id]) trophies[id] = {};
@@ -179,7 +182,7 @@ const compareTrophies = async (game) => {
 	}));
 
 	if (newTrophies.length > 0 && !trophies[id].server) {
-		log.debug('Fetching server trophies for ' + game.titleName);
+		log.debug(`Fetching server trophies for ${game.titleName}`);
 		const serverTrophies = await psnApi.getTitleTrophies(authentication, id, 'all', options);
 		trophies[id].server = serverTrophies.trophies.map(trophy => ({
 			trophyId: trophy.trophyId,
@@ -190,9 +193,7 @@ const compareTrophies = async (game) => {
 
 	// Add title and description to new trophies
 	return newTrophies.map(trophy => {
-		const server = trophies[id].server.find(serverTrophy => (
-			serverTrophy.trophyId === trophy.trophyId
-		));
+		const server = trophies[id].server.find(serverTrophy => serverTrophy.trophyId === trophy.trophyId);
 		return {
 			...trophy,
 			trophyName: server.trophyName,
@@ -204,7 +205,9 @@ const compareTrophies = async (game) => {
 const fetchGameActivity = async () => {
 	await authenticateApi();
 
-	const { basicPresence: { gameTitleInfoList } } = await getBasicPresence(authentication, 'me');
+	const {
+		basicPresence: { gameTitleInfoList },
+	} = await getBasicPresence(authentication, 'me');
 
 	if (!gameTitleInfoList) return;
 
@@ -220,9 +223,11 @@ const fetchGameActivity = async () => {
 	for (let i = 0; i < gameTitleInfoList.length; i++) {
 		const game = gameTitleInfoList[i];
 		const newTrophies = await compareTrophies(game);
+
 		if (newTrophies.length > 0) {
 			log.info(`${newTrophies.length} new trophies for ${game.titleName}`);
 		}
+
 		const activity = updateActivity(
 			game.titleName,
 			playTimeMinutes,
@@ -230,13 +235,16 @@ const fetchGameActivity = async () => {
 			deviceId,
 			playTimeMinutes * minuteMs,
 		);
-		newTrophies.forEach(trophy => insertNewGameAchievement(
-			trophy.trophyName,
-			trophy.trophyDetail,
-			game.titleName,
-			activity.id,
-			deviceId,
-		));
+
+		for (const trophy of newTrophies) {
+			insertNewGameAchievement(
+				trophy.trophyName,
+				trophy.trophyDetail,
+				game.titleName,
+				activity.id,
+				deviceId,
+			);
+		}
 	}
 
 	saveGamesToDisk();

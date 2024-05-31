@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @param {string} name
@@ -9,7 +9,7 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} device_id
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertFood (name, type, created_at, device_id) {
+export function insertFood(name, type, created_at, device_id) {
 	const statement = getStatement(
 		'insertFood',
 		`INSERT INTO food
@@ -35,7 +35,7 @@ export function insertFood (name, type, created_at, device_id) {
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getFood (parameters) {
+export function getFood(parameters) {
 	const statement = getStatement(
 		'getFood',
 		`SELECT * FROM food
@@ -48,11 +48,8 @@ export function getFood (parameters) {
 }
 
 /** @return {number} */
-export function countFood () {
-	const statement = getStatement(
-		'countFood',
-		'SELECT COUNT(*) as total FROM food',
-	);
+export function countFood() {
+	const statement = getStatement('countFood', 'SELECT COUNT(*) as total FROM food');
 
 	return statement.get().total;
 }
@@ -61,11 +58,8 @@ export function countFood () {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteFood (id) {
-	const statement = getStatement(
-		'deleteFood',
-		'DELETE FROM food WHERE id = $id',
-	);
+export function deleteFood(id) {
+	const statement = getStatement('deleteFood', 'DELETE FROM food WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -77,7 +71,7 @@ export function deleteFood (id) {
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateFood (id, name, type, created_at) {
+export function updateFood(id, name, type, created_at) {
 	const statement = getStatement(
 		'updateFood',
 		`UPDATE food

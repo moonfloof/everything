@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @param {number} weight_kgs
@@ -8,7 +8,7 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} device_id
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertWeight (weight_kgs, created_at, device_id) {
+export function insertWeight(weight_kgs, created_at, device_id) {
 	const statement = getStatement(
 		'insertWeight',
 		`INSERT INTO weight
@@ -35,7 +35,7 @@ export function insertWeight (weight_kgs, created_at, device_id) {
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getWeight (parameters) {
+export function getWeight(parameters) {
 	const statement = getStatement(
 		'getWeight',
 		`SELECT * FROM weight
@@ -48,11 +48,8 @@ export function getWeight (parameters) {
 }
 
 /** @return {number} */
-export function countWeight () {
-	const statement = getStatement(
-		'countWeight',
-		'SELECT COUNT(*) as total FROM weight',
-	);
+export function countWeight() {
+	const statement = getStatement('countWeight', 'SELECT COUNT(*) as total FROM weight');
 
 	return statement.get().total;
 }
@@ -61,11 +58,8 @@ export function countWeight () {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteWeight (id) {
-	const statement = getStatement(
-		'deleteWeight',
-		'DELETE FROM weight WHERE id = $id',
-	);
+export function deleteWeight(id) {
+	const statement = getStatement('deleteWeight', 'DELETE FROM weight WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -76,7 +70,7 @@ export function deleteWeight (id) {
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateWeight (id, weight_kgs, created_at) {
+export function updateWeight(id, weight_kgs, created_at) {
 	const statement = getStatement(
 		'updateWeight',
 		`UPDATE weight

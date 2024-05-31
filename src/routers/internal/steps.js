@@ -14,10 +14,13 @@ router.get('/', (req, res) => {
 
 	const steps = getSteps({ page });
 
-	const svg = generateBarGraph(steps.map(s => ({
-		label: shortDate(new Date(s.created_at)),
-		y: s.step_count_total,
-	})), 'daily steps');
+	const svg = generateBarGraph(
+		steps.map(s => ({
+			label: shortDate(new Date(s.created_at)),
+			y: s.step_count_total,
+		})),
+		'daily steps',
+	);
 
 	res.render('internal/steps', { steps, pagination, svg });
 });
@@ -27,11 +30,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
 	const { step_count_total, created_at } = req.body;
 
-	insertSteps(
-		step_count_total,
-		created_at || Date.now(),
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+	insertSteps(step_count_total, created_at || Date.now(), process.env.TOMBOIS_DEFAULT_DEVICE_ID);
 
 	res.redirect('/steps');
 });

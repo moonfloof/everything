@@ -1,16 +1,16 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import phin from 'phin';
+import { insertNewGameAchievement } from '../database/gameachievements.js';
 import { updateActivity } from '../database/games.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
-import { insertNewGameAchievement } from '../database/gameachievements.js';
 
 const log = new Logger('Steam');
 
 const ignoredGames = [
-	250820,  // Steam VR
-	755540,  // LIV
+	250820, // Steam VR
+	755540, // LIV
 	1173510, // XSOverlay
 	1009850, // OVR Advanced Settings
 ];
@@ -42,7 +42,6 @@ let gameActivity = [];
 /** @type {LocalAchievement[]} */
 let achievements = {};
 
-
 const storagePath = () => path.resolve(process.env.TOMBOIS_STEAM_DATA_FILE);
 
 const loadGamesFromDisk = () => {
@@ -70,11 +69,8 @@ const saveGamesToDisk = () => {
  * @param {number} appid
  * @return {Promise<RemoteAchievement[] | null>}
  */
-const fetchAchievements = async (appid) => {
-	const {
-		TOMBOIS_STEAM_APIKEY: apiKey,
-		TOMBOIS_STEAM_USERID: userId,
-	} = process.env;
+const fetchAchievements = async appid => {
+	const { TOMBOIS_STEAM_APIKEY: apiKey, TOMBOIS_STEAM_USERID: userId } = process.env;
 
 	if (!apiKey || !userId) return null;
 
@@ -98,13 +94,15 @@ const fetchAchievements = async (appid) => {
 		return body.playerstats.achievements;
 	} catch (err) {
 		log.error(err.message, err);
-		log.warn('Marking this game as achievement-less. You will not recieve achievement updates for this game');
+		log.warn(
+			'Marking this game as achievement-less. You will not recieve achievement updates for this game',
+		);
 		achievements[`${appid}`] = null;
 		return null;
 	}
 };
 
-const compareAchievements = async (appid) => {
+const compareAchievements = async appid => {
 	/** @type {LocalAchievement[]} */
 	const localAchievements = achievements[`${appid}`];
 	if (localAchievements === null) return [];
@@ -118,11 +116,12 @@ const compareAchievements = async (appid) => {
 		// TODO: Calculate based on the "unlocktime" property
 		if (localAchievements === undefined) return false;
 
-		return localAchievements.some(localAchievement => (
-			localAchievement.apiname === remoteAchievement.apiname &&
-			localAchievement.achieved === 0 &&
-			remoteAchievement.achieved === 1
-		));
+		return localAchievements.some(
+			localAchievement =>
+				localAchievement.apiname === remoteAchievement.apiname &&
+				localAchievement.achieved === 0 &&
+				remoteAchievement.achieved === 1,
+		);
 	});
 };
 
@@ -151,29 +150,28 @@ export const pollForGameActivity = () => {
 		});
 
 		const newActivity = [];
-		body.response.games
-			.filter(game => !ignoredGames.includes(game.appid))
-			.forEach(game => {
-				const activity = {
-					...game,
-					newPlaytime: game.playtime_2weeks,
-				};
 
-				const existing = gameActivity.find(cache => (
-					game.appid === cache.appid
-				));
-				if (!existing) {
-					newActivity.push(activity);
-					return;
-				}
+		for (const game of body.response.games) {
+			if (ignoredGames.includes(game.appid)) continue;
 
-				activity.newPlaytime = game.playtime_forever - existing.playtime_forever;
-				if (activity.newPlaytime <= 0) {
-					return;
-				}
+			const activity = {
+				...game,
+				newPlaytime: game.playtime_2weeks,
+			};
 
+			const existing = gameActivity.find(cache => game.appid === cache.appid);
+			if (!existing) {
 				newActivity.push(activity);
-			});
+				return;
+			}
+
+			activity.newPlaytime = game.playtime_forever - existing.playtime_forever;
+			if (activity.newPlaytime <= 0) {
+				return;
+			}
+
+			newActivity.push(activity);
+		}
 
 		log.debug(`Found ${newActivity.length} instances of new activity`);
 
@@ -191,7 +189,7 @@ export const pollForGameActivity = () => {
 
 			const newAchievements = await compareAchievements(game.appid);
 
-			newAchievements.forEach(achievement => {
+			for (const achievement of newAchievements) {
 				insertNewGameAchievement(
 					achievement.name,
 					achievement.description,
@@ -199,7 +197,7 @@ export const pollForGameActivity = () => {
 					activity.id,
 					steamDeviceId || deviceId,
 				);
-			});
+			}
 		}
 
 		gameActivity = body.response.games.map(game => ({

@@ -20,11 +20,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
 	const { weight_kgs, created_at } = req.body;
 
-	insertWeight(
-		weight_kgs,
-		created_at || new Date().toISOString(),
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+	insertWeight(weight_kgs, created_at, process.env.TOMBOIS_DEFAULT_DEVICE_ID);
 
 	res.redirect('/weight');
 });

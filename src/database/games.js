@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import timeago from '../adapters/timeago.js';
 import { dayMs, getStartOfDay, isoDuration, minuteMs, prettyDuration, shortDate } from '../lib/formatDate.js';
-import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 import { getGameAchievementsForSession } from './gameachievements.js';
 
 /**
@@ -13,7 +13,7 @@ import { getGameAchievementsForSession } from './gameachievements.js';
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, created_at) {
+export function insertNewGameActivity(name, device_id, playtime_mins, url, created_at) {
 	const id = uuid();
 	const statement = getStatement(
 		'insertGameActivity',
@@ -28,7 +28,7 @@ export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, 
 		name,
 		playtime_mins,
 		url,
-		created_at: new Date(created_at || (Date.now() - (playtime_mins * minuteMs))).toISOString(),
+		created_at: new Date(created_at || Date.now() - playtime_mins * minuteMs).toISOString(),
 		updated_at: new Date().toISOString(),
 		device_id,
 	});
@@ -47,7 +47,7 @@ export function insertNewGameActivity (name, device_id, playtime_mins = 0, url, 
  * @param {number} intervalDuration
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateActivity (name, playtime_mins, url, device_id, intervalDuration) {
+export function updateActivity(name, playtime_mins, url, device_id, intervalDuration) {
 	const selectStatement = getStatement(
 		'getGameActivityByName',
 		`SELECT * FROM games WHERE name = $name
@@ -61,7 +61,7 @@ export function updateActivity (name, playtime_mins, url, device_id, intervalDur
 	}
 
 	const lastUpdated = new Date(row.updated_at).getTime();
-	const lastCheck = Date.now() - intervalDuration - (playtime_mins * minuteMs) - minuteMs;
+	const lastCheck = Date.now() - intervalDuration - playtime_mins * minuteMs - minuteMs;
 
 	if (lastUpdated < lastCheck) {
 		return insertNewGameActivity(name, device_id, playtime_mins, url);
@@ -97,7 +97,7 @@ export function updateActivity (name, playtime_mins, url, device_id, intervalDur
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getGameActivity (parameters) {
+export function getGameActivity(parameters) {
 	const statement = getStatement(
 		'getGameActivity',
 		`SELECT * FROM games
@@ -106,24 +106,20 @@ export function getGameActivity (parameters) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all(calculateGetParameters(parameters))
-		.map(row => {
-			const achievements = getGameAchievementsForSession(row.id);
-			const achievementText = achievements.length === 1
-				? 'achievement'
-				: 'achievements';
+	return statement.all(calculateGetParameters(parameters)).map(row => {
+		const achievements = getGameAchievementsForSession(row.id);
+		const achievementText = achievements.length === 1 ? 'achievement' : 'achievements';
 
-			return {
-				...row,
-				duration: prettyDuration(row.playtime_mins * minuteMs),
-				durationNumber: row.playtime_mins / 60,
-				durationIso: isoDuration(row.playtime_mins * minuteMs),
-				timeago: timeago.format(new Date(row.created_at)),
-				achievements,
-				achievementText,
-			};
-		});
+		return {
+			...row,
+			duration: prettyDuration(row.playtime_mins * minuteMs),
+			durationNumber: row.playtime_mins / 60,
+			durationIso: isoDuration(row.playtime_mins * minuteMs),
+			timeago: timeago.format(new Date(row.created_at)),
+			achievements,
+			achievementText,
+		};
+	});
 }
 
 /**
@@ -133,7 +129,7 @@ export function getGameActivity (parameters) {
  * @param {string} [id]
  * @param {number} [page]
  */
-export function getGameActivityByDay (days = 7) {
+export function getGameActivityByDay(days = 7) {
 	const statement = getStatement(
 		'getGameActivityByDay',
 		`SELECT * FROM games
@@ -143,7 +139,7 @@ export function getGameActivityByDay (days = 7) {
 
 	return statement
 		.all({
-			created_at: new Date(Date.now() - (days * dayMs)).toISOString(),
+			created_at: new Date(Date.now() - days * dayMs).toISOString(),
 		})
 		.map(row => ({
 			...row,
@@ -160,8 +156,8 @@ export function getGameActivityByDay (days = 7) {
  * @param {number} [days=14]
  * @return {object[]}
  */
-export function getGameActivityGroupedByDay (days = 14) {
-	const daysAgo = new Date(Date.now() - (days * dayMs));
+export function getGameActivityGroupedByDay(days = 14) {
+	const daysAgo = new Date(Date.now() - days * dayMs);
 	const created_at = getStartOfDay(daysAgo).toISOString();
 
 	const statement = getStatement(
@@ -175,16 +171,14 @@ export function getGameActivityGroupedByDay (days = 14) {
 		ORDER BY day DESC`,
 	);
 
-	return statement
-		.all({ created_at })
-		.map(row => ({
-			...row,
-			y: row.playtime_mins / 60,
-			label: shortDate(new Date(row.day)),
-		}));
+	return statement.all({ created_at }).map(row => ({
+		...row,
+		y: row.playtime_mins / 60,
+		label: shortDate(new Date(row.day)),
+	}));
 }
 
-export function getGameDashboardGraph () {
+export function getGameDashboardGraph() {
 	const statement = getStatement(
 		'getGameDashboardGraph',
 		`SELECT
@@ -196,16 +190,14 @@ export function getGameDashboardGraph () {
 		LIMIT $limit`,
 	);
 
-	return statement
-		.all()
-		.map(row => ({
-			...row,
-			min: 0,
-			max: row.playtime_mins,
-		}));
+	return statement.all().map(row => ({
+		...row,
+		min: 0,
+		max: row.playtime_mins,
+	}));
 }
 
-export function getGameStats () {
+export function getGameStats() {
 	const emptyStats = {
 		totalPlaytime: 0,
 		games: {},
@@ -214,42 +206,37 @@ export function getGameStats () {
 
 	if (games.length === 0) return emptyStats;
 
-	const stats = games.reduce((acc, cur) => {
-		let newAcc = { ...acc };
+	const stats = games.reduce((stats, cur) => {
+		stats.games[cur.name] =
+			stats.games[cur.name] === undefined
+				? cur.playtime_mins
+				: stats.games[cur.name] + cur.playtime_mins;
 
-		newAcc.games[cur.name] = newAcc.games[cur.name] === undefined
-			? cur.playtime_mins
-			: newAcc.games[cur.name] + cur.playtime_mins;
+		stats.totalPlaytime += cur.playtime_mins;
 
-		newAcc.totalPlaytime += cur.playtime_mins;
-
-		return newAcc;
+		return stats;
 	}, emptyStats);
 
 	stats.averagePlaytime = prettyDuration((stats.totalPlaytime / games.length) * 60000);
 	stats.totalSessions = games.length;
 	stats.totalPlaytimeHuman = prettyDuration(stats.totalPlaytime * 60000);
-	stats.favouriteGame = Object
-		.entries(stats.games)
-		.reduce((acc, cur) => {
-			const [ game, duration ] = cur;
-			const newAcc = { ...acc };
+	stats.favouriteGame = Object.entries(stats.games).reduce(
+		(acc, cur) => {
+			const [game, duration] = cur;
 			if (duration >= acc.duration) {
-				newAcc.duration = duration;
-				newAcc.game = game;
+				acc.duration = duration;
+				acc.game = game;
 			}
-			return newAcc;
-		}, { game: '', duration: 0 })
-		.game;
+			return acc;
+		},
+		{ game: '', duration: 0 },
+	).game;
 	return stats;
 }
 
 /** @return {number} */
-export function countGameActivity () {
-	const statement = getStatement(
-		'countGameActivity',
-		'SELECT COUNT(*) as total FROM games',
-	);
+export function countGameActivity() {
+	const statement = getStatement('countGameActivity', 'SELECT COUNT(*) as total FROM games');
 
 	return statement.get().total;
 }
@@ -258,11 +245,8 @@ export function countGameActivity () {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteGameActivity (id) {
-	const statement = getStatement(
-		'deleteGameActivity',
-		'DELETE FROM games WHERE id = $id',
-	);
+export function deleteGameActivity(id) {
+	const statement = getStatement('deleteGameActivity', 'DELETE FROM games WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -276,7 +260,7 @@ export function deleteGameActivity (id) {
  * @param {string} updated_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateGameActivity (id, name, playtime_mins, url, created_at) {
+export function updateGameActivity(id, name, playtime_mins, url, created_at) {
 	const statement = getStatement(
 		'updateGameActivity',
 		`UPDATE games

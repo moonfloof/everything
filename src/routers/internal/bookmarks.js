@@ -1,5 +1,11 @@
 import express from 'express';
-import { countBookmarks, deleteBookmark, getBookmarks, insertBookmark, updateBookmark } from '../../database/bookmarks.js';
+import {
+	countBookmarks,
+	deleteBookmark,
+	getBookmarks,
+	insertBookmark,
+	updateBookmark,
+} from '../../database/bookmarks.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -20,12 +26,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
 	const { url, title, created_at } = req.body;
 
-	insertBookmark(
-		title,
-		url,
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-		created_at || new Date().toISOString(),
-	);
+	insertBookmark(title, url, process.env.TOMBOIS_DEFAULT_DEVICE_ID, created_at);
 
 	res.redirect('/bookmarks');
 });

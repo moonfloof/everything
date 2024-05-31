@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @param {string} title
@@ -9,7 +9,7 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function insertBookmark (title, url, device_id, created_at) {
+export function insertBookmark(title, url, device_id, created_at) {
 	const statement = getStatement(
 		'insertBookmark',
 		`INSERT INTO bookmarks
@@ -27,7 +27,6 @@ export function insertBookmark (title, url, device_id, created_at) {
 	});
 }
 
-
 /**
  * Fetch all bookmarks, or based on a specific ID
  *
@@ -38,7 +37,7 @@ export function insertBookmark (title, url, device_id, created_at) {
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getBookmarks (parameters) {
+export function getBookmarks(parameters) {
 	const statement = getStatement(
 		'getBookmarks',
 		`SELECT * FROM bookmarks
@@ -51,11 +50,8 @@ export function getBookmarks (parameters) {
 }
 
 /** @return {number} */
-export function countBookmarks () {
-	const statement = getStatement(
-		'countBookmarks',
-		'SELECT COUNT(*) as total FROM bookmarks',
-	);
+export function countBookmarks() {
+	const statement = getStatement('countBookmarks', 'SELECT COUNT(*) as total FROM bookmarks');
 
 	return statement.get().total;
 }
@@ -64,11 +60,8 @@ export function countBookmarks () {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteBookmark (id) {
-	const statement = getStatement(
-		'deleteBookmark',
-		'DELETE FROM bookmarks WHERE id = $id',
-	);
+export function deleteBookmark(id) {
+	const statement = getStatement('deleteBookmark', 'DELETE FROM bookmarks WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -80,7 +73,7 @@ export function deleteBookmark (id) {
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateBookmark (id, title, url, created_at) {
+export function updateBookmark(id, title, url, created_at) {
 	const statement = getStatement(
 		'updateBookmark',
 		`UPDATE bookmarks

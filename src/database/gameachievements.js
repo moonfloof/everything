@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { isoDuration, minuteMs, prettyDuration } from '../lib/formatDate.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @param {string} name
@@ -13,7 +13,7 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} created_at
  * @returns {import('better-sqlite3').RunResult}
  */
-export function insertNewGameAchievement (name, description, game_name, game_id, device_id, created_at) {
+export function insertNewGameAchievement(name, description, game_name, game_id, device_id, created_at) {
 	const id = uuid();
 
 	const statement = getStatement(
@@ -46,7 +46,7 @@ export function insertNewGameAchievement (name, description, game_name, game_id,
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getGameAchievement (parameters) {
+export function getGameAchievement(parameters) {
 	const statement = getStatement(
 		'getGameAchievement',
 		`SELECT * FROM gameachievements
@@ -55,18 +55,16 @@ export function getGameAchievement (parameters) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all(calculateGetParameters(parameters))
-		.map(row => ({
-			...row,
-			duration: prettyDuration(row.playtime_mins * minuteMs),
-			durationNumber: row.playtime_mins / 60,
-			durationIso: isoDuration(row.playtime_mins * minuteMs),
-			timeago: timeago.format(new Date(row.created_at)),
-		}));
+	return statement.all(calculateGetParameters(parameters)).map(row => ({
+		...row,
+		duration: prettyDuration(row.playtime_mins * minuteMs),
+		durationNumber: row.playtime_mins / 60,
+		durationIso: isoDuration(row.playtime_mins * minuteMs),
+		timeago: timeago.format(new Date(row.created_at)),
+	}));
 }
 
-export function getGameAchievementsForSession (game_id) {
+export function getGameAchievementsForSession(game_id) {
 	const statement = getStatement(
 		'getGameAchievementsForSession',
 		`SELECT id, name, description, created_at FROM gameachievements
@@ -78,11 +76,8 @@ export function getGameAchievementsForSession (game_id) {
 }
 
 /** @return {number} */
-export function countGameAchievement () {
-	const statement = getStatement(
-		'countGameAchievement',
-		'SELECT COUNT(*) as total FROM gameachievements',
-	);
+export function countGameAchievement() {
+	const statement = getStatement('countGameAchievement', 'SELECT COUNT(*) as total FROM gameachievements');
 
 	return statement.get().total;
 }
@@ -91,11 +86,8 @@ export function countGameAchievement () {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteGameAchievement (id) {
-	const statement = getStatement(
-		'deleteGameAchievement',
-		'DELETE FROM gameachievements WHERE id = $id',
-	);
+export function deleteGameAchievement(id) {
+	const statement = getStatement('deleteGameAchievement', 'DELETE FROM gameachievements WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -107,7 +99,7 @@ export function deleteGameAchievement (id) {
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateGameAchievement (id, name, description, created_at) {
+export function updateGameAchievement(id, name, description, created_at) {
 	const statement = getStatement(
 		'updateGameAchievement',
 		`UPDATE gameachievements

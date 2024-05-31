@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
 import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @export
@@ -15,7 +15,7 @@ import { calculateGetParameters } from './constants.js';
  * @param {string} device_id
  * @returns {import('better-sqlite3').RunResult}
  */
-export function insertFilm (title, year, rating, review, url, watched_at, created_at, device_id) {
+export function insertFilm(title, year, rating, review, url, watched_at, created_at, device_id) {
 	const id = uuid();
 
 	const statement = getStatement(
@@ -49,7 +49,7 @@ export function insertFilm (title, year, rating, review, url, watched_at, create
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getFilms (parameters) {
+export function getFilms(parameters) {
 	const statement = getStatement(
 		'getFilms',
 		`SELECT * FROM films
@@ -58,23 +58,18 @@ export function getFilms (parameters) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all(calculateGetParameters(parameters))
-		.map(row => ({
-			...row,
-			timeago: timeago.format(new Date(row.watched_at)),
-		}));
+	return statement.all(calculateGetParameters(parameters)).map(row => ({
+		...row,
+		timeago: timeago.format(new Date(row.watched_at)),
+	}));
 }
 
 /**
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteFilm (id) {
-	const statement = getStatement(
-		'deleteFilm',
-		'DELETE FROM films WHERE id = $id',
-	);
+export function deleteFilm(id) {
+	const statement = getStatement('deleteFilm', 'DELETE FROM films WHERE id = $id');
 	return statement.run({ id });
 }
 
@@ -89,7 +84,7 @@ export function deleteFilm (id) {
  * @param {string} created_at
  * @returns {import('better-sqlite3').RunResult}
  */
-export function updateFilm (id, title, year, rating, review, url, watched_at, created_at) {
+export function updateFilm(id, title, year, rating, review, url, watched_at, created_at) {
 	const statement = getStatement(
 		'updateFilm',
 		`UPDATE films
@@ -116,11 +111,8 @@ export function updateFilm (id, title, year, rating, review, url, watched_at, cr
 }
 
 /** @return {number} Number of films recorded in database */
-export function countFilms () {
-	const statement = getStatement(
-		'countFilms',
-		'SELECT COUNT(*) as total FROM films',
-	);
+export function countFilms() {
+	const statement = getStatement('countFilms', 'SELECT COUNT(*) as total FROM films');
 
 	return statement.get().total;
 }

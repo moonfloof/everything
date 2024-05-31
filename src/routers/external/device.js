@@ -2,7 +2,6 @@ import express from 'express';
 import { getGeocoder } from '../../adapters/geocoder.js';
 import { updateDevice, validateDevice } from '../../database/devices.js';
 import { insertLocation } from '../../database/locations.js';
-import { asyncForEach } from '../../lib/asyncForEach.js';
 import Logger from '../../lib/logger.js';
 
 const log = new Logger('Overland');
@@ -14,7 +13,7 @@ const router = express.Router();
  * @prop {object} properties
  * @prop {number} properties.timestamp
  * @prop {object} geometry
- * @prop {number[]} geometry.coordinates
+ * @prop {[number, number]} geometry.coordinates
  */
 
 // Overland
@@ -45,22 +44,25 @@ router.post('/overland', async (req, res) => {
 		});
 
 		// Add locations to database
-		await asyncForEach(locations, async (location, index) => {
+		let index = -1;
+		for (const location of locations) {
+			index += 1;
+
 			if (location?.geometry?.coordinates === undefined) {
 				log.debug('Location not provided, skipping');
-				return;
+				continue;
 			}
 
 			if (location?.geometry?.coordinates.length !== 2) {
 				log.debug('Two coordinates not provided, skipping');
-				return;
+				continue;
 			}
 
 			const { timestamp } = location.properties;
 			const timestampDate = new Date(timestamp);
 			const timestampISO = timestampDate.toISOString();
 
-			const [ lon, lat ] = location?.geometry?.coordinates ?? [];
+			const [lon, lat] = location?.geometry?.coordinates ?? [];
 
 			// Get city from last location in batch
 			let city = null;
@@ -73,20 +75,32 @@ router.post('/overland', async (req, res) => {
 			}
 
 			insertLocation(lat, lon, city, timestampISO, deviceId);
-		});
+		}
 
 		// Get latest battery level
 		const lastLoc = locations[locations.length - 1];
 		let { battery_state, battery_level } = lastLoc.properties;
 
+		if (!battery_level && !battery_state) {
+			res.send({ result: 'ok' });
+			return;
+		}
+
 		// Round to two decimal places
-		battery_level = (Math.round(battery_level * 10000) / 100) || 100;
+		battery_level = Math.round(battery_level * 10000) / 100 || 100;
 
 		switch (battery_state) {
-			case true: battery_state = 'charging'; break;
-			case false: battery_state = 'unplugged'; break;
-			case 'unknown': battery_state = null; break;
-			default: break;
+			case true:
+				battery_state = 'charging';
+				break;
+			case false:
+				battery_state = 'unplugged';
+				break;
+			case 'unknown':
+				battery_state = null;
+				break;
+			default:
+				break;
 		}
 
 		updateDevice(deviceId, battery_level, battery_state);
@@ -101,18 +115,25 @@ router.post('/overland', async (req, res) => {
 // Battery Level and Status
 router.post('/battery', (req, res) => {
 	try {
-		const token = req.headers['authorization'];
+		const token = req.headers.authorization;
 		const { id } = validateDevice(token);
 		let { battery_level, battery_state } = req.body;
 
 		// Round to two decimal places
-		battery_level = (Math.round(battery_level * 100) / 100) || 100;
+		battery_level = Math.round(battery_level * 100) / 100 || 100;
 
 		switch (battery_state) {
-			case true: battery_state = 'charging'; break;
-			case false: battery_state = 'unplugged'; break;
-			case 'unknown': battery_state = null; break;
-			default: break;
+			case true:
+				battery_state = 'charging';
+				break;
+			case false:
+				battery_state = 'unplugged';
+				break;
+			case 'unknown':
+				battery_state = null;
+				break;
+			default:
+				break;
 		}
 
 		if (typeof battery_state !== 'string') {

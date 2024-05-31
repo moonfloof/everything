@@ -9,7 +9,7 @@ const boxRadius = 6;
 const pointWidth = (graphWidth - yAxisWidth) / pointLimit;
 const barHeight = graphHeight - padding - xAxisWidth;
 
-function generateText (x, y, text, align = 'start', transform = '') {
+function generateText(x, y, text, align = 'start', transform = '') {
 	return `
 		<text
 			x="${x}"
@@ -30,15 +30,21 @@ function generateText (x, y, text, align = 'start', transform = '') {
  * @param {string} label
  * @return {string} SVG containing two rectangles and the X axis label
  */
-function generateBar (y, max, index, label) {
+function generateBar(y, max, index, label) {
 	const height = Math.round((y / max) * barHeight);
 	const width = pointWidth - padding;
-	const posX = (index * pointWidth) + (padding / 2) + yAxisWidth;
-	const posY = barHeight - height + (padding / 2);
+	const posX = index * pointWidth + padding / 2 + yAxisWidth;
+	const posY = barHeight - height + padding / 2;
 
 	const textScale = 0.75;
 
-	const text = generateText(posX / textScale + (16 / textScale), (barHeight + 24) / textScale, label, 'middle', `scale(${textScale})`);
+	const text = generateText(
+		posX / textScale + 16 / textScale,
+		(barHeight + 24) / textScale,
+		label,
+		'middle',
+		`scale(${textScale})`,
+	);
 
 	return `
 		<rect
@@ -61,11 +67,9 @@ function generateBar (y, max, index, label) {
  * @param {string}   points[].label
  * @export
  */
-export function generateBarGraph (points, yLegend) {
+export function generateBarGraph(points, yLegend) {
 	let max = points.reduce((acc, cur) => {
-		return cur.y > acc
-			? cur.y
-			: acc;
+		return cur.y > acc ? cur.y : acc;
 	}, -99999);
 
 	max = Math.ceil(max);

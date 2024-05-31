@@ -1,6 +1,6 @@
 import express from 'express';
-import { dayMs, formatDate } from '../../lib/formatDate.js';
 import { getLocationHistory } from '../../database/locations.js';
+import { dayMs, formatDate } from '../../lib/formatDate.js';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const DISPLAY_FORMATS = {
 
 router.get('/', (req, res) => {
 	const {
-		date_start = formatDate(new Date(Date.now() - (7 * dayMs))),
+		date_start = formatDate(new Date(Date.now() - 7 * dayMs)),
 		date_end = formatDate(new Date()),
 		format = DISPLAY_FORMATS.HEATMAP,
 	} = req.query;
@@ -29,10 +29,10 @@ router.get('/', (req, res) => {
 		throw new Error('Date End cannot be before Date Start');
 	}
 
-	const location = getLocationHistory(dateStartDate, dateEndDate);
+	const locationHistory = getLocationHistory(dateStartDate, dateEndDate);
 
-	const avgLat = location.reduce((acc, cur) => acc + cur.lat, 0) / location.length;
-	const avgLong = location.reduce((acc, cur) => acc + cur.long, 0) / location.length;
+	const avgLat = locationHistory.reduce((acc, cur) => acc + cur.lat, 0) / locationHistory.length;
+	const avgLong = locationHistory.reduce((acc, cur) => acc + cur.long, 0) / locationHistory.length;
 
 	let paths = [];
 	const points = [];
@@ -42,25 +42,26 @@ router.get('/', (req, res) => {
 		// goes from 1.0 to 0.3 between 0 and 100000 points, in a curve, based
 		// on the following formula (assuming it's clamped at 100000)
 		// =(POWER(((100000 - x) / 10000), 2) / 142.857142857) + 0.3
-		const intensity = location.length <= 100000
-			? (Math.pow((100000 - location.length) / 10000, 2) / 142.857142857) + 0.3
-			: 0.3;
+		const intensity =
+			locationHistory.length <= 100000
+				? ((100000 - locationHistory.length) / 10000) ** 2 / 142.857142857 + 0.3
+				: 0.3;
 
-		paths = location.map(loc => [ loc.lat, loc.long, intensity ]);
+		paths = locationHistory.map(loc => [loc.lat, loc.long, intensity]);
 	} else {
-		paths = [ [] ];
-		location.forEach(location => {
+		paths = [[]];
+		for (const location of locationHistory) {
 			const pathIndex = paths.length - 1;
 
 			// Always add the path if it's currently empty
 			if (paths[pathIndex].length === 0) {
 				if (location.city !== null) {
 					points.push({
-						latlng: [ location.lat, location.long ],
+						latlng: [location.lat, location.long],
 						title: location.city,
 					});
 				}
-				paths[pathIndex].push([ location.lat, location.long ]);
+				paths[pathIndex].push([location.lat, location.long]);
 				return;
 			}
 
@@ -73,14 +74,14 @@ router.get('/', (req, res) => {
 			if (diffLat > 0.2 || diffLong > 0.2) {
 				if (location.city !== null) {
 					points.push({
-						latlng: [ location.lat, location.long ],
+						latlng: [location.lat, location.long],
 						title: location.city,
 					});
 				}
 				if (paths[pathIndex].length === 1) {
 					paths.pop();
 				}
-				paths.push([ [ location.lat, location.long ] ]);
+				paths.push([[location.lat, location.long]]);
 				return;
 			}
 
@@ -89,8 +90,8 @@ router.get('/', (req, res) => {
 				return;
 			}
 
-			paths[pathIndex].push([ location.lat, location.long ]);
-		});
+			paths[pathIndex].push([location.lat, location.long]);
+		}
 	}
 
 	res.render('internal/location', {
@@ -98,7 +99,7 @@ router.get('/', (req, res) => {
 		avgLong,
 		paths: JSON.stringify(paths),
 		points: JSON.stringify(points),
-		pointsTotal: location.length,
+		pointsTotal: locationHistory.length,
 		format,
 		dateToday: formatDate(new Date()),
 		date_start,

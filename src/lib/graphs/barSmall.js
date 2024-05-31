@@ -17,10 +17,10 @@ const pointLimit = 10;
  * @param {number} index
  * @return {string}
  */
-function generateBar (point, min, max, index) {
+function generateBar(point, min, max, index) {
 	const posX = index * (barWidth + barSpacing);
-	const posY = Math.round(graphHeight - ((point.max / max) * graphHeight));
-	const height = Math.round(graphHeight - posY - (((point.min - min) / max) * graphHeight));
+	const posY = Math.round(graphHeight - (point.max / max) * graphHeight);
+	const height = Math.round(graphHeight - posY - ((point.min - min) / max) * graphHeight);
 
 	return `
 		<rect
@@ -36,34 +36,28 @@ function generateBar (point, min, max, index) {
  * @param {number} [minOverride]
  * @param {number} [maxOverride]
  */
-export function generateSmallBarGraph (points, minOverride, maxOverride) {
+export function generateSmallBarGraph(points, minOverride, maxOverride) {
 	const pointsTrunc = points.slice(0, pointLimit);
-	const { min, max } = pointsTrunc.reduce((acc, cur) => {
-		const newAcc = { ...acc };
-		if (cur.min < acc.min) {
-			newAcc.min = Math.floor(cur.min);
-		}
-		if (cur.max > acc.max) {
-			newAcc.max = Math.ceil(cur.max);
-		}
+	const { min, max } = pointsTrunc.reduce(
+		(acc, cur) => {
+			if (cur.min < acc.min) {
+				acc.min = Math.floor(cur.min);
+			}
+			if (cur.max > acc.max) {
+				acc.max = Math.ceil(cur.max);
+			}
 
-		return newAcc;
-	}, { min: 99999, max: -99999 });
+			return acc;
+		},
+		{ min: 99999, max: -99999 },
+	);
 
 	const bars = pointsTrunc
 		.reverse()
-		.map((point, index) => generateBar(
-			point,
-			minOverride ?? min,
-			maxOverride ?? max,
-			index,
-		))
+		.map((point, index) => generateBar(point, minOverride ?? min, maxOverride ?? max, index))
 		.join('');
 
-	const zeroLine = Math.round(graphHeight
-		- 1
-		- (Math.abs(min) / Math.abs(max === 0 ? 1 : max))
-		* graphHeight);
+	const zeroLine = Math.round(graphHeight - 1 - (Math.abs(min) / Math.abs(max === 0 ? 1 : max)) * graphHeight);
 
 	return `
 		<svg

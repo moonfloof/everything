@@ -1,8 +1,8 @@
 import express from 'express';
+import { fetchFilms } from '../../adapters/letterboxd.js';
 import { countFilms, deleteFilm, getFilms, insertFilm, updateFilm } from '../../database/films.js';
 import { formatDate } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
-import { fetchFilms } from '../../adapters/letterboxd.js';
 
 const router = express.Router();
 
@@ -28,8 +28,8 @@ router.post('/', (req, res) => {
 		rating ? Number(rating) : null,
 		review,
 		url,
-		watched_at || formatDate(new Date()),
-		created_at || new Date().toISOString(),
+		watched_at,
+		created_at,
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	);
 
@@ -67,8 +67,8 @@ router.post('/:id', (req, res) => {
 				rating ? Number(rating) : null,
 				review || null,
 				url,
-				watched_at || formatDate(new Date()),
-				created_at || new Date().toISOString(),
+				watched_at,
+				created_at,
 			);
 			break;
 

@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { getStatement } from './database.js';
 import timeago from '../adapters/timeago.js';
-import { calculateGetParameters } from './constants.js';
 import { dayMs, shortDate } from '../lib/formatDate.js';
+import { calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
 
 /**
  * @typedef {object} Listen
@@ -29,7 +29,7 @@ import { dayMs, shortDate } from '../lib/formatDate.js';
  * @param {string} device_id
  * @returns {import('better-sqlite3').RunResult}
  */
-export function insertScrobble (artist, album, title, tracknumber, year, genre, created_at, device_id) {
+export function insertScrobble(artist, album, title, tracknumber, year, genre, created_at, device_id) {
 	const id = uuid();
 
 	const statement = getStatement(
@@ -63,7 +63,7 @@ export function insertScrobble (artist, album, title, tracknumber, year, genre, 
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getListens (parameters) {
+export function getListens(parameters) {
 	const statement = getStatement(
 		'getListens',
 		`SELECT * FROM listens
@@ -72,18 +72,16 @@ export function getListens (parameters) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement
-		.all(calculateGetParameters(parameters))
-		.map(row => ({
-			...row,
-			timeago: timeago.format(new Date(row.created_at)),
-		}));
+	return statement.all(calculateGetParameters(parameters)).map(row => ({
+		...row,
+		timeago: timeago.format(new Date(row.created_at)),
+	}));
 }
 
 /**
  * @param {Listen[]} listens
  */
-export function groupListens (listens) {
+export function groupListens(listens) {
 	return listens.reduce((albums, listen) => {
 		if (
 			albums.length === 0 ||
@@ -96,7 +94,7 @@ export function groupListens (listens) {
 				created_at: listen.created_at,
 				ended_at: listen.created_at,
 				timeago: listen.timeago,
-				tracks: [ { title: listen.title, id: listen.id } ],
+				tracks: [{ title: listen.title, id: listen.id }],
 				count: 1,
 				countText: 'song',
 			});
@@ -115,11 +113,8 @@ export function groupListens (listens) {
  * @param {string} id
  * @return {import('better-sqlite3').RunResult}
  */
-export function deleteListen (id) {
-	const statement = getStatement(
-		'deleteListen',
-		'DELETE FROM listens WHERE id = $id',
-	);
+export function deleteListen(id) {
+	const statement = getStatement('deleteListen', 'DELETE FROM listens WHERE id = $id');
 	return statement.run({ id });
 }
 
@@ -134,7 +129,7 @@ export function deleteListen (id) {
  * @param {string} created_at
  * @return {import('better-sqlite3').RunResult}
  */
-export function updateListen (id, artist, album, title, tracknumber, release_year, genre, created_at) {
+export function updateListen(id, artist, album, title, tracknumber, release_year, genre, created_at) {
 	const statement = getStatement(
 		'updateListen',
 		`UPDATE listens
@@ -161,26 +156,28 @@ export function updateListen (id, artist, album, title, tracknumber, release_yea
 }
 
 /** @returns {number} */
-export function countListens () {
-	const statement = getStatement(
-		'countListens',
-		'SELECT COUNT(*) as total FROM listens',
-	);
+export function countListens() {
+	const statement = getStatement('countListens', 'SELECT COUNT(*) as total FROM listens');
 
 	return statement.get().total;
 }
 
-export function getListensPopular (days) {
+/**
+ * @param {number} days
+ * @return {{ artist: string, count: number, popularityPercentage: number }[]}
+ */
+export function getListensPopular(days) {
 	const statement = getStatement(
 		'getListensPopular',
 		`SELECT artist, count(*) as count
 		FROM listens
 		WHERE created_at >= $created_at
 		GROUP BY artist
-		ORDER BY count DESC, artist ASC;`,
+		ORDER BY count DESC, artist ASC
+		LIMIT 30`,
 	);
 
-	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
+	const created_at = new Date(Date.now() - days * dayMs).toISOString();
 
 	const rows = statement.all({ created_at });
 
@@ -190,22 +187,27 @@ export function getListensPopular (days) {
 	}));
 }
 
-export function getListenPopularDashboard (days) {
-	const genStatement = column => getStatement(
-		`getListenPopularDashboard_${column}`,
-		`SELECT ${column}, count(*) as count
-		FROM listens
-		WHERE created_at >= $created_at
-		GROUP BY ${column}
-		ORDER BY count DESC
-		LIMIT 1;`,
-	);
+/**
+ * @param {number} days
+ * @return {{ artist?: string, album?: string, song?: string }}
+ */
+export function getListenPopularDashboard(days) {
+	const generateStatement = column =>
+		getStatement(
+			`getListenPopularDashboard_${column}`,
+			`SELECT ${column}, count(*) as count
+			FROM listens
+			WHERE created_at >= $created_at
+			GROUP BY ${column}
+			ORDER BY count DESC
+			LIMIT 1;`,
+		);
 
-	const created_at = new Date(Date.now() - (days * dayMs)).toISOString();
+	const created_at = new Date(Date.now() - days * dayMs).toISOString();
 
-	const artist = genStatement('artist').all({ created_at })?.[0];
-	const album = genStatement('album').all({ created_at })?.[0];
-	const song = genStatement('title').all({ created_at })?.[0];
+	const artist = generateStatement('artist').all({ created_at })?.[0];
+	const album = generateStatement('album').all({ created_at })?.[0];
+	const song = generateStatement('title').all({ created_at })?.[0];
 
 	return {
 		artist,
@@ -214,7 +216,10 @@ export function getListenPopularDashboard (days) {
 	};
 }
 
-export function getListenGraph () {
+/**
+ * @return {{ day: string, y: number, label: string }[]}
+ */
+export function getListenGraph() {
 	const statement = getStatement(
 		'getListenGraph',
 		`SELECT DATE(created_at) as day, COUNT(*) as y
@@ -224,15 +229,13 @@ export function getListenGraph () {
 		LIMIT 14;`,
 	);
 
-	return statement
-		.all()
-		.map(row => ({
-			...row,
-			label: shortDate(new Date(row.day)),
-		}));
+	return statement.all().map(row => ({
+		...row,
+		label: shortDate(new Date(row.day)),
+	}));
 }
 
-export function getListenDashboardGraph () {
+export function getListenDashboardGraph() {
 	const statement = getStatement(
 		'getListenDashboardGraph',
 		`SELECT DATE(created_at) as day, COUNT(*) as max
@@ -242,11 +245,9 @@ export function getListenDashboardGraph () {
 		LIMIT 14;`,
 	);
 
-	return statement
-		.all()
-		.map(row => ({
-			...row,
-			min: 0,
-			max: row.max,
-		}));
+	return statement.all().map(row => ({
+		...row,
+		min: 0,
+		max: row.max,
+	}));
 }

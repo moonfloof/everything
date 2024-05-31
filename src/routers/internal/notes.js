@@ -1,13 +1,14 @@
 import express from 'express';
 
 import {
+	ENTRY_TYPES,
 	countNotes,
 	deleteNote,
+	entryStatusValues,
+	entryTypeValues,
 	getNotes,
 	insertNote,
 	updateNote,
-	entryTypeValues,
-	entryStatusValues,
 } from '../../database/notes.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { validatePageNumber } from '../../lib/middleware/validatePageNumber.js';
@@ -31,7 +32,7 @@ router.post('/', (req, res) => {
 	insertNote(
 		req.body.description,
 		req.body.title || null,
-		req.body.type || 'note',
+		req.body.type || ENTRY_TYPES.NOTE,
 		req.body.status || 'public',
 		req.body.url || null,
 		req.body.syndication_json,
@@ -54,7 +55,7 @@ router.post('/:entryId', (req, res) => {
 				entryId,
 				req.body.description,
 				req.body.title || null,
-				req.body.type || 'note',
+				req.body.type || ENTRY_TYPES.NOTE,
 				req.body.status || 'public',
 				req.body.url || null,
 				req.body.syndication_json?.replace(/\t+/g, '') || null,

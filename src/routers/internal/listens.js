@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
 		tracknumber,
 		release_year,
 		genre,
-		created_at || new Date().toISOString(),
+		created_at,
 		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	);
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getSeriesList, getEpisodeList, getEpisode } from '../../adapters/sonarr.js';
+import { getEpisode, getEpisodeList, getSeriesList } from '../../adapters/sonarr.js';
 import { countEpisodes, deleteEpisode, getEpisodes, insertEpisode, updateEpisode } from '../../database/tv.js';
 import { padString } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
@@ -52,12 +52,7 @@ router.post('/episode', async (req, res) => {
 		const episodeTitle = `S${seasonNumber}E${episodeNumber} - ${episode.title}`;
 		const seriesTitle = `${episode.series.title} (${episode.series.year})`;
 
-		insertEpisode(
-			seriesTitle,
-			episodeTitle,
-			new Date().toISOString(),
-			process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-		);
+		insertEpisode(seriesTitle, episodeTitle, process.env.TOMBOIS_DEFAULT_DEVICE_ID);
 
 		log.info(`Logged episode '${episodeTitle}' from '${seriesTitle}'`);
 
@@ -71,12 +66,7 @@ router.post('/episode', async (req, res) => {
 router.post('/', (req, res) => {
 	const { series_title, episode_title, created_at } = req.body;
 
-	insertEpisode(
-		series_title,
-		episode_title,
-		created_at || new Date().toISOString(),
-		process.env.TOMBOIS_DEFAULT_DEVICE_ID,
-	);
+	insertEpisode(series_title, episode_title, process.env.TOMBOIS_DEFAULT_DEVICE_ID, created_at);
 
 	log.info(`Logged episode '${episode_title}' from '${series_title}'`);
 

@@ -29,7 +29,7 @@ export const categoryValues = Object.values(CATEGORIES);
  * @param {string} device_id
  * @returns {import('better-sqlite3').RunResult}
  */
-function insertNewRecord (category, created_at, ended_at, device_id) {
+function insertNewRecord(category, created_at, ended_at, device_id) {
 	const statement = getStatement(
 		'insertTimeTracking',
 		`INSERT INTO timetracking
@@ -52,7 +52,7 @@ function insertNewRecord (category, created_at, ended_at, device_id) {
  * @param {string} ended_at
  * @returns {import('better-sqlite3').RunResult}
  */
-function endTimeTrackingSession (id, ended_at) {
+function endTimeTrackingSession(id, ended_at) {
 	const updateStatement = getStatement(
 		'endTimeTrackingSession',
 		`UPDATE timetracking
@@ -74,7 +74,7 @@ function endTimeTrackingSession (id, ended_at) {
  * @param {string} device_id
  * @return {void}
  */
-export function insertTimeTracking (category, created_at, ended_at, device_id) {
+export function insertTimeTracking(category, created_at, ended_at, device_id) {
 	const selectStatement = getStatement(
 		'selectTimeTracking',
 		`SELECT id FROM timetracking
@@ -101,7 +101,7 @@ export function insertTimeTracking (category, created_at, ended_at, device_id) {
  * @param {number} [parameters.limit]
  * @param {number} [parameters.days]
  */
-export function getTimeTracking (parameters) {
+export function getTimeTracking(parameters) {
 	const statement = getStatement(
 		'getTimeTracking',
 		`SELECT * FROM timetracking
@@ -114,11 +114,8 @@ export function getTimeTracking (parameters) {
 }
 
 /** @return {number} */
-export function countTimeTracking () {
-	const statement = getStatement(
-		'countTimeTracking',
-		'SELECT COUNT(*) as total FROM timetracking',
-	);
+export function countTimeTracking() {
+	const statement = getStatement('countTimeTracking', 'SELECT COUNT(*) as total FROM timetracking');
 
 	return statement.get().total;
 }
@@ -127,11 +124,8 @@ export function countTimeTracking () {
  * @param {string} id
  * @returns {import('better-sqlite3').RunResult}
  */
-export function deleteTimeTracking (id) {
-	const statement = getStatement(
-		'deleteTimeTracking',
-		'DELETE FROM timetracking WHERE id = $id',
-	);
+export function deleteTimeTracking(id) {
+	const statement = getStatement('deleteTimeTracking', 'DELETE FROM timetracking WHERE id = $id');
 
 	return statement.run({ id });
 }
@@ -143,7 +137,7 @@ export function deleteTimeTracking (id) {
  * @param {string} ended_at
  * @returns {import('better-sqlite3').RunResult}
  */
-export function updateTimeTracking (id, category, created_at, ended_at) {
+export function updateTimeTracking(id, category, created_at, ended_at) {
 	if (category?.toLowerCase().startsWith('stop')) {
 		return;
 	}

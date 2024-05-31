@@ -1,5 +1,5 @@
-import phin from 'phin';
 import dotenv from 'dotenv';
+import phin from 'phin';
 
 dotenv.config();
 
@@ -10,10 +10,7 @@ const api = (path, params = {}) => {
 	});
 
 	return phin({
-		url: new URL(
-			`${path}?${paramString}`,
-			process.env.TOMBOIS_SONARR_URL,
-		),
+		url: new URL(`${path}?${paramString}`, process.env.TOMBOIS_SONARR_URL),
 		parse: 'json',
 	});
 };
@@ -27,12 +24,12 @@ export const getSeriesList = async () => {
 	}));
 };
 
-export const getSeries = async (seriesId) => {
+export const getSeries = async seriesId => {
 	const response = await api(`/api/v3/series/${seriesId}`);
 	return response.body;
 };
 
-export const getEpisodeList = async (seriesId) => {
+export const getEpisodeList = async seriesId => {
 	const response = await api('/api/v3/episode', { seriesId });
 
 	return response.body.map(episode => ({
@@ -41,7 +38,7 @@ export const getEpisodeList = async (seriesId) => {
 	}));
 };
 
-export const getEpisode = async (episodeId) => {
+export const getEpisode = async episodeId => {
 	const response = await api(`/api/v3/episode/${episodeId}`);
 	return response.body;
 };
