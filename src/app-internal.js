@@ -1,4 +1,5 @@
 import express from 'express';
+import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 import appCreate from './lib/appCreate.js';
 import Logger from './lib/logger.js';
 import { trimStrings } from './lib/middleware/trimStrings.js';
