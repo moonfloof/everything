@@ -62,7 +62,7 @@ router.get('/', (req, res) => {
 					});
 				}
 				paths[pathIndex].push([location.lat, location.long]);
-				return;
+				continue;
 			}
 
 			const currentPath = paths[pathIndex];
@@ -82,12 +82,12 @@ router.get('/', (req, res) => {
 					paths.pop();
 				}
 				paths.push([[location.lat, location.long]]);
-				return;
+				continue;
 			}
 
 			// Skip very minor movements, to reduce noise and response size.
 			if (diffLat < 0.0001 || diffLong < 0.0001) {
-				return;
+				continue;
 			}
 
 			paths[pathIndex].push([location.lat, location.long]);
