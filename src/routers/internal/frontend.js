@@ -1,4 +1,3 @@
-import { NotFoundError } from '@tombofry/stdlib/src/errors/http.js';
 import express from 'express';
 
 const router = express.Router();
