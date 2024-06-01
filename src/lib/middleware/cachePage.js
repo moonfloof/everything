@@ -68,7 +68,7 @@ export function pollForCacheDeletion() {
 	setInterval(() => {
 		for (const key of Object.keys(cache)) {
 			if (cache[key].lastUpdateUnixMs > Date.now() - cacheDurationMs) {
-				return;
+				continue;
 			}
 
 			// Remove from cache entirely

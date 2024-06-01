@@ -162,12 +162,12 @@ export const pollForGameActivity = () => {
 			const existing = gameActivity.find(cache => game.appid === cache.appid);
 			if (!existing) {
 				newActivity.push(activity);
-				return;
+				continue;
 			}
 
 			activity.newPlaytime = game.playtime_forever - existing.playtime_forever;
 			if (activity.newPlaytime <= 0) {
-				return;
+				continue;
 			}
 
 			newActivity.push(activity);

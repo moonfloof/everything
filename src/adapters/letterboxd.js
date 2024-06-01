@@ -139,14 +139,14 @@ export const fetchFilms = () => {
 		for (const film of newActivity) {
 			// Skip films older than double the interval
 			if (film.watchedDate.getTime() < Date.now() - intervalMs * 2) {
-				return;
+				continue;
 			}
 
 			const existsInCache = filmActivity.some(filmCached => {
 				return film.guid === filmCached.guid;
 			});
 
-			if (existsInCache) return;
+			if (existsInCache) continue;
 
 			log.info(`Adding new film '${film.filmTitle} (${film.filmYear})'`);
 
