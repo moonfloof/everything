@@ -6,24 +6,44 @@
  * {{#xif url '||' description}}
  */
 export function xif(v1, operator, v2, options) {
+	let output = false;
+
 	switch (operator) {
-		case '!=':
-			return v1 !== v2 ? options.fn(this) : options.inverse(this);
-		case '<':
-			return v1 < v2 ? options.fn(this) : options.inverse(this);
-		case '<=':
-			return v1 <= v2 ? options.fn(this) : options.inverse(this);
-		case '>':
-			return v1 > v2 ? options.fn(this) : options.inverse(this);
-		case '>=':
-			return v1 >= v2 ? options.fn(this) : options.inverse(this);
-		case '&&':
-			return v1 && v2 ? options.fn(this) : options.inverse(this);
-		case '||':
-			return v1 || v2 ? options.fn(this) : options.inverse(this);
-		default:
-			return v1 === v2 ? options.fn(this) : options.inverse(this);
+		case '!=': {
+			output = v1 !== v2;
+			break;
+		}
+		case '<': {
+			output = v1 < v2;
+			break;
+		}
+		case '<=': {
+			output = v1 <= v2;
+			break;
+		}
+		case '>': {
+			output = v1 > v2;
+			break;
+		}
+		case '>=': {
+			output = v1 >= v2;
+			break;
+		}
+		case '&&': {
+			output = v1 && v2;
+			break;
+		}
+		case '||': {
+			output = v1 || v2;
+			break;
+		}
+		default: {
+			output = v1 === v2;
+			break;
+		}
 	}
+
+	return output ? options.fn(this) : options.inverse(this);
 }
 
 export function externalRoot() {

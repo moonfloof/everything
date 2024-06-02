@@ -67,7 +67,7 @@ Content-Type: application/json
 
 {
 	"locations": [
-		{ "geometry": { "coordinates": [-6.34523,57.68163]}, "properties": { "timestamp": "{{$datetime iso8601 -1 s}}" } },
+		{ "geometry": { "coordinates": [-6.34523,57.68163]}, "properties": { "timestamp": "{{$datetime iso8601 -1 s}}", "battery_level": 0.47, "battery_state": "unplugged" } },
 		{ "geometry": { "coordinates": [-6.34493,57.68196]}, "properties": { "timestamp": "{{$datetime iso8601 -2 s}}" } },
 		{ "geometry": { "coordinates": [-6.34472,57.68203]}, "properties": { "timestamp": "{{$datetime iso8601 -3 s}}" } },
 		{ "geometry": { "coordinates": [-6.34403,57.68204]}, "properties": { "timestamp": "{{$datetime iso8601 -4 s}}" } }
