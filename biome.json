@@ -1,4 +1,47 @@
 {
+	"linter": {
+		"rules": {
+			"correctness": {
+				"noUndeclaredVariables": "error",
+				"noUnusedImports": "error"
+			},
+			"suspicious": {
+				"noAssignInExpressions": "error",
+				"noDoubleEquals": "error",
+				"noConsoleLog": "warn",
+				"noEmptyBlockStatements": "warn",
+				"useAwait": "warn"
+			},
+			"performance": {
+				"noAccumulatingSpread": "error",
+				"noDelete": "error",
+				"noReExportAll": "error"
+			},
+			"style": {
+				"noParameterAssign": "error",
+				"noRestrictedGlobals": "error",
+				"noShoutyConstants": "error",
+				"noUnusedTemplateLiteral": "error",
+				"noUselessElse": "error",
+				"useCollapsedElseIf": "error",
+				"useConst": "error",
+				"useDefaultParameterLast": "error",
+				"useFilenamingConvention": {
+					"level": "error",
+					"options": {
+						"strictCase": true,
+						"requireAscii": true,
+						"filenameCases": ["camelCase", "export"]
+					}
+				},
+				"useForOf": "error",
+				"useNodejsImportProtocol": "warn",
+				"useNumberNamespace": "error",
+				"useSingleCaseStatement": "warn",
+				"useTemplate": "error"
+			}
+		}
+	},
 	"formatter": {
 		"enabled": true,
 		"formatWithErrors": true,

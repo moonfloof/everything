@@ -16,6 +16,35 @@ const router = express.Router();
  * @prop {[number, number]} geometry.coordinates
  */
 
+/**
+ * @param {boolean|string} state
+ * @return {string|null}
+ */
+const getBatteryState = state => {
+	switch (state) {
+		case true: {
+			state = 'charging';
+			break;
+		}
+		case false: {
+			state = 'unplugged';
+			break;
+		}
+		case 'unknown': {
+			state = null;
+			break;
+		}
+		default:
+			break;
+	}
+
+	if (typeof state !== 'string') {
+		state = null;
+	}
+
+	return state;
+};
+
 // Overland
 router.post('/overland', async (req, res) => {
 	try {
@@ -89,19 +118,7 @@ router.post('/overland', async (req, res) => {
 		// Round to two decimal places
 		battery_level = Math.round(battery_level * 10000) / 100 || 100;
 
-		switch (battery_state) {
-			case true:
-				battery_state = 'charging';
-				break;
-			case false:
-				battery_state = 'unplugged';
-				break;
-			case 'unknown':
-				battery_state = null;
-				break;
-			default:
-				break;
-		}
+		battery_state = getBatteryState(battery_state);
 
 		updateDevice(deviceId, battery_level, battery_state);
 
@@ -122,23 +139,7 @@ router.post('/battery', (req, res) => {
 		// Round to two decimal places
 		battery_level = Math.round(battery_level * 100) / 100 || 100;
 
-		switch (battery_state) {
-			case true:
-				battery_state = 'charging';
-				break;
-			case false:
-				battery_state = 'unplugged';
-				break;
-			case 'unknown':
-				battery_state = null;
-				break;
-			default:
-				break;
-		}
-
-		if (typeof battery_state !== 'string') {
-			battery_state = null;
-		}
+		battery_state = getBatteryState(battery_state);
 
 		updateDevice(id, battery_level, battery_state);
 

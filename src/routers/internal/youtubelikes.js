@@ -47,13 +47,15 @@ router.post('/:id', (req, res) => {
 	const videoId = validateYouTubeUrl(url);
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteYouTubeLike(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateYouTubeLike(id, videoId, title, channel, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing

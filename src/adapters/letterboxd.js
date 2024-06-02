@@ -174,7 +174,7 @@ export const fetchFilms = () => {
 	};
 };
 
-export const pollForFilmActivity = async () => {
+export const pollForFilmActivity = () => {
 	const intervalSecs = Number(process.env.TOMBOIS_LETTERBOXD_POLL_INTERVAL_SECS) ?? 86400;
 	const intervalMs = intervalSecs * 1000;
 

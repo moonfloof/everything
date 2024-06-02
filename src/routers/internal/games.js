@@ -40,13 +40,15 @@ router.post('/:id', (req, res) => {
 	const { crudType, name, playtime_mins, url, created_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteGameActivity(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateGameActivity(id, name, playtime_mins, url, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing
@@ -83,7 +85,7 @@ router.post('/:game_id/achievements', (req, res) => {
 	}
 
 	switch (crudType) {
-		case 'new':
+		case 'new': {
 			insertNewGameAchievement(
 				name,
 				description,
@@ -93,14 +95,17 @@ router.post('/:game_id/achievements', (req, res) => {
 				created_at,
 			);
 			break;
+		}
 
-		case 'delete':
+		case 'delete': {
 			deleteGameAchievement(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateGameAchievement(id, name, description, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing

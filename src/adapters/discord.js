@@ -91,12 +91,14 @@ async function handleMessage(message) {
 	const [command, ...args] = message.content.split(' ');
 	try {
 		switch (command) {
-			case 'youtube':
+			case 'youtube': {
 				commandYouTube(args, message);
 				break;
-			case 'bookmark':
+			}
+			case 'bookmark': {
 				commandBookmark(args, message);
 				break;
+			}
 			default:
 				return;
 		}

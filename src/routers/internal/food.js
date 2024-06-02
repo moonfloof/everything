@@ -45,13 +45,15 @@ router.post('/:id', (req, res) => {
 	const { crudType, name, type, created_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteFood(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateFood(id, name, type, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing
