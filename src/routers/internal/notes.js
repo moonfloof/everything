@@ -46,11 +46,12 @@ router.post('/:entryId', (req, res) => {
 	const { entryId } = req.params;
 
 	switch (req.body.crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteNote(entryId);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateNote(
 				entryId,
 				req.body.description,
@@ -62,6 +63,7 @@ router.post('/:entryId', (req, res) => {
 				req.body.created_at,
 			);
 			break;
+		}
 
 		default:
 			// Do nothing

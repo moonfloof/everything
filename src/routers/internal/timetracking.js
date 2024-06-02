@@ -37,13 +37,15 @@ router.post('/:id', (req, res) => {
 	const { crudType, category, created_at, ended_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteTimeTracking(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateTimeTracking(id, category, created_at, ended_at);
 			break;
+		}
 
 		default:
 			// Do nothing

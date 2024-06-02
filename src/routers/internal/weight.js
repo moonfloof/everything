@@ -30,13 +30,15 @@ router.post('/:id', (req, res) => {
 	const { crudType, weight_kgs, created_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteWeight(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateWeight(id, weight_kgs, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing

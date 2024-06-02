@@ -1,7 +1,6 @@
 import express from 'express';
 import { fetchFilms } from '../../adapters/letterboxd.js';
 import { countFilms, deleteFilm, getFilms, insertFilm, updateFilm } from '../../database/films.js';
-import { formatDate } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const router = express.Router();
@@ -55,11 +54,12 @@ router.post('/:id', (req, res) => {
 	const { crudType, title, year, rating, review, url, watched_at, created_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteFilm(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateFilm(
 				id,
 				title,
@@ -71,6 +71,7 @@ router.post('/:id', (req, res) => {
 				created_at,
 			);
 			break;
+		}
 
 		default:
 			// Do nothing

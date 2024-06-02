@@ -130,9 +130,9 @@ const authenticateApi = async () => {
 };
 
 /**
- *
- *
- * @param {*} game
+ * @param {object} game
+ * @param {string} game.titleName
+ * @param {'PS5'|'ps4'} game.format
  */
 const compareTrophies = async game => {
 	const gameName = game.titleName.replace(/[^a-zA-Z0-9]*/g, '');
@@ -220,8 +220,7 @@ const fetchGameActivity = async () => {
 	const playTimeMinutes = Number(pollInterval) ?? 5;
 	const deviceId = psnDeviceId || defaultDeviceId;
 
-	for (let i = 0; i < gameTitleInfoList.length; i++) {
-		const game = gameTitleInfoList[i];
+	for (const game of gameTitleInfoList) {
 		const newTrophies = await compareTrophies(game);
 
 		if (newTrophies.length > 0) {

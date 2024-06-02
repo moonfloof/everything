@@ -39,13 +39,15 @@ router.post('/:id', (req, res) => {
 	const { crudType, artist, album, title, tracknumber, release_year, genre, created_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteListen(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateListen(id, artist, album, title, tracknumber, release_year, genre, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing

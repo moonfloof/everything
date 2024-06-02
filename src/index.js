@@ -3,8 +3,8 @@ import { getDatabase } from './database/database.js';
 import Logger from './lib/logger.js';
 
 // Servers
-import appExternal from './app-external.js';
-import appInternal from './app-internal.js';
+import appExternal from './appExternal.js';
+import appInternal from './appInternal.js';
 
 // Adapters
 import { pollForLikedVideos } from './adapters/youtube.js';
@@ -33,7 +33,7 @@ appInternal();
 // Start Discord bot
 getDiscordClient();
 
-process.on('exit', async () => {
+process.on('exit', () => {
 	log.info('Exiting - closing database');
 
 	getDatabase().close();

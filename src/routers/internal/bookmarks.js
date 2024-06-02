@@ -36,13 +36,15 @@ router.post('/:id', (req, res) => {
 	const { crudType, url, title, created_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteBookmark(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateBookmark(id, title, url, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing

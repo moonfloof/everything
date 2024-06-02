@@ -37,13 +37,15 @@ router.post('/:purchaseId', (req, res) => {
 	const { crudType, amount, currency, merchant, category, created_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deletePurchase(purchaseId);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updatePurchase(purchaseId, amount, currency, merchant, category, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing

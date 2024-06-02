@@ -40,13 +40,15 @@ router.post('/:id', (req, res) => {
 	const { crudType, step_count_total, created_at } = req.body;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteSteps(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateSteps(id, step_count_total, created_at);
 			break;
+		}
 
 		default:
 			// Do nothing

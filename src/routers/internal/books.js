@@ -76,11 +76,12 @@ router.post('/:id', (req, res) => {
 			: null;
 
 	switch (crudType) {
-		case 'delete':
+		case 'delete': {
 			deleteBook(id);
 			break;
+		}
 
-		case 'update':
+		case 'update': {
 			updateBook(id, {
 				title,
 				year: Number(year),
@@ -95,6 +96,7 @@ router.post('/:id', (req, res) => {
 				created_at,
 			});
 			break;
+		}
 
 		default:
 			// Do nothing
