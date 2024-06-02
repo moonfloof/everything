@@ -186,18 +186,24 @@ export const getYouTubeVideoSnippet = async url => {
  * @throws {Error}
  */
 export const validateYouTubeUrl = url => {
-	const youtubeValidUrls = /(youtube\.com|youtu\.be\/[\w-]{11,})/i;
+	const error = new Error('Not a valid YouTube URL');
+
+	const youtubeValidUrls = /(youtube\.com|youtu\.be)/i;
 	if (!youtubeValidUrls.test(url)) {
-		throw new Error('Not a valid YouTube URL');
+		throw error;
 	}
 
 	if (url.includes('youtu.be')) {
-		return url.split('youtu.be/')[1];
+		const id = url.match(/youtu\.be\/(?<id>[\w-]{11,})/)?.groups.id;
+		if (!id) {
+			throw error;
+		}
+		return id;
 	}
 
 	const id = new URL(url).searchParams.get('v');
 	if (id === null || typeof id !== 'string') {
-		throw new Error('Not a valid YouTube URL');
+		throw error;
 	}
 
 	return id;
