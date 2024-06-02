@@ -21,7 +21,7 @@ export function insertSteps(step_count_total, created_at, device_id) {
 	return statement.run({
 		id: uuid(),
 		step_count_total,
-		created_at: formatDate(new Date(created_at)),
+		created_at: formatDate(new Date(created_at || Date.now())),
 		device_id,
 	});
 }
