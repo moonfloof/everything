@@ -13,7 +13,8 @@
 				"useAwait": "warn"
 			},
 			"complexity": {
-				"noExcessiveCognitiveComplexity": "error"
+				"noExcessiveCognitiveComplexity": "error",
+				"useSimplifiedLogicExpression": "error"
 			},
 			"performance": {
 				"noAccumulatingSpread": "error",

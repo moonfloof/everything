@@ -15,7 +15,7 @@ const nowPlaying = {
 
 export function getNowPlaying() {
 	// Skip if there are missing details
-	if (!nowPlaying.artist || !nowPlaying.title) {
+	if (!(nowPlaying.artist && nowPlaying.title)) {
 		return null;
 	}
 

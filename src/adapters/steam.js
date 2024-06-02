@@ -72,7 +72,7 @@ const saveGamesToDisk = () => {
 const fetchAchievements = async appid => {
 	const { TOMBOIS_STEAM_APIKEY: apiKey, TOMBOIS_STEAM_USERID: userId } = process.env;
 
-	if (!apiKey || !userId) return null;
+	if (!(apiKey && userId)) return null;
 
 	const apiUrl = `http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appid}&key=${apiKey}&steamid=${userId}&format=json&l=en`;
 
