@@ -5,8 +5,7 @@
 ### Server URL
 
 This guide assumes your server is installed at `example.com`, although you can
-change this address to match your actual installed location. For example, mine
-is [`now.floof.fm`](https://now.floof.fm).
+change this address to match your actual installed location.
 
 This address should be available to any devices that will be communicating with
 it. For example, if you wish to scrobble using 4G, the **external** API should
@@ -25,6 +24,15 @@ generated UUIDs.
 
 For future reference in this document, `<API-KEY>` refers to an API key
 generated for a device in this database.
+
+### A note about inconsistencies
+
+Unfortunately, due to connecting to various services, several of these endpoints
+are not consistent with the others (eg. sending `apiKey` as a body parameter, or
+in the URL, or as an HTTP header). While I have also tried to make the response
+payload consistent across all the endpoints, some are still different, so if you
+choose to connect to these endpoints manually, please check that you are sending
+the correct authorisation parameters and checking for the correct responses.
 
 ## Scrobbles / ListenBrainz
 
