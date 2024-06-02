@@ -31,7 +31,7 @@ router.post('/steps', (req, res) => {
 	try {
 		const { createdAt, steps } = req.body;
 
-		log.info(`Steps: ${steps} at '${createdAt}`);
+		log.info(`Steps: ${steps} ${createdAt ? `at '${createdAt}'` : ''}`);
 
 		insertSteps(steps, createdAt, req.deviceId);
 
@@ -46,7 +46,7 @@ router.post('/weight', (req, res) => {
 	try {
 		const { createdAt, weightKgs } = req.body;
 
-		log.info(`Weight: '${weightKgs}' at '${createdAt}'`);
+		log.info(`Weight: '${weightKgs}' ${createdAt ? `at '${createdAt}'` : ''}`);
 		insertWeight(weightKgs, createdAt, req.deviceId);
 
 		res.send({ status: 'ok' });
@@ -74,7 +74,7 @@ router.post('/food', (req, res) => {
 	try {
 		const { createdAt, name, type } = req.body;
 
-		log.info(`Food: ${name} (${type}) started at ${createdAt}`);
+		log.info(`Food: ${name} (${type}) ${createdAt ? `at '${createdAt}'` : ''}`);
 		insertFood(name, type, createdAt, req.deviceId);
 
 		res.send({ status: 'ok' });
