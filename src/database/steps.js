@@ -94,6 +94,6 @@ export function updateSteps(id, step_count_total, created_at) {
 	return statement.run({
 		id,
 		step_count_total,
-		created_at: formatDate(created_at || Date.now()),
+		created_at: formatDate(new Date(created_at || Date.now())),
 	});
 }
