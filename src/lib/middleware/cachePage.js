@@ -12,8 +12,8 @@ const logger = new Logger('cache');
  * @property {string} contents
  */
 
-/** @type {Record<string, CacheObj>} */
-const cache = {};
+/** @type {Map<string, CacheObj>} */
+const cache = new Map();
 
 export default function getCache() {
 	/**
@@ -30,7 +30,7 @@ export default function getCache() {
 		}
 
 		const key = req.originalUrl;
-		const cacheValue = cache[key];
+		const cacheValue = cache.get(key);
 
 		const durationMs = durationSecs * 1000;
 		const lastUpdateUnixMs = Date.now() - durationMs;
@@ -44,10 +44,10 @@ export default function getCache() {
 
 		res.sendResponse = res.send;
 		res.send = body => {
-			cache[key] = {
+			cache.set(key, {
 				contents: body,
 				lastUpdateUnixMs: Date.now(),
-			};
+			});
 			res.sendResponse(body);
 		};
 		next();
@@ -66,14 +66,14 @@ export function pollForCacheDeletion() {
 	const cacheDurationMs = cacheDurationSecs * 1000;
 
 	setInterval(() => {
-		for (const key of Object.keys(cache)) {
-			if (cache[key].lastUpdateUnixMs > Date.now() - cacheDurationMs) {
+		for (const [key, value] of cache.entries()) {
+			if (value.lastUpdateUnixMs > Date.now() - cacheDurationMs) {
 				continue;
 			}
 
 			// Remove from cache entirely
 			logger.info(`Cache for '${key}' expired. Deleting`);
-			delete cache[key];
+			cache.delete(key);
 		}
 	}, intervalDurationMs);
 }
