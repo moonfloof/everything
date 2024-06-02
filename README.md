@@ -55,11 +55,9 @@ Data is entered using the internal CRUD API.
 * **Scrobbles** - [Subsonic API](http://www.subsonic.org/pages/api.jsp)
   installed locally, to get a list of artists and their albums (this is great
   for listening to physical media, where scrobbling is not automatic).
-* **Books** - Also stores progress using page numbers (eg. read 48 pages,
-  total 230 pages, therefore progress is 21%)
-* **Web Bookmarks** - this can be automated by connecting Pocket through IFTTT,
-  and making a POST request to `/api/bookmarks` with a JSON body containing
-  `apiKey`, `title`, `url` as properties.
+* **Books** - Stores progress using page numbers (eg. if you've read 48 pages,
+  and there are total 230 pages, the progress is therefore 21%)
+* **Web Bookmarks**
 
 ## Discord Bot
 
@@ -105,3 +103,8 @@ you should only need to edit the `.env` file to make configuration changes. As
 such, all that's required is:
 
 * `docker compose up -d`
+
+## API / Connecting applications
+
+The [API documentation page](./API.md) contains a full list of endpoints and
+their requirements.
