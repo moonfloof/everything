@@ -17,32 +17,38 @@ const router = express.Router();
  */
 
 /**
- * @param {boolean|string} state
- * @return {string|null}
+ * @param {string} deviceId
+ * @param {{battery_level: number, battery_state: boolean|string}} battery
+ * @param {number} level_exponent
  */
-const getBatteryState = state => {
-	switch (state) {
+const updateBatteryState = (deviceId, battery, level_exponent = 100) => {
+	let status = battery.battery_state;
+
+	switch (status) {
 		case true: {
-			state = 'charging';
+			status = 'charging';
 			break;
 		}
 		case false: {
-			state = 'unplugged';
+			status = 'unplugged';
 			break;
 		}
 		case 'unknown': {
-			state = null;
+			status = null;
 			break;
 		}
 		default:
 			break;
 	}
 
-	if (typeof state !== 'string') {
-		state = null;
+	if (typeof status !== 'string') {
+		status = null;
 	}
 
-	return state;
+	// Round battery charge to 2 decimal places
+	const level = Math.round(battery.battery_level * level_exponent) / 100 || 100;
+
+	updateDevice(deviceId, level, status);
 };
 
 // Overland
@@ -73,7 +79,19 @@ router.post('/overland', async (req, res) => {
 		});
 
 		// Add locations to database
-		let index = -1;
+		let index = 0;
+		const lastLocation = locations[locations.length - 1];
+
+		// Get city information for last entry
+		const results = await getGeocoder().reverse({
+			lat: lastLocation.geometry.coordinates[1],
+			lon: lastLocation.geometry.coordinates[0],
+		});
+		let city = results?.[0]?.city;
+		if (results?.[0]?.state && typeof city === 'string') {
+			city += `, ${results[0].state}`;
+		}
+
 		for (const location of locations) {
 			index += 1;
 
@@ -87,40 +105,23 @@ router.post('/overland', async (req, res) => {
 				continue;
 			}
 
-			const { timestamp } = location.properties;
-			const timestampDate = new Date(timestamp);
-			const timestampISO = timestampDate.toISOString();
-
+			const timestamp = new Date(location.properties.timestamp).toISOString();
 			const [lon, lat] = location?.geometry?.coordinates ?? [];
 
 			// Get city from last location in batch
-			let city = null;
-			if (index === locations.length - 1) {
-				const results = await getGeocoder().reverse({ lat, lon });
-				city = results?.[0]?.city;
-				if (results?.[0]?.state && typeof city === 'string') {
-					city += `, ${results?.[0]?.state}`;
-				}
-			}
-
-			insertLocation(lat, lon, city, timestampISO, deviceId);
+			const currentCity = index === locations.length ? city : null;
+			insertLocation(lat, lon, currentCity, timestamp, deviceId);
 		}
 
 		// Get latest battery level
-		const lastLoc = locations[locations.length - 1];
-		let { battery_state, battery_level } = lastLoc.properties;
+		const { battery_state, battery_level } = lastLocation.properties;
 
 		if (!battery_level && !battery_state) {
 			res.send({ result: 'ok' });
 			return;
 		}
 
-		// Round to two decimal places
-		battery_level = Math.round(battery_level * 10000) / 100 || 100;
-
-		battery_state = getBatteryState(battery_state);
-
-		updateDevice(deviceId, battery_level, battery_state);
+		updateBatteryState(deviceId, lastLocation.properties, 10000);
 
 		res.send({ result: 'ok' });
 	} catch (err) {
@@ -134,14 +135,8 @@ router.post('/battery', (req, res) => {
 	try {
 		const token = req.headers.authorization;
 		const { id } = validateDevice(token);
-		let { battery_level, battery_state } = req.body;
 
-		// Round to two decimal places
-		battery_level = Math.round(battery_level * 100) / 100 || 100;
-
-		battery_state = getBatteryState(battery_state);
-
-		updateDevice(id, battery_level, battery_state);
+		updateBatteryState(id, req.body, 100);
 
 		res.send({ status: 'ok' });
 	} catch (err) {

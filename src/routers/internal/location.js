@@ -9,6 +9,47 @@ const DISPLAY_FORMATS = {
 	HEATMAP: 'heatmap',
 };
 
+/**
+ * @param {{lat: number, long: number}[]} locationHistory
+ * @return {[number, number][]}
+ */
+const generatePathLines = locationHistory => {
+	const paths = [[]];
+
+	for (const location of locationHistory) {
+		const pathIndex = paths.length - 1;
+
+		// Always add the path if it's currently empty
+		if (paths[pathIndex].length === 0) {
+			paths[pathIndex].push([location.lat, location.long]);
+			continue;
+		}
+
+		const currentPath = paths[pathIndex];
+		const idx = currentPath.length - 1;
+		const diffLat = Math.abs(location.lat - currentPath[idx][0]);
+		const diffLong = Math.abs(location.long - currentPath[idx][1]);
+
+		// Start a new path for big jumps
+		if (diffLat > 0.2 || diffLong > 0.2) {
+			if (paths[pathIndex].length === 1) {
+				paths.pop();
+			}
+			paths.push([[location.lat, location.long]]);
+			continue;
+		}
+
+		// Skip very minor movements, to reduce noise and response size.
+		if (diffLat < 0.0001 || diffLong < 0.0001) {
+			continue;
+		}
+
+		paths[pathIndex].push([location.lat, location.long]);
+	}
+
+	return paths;
+};
+
 router.get('/', (req, res) => {
 	const {
 		date_start = formatDate(new Date(Date.now() - 7 * dayMs)),
@@ -35,7 +76,6 @@ router.get('/', (req, res) => {
 	const avgLong = locationHistory.reduce((acc, cur) => acc + cur.long, 0) / locationHistory.length;
 
 	let paths = [];
-	const points = [];
 
 	if (format === DISPLAY_FORMATS.HEATMAP) {
 		// This is some weird calculation I determined in Excel that smoothly
@@ -49,56 +89,13 @@ router.get('/', (req, res) => {
 
 		paths = locationHistory.map(loc => [loc.lat, loc.long, intensity]);
 	} else {
-		paths = [[]];
-		for (const location of locationHistory) {
-			const pathIndex = paths.length - 1;
-
-			// Always add the path if it's currently empty
-			if (paths[pathIndex].length === 0) {
-				if (location.city !== null) {
-					points.push({
-						latlng: [location.lat, location.long],
-						title: location.city,
-					});
-				}
-				paths[pathIndex].push([location.lat, location.long]);
-				continue;
-			}
-
-			const currentPath = paths[pathIndex];
-			const idx = currentPath.length - 1;
-			const diffLat = Math.abs(location.lat - currentPath[idx][0]);
-			const diffLong = Math.abs(location.long - currentPath[idx][1]);
-
-			// Start a new path for big jumps
-			if (diffLat > 0.2 || diffLong > 0.2) {
-				if (location.city !== null) {
-					points.push({
-						latlng: [location.lat, location.long],
-						title: location.city,
-					});
-				}
-				if (paths[pathIndex].length === 1) {
-					paths.pop();
-				}
-				paths.push([[location.lat, location.long]]);
-				continue;
-			}
-
-			// Skip very minor movements, to reduce noise and response size.
-			if (diffLat < 0.0001 || diffLong < 0.0001) {
-				continue;
-			}
-
-			paths[pathIndex].push([location.lat, location.long]);
-		}
+		paths = generatePathLines(locationHistory);
 	}
 
 	res.render('internal/location', {
 		avgLat,
 		avgLong,
 		paths: JSON.stringify(paths),
-		points: JSON.stringify(points),
 		pointsTotal: locationHistory.length,
 		format,
 		dateToday: formatDate(new Date()),

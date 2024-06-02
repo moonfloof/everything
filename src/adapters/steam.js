@@ -125,6 +125,36 @@ const compareAchievements = async appid => {
 	});
 };
 
+const calculateNewActivity = games => {
+	const newActivity = [];
+
+	for (const game of games) {
+		if (ignoredGames.includes(game.appid)) continue;
+
+		const activity = {
+			...game,
+			newPlaytime: game.playtime_2weeks,
+		};
+
+		const existing = gameActivity.find(cache => game.appid === cache.appid);
+		if (!existing) {
+			newActivity.unshift(activity);
+			continue;
+		}
+
+		activity.newPlaytime = game.playtime_forever - existing.playtime_forever;
+		if (activity.newPlaytime <= 0) {
+			continue;
+		}
+
+		newActivity.unshift(activity);
+	}
+
+	log.debug(`Found ${newActivity.length} instances of new activity`);
+
+	return newActivity;
+};
+
 export const pollForGameActivity = () => {
 	const {
 		TOMBOIS_STEAM_POLL_INTERVAL: pollIntervalMinutes,
@@ -149,36 +179,10 @@ export const pollForGameActivity = () => {
 			parse: 'json',
 		});
 
-		const newActivity = [];
-
-		for (const game of body.response.games) {
-			if (ignoredGames.includes(game.appid)) continue;
-
-			const activity = {
-				...game,
-				newPlaytime: game.playtime_2weeks,
-			};
-
-			const existing = gameActivity.find(cache => game.appid === cache.appid);
-			if (!existing) {
-				newActivity.push(activity);
-				continue;
-			}
-
-			activity.newPlaytime = game.playtime_forever - existing.playtime_forever;
-			if (activity.newPlaytime <= 0) {
-				continue;
-			}
-
-			newActivity.push(activity);
-		}
-
-		log.debug(`Found ${newActivity.length} instances of new activity`);
+		const newActivity = calculateNewActivity(body.response.games);
 
 		// Update all new same-game activity
-		for (let i = newActivity.length - 1; i >= 0; i--) {
-			const game = newActivity[i];
-
+		for (const game of newActivity) {
 			const activity = updateActivity(
 				game.name,
 				game.newPlaytime,

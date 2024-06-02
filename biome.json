@@ -12,6 +12,9 @@
 				"noEmptyBlockStatements": "warn",
 				"useAwait": "warn"
 			},
+			"complexity": {
+				"noExcessiveCognitiveComplexity": "error"
+			},
 			"performance": {
 				"noAccumulatingSpread": "error",
 				"noDelete": "error",
