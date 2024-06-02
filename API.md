@@ -19,8 +19,8 @@ direct manipulation of the database without authentication.
 You may want to keep track of individual devices which submit data to the API.
 To submit any data to the API, you will need at least one device. After setting
 up the initial SQLite database and running the migrations in order, go to the
-"devices" table, and add a new device. IDs and API Keys must be randomly
-generated UUIDs.
+"devices" table, and add a new device. Your device ID will be a randomly
+generated UUID, and you should keep your API key secure.
 
 For future reference in this document, `<API-KEY>` refers to an API key
 generated for a device in this database.
