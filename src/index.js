@@ -7,12 +7,12 @@ import appExternal from './appExternal.js';
 import appInternal from './appInternal.js';
 
 // Adapters
-import { pollForLikedVideos } from './adapters/youtube.js';
-import { pollForGameActivity } from './adapters/steam.js';
-import { pollForCacheDeletion } from './lib/middleware/cachePage.js';
-import { pollForFilmActivity } from './adapters/letterboxd.js';
-import { pollForPsnActivity } from './adapters/psn.js';
-import { getDiscordClient } from './adapters/discord.js';
+// import { pollForLikedVideos } from './adapters/youtube.js';
+// import { pollForGameActivity } from './adapters/steam.js';
+// import { pollForCacheDeletion } from './lib/middleware/cachePage.js';
+// import { pollForFilmActivity } from './adapters/letterboxd.js';
+// import { pollForPsnActivity } from './adapters/psn.js';
+// import { getDiscordClient } from './adapters/discord.js';
 
 const log = new Logger('http');
 
@@ -20,18 +20,18 @@ const log = new Logger('http');
 dotenv.config();
 
 // Set up polling adapters
-pollForLikedVideos();
-pollForGameActivity();
-pollForCacheDeletion();
-pollForFilmActivity();
-pollForPsnActivity();
+// pollForLikedVideos();
+// pollForGameActivity();
+// pollForCacheDeletion();
+// pollForFilmActivity();
+// pollForPsnActivity();
 
 // Start servers
 appExternal();
 appInternal();
 
 // Start Discord bot
-getDiscordClient();
+// getDiscordClient();
 
 process.on('exit', () => {
 	log.info('Exiting - closing database');

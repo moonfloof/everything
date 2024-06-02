@@ -116,7 +116,7 @@ router.post('/overland', async (req, res) => {
 		// Get latest battery level
 		const { battery_state, battery_level } = lastLocation.properties;
 
-		if (!battery_level && !battery_state) {
+		if (!(battery_level || battery_state)) {
 			res.send({ result: 'ok' });
 			return;
 		}

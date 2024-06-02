@@ -13,7 +13,7 @@ let client = null;
  * @returns {Client|null}
  */
 export function getDiscordClient() {
-	if (!process.env.TOMBOIS_DISCORD_TOKEN || !process.env.TOMBOIS_DISCORD_CHANNELID) {
+	if (!(process.env.TOMBOIS_DISCORD_TOKEN && process.env.TOMBOIS_DISCORD_CHANNELID)) {
 		log.warn('No token or channel ID provided, bot will not be enabled');
 		return null;
 	}
@@ -70,7 +70,7 @@ async function commandBookmark(args, message) {
 	const [url, ...titleParts] = args;
 	const title = titleParts.join(' ').trim();
 
-	if (!url || !title) {
+	if (!(url && title)) {
 		const error = 'Please provide a url and title';
 		await message.reply(error);
 		throw new Error(error);

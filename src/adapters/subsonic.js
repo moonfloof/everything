@@ -32,7 +32,7 @@ const getBaseParams = () => {
 };
 
 const checkEnvironment = () => {
-	return !process.env.TOMBOIS_SUBSONIC_URL || !process.env.TOMBOIS_SUBSONIC_USERNAME;
+	return !(process.env.TOMBOIS_SUBSONIC_URL && process.env.TOMBOIS_SUBSONIC_USERNAME);
 };
 
 export const getAlbumList = async (page = 0) => {

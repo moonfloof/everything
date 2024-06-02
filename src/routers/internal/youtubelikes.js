@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
 
 	const id = validateYouTubeUrl(url);
 
-	if (!title || !channel) {
+	if (!(title && channel)) {
 		const snippet = await getYouTubeVideoSnippet(url);
 		title = snippet?.snippet?.title;
 		channel = snippet?.snippet?.channelTitle || 'N/A';

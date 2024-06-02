@@ -59,7 +59,7 @@ router.get('/', (req, res) => {
 
 	const dateRegex = new RegExp(/^\d{4}-\d{2}-\d{2}$/);
 
-	if (!dateRegex.test(date_start) || !dateRegex.test(date_end)) {
+	if (!(dateRegex.test(date_start) && dateRegex.test(date_end))) {
 		throw new Error('Date Start and End must be an ISO date formatted string (eg. "2024-01-02"');
 	}
 
