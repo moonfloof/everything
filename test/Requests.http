@@ -34,7 +34,7 @@ Authorization: {{apiKey}}
 Content-Type: application/json
 
 {
-	"category": "sleep",
+	"category": "Sleep",
 	"createdAt": "{{$datetime iso8601}}"
 }
 
@@ -45,7 +45,7 @@ Authorization: {{apiKey}}
 Content-Type: application/json
 
 {
-	"weightKgs": 10.0,
+	"weightKgs": 10,
 	"createdAt": "{{$datetime iso8601}}"
 }
 
@@ -151,11 +151,16 @@ X-Api-Key: {{sonarApiKey}}
 GET {{sonarUrl}}api/v3/episode?seriesId=2
 X-Api-Key: {{sonarApiKey}}
 
+### SONARR - Get episode information
+
+GET {{sonarUrl}}api/v3/episode/4
+X-Api-Key: {{sonarApiKey}}
+
 ### STEAM - Get user's achievements for a given game
 
 @steamApiKey={{$dotenv TOMBOIS_STEAM_APIKEY}}
 @steamUserId={{$dotenv TOMBOIS_STEAM_USERID}}
-@steamGameId=224760
+@steamGameId=1029690
 
 GET http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid={{steamGameId}}&key={{steamApiKey}}&steamid={{steamUserId}}&format=json&l=en
 Content-Type: application/json

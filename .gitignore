@@ -61,3 +61,4 @@ sketch
 
 data/*.json
 *.db
+dist/
