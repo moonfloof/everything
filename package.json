@@ -5,15 +5,16 @@
 	"main": "src/index.js",
 	"type": "module",
 	"scripts": {
-		"start": "nodemon src/index.js",
-		"start:production": "node src/index.js",
-		"lint": "eslint --fix src/**/*.js",
+		"start": "nodemon dist/index.js",
+		"start:production": "node dist/index.js",
+		"build": "esbuild src/index.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/index.js",
+		"lint": "biome check src",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "moonfloof <git@moonfloof.com>",
 	"license": "AGPL-3.0-or-later",
 	"dependencies": {
-		"@tombofry/stdlib": "^0.10.1",
+		"@tombofry/stdlib": "^0.11.0",
 		"better-sqlite3": "^11.0.0",
 		"discord.js": "^14.14.1",
 		"dotenv": "^16.3.1",
@@ -31,9 +32,18 @@
 		"uuid": "^9.0.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.7.3"
+		"@biomejs/biome": "^1.7.3",
+		"@types/better-sqlite3": "^7.6.10",
+		"@types/express": "^4.17.21",
+		"@types/node-geocoder": "^4.2.6",
+		"@types/sax": "^1.2.7",
+		"@types/uuid": "^9.0.8",
+		"esbuild": "^0.21.4",
+		"typescript": "^5.4.5"
 	},
 	"nodemonConfig": {
-		"ignore": ["*.json"]
+		"ext": "ts",
+		"ignore": ["*.json", "dist"],
+		"exec": "npm run build && node"
 	}
 }

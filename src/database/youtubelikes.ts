@@ -1,0 +1,78 @@
+import { v4 as uuid } from 'uuid';
+import { timeago } from '../adapters/timeago.js';
+import { dateDefault } from '../lib/formatDate.js';
+import type { Optional } from '../types/database.js';
+import { type Parameters, calculateGetParameters } from './constants.js';
+import { getStatement } from './database.js';
+
+interface YouTubeLike {
+	id: string;
+	video_id: string;
+	title: string;
+	channel: Optional<string>;
+	device_id: string;
+	created_at: string;
+}
+
+export function insertYouTubeLike(video: Omit<YouTubeLike, 'id'>) {
+	const statement = getStatement(
+		'insertYouTubeLike',
+		`INSERT INTO youtubelikes
+		(id, video_id, title, channel, device_id, created_at)
+		VALUES
+		($id, $video_id, $title, $channel, $device_id, $created_at)`,
+	);
+
+	return statement.run({
+		...video,
+		id: uuid(),
+		created_at: dateDefault(video.created_at),
+	});
+}
+
+export function getLikes(parameters: Partial<Parameters> = {}) {
+	const statement = getStatement<YouTubeLike>(
+		'getYouTubeLikes',
+		`SELECT * FROM youtubelikes
+		WHERE id LIKE $id AND created_at >= $created_at
+		ORDER BY created_at DESC
+		LIMIT $limit OFFSET $offset`,
+	);
+
+	return statement.all(calculateGetParameters(parameters)).map(row => ({
+		...row,
+		url: `https://www.youtube.com/watch?v=${row.video_id}`,
+		timeago: timeago.format(new Date(row.created_at)),
+	}));
+}
+
+export function countYouTubeLikes() {
+	const statement = getStatement<{ total: number }>(
+		'countYouTubeLikes',
+		'SELECT COUNT(*) as total FROM youtubelikes',
+	);
+
+	return statement.get()?.total || 0;
+}
+
+export function deleteYouTubeLike(id: string) {
+	const statement = getStatement('deleteYouTubeLike', 'DELETE FROM youtubelikes WHERE id = $id');
+	return statement.run({ id });
+}
+
+export function updateYouTubeLike(video: Omit<YouTubeLike, 'device_id'>) {
+	const statement = getStatement(
+		'updateYouTubeLike',
+		`UPDATE youtubelikes
+		SET video_id = $video_id,
+		    title = $title,
+		    channel = $channel,
+		    created_at = $created_at
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		...video,
+		created_at: dateDefault(video.created_at),
+	});
+}

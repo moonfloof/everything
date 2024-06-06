@@ -13,7 +13,7 @@
 				"useAwait": "warn"
 			},
 			"complexity": {
-				"noExcessiveCognitiveComplexity": "error",
+				"noExcessiveCognitiveComplexity": "warn",
 				"useSimplifiedLogicExpression": "error"
 			},
 			"performance": {
@@ -59,7 +59,7 @@
 			"arrowParentheses": "asNeeded",
 			"quoteStyle": "single",
 			"semicolons": "always",
-			"trailingComma": "all"
+			"trailingCommas": "all"
 		}
 	},
 	"json": {

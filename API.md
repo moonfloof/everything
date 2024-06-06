@@ -155,7 +155,8 @@ receiving YouTube URLs from the Share sheet for manual submissions.
 
 * `url`: The YouTube URL, can be in the format `youtube.com/watch?v=...` or
   `youtu.be/...`
-* `title`: Optional, if you wish to override the actual title of the video
+* `title`: Optional, to override the real title of the video
+* `created_at`: Optional, to override the liked date, in ISO8601 format
 * `apiKey`: Value of `<API-KEY>`
 
 #### Payload Example
@@ -163,7 +164,9 @@ receiving YouTube URLs from the Share sheet for manual submissions.
 ```json
 {
   "url": "https://www.youtube.com/watch?v=4Q0p2WnVvMU",
-  "apiKey": "0ccdd0ad-dd26-..."
+  "title": "Floating Amongst The Stars (Official Lyric Video)",
+  "created_at": "2024-01-01T09:00:00.000Z",
+  "apiKey": "0ccdd0ad-dd26-...",
 }
 ```
 
@@ -200,9 +203,10 @@ receiving URLs from the Share sheet for manual submissions.
 
 #### Payload
 
+* `apiKey`: Value of `<API-KEY>`
 * `url`: The page URL being bookmarked
 * `title`: The title of the page
-* `apiKey`: Value of `<API-KEY>`
+* `created_at`: Optional, set a custom date, in ISO8601 date/time format
 
 #### Payload Example
 
@@ -210,7 +214,8 @@ receiving URLs from the Share sheet for manual submissions.
 {
   "url": "https://floof.fm/",
   "title": "moonfloof",
-  "apiKey": "a732cb0b-c24f-..."
+  "apiKey": "a732cb0b-c24f-...",
+  "created_at": "2024-01-01T09:45:00.000Z"
 }
 ```
 
@@ -323,7 +328,7 @@ endpoint at 23:59 every day.
 
 #### Payload
 
-* `createdAt`: the date you're logging steps for, in `YYYY-MM-DD` format. You
+* `created_at`: the date you're logging steps for, in `YYYY-MM-DD` format. You
   _can_ provide a full ISO8601 date but it will be truncated to the whole day in
   the database, so you only need to log this once per day. If **not** provided,
   the API will default to the current date.
@@ -333,7 +338,7 @@ endpoint at 23:59 every day.
 
 ```json
 {
-  "createdAt": "2024-01-01",
+  "created_at": "2024-01-01",
   "steps": 3056
 }
 ```
@@ -345,19 +350,19 @@ endpoint at 23:59 every day.
 
 #### Payload
 
-* `createdAt`: the date you're logging weight for, in `YYYY-MM-DD` format. You
+* `created_at`: the date you're logging weight for, in `YYYY-MM-DD` format. You
   _can_ provide a full ISO8601 date but it will be truncated to the whole day in
   the database, so you only need to log this once per day. If **not** provided,
   the API will default to the current date.
-* `weightKgs`: weight in kilograms, as a number (technically there's nothing
+* `weight_kgs`: weight in kilograms, as a number (technically there's nothing
   stopping you from logging pounds, stone, or some other unit).
 
 #### Payload Example
 
 ```json
 {
-  "createdAt": "2024-01-01",
-  "weightKgs": 70.0
+  "created_at": "2024-01-01",
+  "weight_kgs": 70.0
 }
 ```
 
@@ -365,7 +370,7 @@ endpoint at 23:59 every day.
 
 #### Payload
 
-* `createdAt`: full date/time in ISO8601 format. If **not** provided, the API
+* `created_at`: full date/time in ISO8601 format. If **not** provided, the API
   will default to the current date/time.
 * `name`: what you're currently eating/drinking
 * `type`: used to categorise food types. You may wish to track takeouts,
@@ -377,7 +382,7 @@ endpoint at 23:59 every day.
 
 ```json
 {
-  "createdAt": "2024-01-01T09:00:00.000Z",
+  "created_at": "2024-01-01T09:00:00.000Z",
   "name": "Chicken and mushroom curry",
   "type": "takeout"
 }
@@ -390,14 +395,14 @@ to this endpoint to start/end a session.
 
 #### Payload
 
-* `createdAt`: date/time, in ISO8601
-* `endedAt`: date/time, in ISO8601
+* `created_at`: date/time, in ISO8601
+* `ended_at`: date/time, in ISO8601
 * `category`: what you're time tracking
 
-You do not have to provide `createdAt` or `endedAt` - if you send a payload
+You do not have to provide `created_at` or `ended_at` - if you send a payload
 without dates, it will start timetracking at the current date/time. If you send
 another payload afterwards, the previous session will end and a new one will
-begin at the current date/time. You can send `createdAt` without `endedAt` if
+begin at the current date/time. You can send `created_at` without `ended_at` if
 you wish to start a timetracking session with a custom date/time.
 
 Also, if you send the `category` as "stop" while a session is currently running,
@@ -419,7 +424,7 @@ time, and end the previous session at that time as well.
 ```json
 {
   "category": "cooking / eating",
-  "createdAt": "2024-01-01T09:00:00.000Z"
+  "created_at": "2024-01-01T09:00:00.000Z"
 }
 ```
 
