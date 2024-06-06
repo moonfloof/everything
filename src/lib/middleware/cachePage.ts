@@ -41,7 +41,8 @@ export default function getCache() {
 				contents: body,
 				lastUpdateUnixMs: Date.now(),
 			});
-			sendActual(body);
+			res.send = sendActual;
+			res.send(body);
 			return body;
 		};
 		next();
