@@ -2,6 +2,7 @@
 // this caching solution will store the entirety of common pages in memory using
 // a very simple singleton object.
 
+import type { OutgoingHttpHeaders } from 'node:http';
 import type { NextFunction, Request, Response } from 'express';
 import { config } from '../config.js';
 import Logger from '../logger.js';
@@ -11,6 +12,7 @@ const logger = new Logger('cache');
 interface CacheObj {
 	lastUpdateUnixMs: number;
 	contents: string;
+	headers: OutgoingHttpHeaders;
 }
 
 const cache: Map<string, CacheObj> = new Map();
@@ -29,6 +31,7 @@ export default function getCache() {
 		const lastUpdateUnixMs = Date.now() - durationMs;
 
 		if (cacheValue?.lastUpdateUnixMs && cacheValue.lastUpdateUnixMs > lastUpdateUnixMs) {
+			res.set(cacheValue.headers);
 			res.send(cacheValue.contents);
 			return;
 		}
@@ -39,6 +42,7 @@ export default function getCache() {
 		res.send = body => {
 			cache.set(key, {
 				contents: body,
+				headers: res.getHeaders(),
 				lastUpdateUnixMs: Date.now(),
 			});
 			res.send = sendActual;
