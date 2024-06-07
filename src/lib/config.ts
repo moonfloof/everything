@@ -18,6 +18,8 @@ export const config = {
 	sqliteLocation: process.env.TOMBOIS_SQLITE_LOCATION as string,
 	defaultDeviceId: process.env.TOMBOIS_DEFAULT_DEVICE_ID as string,
 	serverExternalUri: process.env.TOMBOIS_SERVER_EXTERNAL_URI as string,
+	personName: process.env.TOMBOIS_PERSON_NAME,
+	footerHtml: process.env.TOMBOIS_FOOTER_HTML,
 	cacheDurationSecs: Number(process.env.TOMBOIS_SERVER_CACHE_DURATION_SECS || 600),
 	cacheIntervalSecs: Number(process.env.TOMBOIS_SERVER_CACHE_INTERVAL_SECS || 1200),
 

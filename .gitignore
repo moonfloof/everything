@@ -26,16 +26,9 @@ coverage
 
 # Dependency directories
 node_modules/
-jspm_packages/
 
 # TypeScript cache
 *.tsbuildinfo
-
-# Optional npm cache directory
-.npm
-
-# Optional REPL history
-.node_repl_history
 
 # Output of 'npm pack'
 *.tgz
@@ -45,20 +38,8 @@ jspm_packages/
 .env.test
 .env.production
 
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
-### react ###
-.DS_*
-**/*.backup.*
-**/*.back.*
-
-*.sublime*
-
-psd
-thumb
-sketch
-
+# Project-specific
+public/*.js
 data/*.json
 *.db
 dist/
