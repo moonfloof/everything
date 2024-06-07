@@ -1,4 +1,5 @@
 import type { HelperDeclareSpec, HelperOptions } from 'handlebars';
+import { config } from './config.js';
 
 /**
  * @example <caption>Not Equal</caption>
@@ -49,15 +50,20 @@ export function xif<T>(this: HelperDeclareSpec, v1: T, operator: string, v2: T, 
 }
 
 export function externalRoot() {
-	return process.env.TOMBOIS_SERVER_EXTERNAL_URI;
+	return config.serverExternalUri;
 }
 
 export function person() {
-	return process.env.TOMBOIS_PERSON_NAME;
+	return config.personName;
+}
+
+export function footerHtml() {
+	return config.footerHtml;
 }
 
 export const helpers: HelperDeclareSpec = {
 	xif,
 	externalRoot,
 	person,
+	footerHtml,
 };
