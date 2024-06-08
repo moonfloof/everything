@@ -67,7 +67,7 @@ export function updateActivity(game: Omit<Game, 'id' | 'created_at' | 'updated_a
 		ORDER BY created_at DESC LIMIT 1;`,
 	);
 
-	const row = selectStatement.get({ name });
+	const row = selectStatement.get({ name: game.name });
 
 	if (row === undefined) {
 		return insertNewGameActivity({ ...game, created_at: '' });

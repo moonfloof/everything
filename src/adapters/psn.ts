@@ -1,6 +1,11 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import type { AuthTokensResponse, TitleTrophiesResponse, UserTrophiesEarnedForTitleResponse } from 'psn-api';
+import type {
+	AuthTokensResponse,
+	TitleTrophiesResponse,
+	UserTrophiesEarnedForTitleResponse,
+	BasicPresenceResponse,
+} from 'psn-api';
 const {
 	exchangeCodeForAccessToken,
 	exchangeNpssoForCode,
@@ -199,7 +204,7 @@ async function fetchGameActivity() {
 
 	const {
 		basicPresence: { gameTitleInfoList },
-	} = await getBasicPresence(authentication, 'me');
+	}: BasicPresenceResponse = await getBasicPresence(authentication, 'me');
 
 	if (!gameTitleInfoList) return;
 
