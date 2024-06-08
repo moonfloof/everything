@@ -29,7 +29,7 @@ import { formatTime, prettyDate, shortDate } from '../../lib/formatDate.js';
 import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
-import getCache from '../../lib/middleware/cachePage.js';
+import { pageCache } from '../../lib/middleware/cachePage.js';
 
 // Others
 import type { RequestFrontend } from '../../types/express.js';
@@ -39,7 +39,7 @@ const router = express.Router();
 
 // DASHBOARD
 
-router.use(getCache());
+router.use(pageCache.getCache());
 
 router.get('/', (req, res) => {
 	const listens = getListenPopularDashboard(7);

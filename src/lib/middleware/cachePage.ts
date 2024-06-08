@@ -7,70 +7,86 @@ import type { NextFunction, Request, Response } from 'express';
 import { config } from '../config.js';
 import Logger from '../logger.js';
 
-const logger = new Logger('cache');
-
 interface CacheObj {
 	lastUpdateUnixMs: number;
 	contents: string;
 	headers: OutgoingHttpHeaders;
 }
 
-const cache: Map<string, CacheObj> = new Map();
+class PageCache {
+	#cache: Map<string, CacheObj> = new Map();
+	#logger = new Logger('cache');
 
-export default function getCache() {
-	return (req: Request, res: Response, next: NextFunction) => {
-		if (config.cacheDurationSecs === 0 || config.cacheIntervalSecs === 0) {
-			next();
-			return;
-		}
-
-		const key = req.originalUrl;
-		const cacheValue = cache.get(key);
-
-		const durationMs = config.cacheDurationSecs * 1000;
-		const lastUpdateUnixMs = Date.now() - durationMs;
-
-		if (cacheValue?.lastUpdateUnixMs && cacheValue.lastUpdateUnixMs > lastUpdateUnixMs) {
-			res.set(cacheValue.headers);
-			res.send(cacheValue.contents);
-			return;
-		}
-
-		logger.info(`Caching '${key}' for ${config.cacheDurationSecs} seconds`);
-
-		const sendActual = res.send;
-		res.send = body => {
-			cache.set(key, {
-				contents: body,
-				headers: res.getHeaders(),
-				lastUpdateUnixMs: Date.now(),
-			});
-			res.send = sendActual;
-			res.send(body);
-			return body;
-		};
-		next();
-	};
-}
-
-export function pollForCacheDeletion() {
-	if (config.cacheIntervalSecs <= 0 || config.cacheDurationSecs <= 0) {
-		logger.warn('Page caching disabled, all requests will be hot');
-		return;
+	get cache() {
+		return this.#cache.entries();
 	}
 
-	const intervalDurationMs = config.cacheIntervalSecs * 1000;
-	const cacheDurationMs = config.cacheDurationSecs * 1000;
-
-	setInterval(() => {
-		for (const [key, value] of cache.entries()) {
-			if (value.lastUpdateUnixMs > Date.now() - cacheDurationMs) {
-				continue;
+	public getCache() {
+		return (req: Request, res: Response, next: NextFunction) => {
+			if (config.cacheDurationSecs === 0 || config.cacheIntervalSecs === 0) {
+				next();
+				return;
 			}
 
-			// Remove from cache entirely
-			logger.info(`Cache for '${key}' expired. Deleting`);
-			cache.delete(key);
+			const key = req.originalUrl;
+			const cacheValue = this.#cache.get(key);
+
+			const durationMs = config.cacheDurationSecs * 1000;
+			const lastUpdateUnixMs = Date.now() - durationMs;
+
+			if (cacheValue?.lastUpdateUnixMs && cacheValue.lastUpdateUnixMs > lastUpdateUnixMs) {
+				res.set(cacheValue.headers);
+				res.send(cacheValue.contents);
+				return;
+			}
+
+			this.#logger.info(`Caching '${key}' for ${config.cacheDurationSecs} seconds`);
+
+			const sendActual = res.send;
+			res.send = body => {
+				this.#cache.set(key, {
+					contents: body,
+					headers: res.getHeaders(),
+					lastUpdateUnixMs: Date.now(),
+				});
+				res.send = sendActual;
+				res.send(body);
+				return body;
+			};
+			next();
+		};
+	}
+
+	public deleteCacheEntry(url: string) {
+		if (!this.#cache.has(url)) {
+			this.#logger.error(`The URL '${url}' does not exist in cache`);
+			throw new Error('This page does not exist in cache');
 		}
-	}, intervalDurationMs);
+
+		this.#cache.delete(url);
+	}
+
+	public pollForCacheDeletion() {
+		if (config.cacheIntervalSecs <= 0 || config.cacheDurationSecs <= 0) {
+			this.#logger.warn('Page caching disabled, all requests will be hot');
+			return;
+		}
+
+		const intervalDurationMs = config.cacheIntervalSecs * 1000;
+		const cacheDurationMs = config.cacheDurationSecs * 1000;
+
+		setInterval(() => {
+			for (const [key, value] of this.#cache.entries()) {
+				if (value.lastUpdateUnixMs > Date.now() - cacheDurationMs) {
+					continue;
+				}
+
+				// Remove from cache entirely
+				this.#logger.info(`Cache for '${key}' expired. Deleting`);
+				this.#cache.delete(key);
+			}
+		}, intervalDurationMs);
+	}
 }
+
+export const pageCache = new PageCache();

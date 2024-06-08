@@ -420,6 +420,28 @@ select {
 	z-index: 10000;
 }
 
+.cache-list {
+	border-top: 1px solid var(--border);
+}
+
+.cache-list li {
+	margin-top: 0;
+	padding: 8px;
+	display: flex;
+	align-items: center;
+	border-bottom: 1px solid var(--border);
+}
+
+.cache-list--url {
+	flex: 1;
+}
+
+.page--data .form-inline {
+	margin-top: 0;
+	margin-left: 16px;
+	display: inline;
+}
+
 @media (max-width: 660px) {
 	.container {
 		padding: 48px 24px;
@@ -446,5 +468,18 @@ select {
 	.dashboard--panel {
 		margin-bottom: 24px;
 		height: auto;
+	}
+
+	.cache-list li {
+		display: block;
+	}
+
+	.cache-list--url,
+	.cache-list--size {
+		margin-bottom: 8px;
+	}
+
+	.page--data .form-inline {
+		margin-left: 0;
 	}
 }

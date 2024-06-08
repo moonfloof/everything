@@ -13,14 +13,14 @@ import { pollForGameActivity } from './adapters/steam.js';
 
 // Adapters
 import { pollForLikedVideos } from './adapters/youtube.js';
-import { pollForCacheDeletion } from './lib/middleware/cachePage.js';
+import { pageCache } from './lib/middleware/cachePage.js';
 
 const log = new Logger('http');
 
 // Set up polling adapters
+pageCache.pollForCacheDeletion();
 pollForLikedVideos();
 pollForGameActivity();
-pollForCacheDeletion();
 pollForFilmActivity();
 pollForPsnActivity();
 

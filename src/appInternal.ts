@@ -24,6 +24,7 @@ import timetracking from './routers/internal/timetracking.js';
 import tv from './routers/internal/tv.js';
 import weight from './routers/internal/weight.js';
 import youtubelikes from './routers/internal/youtubelikes.js';
+import cache from './routers/internal/cache.js';
 
 const log = new Logger('server-int');
 
@@ -50,6 +51,7 @@ app.use('/timetracking', timetracking);
 app.use('/tv', tv);
 app.use('/weight', weight);
 app.use('/youtubelikes', youtubelikes);
+app.use('/cache', cache);
 
 app.get('*', () => {
 	throw new NotFoundError('Page Not Found');
