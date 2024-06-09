@@ -1,11 +1,46 @@
 <div class="page--data">
-	{{> pageHeader title="Watching (YouTube)" url="/" }}
+	{{> pageHeader title="Liked YouTube Videos" url="/" }}
 
-	<p class="dashboard--lead">
-		Admittedly, I watch a <em>lot</em> of YouTube videos, and here
-		are my favourites. You'll typically find videos about maths,
-		science, music, and comedy.
-	</p>
+	{{#xif pagination.page '==' 0}}
+	<h3>Top 10 liked channels (last {{days}} days)</h3>
+
+	<form action="/youtube" method="get" name="days">
+		<select name="days">
+			{{#each dayOptions as |option|}}
+				<option
+					{{#if option.selected}}selected{{/if}}
+					value="{{option.value}}"
+				>{{option.value}} days</option>
+			{{/each}}
+		</select>
+		<input type="submit" value="Go" />
+	</form>
+
+	{{#if popular}}
+	<table>
+		{{#each popular as |channel| }}
+		<tr>
+			<td class="align-r">
+				{{channel.channel}}
+			</td>
+			<td class="table-flex-1">
+				<span class="artist-count" style="width: {{channel.popularityPercentage}}%">
+					{{channel.count}}
+				</span>
+			</td>
+		</tr>
+		{{/each}}
+	</table>
+	{{else}}
+	<div class="error rounded-panel">
+		<p class="lead">I haven't liked any YouTube videos within the last {{days}} days! 😭</p>
+	</div>
+	{{/if}}
+
+	<h3>Recently liked YouTube videos</h3>
+	{{/xif}}
+
+
 	{{#each youtubeLikes as |like|}}
 		{{> youtubeLike data=like }}
 	{{/each}}

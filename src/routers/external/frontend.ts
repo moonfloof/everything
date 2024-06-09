@@ -21,7 +21,7 @@ import { countNotes, getNotes } from '../../database/notes.js';
 import { getSleepStats } from '../../database/sleep.js';
 import { getStepsYesterday } from '../../database/steps.js';
 import { countEpisodes, getEpisodes } from '../../database/tv.js';
-import { countYouTubeLikes, getLikes } from '../../database/youtubelikes.js';
+import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../database/youtubelikes.js';
 
 // Lib
 import addMissingDates from '../../lib/addMissingDates.js';
@@ -101,20 +101,22 @@ router.get('/music', (req: RequestFrontend, res) => {
 
 	const description =
 		popular.length > 0
-			? `My favourite artist in the last 7 days has been ${popular[0].artist}, with ${popular[0].count} listens`
-			: "I haven't listened to any music in the last 7 days!";
+			? `My favourite artist in the last ${daysInt} days has been ${popular[0].artist}, with ${popular[0].count} listens`
+			: `I haven't listened to any music in the last ${daysInt} days!`;
 
 	res.render('external/listen-list', {
 		nowPlaying,
 		listens,
-		popular,
 		pagination,
 		svg,
-		days,
-		dayOptions,
 		canonicalUrl: getCanonicalUrl(req),
 		title: 'listens to music',
 		description,
+
+		// Popular chart
+		days,
+		dayOptions,
+		popular,
 	});
 });
 
@@ -142,16 +144,39 @@ router.get('/music/:id', (req, res) => {
 // YOUTUBE LIKES
 
 router.get('/youtube', (req: RequestFrontend, res) => {
-	const { page = 0 } = req.query;
+	const { page = 0, days = '60' } = req.query;
 	const pagination = handlebarsPagination(page, countYouTubeLikes());
 
+	const daysInt = Number(days);
+	const dayOptions = [
+		{ value: 60, selected: daysInt === 60 },
+		{ value: 180, selected: daysInt === 180 },
+		{ value: 365, selected: daysInt === 365 },
+	];
+
+	if (!Number.isSafeInteger(daysInt) || daysInt < 60 || daysInt > 365) {
+		throw new Error('"days" query must be a number between 60 and 365');
+	}
+
 	const youtubeLikes = getLikes({ page });
+	const popular = getPopularYouTubeChannels(daysInt);
+
+	const description =
+		popular.length > 0
+			? `My favourite YouTube channel in the last ${daysInt} days has been ${popular[0].channel}, with ${popular[0].count} likes`
+			: `I haven't liked any YouTube videos in the last ${daysInt} days!`;
 
 	res.render('external/youtubelike-list', {
 		youtubeLikes,
 		pagination,
 		title: 'watches YouTube',
+		description,
 		canonicalUrl: getCanonicalUrl(req),
+
+		// Popular chart
+		days,
+		dayOptions,
+		popular,
 	});
 });
 
