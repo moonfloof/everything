@@ -86,11 +86,11 @@ It currently supports these commands, following this format:
 * Copy `.env.template` to `.env` and modify values as you see fit. **Most of the
   setup instructions you'll need already appear within the .env file**, as they
   are specific to each service you'd like to track.
-* Start the server, so the database migrations can run, then shut it down again.
-* Add at least one device to the `devices` table (where `id` is a UUID), and add
-  it to the `TOMBOIS_DEFAULT_DEVICE_ID` variable in `.env`.
-* Now that you've gotten a device added, you can start the server back up and
-  keep it running!
+* Start the server and open the internal API: it'll prompt you to set up a
+  new device.
+* Add the new device ID to the `TOMBOIS_DEFAULT_DEVICE_ID` variable in `.env`.
+* Now that you've gotten a device added, you can restart the server and start
+  collecting data!
 
 ### Running via NPM on bare metal
 

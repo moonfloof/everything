@@ -1,0 +1,51 @@
+<div class="page--data" id="setup-page">
+	{{#if error}}
+	<div class="rounded-panel error">
+		<p>{{error}}</p>
+	</div>
+	<br/>
+	{{/if}}
+
+	{{#if device_id}}
+		<div class="rounded-panel info">
+			<p>Your new device ID is <code>{{device_id}}</code></p>
+			<p>
+				Please update the <code>TOMBOIS_DEFAULT_DEVICE_ID</code> variable in your
+				<code>.env</code> file and restart the server.
+			</p>
+			<p>
+				If you forget your device ID or API key in the future, you can check the
+				<code>devices</code> table in the database.
+			</p>
+		</div>
+		<br/>
+		<a href="/">Continue -&gt;</a>
+	{{else}}
+
+	<h1>Setup Required</h1>
+
+	<p>Hello, to start using everything, please add at least one device to your database.</p>
+
+	<form method="post" action="/setup">
+		<div class="row">
+			<div class="left">👤</div>
+			<div class="right">
+				<p><strong>Device Name</strong></p>
+				<p>A short description you can use to identify this device (eg. "iPhone", "PC").</p>
+				<input class="right" type="text" id="description" name="description" placeholder="Device Name" />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="left">🔑</div>
+			<div class="right">
+				<p><strong>Password / API key</strong></p>
+				<p>A long, secure password used to track data via the external API.</p>
+				<input class="right" type="password" id="apiKey" name="apiKey" placeholder="Password / API Key" />
+			</div>
+		</div>
+
+		{{> internal/crudSubmit}}
+	</form>
+	{{/if}}
+</div>
