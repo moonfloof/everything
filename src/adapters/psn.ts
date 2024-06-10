@@ -2,9 +2,9 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import type {
 	AuthTokensResponse,
+	BasicPresenceResponse,
 	TitleTrophiesResponse,
 	UserTrophiesEarnedForTitleResponse,
-	BasicPresenceResponse,
 } from 'psn-api';
 const {
 	exchangeCodeForAccessToken,

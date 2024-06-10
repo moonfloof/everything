@@ -156,6 +156,8 @@ export function getListenPopularDashboard(days: number) {
 	const album = generateStatement('album').get({ created_at });
 	const song = generateStatement('title').get({ created_at });
 
+	if (!(artist?.count && album?.count && song?.count)) return null;
+
 	return {
 		artist,
 		album,
