@@ -9,6 +9,7 @@ RUN npm ci
 
 COPY ./src/ ./src/
 COPY ./public/ ./public/
+COPY ./migrations/ ./migrations/
 RUN npm run build
 
 CMD [ "npm", "run", "start:production" ]
