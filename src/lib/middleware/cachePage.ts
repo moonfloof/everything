@@ -66,6 +66,10 @@ class PageCache {
 		this.#cache.delete(url);
 	}
 
+	public purgeAllCache() {
+		this.#cache.clear();
+	}
+
 	public pollForCacheDeletion() {
 		if (config.cacheIntervalSecs <= 0 || config.cacheDurationSecs <= 0) {
 			this.#logger.warn('Page caching disabled, all requests will be hot');

@@ -7,6 +7,10 @@
 	</div>
 {{/if}}
 
+<form class="form-inline" method="post" action="/cache/delete-all">
+	<p><input type="submit" value="❌ Purge Entire Cache" /></p>
+</form>
+
 {{#if cachedPages}}
 	<ul class="sectioncontainer cache-list">
 	{{#each cachedPages as |page| }}

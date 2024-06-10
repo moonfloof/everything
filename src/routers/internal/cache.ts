@@ -21,4 +21,9 @@ router.post('/delete', (req: RequestFrontend<object, { url: string }>, res) => {
 	}
 });
 
+router.post('/delete-all', (_req, res) => {
+	pageCache.purgeAllCache();
+	res.redirect('/cache');
+});
+
 export default router;
