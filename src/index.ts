@@ -1,5 +1,6 @@
 import './lib/config.js';
 import { getDatabase } from './database/database.js';
+import { checkMigrations } from './database/migrations.js';
 import Logger from './lib/logger.js';
 
 // Servers
@@ -13,7 +14,6 @@ import { pollForGameActivity } from './adapters/steam.js';
 
 // Adapters
 import { pollForLikedVideos } from './adapters/youtube.js';
-import { checkMigrations } from './database/migrations.js';
 import { pageCache } from './lib/middleware/cachePage.js';
 
 const log = new Logger('http');

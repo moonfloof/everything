@@ -198,7 +198,7 @@ export function getGameStats() {
 	};
 	const games = getGameActivityByDay(7);
 
-	if (games.length === 0) return emptyStats;
+	if (games.length === 0) return null;
 
 	const stats = games.reduce((stats, cur) => {
 		stats.games[cur.name] =

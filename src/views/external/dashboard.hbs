@@ -8,81 +8,89 @@
 	</div>
 </div>
 
-{{#> dashpanel title="notes" link="notes"}}
-	<ul>
-	{{#each notes}}
-		<li class="dashboard--panel__li">
-			<span>
-				{{emoji}} {{#if title}}{{title}}{{else}}{{summary}}{{/if}}
-			</span>
-			<small>
-				<a href="/note/{{id}}">{{timeago}}</a>
-			</small>
-		</li>
-	{{/each}}
-	</ul>
-{{/dashpanel}}
-
-<div id="dashboard--panels">
-	{{#> dashpanel title="listening <small>(7 days)</small>" link="music" }}
-		<div class="dashboard--panel--meta">
-			<div class="dashboard--panel--meta__row">
-				<span>fav artist</span>
-				<span>
-					<strong>{{listens.artist.title}}</strong>
-					<small>(x{{listens.artist.count}})</small>
-				</span>
-			</div>
-			<div class="dashboard--panel--meta__row">
-				<span>fav album</span>
-				<span>
-					<strong>{{listens.album.title}}</strong>
-					<small>(x{{listens.album.count}})</small>
-				</span>
-			</div>
-			<div class="dashboard--panel--meta__row">
-				<span>fav song</span>
-				<span>
-					<strong>{{listens.song.title}}</strong>
-					<small>(x{{listens.song.count}})</small>
-				</span>
-			</div>
-		</div>
-	{{/dashpanel}}
-
-	{{#> dashpanel title="gaming <small>(7 days)</small>" link="games" }}
-		<div class="dashboard--panel--meta">
-			<div class="dashboard--panel--meta__row">
-				<span>total playtime</span>
-				<span><strong>{{gameStats.totalPlaytimeHuman}}</strong></span>
-			</div>
-			<div class="dashboard--panel--meta__row">
-				<span>average length</span>
-				<span><strong>{{gameStats.averagePlaytime}}</strong></span>
-			</div>
-			<div class="dashboard--panel--meta__row">
-				<span>total sessions</span>
-				<span><strong>{{gameStats.totalSessions}}</strong></span>
-			</div>
-			<div class="dashboard--panel--meta__row">
-				<span>fav game</span>
-				<span><strong>{{gameStats.favouriteGame}}</strong></span>
-			</div>
-		</div>
-	{{/dashpanel}}
-
-	{{#> dashpanel title="youtube" link="youtube" }}
+{{#if notes.length}}
+	{{#> dashpanel title="notes" link="notes"}}
 		<ul>
-		{{#each youtubeLikes}}
+		{{#each notes}}
 			<li class="dashboard--panel__li">
-				<a href="{{url}}" target="_blank" rel="noopener">
-					<strong>{{ title }}</strong>
-				</a>
-				<small>{{channel}}</small>
+				<span>
+					{{emoji}} {{#if title}}{{title}}{{else}}{{summary}}{{/if}}
+				</span>
+				<small>
+					<a href="/note/{{id}}">{{timeago}}</a>
+				</small>
 			</li>
 		{{/each}}
 		</ul>
 	{{/dashpanel}}
+{{/if}}
+
+<div id="dashboard--panels">
+	{{#if listens}}
+		{{#> dashpanel title="listening <small>(7 days)</small>" link="music" }}
+			<div class="dashboard--panel--meta">
+				<div class="dashboard--panel--meta__row">
+					<span>fav artist</span>
+					<span>
+						<strong>{{listens.artist.title}}</strong>
+						<small>(x{{listens.artist.count}})</small>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>fav album</span>
+					<span>
+						<strong>{{listens.album.title}}</strong>
+						<small>(x{{listens.album.count}})</small>
+					</span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>fav song</span>
+					<span>
+						<strong>{{listens.song.title}}</strong>
+						<small>(x{{listens.song.count}})</small>
+					</span>
+				</div>
+			</div>
+		{{/dashpanel}}
+	{{/if}}
+
+	{{#if gameStats}}
+		{{#> dashpanel title="gaming <small>(7 days)</small>" link="games" }}
+			<div class="dashboard--panel--meta">
+				<div class="dashboard--panel--meta__row">
+					<span>total playtime</span>
+					<span><strong>{{gameStats.totalPlaytimeHuman}}</strong></span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>average length</span>
+					<span><strong>{{gameStats.averagePlaytime}}</strong></span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>total sessions</span>
+					<span><strong>{{gameStats.totalSessions}}</strong></span>
+				</div>
+				<div class="dashboard--panel--meta__row">
+					<span>fav game</span>
+					<span><strong>{{gameStats.favouriteGame}}</strong></span>
+				</div>
+			</div>
+		{{/dashpanel}}
+	{{/if}}
+
+	{{#if youtubeLikes.length}}
+		{{#> dashpanel title="youtube" link="youtube" }}
+			<ul>
+			{{#each youtubeLikes}}
+				<li class="dashboard--panel__li">
+					<a href="{{url}}" target="_blank" rel="noopener">
+						<strong>{{ title }}</strong>
+					</a>
+					<small>{{channel}}</small>
+				</li>
+			{{/each}}
+			</ul>
+		{{/dashpanel}}
+	{{/if}}
 
 	{{#if tvEpisodes}}
 		{{#> dashpanel title="watching" link="tv" }}

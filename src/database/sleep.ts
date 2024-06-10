@@ -77,7 +77,7 @@ export function getSleepStats() {
 
 	const sleepCycles = getSleepCycles({ days: 100 }).slice(0, 10);
 
-	if (sleepCycles.length === 0) return emptyStats;
+	if (sleepCycles.length === 0) return null;
 
 	const stats = sleepCycles.reduce((stats, sleep) => {
 		// Skip currently sleeping

@@ -10,6 +10,7 @@ import { validatePageNumber } from './lib/middleware/validatePageNumber.js';
 // Routers
 import bookmarks from './routers/internal/bookmarks.js';
 import books from './routers/internal/books.js';
+import cache from './routers/internal/cache.js';
 import films from './routers/internal/films.js';
 import food from './routers/internal/food.js';
 import frontend from './routers/internal/frontend.js';
@@ -24,7 +25,6 @@ import timetracking from './routers/internal/timetracking.js';
 import tv from './routers/internal/tv.js';
 import weight from './routers/internal/weight.js';
 import youtubelikes from './routers/internal/youtubelikes.js';
-import cache from './routers/internal/cache.js';
 
 const log = new Logger('server-int');
 
