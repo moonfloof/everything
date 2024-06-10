@@ -83,16 +83,19 @@ It currently supports these commands, following this format:
 
 ### Prerequisites
 
-* Create a SQLite database file, running all the migrations in order of date
-  inside the `migrations` folder
-* Add at least one device to the `devices` table (where `id` is a UUID)
 * Copy `.env.template` to `.env` and modify values as you see fit. **Most of the
   setup instructions you'll need already appear within the .env file**, as they
   are specific to each service you'd like to track.
+* Start the server, so the database migrations can run, then shut it down again.
+* Add at least one device to the `devices` table (where `id` is a UUID), and add
+  it to the `TOMBOIS_DEFAULT_DEVICE_ID` variable in `.env`.
+* Now that you've gotten a device added, you can start the server back up and
+  keep it running!
 
-### Running NPM on bare metal
+### Running via NPM on bare metal
 
 * `npm install`
+* `npm run build`
 * `npm run start:production` (or your preferred way of managing node 
   applications, eg. `forever`, `pm2`, etc)
 
