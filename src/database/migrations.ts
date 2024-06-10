@@ -26,7 +26,7 @@ export function checkMigrations() {
 	// Step 4: Run remaining migrations
 	for (const migration of requiredMigrations) {
 		log.info(`Running migration for '${migration}'`);
-		const sql = fs.readFileSync(path.join('migrations', migration), 'utf-8');
+		const sql = fs.readFileSync(path.resolve(path.join('migrations', migration)), 'utf-8');
 		getDatabase().exec(sql);
 		insertMigration(migration);
 	}
@@ -34,7 +34,7 @@ export function checkMigrations() {
 
 function migrationsTableExists() {
 	log.info('Checking migration table exists');
-	const sql = fs.readFileSync(path.join('migrations', '2024-06-10-set-up-migrations.sql'), 'utf-8');
+	const sql = fs.readFileSync(path.resolve(path.join('migrations', '2024-06-10-set-up-migrations.sql')), 'utf-8');
 	getDatabase().exec(sql);
 }
 
