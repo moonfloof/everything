@@ -42,13 +42,18 @@ const router = express.Router();
 router.use(pageCache.getCache());
 
 router.get('/', (req, res) => {
+	const devices = getDevices();
+	if (devices.length === 0) {
+		res.render('external/setup-required');
+		return;
+	}
+
 	const listens = getListenPopularDashboard(7);
 	const youtubeLikes = getLikes().slice(0, 2);
 	const tvEpisodes = getEpisodes().slice(0, 2);
 	const films = getFilms().slice(0, 2);
 	const gameStats = getGameStats();
-	const games = getGameActivity();
-	const device = getDevices()[0];
+	const device = devices[0];
 	const location = getLatestCity();
 	const steps = getStepsYesterday()?.step_count_total;
 	const sleepStats = getSleepStats();
@@ -62,7 +67,6 @@ router.get('/', (req, res) => {
 		tvEpisodes,
 		films,
 		books,
-		games,
 		gameStats,
 		notes,
 		device,

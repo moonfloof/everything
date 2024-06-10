@@ -77,11 +77,22 @@ a:hover {
 	text-decoration: underline;
 }
 
-div.error {
+/** ALERTS **/
+
+div.error,
+div.info {
 	padding: 0 24px 24px;
+}
+
+div.error {
 	background-color: var(--error-bg);
 	border: 1px solid var(--error-fg);
 	font-weight: 700;
+}
+
+div.info {
+	background-color: var(--secondary-bg);
+	border: 1px solid var(--secondary-fg);
 }
 
 /** DASHBOARD **/
@@ -386,17 +397,29 @@ table td {
 
 /** INTERNAL USE ONLY **/
 
+code,
 pre {
 	font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
 	line-height: 1.2;
+}
+
+pre {
 	width: 100%;
 	overflow-x: auto;
 	overflow-y: hidden;
 }
 
+code {
+	background-color: rgba(0, 0, 0, 0.1);
+	padding: 2px 4px;
+	border-radius: 4px;
+	font-weight: 700;
+}
+
 input.right,
 select.right,
 textarea.right {
+	width: 100%;
 	flex: 1;
 	padding: 2px;
 	max-width: 320px;
@@ -418,6 +441,7 @@ select {
 	color: var(--primary-fg);
 	padding: 4px 8px;
 	z-index: 10000;
+	text-align: left;
 }
 
 .cache-list {
@@ -440,6 +464,15 @@ select {
 	margin-top: 0;
 	margin-left: 16px;
 	display: inline;
+}
+
+#setup-page .row {
+	margin-bottom: 16px;
+}
+
+#setup-page .right p {
+	margin-top: 0;
+	margin-bottom: 4px;
 }
 
 @media (max-width: 660px) {
