@@ -11,7 +11,7 @@ const router = express.Router();
 
 interface Location {
 	properties: {
-		timestamp: number;
+		timestamp: string;
 		battery_state: string;
 		battery_level: number;
 	};
@@ -108,7 +108,12 @@ router.post('/overland', async (req: RequestFrontend, res) => {
 				continue;
 			}
 
-			const created_at = new Date(location.properties.timestamp).toISOString();
+			if (!location.properties.timestamp) {
+				log.debug('Timestamp not provided, skipping');
+				continue;
+			}
+
+			const created_at = new Date(location.properties.timestamp).getTime();
 			const [long, lat] = location.geometry.coordinates ?? [];
 
 			// Get city from last location in batch
