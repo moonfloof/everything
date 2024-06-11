@@ -240,7 +240,7 @@ export function deleteGameActivity(id: string) {
 	return statement.run({ id });
 }
 
-export function updateGameActivity(game: Omit<Game, 'device_id' | 'updated_at'>) {
+export function updateGameActivity(game: Omit<Game, 'device_id'>) {
 	const statement = getStatement(
 		'updateGameActivity',
 		`UPDATE games
@@ -256,6 +256,6 @@ export function updateGameActivity(game: Omit<Game, 'device_id' | 'updated_at'>)
 		...game,
 		playtime_mins: Number(game.playtime_mins),
 		created_at: dateDefault(game.created_at),
-		updated_at: new Date().toISOString(),
+		updated_at: dateDefault(game.updated_at),
 	});
 }
