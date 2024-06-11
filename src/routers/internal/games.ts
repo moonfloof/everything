@@ -45,7 +45,7 @@ router.post('/', (req: RequestFrontend, res) => {
 
 router.post('/:id', (req: RequestFrontend, res) => {
 	const { id } = req.params;
-	const { crudType, name, playtime_mins, url, created_at } = req.body;
+	const { crudType, name, playtime_mins, url, created_at, updated_at } = req.body;
 
 	switch (crudType) {
 		case 'delete': {
@@ -54,7 +54,14 @@ router.post('/:id', (req: RequestFrontend, res) => {
 		}
 
 		case 'update': {
-			updateGameActivity({ id, name, playtime_mins: Number(playtime_mins || 0), url, created_at });
+			updateGameActivity({
+				id,
+				name,
+				playtime_mins: Number(playtime_mins || 0),
+				url,
+				created_at,
+				updated_at,
+			});
 			break;
 		}
 
