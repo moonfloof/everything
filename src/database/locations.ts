@@ -1,13 +1,11 @@
-import { v4 as uuid } from 'uuid';
-import { dateDefault, dayMs } from '../lib/formatDate.js';
+import { dayMs } from '../lib/formatDate.js';
 import { getStatement } from './database.js';
 
 interface Location {
-	id: string;
 	lat: number;
 	long: number;
 	city?: string | null;
-	created_at: string;
+	created_at: number;
 	device_id: string;
 }
 
@@ -15,16 +13,12 @@ export function insertLocation(location: Omit<Location, 'id'>) {
 	const statement = getStatement(
 		'insertLocation',
 		`INSERT INTO location
-		(id, lat, long, city, created_at, device_id)
+		(lat, long, city, created_at, device_id)
 		VALUES
-		($id, $lat, $long, $city, $created_at, $device_id)`,
+		($lat, $long, $city, $created_at, $device_id)`,
 	);
 
-	return statement.run({
-		...location,
-		id: uuid(),
-		created_at: dateDefault(location.created_at),
-	});
+	return statement.run(location);
 }
 
 export function getLatestCity() {
@@ -38,7 +32,7 @@ export function getLatestCity() {
 	);
 
 	// Only return city if the data comes from the last two days
-	const created_at = new Date(Date.now() - 2 * dayMs).toISOString();
+	const created_at = new Date(Date.now() - 2 * dayMs).getTime();
 
 	return statement.get({ created_at })?.city;
 }
@@ -53,7 +47,7 @@ export function getLocationHistory(date_start: Date, date_end: Date) {
 	);
 
 	return statement.all({
-		date_start: date_start.toISOString(),
-		date_end: new Date(date_end.getTime() + dayMs).toISOString(),
+		date_start: date_start.getTime(),
+		date_end: new Date(date_end.getTime() + dayMs).getTime(),
 	});
 }
