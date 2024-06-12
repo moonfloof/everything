@@ -56,6 +56,9 @@ interface Song {
 	parent: number;
 	title: string;
 	artist: string;
+	album: string;
+	year: number;
+	track: number;
 	isDir: boolean;
 	coverArt: number;
 	created: string;
@@ -74,6 +77,15 @@ interface Song {
 interface AlbumResponse {
 	'subsonic-response': {
 		album: {
+			song: Song[];
+		};
+	};
+}
+
+interface Search3Response {
+	'subsonic-response': {
+		searchResult3: {
+			album: AlbumList[];
 			song: Song[];
 		};
 	};
@@ -142,4 +154,20 @@ export const scrobbleTrack = async (trackId: number, timestamp: number) => {
 	const response = await phin({ url, parse: 'json' });
 
 	return response.body;
+};
+
+export const searchTrack = async (title: string, album: string, artist: string) => {
+	if (checkEnvironment()) return null;
+
+	const params = new URLSearchParams({
+		...getBaseParams(),
+		query: `${title}`,
+	});
+
+	const url = new URL(`/rest/search3?${params}`, config.subsonic.url);
+
+	const response = await phin<Search3Response>({ url, parse: 'json' });
+	const results = response.body['subsonic-response'].searchResult3;
+
+	return results.song.find(song => song.artist === artist && song.album === album) ?? null;
 };
