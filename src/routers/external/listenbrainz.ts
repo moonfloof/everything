@@ -4,6 +4,7 @@ import { insertScrobble } from '../../database/listens.js';
 import { minuteMs } from '../../lib/formatDate.js';
 import Logger from '../../lib/logger.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { searchTrack } from '../../adapters/subsonic.js';
 
 const log = new Logger('ListenBrainz');
 const router = express.Router();
@@ -69,7 +70,7 @@ interface ListenBrainzPayload {
 	}[];
 }
 
-router.post('/1/submit-listens', (req: RequestFrontend<object, ListenBrainzPayload>, res) => {
+router.post('/1/submit-listens', async (req: RequestFrontend<object, ListenBrainzPayload>, res) => {
 	try {
 		// Validate Device API Key
 		const authToken = req.header('Authorization')?.toLowerCase();
@@ -99,11 +100,20 @@ router.post('/1/submit-listens', (req: RequestFrontend<object, ListenBrainzPaylo
 			// Apparently additional_info doesn't always get sent
 			const releaseDateISO = scrobble.track_metadata.additional_info?.date;
 			const genres = scrobble.track_metadata.additional_info?.tags;
-			const tracknumber = scrobble.track_metadata.additional_info?.tracknumber || null;
+			let tracknumber = scrobble.track_metadata.additional_info?.tracknumber || null;
 
 			// Process payload data
-			const release_year = releaseDateISO ? new Date(releaseDateISO).getFullYear() : null;
+			let release_year = releaseDateISO ? new Date(releaseDateISO).getFullYear() : null;
 			const genre = Array.isArray(genres) && genres.length > 0 ? genres[0] : null;
+
+			// Get extra data from subsonic, if available
+			// The API unfortunately doesn't return genre data nicely.
+			if (release_year === null || tracknumber === null) {
+				const search = await searchTrack(title, album, artist);
+
+				if (search?.track) tracknumber = search.track;
+				if (search?.year) release_year = search.year;
+			}
 
 			log.debug(`Saving "${title}" by ${artist}`);
 
