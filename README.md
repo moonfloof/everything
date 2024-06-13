@@ -10,13 +10,30 @@ an upperhand on the things I like to consume.
 If this also applies to you, you might consider using Everything (for lack
 of a better name!).
 
----
+## Screenshots
+
+For an actual live demo of my data collection, visit
+<https://now.floof.fm>, otherwise here are a couple of screenshots:
+
+![everything dashboard screenshot](./screenshot-dashboard.png)
+
+This is the landing page dashboard - it contains a brief overview of everything
+being collected (that you'd want public, anyway), and - where it makes sense to
+view more details - you can click `see more >` to view individual tracking
+records. For example, here's the music page:
+
+![everything listens page screenshot](./screenshot-listens.png)
+
+Some pages have graphs and tables for some interesting visualisations, however
+most just have records like the ones you see at the bottom of this screenshot.
+
+## Data Collection & Sources
 
 There are various types of data that can be stored, half of which is completely
 automatic, and another half which may require manual input (until I figure out a
 better way to do it).
 
-## Automatic/External Data Sources
+### Automatic/External
 
 * **Location Tracking** - Using the
   [Overland API](https://github.com/aaronpk/Overland-iOS#api) by
@@ -39,7 +56,7 @@ better way to do it).
   [Monzo webhook](https://docs.monzo.com/#webhooks) to automatically POST to
   `/api/purchases` whenever you make a purchase (or get paid).
 
-## Manual Data Entry
+### Manual Data Entry
 
 Data is entered using the internal CRUD API.
 
@@ -86,17 +103,21 @@ It currently supports these commands, following this format:
 * Copy `.env.template` to `.env` and modify values as you see fit. **Most of the
   setup instructions you'll need already appear within the .env file**, as they
   are specific to each service you'd like to track.
-* Start the server and open the internal API: it'll prompt you to set up a
-  new device.
+* Start the server and open the internal API: it'll prompt you to set up a new
+  device.
 * Add the new device ID to the `TOMBOIS_DEFAULT_DEVICE_ID` variable in `.env`.
 * Now that you've gotten a device added, you can restart the server and start
   collecting data!
+* ⚠ **Note:** You will likely want to change the homepage layout and specific
+  theming elements of the site, you can do this by changing the styles in
+  `public/style.css` and the various templates in `src/views`. If you're running
+  this on Docker, you'll need to rebuild the image any time you make a change.
 
 ### Running via NPM on bare metal
 
 * `npm install`
 * `npm run build`
-* `npm run start:production` (or your preferred way of managing node 
+* `npm run start:production` (or your preferred way of managing node
   applications, eg. `forever`, `pm2`, etc)
 
 ### Running via Docker
