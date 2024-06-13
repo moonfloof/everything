@@ -95,6 +95,26 @@ export async function retrieveAccessToken(authCode: string) {
 	google.options({ auth: getClient() });
 }
 
+async function getLatestLikedVideos() {
+	if (!(googleAuth.accessToken && googleAuth.accessTokenExpiryDate)) {
+		log.debug('No token provided, skipping.');
+		return [];
+	}
+
+	if (googleAuth.accessTokenExpiryDate < Date.now()) {
+		log.info('Access token has expired. Using refresh token.');
+	}
+
+	const youtube = google.youtube('v3');
+	const { data } = await youtube.videos.list({
+		part: ['snippet'],
+		maxResults: 10,
+		myRating: 'like',
+	});
+
+	return data.items || [];
+}
+
 export function pollForLikedVideos() {
 	const intervalMs = config.youtube.pollInterval * minuteMs;
 
@@ -105,34 +125,14 @@ export function pollForLikedVideos() {
 
 	loadTokensFromDisk();
 
-	// TODO: Simplify?
 	const fetchVideos = async () => {
 		log.info('Polling YouTube for liked videos');
 		try {
-			if (!(googleAuth.accessToken && googleAuth.accessTokenExpiryDate)) {
-				log.debug('No token provided, skipping.');
-				return;
-			}
-
-			if (googleAuth.accessTokenExpiryDate < Date.now()) {
-				log.info('Access token has expired. Using refresh token.');
-			}
-
-			const youtube = google.youtube('v3');
-			const { data } = await youtube.videos.list({
-				part: ['snippet'],
-				maxResults: 10,
-				myRating: 'like',
-			});
-
-			if (!data?.items) return;
-
-			const newVideos = data.items.filter(item => !youtubeLikes.find(id => item.id === id));
+			const items = await getLatestLikedVideos();
+			const newVideos = items.filter(item => !youtubeLikes.find(id => item.id === id));
 			newVideos.reverse();
 
-			if (newVideos.length === 0) {
-				return;
-			}
+			if (newVideos.length === 0) return;
 
 			log.debug(`Found ${newVideos.length} new videos`);
 
@@ -150,7 +150,7 @@ export function pollForLikedVideos() {
 				});
 			}
 
-			youtubeLikes = data.items.map(v => v.id || '');
+			youtubeLikes = items.map(v => v.id || '');
 			saveTokensToDisk();
 		} catch (err) {
 			console.error(err);

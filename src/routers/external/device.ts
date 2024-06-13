@@ -54,8 +54,28 @@ const updateBatteryState = (
 	updateDevice(deviceId, level, status);
 };
 
-// Overland
-// TODO: Simplify?
+const isLocationValid = (location: Location): boolean => {
+	if (location.geometry.coordinates === undefined) {
+		log.debug('Location not provided, skipping');
+		return false;
+	}
+
+	if (location.geometry.coordinates.length !== 2) {
+		log.debug('Two coordinates not provided, skipping');
+		return false;
+	}
+
+	if (!location.properties.timestamp) {
+		log.debug('Timestamp not provided, skipping');
+		return false;
+	}
+
+	return true;
+};
+
+// Overland API
+// - https://github.com/aaronpk/Overland-iOS#api
+// - https://overland.p3k.app/
 router.post('/overland', async (req: RequestFrontend, res) => {
 	try {
 		// Validate Device ID / API Key
@@ -98,20 +118,7 @@ router.post('/overland', async (req: RequestFrontend, res) => {
 		for (const location of locations) {
 			index += 1;
 
-			if (location.geometry.coordinates === undefined) {
-				log.debug('Location not provided, skipping');
-				continue;
-			}
-
-			if (location.geometry.coordinates.length !== 2) {
-				log.debug('Two coordinates not provided, skipping');
-				continue;
-			}
-
-			if (!location.properties.timestamp) {
-				log.debug('Timestamp not provided, skipping');
-				continue;
-			}
+			if (!isLocationValid(location)) continue;
 
 			const created_at = new Date(location.properties.timestamp).getTime();
 			const [long, lat] = location.geometry.coordinates ?? [];
