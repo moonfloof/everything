@@ -15,7 +15,7 @@ const router = express.Router();
 const validateAuth = (req: Request, res: Response, next: NextFunction) => {
 	// Validate Device API Key
 	try {
-		const authToken = req.header('Authorization');
+		const authToken = req.headers.authorization;
 		if (!authToken) throw new Error('Please provide an authorization token');
 		const { id } = validateDevice(authToken);
 		req.body.device_id = id;

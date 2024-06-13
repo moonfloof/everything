@@ -33,7 +33,7 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 
 // Others
 import type { RequestFrontend } from '../../types/express.js';
-import { getNowPlaying } from './listenbrainz.js';
+import { getNowPlaying } from '../../adapters/listenbrainz.js';
 
 const router = express.Router();
 

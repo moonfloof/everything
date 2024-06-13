@@ -5,7 +5,7 @@ import type { Optional } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
-interface Listen {
+export interface Listen {
 	id: string;
 	artist: string;
 	album: string;
