@@ -24,6 +24,7 @@ html {
 	background: var(--primary-bg);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	overflow-x: hidden;
 }
 
 * {
@@ -431,7 +432,12 @@ select {
 	padding: 6px 12px;
 }
 
-[data-tooltip]:hover::after {
+[data-tooltip] {
+	cursor: help;
+	text-decoration: dotted underline;
+}
+
+[data-tooltip]::after {
 	display: block;
 	position: absolute;
 	content: attr(data-tooltip);
@@ -440,8 +446,19 @@ select {
 	background-color: var(--panel-bg);
 	color: var(--primary-fg);
 	padding: 4px 8px;
-	z-index: 10000;
 	text-align: left;
+
+	opacity: 0;
+	transition: transform 0.2s, opacity 0.1s;
+	transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	transform: scale(0.01);
+	transform-origin: top left;
+}
+
+[data-tooltip]:hover::after {
+	opacity: 1;
+	transform: scale(1);
+	z-index: 10000;
 }
 
 .cache-list {
