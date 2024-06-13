@@ -1,10 +1,10 @@
 import express from 'express';
+import { searchTrack } from '../../adapters/subsonic.js';
 import { validateDevice } from '../../database/devices.js';
 import { insertScrobble } from '../../database/listens.js';
 import { minuteMs } from '../../lib/formatDate.js';
 import Logger from '../../lib/logger.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { searchTrack } from '../../adapters/subsonic.js';
 
 const log = new Logger('ListenBrainz');
 const router = express.Router();
@@ -111,8 +111,8 @@ router.post('/1/submit-listens', async (req: RequestFrontend<object, ListenBrain
 			if (release_year === null || tracknumber === null) {
 				const search = await searchTrack(title, album, artist);
 
-				if (search?.track) tracknumber = search.track;
-				if (search?.year) release_year = search.year;
+				if (!tracknumber && search?.track) tracknumber = search.track;
+				if (!release_year && search?.year) release_year = search.year;
 			}
 
 			log.debug(`Saving "${title}" by ${artist}`);

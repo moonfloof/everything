@@ -437,7 +437,7 @@ select {
 	content: attr(data-tooltip);
 	border: 2px solid var(--primary-fg);
 	border-radius: 6px;
-	background-color: var(--primary-bg);
+	background-color: var(--panel-bg);
 	color: var(--primary-fg);
 	padding: 4px 8px;
 	z-index: 10000;
