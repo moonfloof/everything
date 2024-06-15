@@ -1,5 +1,5 @@
 import express from 'express';
-import { getGeocoder } from '../../adapters/geocoder.js';
+import { reverseLocation } from '../../adapters/geocoder.js';
 import { updateDevice, validateDevice } from '../../database/devices.js';
 import { insertLocation } from '../../database/locations.js';
 import Logger from '../../lib/logger.js';
@@ -106,13 +106,14 @@ router.post('/overland', async (req: RequestFrontend, res) => {
 		const lastLocation = locations[locations.length - 1];
 
 		// Get city information for last entry
-		const results = await getGeocoder().reverse({
-			lat: lastLocation.geometry.coordinates[1],
-			lon: lastLocation.geometry.coordinates[0],
-		});
-		let lastCity = results[0]?.city || null;
-		if (typeof lastCity === 'string' && results[0]?.state) {
-			lastCity += `, ${results[0].state}`;
+		let lastCity = null;
+		const results = await reverseLocation(
+			lastLocation.geometry.coordinates[1],
+			lastLocation.geometry.coordinates[0],
+		);
+		lastCity = results?.city || null;
+		if (typeof lastCity === 'string' && results?.state) {
+			lastCity += `, ${results.state}`;
 		}
 
 		for (const location of locations) {
