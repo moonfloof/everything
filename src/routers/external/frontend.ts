@@ -7,7 +7,13 @@ import helmet from 'helmet';
 import { countBooks, getBooks } from '../../database/books.js';
 import { getDevices } from '../../database/devices.js';
 import { countFilms, getFilms } from '../../database/films.js';
-import { countGameActivity, getGameActivity, getGameActivityGroupedByDay, getGameStats } from '../../database/games.js';
+import {
+	countGameActivity,
+	getGameActivity,
+	getGameActivityGroupedByDay,
+	getGameStats,
+	getPopularGames,
+} from '../../database/games.js';
 import {
 	countListens,
 	getListenGraph,
@@ -206,11 +212,23 @@ router.get('/youtube/:id', (req, res) => {
 // STEAM ACTIVITY
 
 router.get('/games', (req: RequestFrontend, res) => {
-	const { page = 0 } = req.query;
+	const { page = 0, days = '60' } = req.query;
 	const pagination = handlebarsPagination(page, countGameActivity());
+
+	const daysInt = Number(days);
+	const dayOptions = [
+		{ value: 60, selected: daysInt === 60 },
+		{ value: 180, selected: daysInt === 180 },
+		{ value: 365, selected: daysInt === 365 },
+	];
+
+	if (!Number.isSafeInteger(daysInt) || daysInt < 60 || daysInt > 365) {
+		throw new Error('"days" query must be a number between 1 and 60');
+	}
 
 	const gameActivity = getGameActivity({ page });
 	const gamesByDay = getGameActivityGroupedByDay();
+	const popular = getPopularGames(daysInt);
 	const svg = generateBarGraph(
 		addMissingDates(gamesByDay, date => ({ y: 0, label: shortDate(date) })),
 		'hours',
@@ -222,6 +240,11 @@ router.get('/games', (req: RequestFrontend, res) => {
 		pagination,
 		title: 'plays video games',
 		canonicalUrl: getCanonicalUrl(req),
+
+		// Popular chart
+		popular,
+		days,
+		dayOptions,
 	});
 });
 

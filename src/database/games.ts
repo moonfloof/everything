@@ -259,3 +259,24 @@ export function updateGameActivity(game: Omit<Game, 'device_id'>) {
 		updated_at: dateDefault(game.updated_at),
 	});
 }
+
+export function getPopularGames(days: number, limit = 10) {
+	const statement = getStatement<{ name: string; count: number }>(
+		'getPopularGames',
+		`SELECT name, sum(playtime_mins) as count
+		FROM games
+		WHERE created_at >= $created_at
+		GROUP BY name
+		ORDER BY count DESC, name ASC
+		LIMIT $limit`,
+	);
+
+	const created_at = new Date(Date.now() - days * dayMs).toISOString();
+	const rows = statement.all({ created_at, limit });
+
+	return rows.map(row => ({
+		...row,
+		count: Math.round(row.count / 60),
+		popularityPercentage: (row.count / rows[0].count) * 100,
+	}));
+}
