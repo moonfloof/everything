@@ -107,13 +107,13 @@ router.post('/overland', async (req: RequestFrontend, res) => {
 
 		// Get city information for last entry
 		let lastCity = null;
-		const results = await reverseLocation(
+		const result = await reverseLocation(
 			lastLocation.geometry.coordinates[1],
 			lastLocation.geometry.coordinates[0],
 		);
-		lastCity = results?.city || null;
-		if (typeof lastCity === 'string' && results?.state) {
-			lastCity += `, ${results.state}`;
+		lastCity = result?.city || null;
+		if (typeof lastCity === 'string' && result?.state) {
+			lastCity += `, ${result.state}`;
 		}
 
 		for (const location of locations) {

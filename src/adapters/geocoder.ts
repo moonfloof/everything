@@ -1,11 +1,19 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import NodeGeocoder from 'node-geocoder';
 import { config } from '../lib/config.js';
 import Logger from '../lib/logger.js';
+import phin from 'phin';
+
+interface OpenStreetMapResponse {
+	address: {
+		city?: string;
+		town?: string;
+		village?: string;
+		hamlet?: string;
+		state?: string;
+	};
+}
 
 const log = new Logger('geocoder');
-
-let geocoder: NodeGeocoder.Geocoder;
 
 let cache: Record<string, { city?: string; state?: string } | null> = {};
 
@@ -29,35 +37,45 @@ function saveLocationCache() {
 	writeFileSync(config.geocoder.cachePath, str);
 }
 
-export function getGeocoder() {
+export async function rawReverseLookup(lat: number, long: number) {
 	if (!config.geocoder.enabled) return null;
-	if (geocoder) return geocoder;
 
-	geocoder = NodeGeocoder({
-		provider: 'openstreetmap',
-	});
-
-	return geocoder;
+	try {
+		const { body } = await phin<OpenStreetMapResponse>({
+			url: `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=json&addressdetails=1`,
+			method: 'GET',
+			parse: 'json',
+			headers: {
+				'User-Agent': 'everything <git@moonfloof.com>',
+			},
+		});
+		const result = {
+			city: body.address.city || body.address.town || body.address.village || body.address.hamlet,
+			state: body.address.state,
+		};
+		log.debug('Retrieved location from OpenStreetMap:', result);
+		return result;
+	} catch (err) {
+		log.error(err);
+		return null;
+	}
 }
 
-export async function reverseLocation(lat: number, lon: number) {
+export async function reverseLocation(lat: number, long: number) {
 	if (!config.geocoder.enabled) return null;
 
-	const cacheKey = `${Math.trunc(lat * 100)},${Math.trunc(lon * 100)}`;
+	const cacheKey = `${Math.trunc(lat * 100)},${Math.trunc(long * 100)}`;
 	if (cache[cacheKey]) return cache[cacheKey];
 
 	try {
-		const results = (await getGeocoder()?.reverse({ lat, lon })) || [];
-		if (results.length === 0) {
-			throw new Error('No results returned');
+		const result = await rawReverseLookup(lat, long);
+		if (result === null) {
+			throw new Error(`No results returned for ${lat}, ${long}`);
 		}
 
-		cache[cacheKey] = {
-			city: results[0].city,
-			state: results[0].state,
-		};
+		cache[cacheKey] = result;
 		saveLocationCache();
-		return results[0];
+		return result;
 	} catch (err) {
 		log.error(err);
 
