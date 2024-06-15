@@ -38,8 +38,8 @@ import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
 
 // Others
-import type { RequestFrontend } from '../../types/express.js';
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
+import type { RequestFrontend } from '../../types/express.js';
 
 const router = express.Router();
 

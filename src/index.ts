@@ -13,6 +13,7 @@ import { pollForPsnActivity } from './adapters/psn.js';
 import { pollForGameActivity } from './adapters/steam.js';
 
 // Adapters
+import { initLocationCache } from './adapters/geocoder.js';
 import { pollForLikedVideos } from './adapters/youtube.js';
 import { pageCache } from './lib/middleware/cachePage.js';
 
@@ -22,6 +23,7 @@ const log = new Logger('http');
 checkMigrations();
 
 // Set up polling adapters
+initLocationCache();
 pageCache.pollForCacheDeletion();
 pollForLikedVideos();
 pollForGameActivity();

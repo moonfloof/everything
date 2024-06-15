@@ -23,6 +23,11 @@ export const config = {
 	cacheDurationSecs: Number(process.env.TOMBOIS_SERVER_CACHE_DURATION_SECS || 600),
 	cacheIntervalSecs: Number(process.env.TOMBOIS_SERVER_CACHE_INTERVAL_SECS || 1200),
 
+	geocoder: {
+		enabled: process.env.TOMBOIS_GEOCODER_ENABLED !== 'false',
+		cachePath: resolve(process.env.TOMBOIS_GEOCODER_CACHE_PATH || 'data/geocoder.json'),
+	},
+
 	discord: {
 		token: process.env.TOMBOIS_DISCORD_TOKEN,
 		channelId: process.env.TOMBOIS_DISCORD_CHANNELID,
