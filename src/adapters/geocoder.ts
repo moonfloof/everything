@@ -1,7 +1,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { config } from '../lib/config.js';
-import Logger from '../lib/logger.js';
+import cron from 'node-cron';
 import phin from 'phin';
+import { config } from '../lib/config.js';
+import { weekMs } from '../lib/formatDate.js';
+import Logger from '../lib/logger.js';
 
 interface OpenStreetMapResponse {
 	address: {
@@ -16,10 +18,12 @@ interface OpenStreetMapResponse {
 
 const log = new Logger('geocoder');
 
-let cache: Record<string, { city?: string; state?: string } | null> = {};
+let cache: Record<string, { city?: string; state?: string; retrievedAt: number }> = {};
 
 export function initLocationCache() {
 	if (!config.geocoder.enabled) return;
+
+	cron.schedule('0 1 * * *', cleanCache, { name: 'geocoder-cache' });
 
 	if (!existsSync(config.geocoder.cachePath)) {
 		saveLocationCache();
@@ -27,8 +31,8 @@ export function initLocationCache() {
 	}
 
 	const contents = JSON.parse(readFileSync(config.geocoder.cachePath).toString());
-
 	cache = contents.cache || {};
+
 	log.info(`Loaded ${Object.keys(cache).length} locations into cache`);
 }
 
@@ -38,9 +42,22 @@ function saveLocationCache() {
 	writeFileSync(config.geocoder.cachePath, str);
 }
 
-export async function rawReverseLookup(lat: number, long: number) {
-	if (!config.geocoder.enabled) return null;
+function cleanCache() {
+	log.debug('Performing maintenance location cache cleanup');
 
+	let dirty = 0;
+	for (const [key, value] of Object.entries(cache)) {
+		if (value.retrievedAt > Date.now() - 4 * weekMs) continue;
+		delete cache[key];
+		dirty += 1;
+	}
+	if (dirty > 0) {
+		log.debug(`Deleted ${dirty} locations from cache`);
+		saveLocationCache();
+	}
+}
+
+export async function rawReverseLookup(lat: number, long: number) {
 	try {
 		const { body } = await phin<OpenStreetMapResponse>({
 			url: `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&zoom=13&format=json&addressdetails=1`,
@@ -58,34 +75,37 @@ export async function rawReverseLookup(lat: number, long: number) {
 				body.address.suburb ||
 				body.address.hamlet,
 			state: body.address.state,
+			retrievedAt: Date.now(),
 		};
 		log.debug('Retrieved location from OpenStreetMap:', result);
 		return result;
 	} catch (err) {
 		log.error(err);
-		return null;
+		return { retrievedAt: Date.now() };
 	}
 }
 
-export async function reverseLocation(lat: number, long: number) {
+export async function reverseLocation(
+	lat: number,
+	long: number,
+): Promise<{ retrievedAt: number; city?: string; state?: string } | null> {
 	if (!config.geocoder.enabled) return null;
 
+	// 1. Use cache if available
 	const cacheKey = `${Math.trunc(lat * 100)},${Math.trunc(long * 100)}`;
 	if (cache[cacheKey]) return cache[cacheKey];
 
 	try {
+		// 2. Lookup cache from OpenStreetMap
 		const result = await rawReverseLookup(lat, long);
-		if (result === null) {
-			throw new Error(`No results returned for ${lat}, ${long}`);
-		}
-
 		cache[cacheKey] = result;
 		saveLocationCache();
 		return result;
 	} catch (err) {
+		// 3. Failing that, set the cache anyway, so we don't ask OSM
+		//    again for another 4 weeks.
 		log.error(err);
-
-		cache[cacheKey] = null;
+		cache[cacheKey] = { retrievedAt: Date.now() };
 		saveLocationCache();
 		return null;
 	}
