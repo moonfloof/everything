@@ -53,6 +53,10 @@ export function externalRoot() {
 	return config.serverExternalUri;
 }
 
+export function internalRoot() {
+	return config.serverInternalUri;
+}
+
 export function person() {
 	return config.personName;
 }
@@ -64,6 +68,7 @@ export function footerHtml() {
 export const helpers: HelperDeclareSpec = {
 	xif,
 	externalRoot,
+	internalRoot,
 	person,
 	footerHtml,
 };

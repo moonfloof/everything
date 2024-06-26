@@ -231,6 +231,10 @@ div.info {
 	margin-top: 24px;
 }
 
+.page--data p {
+	line-height: 1.618;
+}
+
 .page--data__header {
 	display: flex;
 	align-items: center;
