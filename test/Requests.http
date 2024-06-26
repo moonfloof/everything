@@ -35,7 +35,7 @@ Content-Type: application/json
 
 {
 	"category": "Sleep",
-	"createdAt": "{{$datetime iso8601}}"
+	"created_at": "{{$datetime iso8601}}"
 }
 
 ### Weight Logging
@@ -45,8 +45,8 @@ Authorization: {{apiKey}}
 Content-Type: application/json
 
 {
-	"weightKgs": 10,
-	"createdAt": "{{$datetime iso8601}}"
+	"weight_kgs": 10,
+	"created_at": "{{$datetime iso8601}}"
 }
 
 ###
