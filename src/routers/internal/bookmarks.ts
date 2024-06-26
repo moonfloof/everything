@@ -15,12 +15,12 @@ const router = express.Router();
 // FRONTEND
 
 router.get('/', (req: RequestFrontend, res) => {
-	const { page = 0 } = req.query;
+	const { page = 0, title, url } = req.query;
 	const pagination = handlebarsPagination(page, countBookmarks());
 
 	const bookmarks = getBookmarks({ page });
 
-	res.render('internal/bookmarks', { bookmarks, pagination });
+	res.render('internal/bookmarks', { bookmarks, pagination, bookmark: { title, url } });
 });
 
 // CRUD
