@@ -14,7 +14,7 @@
 	"author": "moonfloof <git@moonfloof.com>",
 	"license": "AGPL-3.0-or-later",
 	"dependencies": {
-		"@tombofry/stdlib": "^0.11.0",
+		"@tombofry/stdlib": "^0.11.1",
 		"better-sqlite3": "^11.0.0",
 		"discord.js": "^14.14.1",
 		"dotenv": "^16.3.1",
@@ -32,7 +32,7 @@
 		"uuid": "^10.0.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.8.1",
+		"@biomejs/biome": "^1.8.2",
 		"@types/better-sqlite3": "^7.6.10",
 		"@types/express": "^4.17.21",
 		"@types/node-cron": "^3.0.11",
