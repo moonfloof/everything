@@ -65,6 +65,7 @@ export async function rawReverseLookup(lat: number, long: number) {
 			parse: 'json',
 			headers: {
 				'User-Agent': 'tombo-everything <tom@tombofry.co.uk>',
+				'Accept-Language': 'en-GB',
 			},
 		});
 		const result = {
