@@ -42,7 +42,7 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { generateSmallBarGraph, generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
+import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
 
 const router = express.Router();
 
@@ -108,9 +108,11 @@ router.get('/music.svg', (req, res) => {
 
 	res.type('image/svg+xml').send(`<?xml version="1.0" ?>
 	<svg width="400" height="120" viewBox="0 0 400 120" version="1.1" xmlns="http://www.w3.org/2000/svg">
-		<text style="font-size: 16px; font-weight: 400;" fill="#3e3475" x="8" y="20">scrobble history (last 14 days)</text>
-		${favouriteText}
-		${nowPlayingText}
+		<g style="font-family: Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+			<text style="font-size: 16px; font-weight: 400;" fill="#3e3475" x="8" y="20">scrobble history (last 14 days)</text>
+			${favouriteText}
+			${nowPlayingText}
+		</g>
 		<g transform="translate(8,32)">${listenGraph}</g>
 	</svg>`);
 });
