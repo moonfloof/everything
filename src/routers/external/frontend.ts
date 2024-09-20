@@ -16,10 +16,12 @@ import {
 } from '../../database/games.js';
 import {
 	countListens,
+	getListenDashboardGraph,
 	getListenGraph,
 	getListenPopularDashboard,
 	getListens,
 	getListensPopular,
+	getPopularAlbumWithArtist,
 	groupListens,
 } from '../../database/listens.js';
 import { getLatestCity } from '../../database/locations.js';
@@ -40,6 +42,7 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { generateSmallBarGraph, generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
 
 const router = express.Router();
 
@@ -80,6 +83,36 @@ router.get('/', (req, res) => {
 		location,
 		canonicalUrl: getCanonicalUrl(req),
 	});
+});
+
+// SVGs
+
+router.get('/music.svg', (req, res) => {
+	const nowPlaying = getNowPlaying();
+	const favourite = getPopularAlbumWithArtist(14);
+	const listenGraph = generateSmallBarRectangles(
+		addMissingDates(getListenDashboardGraph(), day => ({ day, min: 0, max: 0 })),
+	);
+
+	const nowPlayingText =
+		nowPlaying?.artist && nowPlaying.title
+			? `<text style="font-size: 12px; font-weight: 400;" fill="#4d4d4d" x="96" y="92">now playing</text>
+			   <text style="font-size: 16px; font-weight: 700;" fill="#1a1a1a" x="96" y="108">${nowPlaying.title}, by ${nowPlaying.artist}</text>`
+			: '';
+
+	const favouriteText =
+		favourite?.album && favourite?.artist
+			? `<text style="font-size: 12px; font-weight: 400;" fill="#4d4d4d" x="96" y="52">favourite album</text>
+			   <text style="font-size: 16px; font-weight: 700;" fill="#1a1a1a" x="96" y="68">${favourite.album}, by ${favourite.album}</text>`
+			: '';
+
+	res.type('image/svg+xml').send(`<?xml version="1.0" ?>
+	<svg width="400" height="120" viewBox="0 0 400 120" version="1.1" xmlns="http://www.w3.org/2000/svg">
+		<text style="font-size: 16px; font-weight: 400;" fill="#3e3475" x="8" y="20">scrobble history (last 14 days)</text>
+		${favouriteText}
+		${nowPlayingText}
+		<g transform="translate(8,32)">${listenGraph}</g>
+	</svg>`);
 });
 
 // LISTENS
