@@ -103,7 +103,7 @@ router.get('/music.svg', (req, res) => {
 	const favouriteText =
 		favourite?.album && favourite?.artist
 			? `<text style="font-size: 12px; font-weight: 400;" fill="#4d4d4d" x="96" y="52">favourite album</text>
-			   <text style="font-size: 16px; font-weight: 700;" fill="#1a1a1a" x="96" y="68">${favourite.album}, by ${favourite.album}</text>`
+			   <text style="font-size: 16px; font-weight: 700;" fill="#1a1a1a" x="96" y="68">${favourite.album}, by ${favourite.artist}</text>`
 			: '';
 
 	res.type('image/svg+xml').send(`<?xml version="1.0" ?>
