@@ -181,3 +181,36 @@ export function getListenGraph() {
 		label: shortDate(new Date(row.day)),
 	}));
 }
+
+export function getListenDashboardGraph() {
+	const statement = getStatement<{ day: string; max: number }>(
+		'getListenDashboardGraph',
+		`SELECT DATE(created_at) as day, COUNT(*) as max
+		FROM listens
+		GROUP BY day
+		ORDER BY day DESC
+		LIMIT 14;`,
+	);
+
+	return statement.all().map(row => ({
+		day: new Date(row.day),
+		min: 0,
+		max: row.max,
+	}));
+}
+
+export function getPopularAlbumWithArtist(days = 14) {
+	const statement = getStatement<{ album: string; artist: string; count: number }>(
+		'getPopularAlbumWithArtist',
+		`SELECT album, artist, count(*) as count
+		FROM listens
+		WHERE created_at >= $created_at
+		GROUP BY album, artist
+		ORDER BY count DESC
+		LIMIT 1;`,
+	);
+
+	const created_at = new Date(Date.now() - days * dayMs).toISOString();
+
+	return statement.get({ created_at });
+}
