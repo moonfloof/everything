@@ -47,9 +47,13 @@ better way to do it).
   posting a message in Discord.  
   By default, the Google API limits refresh tokens to 7 days, so I've found this
   to be unreliable.
-* **Steam game activity** - Polls the
-  [Steam Web API](https://developer.valvesoftware.com/wiki/Steam_Web_API) to get
-  recently played games
+* **Video game activity and achievements/trophies**:
+  * [**Steam**](https://store.steampowered.com/): Polls the
+    [Steam Web API](https://developer.valvesoftware.com/wiki/Steam_Web_API)
+  * [**PSN**](https://www.playstation.com/playstation-network/): Polls the
+    [PSN API](https://github.com/achievements-app/psn-api)
+  * [**RetroAchievements**](https://retroachievements.org/): Polls the
+    [RetroAchievements API](https://api-docs.retroachievements.org/)
 * **Films/Movies** - Polls your [Letterboxd](https://letterboxd.com) profile for
   newly logged films to your diary.
 * **Card purchases** - Create a

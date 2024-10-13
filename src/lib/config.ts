@@ -64,6 +64,14 @@ export const config = {
 		pollInterval: Number(process.env.TOMBOIS_PSN_POLL_INTERVAL ?? 5),
 	},
 
+	retroachievements: {
+		dataPath: resolve(process.env.TOMBOIS_RETROACHIEVEMENTS_DATA_FILE ?? ''),
+		apiKey: process.env.TOMBOIS_RETROACHIEVEMENTS_APIKEY,
+		username: process.env.TOMBOIS_RETROACHIEVEMENTS_USERNAME,
+		pollInterval: Number(process.env.TOMBOIS_RETROACHIEVEMENTS_POLL_INTERVAL ?? 60),
+		deviceId: process.env.TOMBOIS_RETROACHIEVEMENTS_DEVICE_ID,
+	},
+
 	sonarr: {
 		apiKey: process.env.TOMBOIS_SONARR_APIKEY,
 		serverUrl: process.env.TOMBOIS_SONARR_URL,
