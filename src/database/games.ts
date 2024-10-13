@@ -49,7 +49,7 @@ export function insertNewGameActivity(game: Omit<Game, 'id' | 'updated_at'>) {
 
 	const result = statement.run({
 		...game,
-		id: uuid(),
+		id,
 		created_at,
 		updated_at: new Date().toISOString(),
 	});

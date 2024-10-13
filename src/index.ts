@@ -11,6 +11,7 @@ import { getDiscordClient } from './adapters/discord.js';
 import { pollForFilmActivity } from './adapters/letterboxd.js';
 import { pollForPsnActivity } from './adapters/psn.js';
 import { pollForGameActivity } from './adapters/steam.js';
+import { pollForRetroAchievementsActivity } from './adapters/retroachievements.js';
 
 // Adapters
 import { initLocationCache } from './adapters/geocoder.js';
@@ -29,6 +30,7 @@ pollForLikedVideos();
 pollForGameActivity();
 pollForFilmActivity();
 pollForPsnActivity();
+pollForRetroAchievementsActivity();
 
 // Start servers
 appExternal();
