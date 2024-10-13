@@ -55,6 +55,9 @@ function saveFilmsToDisk() {
 async function fetchLetterboxdFeed(username: string) {
 	const response = await phin({
 		url: `https://letterboxd.com/${username}/rss/`,
+		headers: {
+			'User-Agent': config.versionString,
+		},
 		parse: 'string',
 	});
 	return response.body;
