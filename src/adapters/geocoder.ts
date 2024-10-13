@@ -64,7 +64,7 @@ export async function rawReverseLookup(lat: number, long: number) {
 			method: 'GET',
 			parse: 'json',
 			headers: {
-				'User-Agent': 'everything <git@moonfloof.com>',
+				'User-Agent': config.versionString,
 				'Accept-Language': 'en-GB',
 			},
 		});

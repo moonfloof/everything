@@ -91,6 +91,9 @@ async function fetchAchievements(appid: number): Promise<SteamAchievement[] | nu
 	try {
 		const { body } = await phin<SteamGetPlayerAchievementsResponse>({
 			url: apiUrl,
+			headers: {
+				'User-Agent': config.versionString,
+			},
 			parse: 'json',
 		});
 

@@ -13,6 +13,7 @@ environment.checkEnvironment({}, [
 ]);
 
 export const config = {
+	versionString: 'everything <git@moonfloof.com>',
 	portExternal: process.env.TOMBOIS_SERVER_PORT_EXTERNAL as string,
 	portInternal: process.env.TOMBOIS_SERVER_PORT_INTERNAL as string,
 	sqliteLocation: process.env.TOMBOIS_SQLITE_LOCATION as string,
