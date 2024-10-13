@@ -106,6 +106,7 @@ router.get('/music.svg', (req, res) => {
 			   <text style="font-size: 16px; font-weight: 700;" fill="#1a1a1a" x="96" y="68">${favourite.album}, by ${favourite.artist}</text>`
 			: '';
 
+	res.header('Cache-Control', 'public, max-age=1200, immutable');
 	res.type('image/svg+xml').send(`<?xml version="1.0" ?>
 	<svg width="400" height="120" viewBox="0 0 400 120" version="1.1" xmlns="http://www.w3.org/2000/svg">
 		<g style="font-family: Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
