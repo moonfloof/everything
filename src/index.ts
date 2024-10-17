@@ -10,8 +10,8 @@ import appInternal from './appInternal.js';
 import { getDiscordClient } from './adapters/discord.js';
 import { pollForFilmActivity } from './adapters/letterboxd.js';
 import { pollForPsnActivity } from './adapters/psn.js';
-import { pollForGameActivity } from './adapters/steam.js';
 import { pollForRetroAchievementsActivity } from './adapters/retroachievements.js';
+import { pollForGameActivity } from './adapters/steam.js';
 
 // Adapters
 import { initLocationCache } from './adapters/geocoder.js';

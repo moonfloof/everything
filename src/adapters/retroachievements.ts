@@ -1,9 +1,9 @@
-import { config } from '../lib/config.js';
-import Logger from '../lib/logger.js';
 import phin from 'phin';
-import { minuteMs } from '../lib/formatDate.js';
-import { updateActivity } from '../database/games.js';
 import { insertNewGameAchievement } from '../database/gameachievements.js';
+import { updateActivity } from '../database/games.js';
+import { config } from '../lib/config.js';
+import { minuteMs } from '../lib/formatDate.js';
+import Logger from '../lib/logger.js';
 
 const log = new Logger('RetroAchievements');
 
