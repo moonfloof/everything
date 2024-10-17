@@ -77,18 +77,22 @@ async function handleMessage(message: Message, client: Client<true>) {
 	try {
 		switch (command) {
 			case 'youtube': {
-				commandYouTube(args, message);
+				await commandYouTube(args, message);
 				break;
 			}
 			case 'bookmark': {
-				commandBookmark(args, message);
+				await commandBookmark(args, message);
 				break;
 			}
 			default:
 				return;
 		}
 
-		await message.react('👍');
+		if (message.deletable) {
+			await message.delete();
+		} else {
+			await message.react('👍');
+		}
 	} catch (err) {
 		log.error(err);
 		await message.react('🛑');
