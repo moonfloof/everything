@@ -53,7 +53,7 @@ app.use('/weight', weight);
 app.use('/youtubelikes', youtubelikes);
 app.use('/cache', cache);
 
-app.get('*', () => {
+app.get('*url', () => {
 	throw new NotFoundError('Page Not Found');
 });
 
