@@ -25,7 +25,7 @@ export const entryStatusValues = Object.values(ENTRY_STATUS);
 export type EntryType = keyof typeof ENTRY_TYPES;
 export type EntryStatus = (typeof ENTRY_STATUS)[keyof typeof ENTRY_STATUS];
 
-interface Entry {
+export interface Entry {
 	id: string;
 	title: Optional<string>;
 	description: string;

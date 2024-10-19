@@ -72,6 +72,13 @@ export const config = {
 		deviceId: process.env.TOMBOIS_RETROACHIEVEMENTS_DEVICE_ID,
 	},
 
+	bluesky: {
+		dataPath: resolve(process.env.TOMBOIS_BLUESKY_DATA_FILE ?? 'data/bluesky.json'),
+		username: process.env.TOMBOIS_BLUESKY_USERNAME,
+		includeReplies: process.env.TOMBOIS_BLUESKY_INCLUDE_REPLIES === 'true',
+		pollInterval: Number(process.env.TOMBOIS_BLUESKY_POLL_INTERVAL_MINS ?? 120),
+	},
+
 	sonarr: {
 		apiKey: process.env.TOMBOIS_SONARR_APIKEY,
 		serverUrl: process.env.TOMBOIS_SONARR_URL,
