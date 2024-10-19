@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { dateDefault } from '../lib/formatDate.js';
+import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -11,7 +12,7 @@ interface Bookmark {
 	created_at: string;
 }
 
-export function insertBookmark(bookmark: Omit<Bookmark, 'id'>) {
+export function insertBookmark(bookmark: Insert<Bookmark>) {
 	const statement = getStatement(
 		'insertBookmark',
 		`INSERT INTO bookmarks
@@ -51,7 +52,7 @@ export function deleteBookmark(id: string) {
 	return statement.run({ id });
 }
 
-export function updateBookmark({ id, title, url, created_at }: Omit<Bookmark, 'device_id'>) {
+export function updateBookmark({ id, title, url, created_at }: Update<Bookmark>) {
 	const statement = getStatement(
 		'updateBookmark',
 		`UPDATE bookmarks

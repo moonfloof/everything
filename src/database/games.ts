@@ -9,7 +9,7 @@ import {
 	prettyDuration,
 	shortDate,
 } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 import { getGameAchievementsForSession } from './gameachievements.js';
@@ -33,7 +33,7 @@ interface GameStats {
 	favouriteGame: string;
 }
 
-export function insertNewGameActivity(game: Omit<Game, 'id' | 'updated_at'>) {
+export function insertNewGameActivity(game: Insert<Game>) {
 	const id = uuid();
 	const statement = getStatement(
 		'insertGameActivity',
@@ -240,7 +240,7 @@ export function deleteGameActivity(id: string) {
 	return statement.run({ id });
 }
 
-export function updateGameActivity(game: Omit<Game, 'device_id'>) {
+export function updateGameActivity(game: Update<Game>) {
 	const statement = getStatement(
 		'updateGameActivity',
 		`UPDATE games

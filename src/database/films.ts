@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -17,7 +17,7 @@ interface Film {
 	device_id: string;
 }
 
-export function insertFilm(film: Omit<Film, 'id'>) {
+export function insertFilm(film: Insert<Film>) {
 	const statement = getStatement(
 		'insertFilm',
 		`INSERT INTO films
@@ -54,7 +54,7 @@ export function deleteFilm(id: string) {
 	return statement.run({ id });
 }
 
-export function updateFilm(film: Omit<Film, 'device_id'>) {
+export function updateFilm(film: Update<Film>) {
 	const statement = getStatement(
 		'updateFilm',
 		`UPDATE films

@@ -64,6 +64,7 @@ router.post('/:id', (req: RequestFrontend, res) => {
 				url: req.body.url || null,
 				syndication_json: req.body.syndication_json?.replace(/\t+/g, '') || null,
 				created_at: req.body.created_at,
+				updated_at: req.body.updated_at,
 			});
 			break;
 		}
