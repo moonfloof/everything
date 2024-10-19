@@ -501,7 +501,7 @@ router.get('/feed', async (_req, res) => {
 
 // NOT FOUND
 
-router.get('*', () => {
+router.get('*url', () => {
 	throw new NotFoundError('Page Not Found');
 });
 
