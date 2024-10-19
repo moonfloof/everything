@@ -36,7 +36,7 @@ export const config = {
 	},
 
 	youtube: {
-		tokenPath: resolve(process.env.TOMBOIS_GOOGLE_TOKENFILE ?? ''),
+		tokenPath: resolve(process.env.TOMBOIS_GOOGLE_TOKENFILE ?? 'data/google-tokens.json'),
 		clientId: process.env.TOMBOIS_GOOGLE_CLIENTID,
 		clientSecret: process.env.TOMBOIS_GOOGLE_CLIENTSECRET,
 		apiKey: process.env.TOMBOIS_GOOGLE_APIKEY,
@@ -44,13 +44,13 @@ export const config = {
 	},
 
 	letterboxd: {
-		dataPath: resolve(process.env.TOMBOIS_LETTERBOXD_DATA_FILE ?? ''),
+		dataPath: resolve(process.env.TOMBOIS_LETTERBOXD_DATA_FILE ?? 'data/letterboxd.json'),
 		username: process.env.TOMBOIS_LETTERBOXD_USERNAME,
 		intervalSecs: Number(process.env.TOMBOIS_LETTERBOXD_POLL_INTERVAL_SECS ?? 86400),
 	},
 
 	steam: {
-		dataPath: resolve(process.env.TOMBOIS_STEAM_DATA_FILE ?? ''),
+		dataPath: resolve(process.env.TOMBOIS_STEAM_DATA_FILE ?? 'data/steam-activity.json'),
 		apiKey: process.env.TOMBOIS_STEAM_APIKEY,
 		userId: process.env.TOMBOIS_STEAM_USERID,
 		steamDeviceId: process.env.TOMBOIS_STEAM_DEVICE_ID,
@@ -58,14 +58,13 @@ export const config = {
 	},
 
 	psn: {
-		dataPath: resolve(process.env.TOMBOIS_PSN_DATA_FILE ?? ''),
+		dataPath: resolve(process.env.TOMBOIS_PSN_DATA_FILE ?? 'data/psn-activity.json'),
 		npsso: process.env.TOMBOIS_PSN_NPSSO,
 		deviceId: process.env.TOMBOIS_PSN_DEVICE_ID,
 		pollInterval: Number(process.env.TOMBOIS_PSN_POLL_INTERVAL ?? 5),
 	},
 
 	retroachievements: {
-		dataPath: resolve(process.env.TOMBOIS_RETROACHIEVEMENTS_DATA_FILE ?? ''),
 		apiKey: process.env.TOMBOIS_RETROACHIEVEMENTS_APIKEY,
 		username: process.env.TOMBOIS_RETROACHIEVEMENTS_USERNAME,
 		pollInterval: Number(process.env.TOMBOIS_RETROACHIEVEMENTS_POLL_INTERVAL ?? 60),
