@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
+import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -12,7 +13,7 @@ interface Episode {
 	device_id: string;
 }
 
-export function insertEpisode(episode: Omit<Episode, 'id'>) {
+export function insertEpisode(episode: Insert<Episode>) {
 	const statement = getStatement(
 		'insertEpisode',
 		`INSERT INTO tv (id, series_title, episode_title, created_at, device_id)
@@ -51,7 +52,7 @@ export function countEpisodes() {
 	return statement.get()?.total || 0;
 }
 
-export function updateEpisode(episode: Omit<Episode, 'device_id'>) {
+export function updateEpisode(episode: Update<Episode>) {
 	const statement = getStatement(
 		'updateEpisode',
 		`UPDATE tv

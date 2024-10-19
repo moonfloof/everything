@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault, dayMs, shortDate } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional, Select, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -28,7 +28,7 @@ interface ListenGroup {
 	countText: 'song' | 'songs';
 }
 
-export function insertScrobble(listen: Omit<Listen, 'id'>) {
+export function insertScrobble(listen: Insert<Listen>) {
 	const statement = getStatement(
 		'insertListen',
 		`INSERT INTO listens
@@ -59,7 +59,7 @@ export function getListens(parameters: Partial<Parameters> = {}) {
 	}));
 }
 
-export function groupListens(listens: (Listen & { timeago: string })[]) {
+export function groupListens(listens: Select<Listen>[]) {
 	return listens.reduce((albums, listen) => {
 		if (
 			albums.length === 0 ||
@@ -92,7 +92,7 @@ export function deleteListen(id: string) {
 	return statement.run({ id });
 }
 
-export function updateListen(listen: Omit<Listen, 'device_id'>) {
+export function updateListen(listen: Update<Listen>) {
 	const statement = getStatement(
 		'updateListen',
 		`UPDATE listens

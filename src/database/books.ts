@@ -2,7 +2,7 @@ import type { RunResult } from 'better-sqlite3';
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault, formatDate, prettyDate } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -23,7 +23,7 @@ interface Book {
 	device_id: string;
 }
 
-export function insertBook(book: Omit<Book, 'id' | 'updated_at'>): RunResult {
+export function insertBook(book: Insert<Book>): RunResult {
 	const statement = getStatement(
 		'insertBook',
 		`INSERT INTO books

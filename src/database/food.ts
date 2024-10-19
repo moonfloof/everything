@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { dateDefault } from '../lib/formatDate.js';
+import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -11,7 +12,7 @@ interface Food {
 	device_id: string;
 }
 
-export function insertFood(food: Omit<Food, 'id'>) {
+export function insertFood(food: Insert<Food>) {
 	const statement = getStatement(
 		'insertFood',
 		`INSERT INTO food
@@ -49,7 +50,7 @@ export function deleteFood(id: string) {
 	return statement.run({ id });
 }
 
-export function updateFood(food: Omit<Food, 'device_id'>) {
+export function updateFood(food: Update<Food>) {
 	const statement = getStatement(
 		'updateFood',
 		`UPDATE food

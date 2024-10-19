@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { dateDefault } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -32,7 +32,7 @@ export const CATEGORIES = {
 
 export const categoryValues = Object.values(CATEGORIES);
 
-function insertNewRecord(session: Omit<Timetracking, 'id'>) {
+function insertNewRecord(session: Insert<Timetracking>) {
 	const statement = getStatement(
 		'insertTimeTracking',
 		`INSERT INTO timetracking
@@ -63,7 +63,7 @@ function endTimeTrackingSession(id: string, ended_at: string) {
 	});
 }
 
-export function insertTimeTracking(session: Omit<Timetracking, 'id'>) {
+export function insertTimeTracking(session: Insert<Timetracking>) {
 	const selectStatement = getStatement<Pick<Timetracking, 'id'>>(
 		'selectTimeTracking',
 		`SELECT id FROM timetracking
@@ -109,7 +109,7 @@ export function deleteTimeTracking(id: string) {
 	return statement.run({ id });
 }
 
-export function updateTimeTracking(session: Omit<Timetracking, 'device_id'>) {
+export function updateTimeTracking(session: Update<Timetracking>) {
 	if (session.category?.toLowerCase().startsWith('stop')) {
 		return;
 	}

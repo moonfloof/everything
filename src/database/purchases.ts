@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { dateDefault } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -14,7 +14,7 @@ interface Purchase {
 	device_id: string;
 }
 
-export function insertPurchase(purchase: Omit<Purchase, 'id'>) {
+export function insertPurchase(purchase: Insert<Purchase>) {
 	const statement = getStatement(
 		'insertPurchase',
 		`INSERT INTO purchases
@@ -54,7 +54,7 @@ export function deletePurchase(id: string) {
 	return statement.run({ id });
 }
 
-export function updatePurchase(purchase: Omit<Purchase, 'device_id'>) {
+export function updatePurchase(purchase: Update<Purchase>) {
 	const statement = getStatement(
 		'updatePurchase',
 		`UPDATE purchases

@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -38,7 +38,7 @@ interface Entry {
 	device_id: string;
 }
 
-export function insertNote(note: Omit<Entry, 'id' | 'updated_at'>) {
+export function insertNote(note: Insert<Entry>) {
 	const statement = getStatement(
 		'insertNote',
 		`INSERT INTO entries
@@ -109,7 +109,7 @@ export function deleteNote(id: string) {
 	return statement.run({ id });
 }
 
-export function updateNote(note: Omit<Entry, 'device_id' | 'updated_at'>) {
+export function updateNote(note: Update<Entry>) {
 	const statement = getStatement(
 		'updateNote',
 		`UPDATE entries
@@ -127,6 +127,6 @@ export function updateNote(note: Omit<Entry, 'device_id' | 'updated_at'>) {
 	return statement.run({
 		...note,
 		created_at: dateDefault(note.created_at),
-		updated_at: new Date().toISOString(),
+		updated_at: note.updated_at || new Date().toISOString(),
 	});
 }

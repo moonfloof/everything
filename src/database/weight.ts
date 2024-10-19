@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { dateDefault } from '../lib/formatDate.js';
+import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -10,7 +11,7 @@ interface Weight {
 	device_id: string;
 }
 
-export function insertWeight(weight: Omit<Weight, 'id'>) {
+export function insertWeight(weight: Insert<Weight>) {
 	const statement = getStatement(
 		'insertWeight',
 		`INSERT INTO weight
@@ -50,7 +51,7 @@ export function deleteWeight(id: string) {
 	return statement.run({ id });
 }
 
-export function updateWeight(weight: Omit<Weight, 'device_id'>) {
+export function updateWeight(weight: Update<Weight>) {
 	const statement = getStatement(
 		'updateWeight',
 		`UPDATE weight

@@ -1,4 +1,5 @@
 import { dayMs } from '../lib/formatDate.js';
+import type { Insert } from '../types/database.js';
 import { getStatement } from './database.js';
 
 interface Location {
@@ -9,7 +10,7 @@ interface Location {
 	device_id: string;
 }
 
-export function insertLocation(location: Omit<Location, 'id'>) {
+export function insertLocation(location: Insert<Location>) {
 	const statement = getStatement(
 		'insertLocation',
 		`INSERT INTO location
@@ -48,6 +49,6 @@ export function getLocationHistory(date_start: Date, date_end: Date) {
 
 	return statement.all({
 		date_start: date_start.getTime(),
-		date_end: new Date(date_end.getTime() + dayMs).getTime(),
+		date_end: date_end.getTime() + dayMs,
 	});
 }

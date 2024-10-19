@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault, dayMs } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -14,7 +14,7 @@ interface YouTubeLike {
 	created_at: string;
 }
 
-export function insertYouTubeLike(video: Omit<YouTubeLike, 'id'>) {
+export function insertYouTubeLike(video: Insert<YouTubeLike>) {
 	const statement = getStatement(
 		'insertYouTubeLike',
 		`INSERT INTO youtubelikes
@@ -60,7 +60,7 @@ export function deleteYouTubeLike(id: string) {
 	return statement.run({ id });
 }
 
-export function updateYouTubeLike(video: Omit<YouTubeLike, 'device_id'>) {
+export function updateYouTubeLike(video: Update<YouTubeLike>) {
 	const statement = getStatement(
 		'updateYouTubeLike',
 		`UPDATE youtubelikes

@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
-import type { Optional } from '../types/database.js';
+import type { Insert, Optional } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -15,7 +15,7 @@ export interface GameAchievement {
 	created_at: string;
 }
 
-export function insertNewGameAchievement(achievement: Omit<GameAchievement, 'id'>) {
+export function insertNewGameAchievement(achievement: Insert<GameAchievement>) {
 	const statement = getStatement(
 		'insertGameAchievement',
 		`INSERT INTO gameachievements

@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { dayMs, formatDate } from '../lib/formatDate.js';
+import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -10,7 +11,7 @@ interface Steps {
 	device_id: string;
 }
 
-export function insertSteps(steps: Omit<Steps, 'id'>) {
+export function insertSteps(steps: Insert<Steps>) {
 	const statement = getStatement(
 		'insertSteps',
 		`INSERT INTO steps
@@ -61,7 +62,7 @@ export function deleteSteps(id: string) {
 	return statement.run({ id });
 }
 
-export function updateSteps(steps: Omit<Steps, 'device_id'>) {
+export function updateSteps(steps: Update<Steps>) {
 	const statement = getStatement(
 		'updateSteps',
 		`UPDATE steps
