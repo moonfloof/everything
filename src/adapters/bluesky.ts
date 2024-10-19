@@ -9,6 +9,8 @@ import type { Insert } from '../types/database.js';
 
 const log = new Logger('bluesky');
 
+type BlueskyDid = `did:plc:${string}`;
+
 interface BlueskyBlob {
 	$type: 'blob';
 	ref: {
@@ -75,7 +77,16 @@ type BlueskyFacetLink = BlueskyFacetIndex & {
 	];
 };
 
-type BlueskyFacet = BlueskyFacetTag | BlueskyFacetLink;
+type BlueskyFacetMention = BlueskyFacetIndex & {
+	features: [
+		{
+			$type: 'app.bsky.richtext.facet#mention';
+			did: BlueskyDid;
+		},
+	];
+};
+
+type BlueskyFacet = BlueskyFacetTag | BlueskyFacetLink | BlueskyFacetMention;
 
 interface BlueskyPost {
 	uri: string;
@@ -93,7 +104,7 @@ interface BlueskyPost {
 		facets?: BlueskyFacet[];
 	};
 	author: {
-		did: string;
+		did: BlueskyDid;
 		handle: string;
 		displayName: string;
 		avatar: string | undefined;
@@ -160,17 +171,22 @@ function parsePostContents(post: BlueskyPost): string {
 		const start = decoder.decode(contents.slice(0, index.byteStart));
 		const middle = decoder.decode(contents.slice(index.byteStart, index.byteEnd));
 		const end = decoder.decode(contents.slice(index.byteEnd));
+		const getLink = (href: string) => `<a href='${href}' target='_blank' rel='noopener'>${middle}</a>`;
 
 		switch (feature.$type) {
 			case 'app.bsky.richtext.facet#link': {
-				contents = encoder.encode(
-					`${start}<a href='${feature.uri}' target='_blank' rel='noopener'>${middle}</a>${end}`,
-				);
+				contents = encoder.encode(`${start}${getLink(feature.uri)}${end}`);
 				break;
 			}
 			case 'app.bsky.richtext.facet#tag': {
 				contents = encoder.encode(
-					`${start}<a href='https://bsky.app/hashtag/${feature.tag}' target='_blank' rel='noopener'>${middle}</a>${end}`,
+					`${start}${getLink(`https://bsky.app/hashtag/${feature.tag}`)}${end}`,
+				);
+				break;
+			}
+			case 'app.bsky.richtext.facet#mention': {
+				contents = encoder.encode(
+					`${start}${getLink(`https://bsky.app/profile/${feature.did}`)}${end}`,
 				);
 				break;
 			}
