@@ -47,6 +47,10 @@ better way to do it).
   posting a message in Discord.  
   By default, the Google API limits refresh tokens to 7 days, so I've found this
   to be unreliable.
+* **Social media posts**
+  * Currently, only [**Bluesky**](https://bsky.social) is supported, using their
+    [HTTP API](https://docs.bsky.app/docs/api/app-bsky-feed-get-author-feed)
+  * You can also manually make micro-blog posts
 * **Video game activity and achievements/trophies**:
   * [**Steam**](https://store.steampowered.com/): Polls the
     [Steam Web API](https://developer.valvesoftware.com/wiki/Steam_Web_API)
