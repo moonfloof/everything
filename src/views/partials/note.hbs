@@ -1,4 +1,28 @@
 <div class="sectioncontainer h-entry">
+	{{#xif data.type '==' 'reply'}}
+	{{#if data.url}}
+	<div class="row metadata">
+		<span class="left"></span>
+		<span class="right">
+			replied to
+			<strong><a href="{{data.url}}" target="_blank" rel="noopener" class="u-in-reply-to">{{data.url}}</a></strong>
+		</span>
+	</div>
+	{{/if}}
+	{{/xif}}
+
+	{{#xif data.type '==' 'repost'}}
+	{{#if data.url}}
+	<div class="row metadata">
+		<span class="left"></span>
+		<span class="right">
+			reposted
+			<strong><a href="{{data.url}}" target="_blank" rel="noopener" class="u-repost-of">{{data.url}}</a></strong>
+		</span>
+	</div>
+	{{/if}}
+	{{/xif}}
+
 	{{#if data.title}}
 	<div class="row">
 		<span class="left">{{data.emoji}}</span>
@@ -58,7 +82,7 @@
 	{{/xif}}
 
 	{{#if data.syndication}}
-	<div class="row">
+	<div class="row metadata">
 		<div class="left">🔗</div>
 		<div class="right">
 			Originally posted on:
