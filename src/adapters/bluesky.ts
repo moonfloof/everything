@@ -11,6 +11,14 @@ const log = new Logger('bluesky');
 
 type BlueskyDid = `did:plc:${string}`;
 
+interface BlueskyAuthor {
+	did: BlueskyDid;
+	handle: string;
+	displayName?: string;
+	avatar?: string;
+	createdAt?: string;
+}
+
 interface BlueskyBlob {
 	$type: 'blob';
 	ref: {
@@ -103,19 +111,26 @@ interface BlueskyPost {
 		embed?: BlueskyEmbed;
 		facets?: BlueskyFacet[];
 	};
-	author: {
-		did: BlueskyDid;
-		handle: string;
-		displayName: string;
-		avatar: string | undefined;
-		createdAt: string;
-	};
+	author: BlueskyAuthor;
 }
+
+interface BlueskyReasonRepost {
+	$type: 'app.bsky.feed.defs#reasonRepost';
+	by: BlueskyAuthor;
+	indexedAt: string;
+}
+
+interface BlueskyReasonPin {
+	$type: 'app.bsky.feed.defs#reasonPin';
+}
+
+type BlueskyReason = BlueskyReasonRepost | BlueskyReasonPin;
 
 interface BlueskyAuthorFeedResponse {
 	feed: {
 		post: BlueskyPost;
-		reply: unknown;
+		reply?: unknown;
+		reason?: BlueskyReason;
 	}[];
 }
 
@@ -254,7 +269,11 @@ export function pollForBlueskyPosts() {
 	const copyPosts = async () => {
 		const { feed } = await fetchPosts();
 		const newPosts = feed.filter(feedPost => {
+			// TODO: Handle reposts
+			if (feedPost.reason !== undefined) return false;
+
 			// Skip reply posts if we should exclude them
+			// TODO: Properly handle replies with the correct entry-type
 			if (feedPost.reply !== undefined && !includeReplies) return false;
 
 			// Otherwise, just check it's not already in recentPosts
