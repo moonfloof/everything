@@ -6,133 +6,9 @@ import Logger from '../lib/logger.js';
 
 import { type Entry, insertNote } from '../database/notes.js';
 import type { Insert } from '../types/database.js';
+import type { BlueskyAuthorFeedResponse, BlueskyPost } from './bluesky-types.js';
 
 const log = new Logger('bluesky');
-
-type BlueskyDid = `did:plc:${string}`;
-
-interface BlueskyAuthor {
-	did: BlueskyDid;
-	handle: string;
-	displayName?: string;
-	avatar?: string;
-	createdAt?: string;
-}
-
-interface BlueskyBlob {
-	$type: 'blob';
-	ref: {
-		$link: string;
-	};
-	mimeType: string;
-	size: number;
-}
-
-interface BlueskyEmbedImages {
-	$type: 'app.bsky.embed.images';
-	images: {
-		alt?: string;
-		aspectRatio: {
-			width: number;
-			height: number;
-		};
-		image: BlueskyBlob;
-	}[];
-}
-interface BlueskyEmbedVideo {
-	$type: 'app.bsky.embed.video';
-	aspectRatio: {
-		width: number;
-		height: number;
-	};
-	video: BlueskyBlob;
-}
-
-interface BlueskyEmbedExternal {
-	$type: 'app.bsky.embed.external';
-	external: {
-		description: string;
-		title: string;
-		uri: string;
-		thumb?: BlueskyBlob;
-	};
-}
-
-type BlueskyEmbed = BlueskyEmbedImages | BlueskyEmbedVideo | BlueskyEmbedExternal;
-
-interface BlueskyFacetIndex {
-	index: {
-		byteStart: number;
-		byteEnd: number;
-	};
-}
-
-type BlueskyFacetTag = BlueskyFacetIndex & {
-	features: [
-		{
-			$type: 'app.bsky.richtext.facet#tag';
-			tag: string;
-		},
-	];
-};
-
-type BlueskyFacetLink = BlueskyFacetIndex & {
-	features: [
-		{
-			$type: 'app.bsky.richtext.facet#link';
-			uri: string;
-		},
-	];
-};
-
-type BlueskyFacetMention = BlueskyFacetIndex & {
-	features: [
-		{
-			$type: 'app.bsky.richtext.facet#mention';
-			did: BlueskyDid;
-		},
-	];
-};
-
-type BlueskyFacet = BlueskyFacetTag | BlueskyFacetLink | BlueskyFacetMention;
-
-interface BlueskyPost {
-	uri: string;
-	cid: string;
-	replyCount: number;
-	repostCount: number;
-	likeCount: number;
-	quoteCount: number;
-	indexedAt: string;
-	record: {
-		$type: 'app.bsky.feed.post';
-		createdAt: string;
-		text: string;
-		embed?: BlueskyEmbed;
-		facets?: BlueskyFacet[];
-	};
-	author: BlueskyAuthor;
-}
-
-interface BlueskyReasonRepost {
-	$type: 'app.bsky.feed.defs#reasonRepost';
-	by: BlueskyAuthor;
-	indexedAt: string;
-}
-
-interface BlueskyReasonPin {
-	$type: 'app.bsky.feed.defs#reasonPin';
-}
-
-type BlueskyReason = BlueskyReasonRepost | BlueskyReasonPin;
-
-interface BlueskyAuthorFeedResponse {
-	feed: {
-		post: BlueskyPost;
-		reply?: unknown;
-		reason?: BlueskyReason;
-	}[];
-}
 
 let recentPosts: BlueskyAuthorFeedResponse['feed'] = [];
 
@@ -231,7 +107,7 @@ function getBlobUrl(post: BlueskyPost): { url: string | null; type: Entry['type'
 	if (!post.record.embed) return { url: null, type: 'note' };
 
 	let link: string | null = null;
-	let type: Entry['type'] | null = 'note';
+	let type: Entry['type'] = 'note';
 
 	switch (post.record.embed.$type) {
 		case 'app.bsky.embed.video': {
@@ -252,7 +128,10 @@ function getBlobUrl(post: BlueskyPost): { url: string | null; type: Entry['type'
 			return { url: null, type };
 	}
 
-	return { url: `https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${post.author.did}&cid=${link}`, type };
+	return {
+		url: `https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${post.author.did}&cid=${link}`,
+		type,
+	};
 }
 
 export function pollForBlueskyPosts() {
