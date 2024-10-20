@@ -75,6 +75,7 @@ export const config = {
 		dataPath: resolve(process.env.TOMBOIS_BLUESKY_DATA_FILE ?? 'data/bluesky.json'),
 		username: process.env.TOMBOIS_BLUESKY_USERNAME,
 		includeReplies: process.env.TOMBOIS_BLUESKY_INCLUDE_REPLIES === 'true',
+		includeReposts: process.env.TOMBOIS_BLUESKY_INCLUDE_REPOSTS === 'true',
 		pollInterval: Number(process.env.TOMBOIS_BLUESKY_POLL_INTERVAL_MINS ?? 120),
 	},
 

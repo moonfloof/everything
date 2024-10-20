@@ -6,11 +6,11 @@ import Logger from '../lib/logger.js';
 
 import { type Entry, insertNote } from '../database/notes.js';
 import type { Insert } from '../types/database.js';
-import type { BlueskyAuthorFeedResponse, BlueskyPost } from './bluesky-types.js';
+import type { AuthorFeedResponse, FeedItem, Post } from './blueskyTypes.js';
 
 const log = new Logger('bluesky');
 
-let recentPosts: BlueskyAuthorFeedResponse['feed'] = [];
+let recentPosts: AuthorFeedResponse['feed'] = [];
 
 function loadPostsFromDisk() {
 	log.info('Loading posts from disk');
@@ -46,7 +46,12 @@ async function fetchPosts(): Promise<BlueskyAuthorFeedResponse> {
 	return response.body;
 }
 
-function parsePostContents(post: BlueskyPost): string {
+const getHashtagUrl = (hashtag: string) => `https://bsky.app/hashtag/${hashtag}`;
+const getProfileUrl = (handle: string) => `https://bsky.app/profile/${handle}`;
+const getBlobUrl = (did: string, cid: string) =>
+	`https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${cid}`;
+
+function parsePostContents(post: Post): string {
 	const encoder = new TextEncoder();
 	const decoder = new TextDecoder();
 
@@ -70,15 +75,11 @@ function parsePostContents(post: BlueskyPost): string {
 				break;
 			}
 			case 'app.bsky.richtext.facet#tag': {
-				contents = encoder.encode(
-					`${start}${getLink(`https://bsky.app/hashtag/${feature.tag}`)}${end}`,
-				);
+				contents = encoder.encode(`${start}${getLink(getHashtagUrl(feature.tag))}${end}`);
 				break;
 			}
 			case 'app.bsky.richtext.facet#mention': {
-				contents = encoder.encode(
-					`${start}${getLink(`https://bsky.app/profile/${feature.did}`)}${end}`,
-				);
+				contents = encoder.encode(`${start}${getLink(getProfileUrl(feature.did))}${end}`);
 				break;
 			}
 			default:
@@ -92,7 +93,7 @@ function parsePostContents(post: BlueskyPost): string {
 	return `<p>${finalContents}</p>`;
 }
 
-function transformAtUri(post: BlueskyPost): string {
+function transformAtUri(post: Post): string {
 	const regex = new RegExp(`at:\/\/(?<did>did:plc:[a-z0-9]+)\/${post.record.$type}\/(?<id>[a-z0-9]+)`);
 
 	const match = post.uri.match(regex);
@@ -100,42 +101,74 @@ function transformAtUri(post: BlueskyPost): string {
 		throw new Error('Invalid bluesky post detected');
 	}
 
-	return `https://bsky.app/profile/${match.groups.did}/post/${match.groups.id}`;
+	return `https://bsky.app/profile/${post.author.handle ?? match.groups.did}/post/${match.groups.id}`;
 }
 
-function getBlobUrl(post: BlueskyPost): { url: string | null; type: Entry['type'] } {
-	if (!post.record.embed) return { url: null, type: 'note' };
+function getPostMetadata(item: FeedItem): Partial<Entry> {
+	const { post, reply, reason } = item;
 
-	let link: string | null = null;
-	let type: Entry['type'] = 'note';
+	const metadata: Partial<Entry> & { description: string } = {
+		description: parsePostContents(post),
+	};
+
+	if (reason?.$type === 'app.bsky.feed.defs#reasonRepost') {
+		metadata.url = transformAtUri(post);
+		metadata.type = 'repost';
+
+		// Include embedded images and videos in reposts
+		switch (post.record.embed?.$type) {
+			case undefined:
+				break;
+			case 'app.bsky.embed.images': {
+				if (post.record.embed.images.length === 0) break;
+				const blobUrl = getBlobUrl(
+					post.author.did,
+					post.record.embed.images[0]!.image.ref.$link,
+				);
+				const altText = post.record.embed.images[0]!.alt;
+				metadata.description = `<img class='u-photo' src='${blobUrl}' alt='${altText}' />${metadata.description}`;
+				break;
+			}
+			case 'app.bsky.embed.video': {
+				const blobUrl = getBlobUrl(post.author.did, post.record.embed!.video.ref.$link);
+				metadata.description = `<video class='u-video' src='${blobUrl}' controls></video>${metadata.description}`;
+			}
+		}
+
+		return metadata;
+	}
+
+	// TODO: Refactor embed switches to reuse for posts, replies, and reposts
+	if (reply) {
+		metadata.url = transformAtUri(reply.parent);
+		metadata.type = 'reply';
+		return metadata;
+	}
+
+	if (!post.record.embed) return metadata;
 
 	switch (post.record.embed.$type) {
 		case 'app.bsky.embed.video': {
-			link = post.record.embed.video.ref.$link;
-			type = 'video';
-			break;
+			metadata.url = getBlobUrl(post.author.did, post.record.embed.video.ref.$link);
+			metadata.type = 'video';
+			return metadata;
 		}
 		case 'app.bsky.embed.images': {
 			if (post.record.embed.images.length === 0) {
 				break;
 			}
 
-			link = post.record.embed.images[0].image.ref.$link;
-			type = 'photo';
-			break;
+			metadata.url = getBlobUrl(post.author.did, post.record.embed.images[0]!.image.ref.$link);
+			metadata.type = 'photo';
+			return metadata;
 		}
-		default:
-			return { url: null, type };
 	}
 
-	return {
-		url: `https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${post.author.did}&cid=${link}`,
-		type,
-	};
+	return metadata;
 }
 
 export function pollForBlueskyPosts() {
-	const { pollInterval, username, includeReplies } = config.bluesky;
+	const { pollInterval, username, includeReplies, includeReposts } = config.bluesky;
 
 	const intervalMs = pollInterval * minuteMs;
 	if (intervalMs === 0 || !username) {
@@ -148,31 +181,45 @@ export function pollForBlueskyPosts() {
 	const copyPosts = async () => {
 		const { feed } = await fetchPosts();
 		const newPosts = feed.filter(feedPost => {
-			// TODO: Handle reposts
-			if (feedPost.reason !== undefined) return false;
+			// Pinned posts aren't included in the request by default,
+			// but exclude them to be certain.
+			if (feedPost.reason?.$type === 'app.bsky.feed.defs#reasonPin') return false;
+
+			// Skip reposts if we should exclude them
+			if (feedPost.reason?.$type === 'app.bsky.feed.defs#reasonRepost' && !includeReposts)
+				return false;
 
 			// Skip reply posts if we should exclude them
-			// TODO: Properly handle replies with the correct entry-type
 			if (feedPost.reply !== undefined && !includeReplies) return false;
 
 			// Otherwise, just check it's not already in recentPosts
 			return !recentPosts.some(recentPost => recentPost.post.cid === feedPost.post.cid);
 		});
 
+		// Sort by reverse chronological order
+		newPosts.sort(
+			(a, b) =>
+				new Date(a.post.record.createdAt).getTime() -
+				new Date(b.post.record.createdAt).getTime(),
+		);
+
 		log.info(`Detected ${newPosts.length} new posts`);
 
-		for (const { post } of newPosts) {
+		for (const item of newPosts) {
+			const { post } = item;
 			const syndicationUrl = transformAtUri(post);
-			const { url, type } = getBlobUrl(post);
+			const metadata = getPostMetadata(item);
 			const entry: Insert<Entry> = {
-				title: null,
 				description: parsePostContents(post),
-				created_at: post.record.createdAt,
+				title: null,
+				url: null,
+				type: 'note',
+				...metadata,
+
 				status: 'public',
+				created_at: post.record.createdAt,
 				syndication_json: JSON.stringify([{ name: 'bluesky', url: syndicationUrl }]),
 				device_id: config.defaultDeviceId,
-				url,
-				type,
 			};
 			insertNote(entry);
 			log.debug(`Inserted new post: '${entry.description.slice(0, 40)}...'`);
