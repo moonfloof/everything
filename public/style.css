@@ -226,9 +226,12 @@ div.info {
 .page--data svg,
 .page--data table,
 .page--data .error,
-.page--data form,
+.page--data form {
+	margin-top: 16px;
+}
+
 .sectioncontainer {
-	margin-top: 24px;
+	margin-top: 48px;
 }
 
 .page--data p {
@@ -307,6 +310,11 @@ summary {
 
 .row p:first-of-type {
 	margin-top: 0;
+}
+
+.row.metadata .right {
+	align-self: center;
+	font-size: 12px;
 }
 
 /** MUSIC STATS **/

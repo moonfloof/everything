@@ -11,6 +11,8 @@ export const ENTRY_TYPES = {
 	audio: '🎵',
 	video: '🎥',
 	photo: '📸',
+	reply: '↩',
+	repost: '🔁',
 } as const;
 
 export const entryTypeValues = Object.keys(ENTRY_TYPES);
