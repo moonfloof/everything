@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
-import { dateDefault, dayMs, shortDate } from '../lib/formatDate.js';
+import { dateDefault, dayMs, hourMs, shortDate } from '../lib/formatDate.js';
 import type { Insert, Optional, Select, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
@@ -63,8 +63,14 @@ export function groupListens(listens: Select<Listen>[]) {
 	return listens.reduce((albums, listen) => {
 		if (
 			albums.length === 0 ||
+			// Different album/artist
 			albums[albums.length - 1].album !== listen.album ||
-			albums[albums.length - 1].artist !== listen.artist
+			albums[albums.length - 1].artist !== listen.artist ||
+			// Same album/artist, but longer than one hour since last listen
+			Math.abs(
+				new Date(albums[albums.length - 1].created_at).getTime() -
+					new Date(listen.created_at).getTime(),
+			) > hourMs
 		) {
 			albums.push({
 				artist: listen.artist,
