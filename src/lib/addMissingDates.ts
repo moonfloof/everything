@@ -2,8 +2,8 @@ import { RECORDS_PER_PAGE } from '../database/constants.js';
 import { dayMs, getStartOfDay, isSameDate } from './formatDate.js';
 
 /** Takes an array of dates and adds valueEmpty to any missing dates */
-export default function addMissingDates<T extends object = Record<string, string | number>>(
-	input: (T & { day: Date })[],
+export default function addMissingDates<T extends Record<string, string | number | Date> & { day: Date }>(
+	input: T[],
 	getEmptyValue: (day: Date) => T,
 ): T[] {
 	if (input.length <= 1) {
@@ -15,7 +15,7 @@ export default function addMissingDates<T extends object = Record<string, string
 	const startDate = getStartOfDay(input[0].day);
 	const endDate = getStartOfDay(input[input.length - 1].day);
 
-	const dateArray = [];
+	const dateArray: T[] = [];
 	let dateInProgress = startDate;
 	let inputIndex = 0;
 	let limit = RECORDS_PER_PAGE;

@@ -141,7 +141,7 @@ router.get('/music', (req: RequestFrontend, res) => {
 	const popular = getListensPopular(daysInt);
 	const graphPoints = getListenGraph();
 	const svg = generateBarGraph(
-		addMissingDates(graphPoints, date => ({ y: 0, label: shortDate(date) })),
+		addMissingDates(graphPoints, day => ({ day, y: 0, label: shortDate(day) })),
 		'scrobbles',
 	);
 
@@ -266,7 +266,7 @@ router.get('/games', (req: RequestFrontend, res) => {
 	const gamesByDay = getGameActivityGroupedByDay();
 	const popular = getPopularGames(daysInt);
 	const svg = generateBarGraph(
-		addMissingDates(gamesByDay, date => ({ y: 0, label: shortDate(date) })),
+		addMissingDates(gamesByDay, day => ({ day, y: 0, label: shortDate(day) })),
 		'hours',
 	);
 
