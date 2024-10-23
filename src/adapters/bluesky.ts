@@ -31,10 +31,10 @@ function savePostsToDisk() {
 	writeFileSync(config.bluesky.dataPath, str);
 }
 
-async function fetchPosts(): Promise<BlueskyAuthorFeedResponse> {
+async function fetchPosts(): Promise<AuthorFeedResponse> {
 	const { username } = config.bluesky;
 	const params = new URLSearchParams({ actor: username || '' });
-	const response = await phin<BlueskyAuthorFeedResponse>({
+	const response = await phin<AuthorFeedResponse>({
 		url: `https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?${params.toString()}`,
 		method: 'GET',
 		parse: 'json',
