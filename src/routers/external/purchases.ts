@@ -12,7 +12,9 @@ router.post('/', (req, res) => {
 		const { type, data } = req.body;
 
 		if (type !== 'transaction.created') {
-			throw new Error('Unrecognised webhook type');
+			log.info(`Received webhook with type: '${type}'. Quietly ignoring`);
+			res.send({ status: 'ok' });
+			return;
 		}
 
 		const { account_id, currency, category } = data;
