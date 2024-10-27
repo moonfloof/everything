@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import appCreate from './lib/appCreate.js';
 import Logger from './lib/logger.js';
 import { validatePageNumber } from './lib/middleware/validatePageNumber.js';
+import { config } from './lib/config.js';
 
 // Routers
 import bookmarks from './routers/external/bookmarks.js';
@@ -19,6 +20,13 @@ const log = new Logger('server-ext');
 const app = appCreate();
 app.use(helmet());
 app.use(validatePageNumber(false));
+
+if (config.bluesky.username?.startsWith('did:plc:')) {
+	app.get('/.well-known/atproto-did', (_, res) => {
+		res.type('text/plain').send(config.bluesky.username);
+		return;
+	});
+}
 
 // Set up routers
 app.use('/api/device', device);
@@ -41,7 +49,7 @@ app.use((err: HTTPError, req: Request, res: Response, _next: NextFunction): void
 });
 
 const startServer = () => {
-	const port = process.env.TOMBOIS_SERVER_PORT_EXTERNAL;
+	const port = config.portExternal;
 	app.listen(port, () => {
 		log.info(`Running on port ${port}`);
 	});
