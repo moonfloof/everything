@@ -5,17 +5,28 @@ import type { Insert, Optional, Select, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
-export interface Listen {
-	id: string;
-	artist: string;
+export interface ListenTrack {
+	id: number;
 	album: string;
+	artist: string;
 	title: string;
-	tracknumber: Optional<number>;
+	track_number: Optional<number>;
 	release_year: Optional<number>;
 	genre: Optional<string>;
+	duration_secs: Optional<number>;
+}
+
+export type ListenInsert = Insert<ListenTrack> & {
 	created_at: string;
 	device_id: string;
-}
+};
+
+export type Listen = Omit<ListenTrack, 'id'> & {
+	id: string;
+	track_id: number;
+	created_at: string;
+	device_id: string;
+};
 
 interface ListenGroup {
 	artist: string;
@@ -28,28 +39,75 @@ interface ListenGroup {
 	countText: 'song' | 'songs';
 }
 
-export function insertScrobble(listen: Insert<Listen>) {
+function selectListenTrack(track: Insert<ListenTrack>): number | undefined {
+	const selectResult = getStatement<{ id: number }>(
+		'selectListenTrack',
+		`SELECT id FROM listens_track
+		WHERE artist = $artist AND album = $album AND title = $title
+		LIMIT 1`,
+	).get({
+		artist: track.artist,
+		album: track.album,
+		title: track.title,
+	});
+
+	return selectResult?.id;
+}
+
+function selectListenTrackFromListenId(listen: { id: string }) {
+	return getStatement<{ id: number }>(
+		'selectListenTrackFromListenId',
+		`SELECT t.id as id FROM listens AS l
+		JOIN listens_track AS t ON l.track_id = t.id
+		WHERE l.id == $id
+		LIMIT 1;`,
+	).get({ id: listen.id })?.id;
+}
+
+function selectOrInsertTrack(track: Insert<ListenTrack>): number {
+	const id = selectListenTrack(track);
+
+	if (id !== undefined) return id;
+
+	getStatement(
+		'insertListenTrack',
+		`INSERT INTO listens_track
+		(artist, album, title, track_number, release_year, genre, duration_secs)
+		VALUES
+		($artist, $album, $title, $track_number, $release_year, $genre, $duration_secs)`,
+	).run(track);
+
+	// biome-ignore lint/style/noNonNullAssertion: Track guaranteed to exist at this point
+	return selectListenTrack(track)!;
+}
+
+export function insertScrobble(listen: ListenInsert) {
+	const track_id = selectOrInsertTrack(listen);
+	updateListenTrack({ ...listen, track_id, id: '' });
 	const statement = getStatement(
 		'insertListen',
 		`INSERT INTO listens
-		(id, artist, album, title, tracknumber, release_year, genre, created_at, device_id)
+		(id, track_id, created_at, device_id)
 		VALUES
-		($id, $artist, $album, $title, $tracknumber, $release_year, $genre, $created_at, $device_id)`,
+		($id, $track_id, $created_at, $device_id)`,
 	);
 
 	return statement.run({
-		...listen,
 		id: uuid(),
+		track_id,
 		created_at: dateDefault(listen.created_at),
+		device_id: listen.device_id,
 	});
 }
 
 export function getListens(parameters: Partial<Parameters> = {}) {
 	const statement = getStatement<Listen>(
 		'getListens',
-		`SELECT * FROM listens
-		WHERE id LIKE $id AND created_at >= $created_at
-		ORDER BY created_at DESC
+		`SELECT l.*, t.artist, t.album, t.title, t.track_number, t.release_year, t.genre, t.duration_secs
+		FROM listens AS l
+		JOIN listens_track AS t ON l.track_id = t.id
+		WHERE l.id LIKE $id AND l.created_at >= $created_at
+		ORDER BY l.created_at DESC
 		LIMIT $limit OFFSET $offset`,
 	);
 
@@ -98,23 +156,42 @@ export function deleteListen(id: string) {
 	return statement.run({ id });
 }
 
-export function updateListen(listen: Update<Listen>) {
-	const statement = getStatement(
-		'updateListen',
-		`UPDATE listens
+export function updateListenTrack(track: Update<Listen> & { track_id?: number }) {
+	const track_id = track.track_id ?? (track.id ? selectListenTrackFromListenId(track) : selectListenTrack(track));
+	if (!track_id) {
+		throw new Error('Expected to find a track');
+	}
+
+	getStatement(
+		'updateListenTrack',
+		`UPDATE listens_track
 		SET artist = $artist,
 		    album = $album,
 		    title = $title,
-		    tracknumber = $tracknumber,
+		    track_number = $track_number,
 		    release_year = $release_year,
 		    genre = $genre,
+		    duration_secs = $duration_secs
+		WHERE id = $id`,
+	).run({ ...track, id: track_id });
+
+	return track_id;
+}
+
+export function updateListen(listen: Update<Listen>) {
+	const track_id = updateListenTrack(listen);
+	const statement = getStatement(
+		'updateListen',
+		`UPDATE listens
+		SET track_id = $track_id,
 		    created_at = $created_at
 		WHERE id = $id`,
 	);
 
 	return statement.run({
-		...listen,
+		track_id,
 		created_at: dateDefault(listen.created_at),
+		id: listen.id,
 	});
 }
 
@@ -127,8 +204,9 @@ export function countListens() {
 export function getListensPopular(days: number) {
 	const statement = getStatement<{ artist: string; count: number }>(
 		'getListensPopular',
-		`SELECT artist, count(*) as count
-		FROM listens
+		`SELECT t.artist AS artist, count(*) as count
+		FROM listens AS l
+		JOIN listens_track AS t ON t.id = l.track_id
 		WHERE created_at >= $created_at
 		GROUP BY artist
 		ORDER BY count DESC, artist ASC
@@ -148,10 +226,10 @@ export function getListenPopularDashboard(days: number) {
 	const generateStatement = (column: keyof Listen) =>
 		getStatement<{ title: string; count: number }>(
 			`getListenPopularDashboard_${column}`,
-			`SELECT ${column} as title, count(*) as count
-			FROM listens
+			`SELECT t.${column} as label, count(*) as count FROM listens AS l
+			JOIN listens_track AS t ON t.id = l.track_id
 			WHERE created_at >= $created_at
-			GROUP BY ${column}
+			GROUP BY label
 			ORDER BY count DESC
 			LIMIT 1;`,
 		);
@@ -208,8 +286,8 @@ export function getListenDashboardGraph() {
 export function getPopularAlbumWithArtist(days = 14) {
 	const statement = getStatement<{ album: string; artist: string; count: number }>(
 		'getPopularAlbumWithArtist',
-		`SELECT album, artist, count(*) as count
-		FROM listens
+		`SELECT t.artist as artist, t.album as album, COUNT(*) AS count FROM listens_track AS t
+		JOIN listens AS l ON l.track_id = t.id
 		WHERE created_at >= $created_at
 		GROUP BY album, artist
 		ORDER BY count DESC
@@ -219,4 +297,16 @@ export function getPopularAlbumWithArtist(days = 14) {
 	const created_at = new Date(Date.now() - days * dayMs).toISOString();
 
 	return statement.get({ created_at });
+}
+
+export function getTracksWithMissingMetadata() {
+	return getStatement<ListenTrack>(
+		'getTracksWithMissingMetadata',
+		`SELECT * FROM listens_track
+		WHERE
+		    genre == '' OR genre LIKE 'Unknown%' OR genre IS NULL OR
+		    release_year IS NULL OR
+		    track_number IS NULL OR
+		    duration_secs IS NULL;`,
+	).all();
 }

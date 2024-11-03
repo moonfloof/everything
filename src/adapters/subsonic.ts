@@ -72,6 +72,7 @@ interface Song {
 	albumId: number;
 	artistId: number;
 	type: string;
+	genre: string;
 }
 
 interface AlbumResponse {
@@ -86,7 +87,7 @@ interface Search3Response {
 	'subsonic-response': {
 		searchResult3: {
 			album: AlbumList[];
-			song: Song[];
+			song?: Song[];
 		};
 	};
 }
@@ -169,5 +170,5 @@ export const searchTrack = async (title: string, album: string, artist: string) 
 	const response = await phin<Search3Response>({ url, parse: 'json' });
 	const results = response.body['subsonic-response'].searchResult3;
 
-	return results.song.find(song => song.artist === artist && song.album === album) ?? null;
+	return results.song?.find(song => song.artist === artist && song.album === album) ?? null;
 };

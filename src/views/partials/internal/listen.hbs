@@ -5,9 +5,10 @@
 		{{> internal/crudRow emoji="🎵" name="title" value=data.title }}
 		{{> internal/crudRow emoji="💿" name="album" value=data.album }}
 		{{> internal/crudRow emoji="👤" name="artist" value=data.artist }}
-		{{> internal/crudRow emoji="🔢" name="tracknumber" value=data.tracknumber }}
-		{{> internal/crudRow emoji="📅" name="release_year" value=data.release_year }}
+		{{> internal/crudRowNumber emoji="🔢" name="track_number" value=data.track_number }}
+		{{> internal/crudRowNumber emoji="📅" name="release_year" value=data.release_year }}
 		{{> internal/crudRow emoji="📦" name="genre" value=data.genre }}
+		{{> internal/crudRowNumber emoji="⌚" name="duration_secs" value=data.duration_secs }}
 		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
 
 		{{> internal/crudSubmit }}
