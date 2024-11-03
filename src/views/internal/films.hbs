@@ -8,12 +8,14 @@
 </div>
 {{/if}}
 
+{{#if hasLetterboxdConnected}}
 <form action="/films/rescan" method="POST" class="sectioncontainer">
-	<label for="rescan">
-		Manually rescan films from Letterboxd
-	</label>
-	<input type="submit" value="Rescan" id="rescan" />
+	<div class="info rounded-panel page--data">
+		<p><strong>Manually rescan films from Letterboxd</strong></p>
+		<input type="submit" value="Rescan" id="rescan" />
+	</div>
 </form>
+{{/if}}
 
 {{> internal/film }}
 <hr/>

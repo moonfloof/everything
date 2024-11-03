@@ -12,10 +12,16 @@ const router = express.Router();
 router.get('/', (req: RequestFrontend, res) => {
 	const { page = 0, rescanerror } = req.query;
 	const pagination = handlebarsPagination(page, countFilms());
+	const hasLetterboxdConnected = config.letterboxd.username !== '' && config.letterboxd.username !== undefined;
 
 	const films = getFilms({ page });
 
-	res.render('internal/films', { films, pagination, rescanerror: rescanerror !== undefined });
+	res.render('internal/films', {
+		films,
+		pagination,
+		hasLetterboxdConnected,
+		rescanerror: rescanerror !== undefined,
+	});
 });
 
 // CRUD
