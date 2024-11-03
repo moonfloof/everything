@@ -20,10 +20,11 @@ const router = express.Router();
 router.get('/', (req: RequestFrontend, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countListens());
+	const hasSubsonicConnected = config.subsonic.url !== '' && config.subsonic.url !== undefined;
 
 	const listens = getListens({ page });
 
-	res.render('internal/listens', { listens, pagination });
+	res.render('internal/listens', { listens, pagination, hasSubsonicConnected });
 });
 
 // CRUD

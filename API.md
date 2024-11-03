@@ -65,6 +65,7 @@ only need to change the endpoint from `https://api.listenbrainz.org` to
       * `date`: The date this song/album was released, in ISO8601 format
       * `tags`: An array of strings, containing the music genres of the track
       * `tracknumber`: An integer
+      * `duration_ms`: An integer, the length of the song in milliseconds
 
 Typically, more information about this track may be included by scrobblers, but
 the information provided above is all Everything uses to store scrobbles.
@@ -84,7 +85,8 @@ the information provided above is all Everything uses to store scrobbles.
         "additional_info": {
           "date": "2024-04-26",
           "tags": ["Progressive Rock", "Indie Rock"],
-          "tracknumber": 2
+          "tracknumber": 2,
+          "duration_ms": 451736
         }
       }
     }

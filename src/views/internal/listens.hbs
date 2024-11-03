@@ -1,5 +1,6 @@
 {{> pageHeader title="Listens" url="/" }}
 
+{{#if hasSubsonicConnected}}
 <form action="/listens/update_metadata" method="POST" class="sectioncontainer">
 	<div class="info rounded-panel page--data">
 		<p><strong>Update missing metadata from subsonic.</strong></p>
@@ -7,6 +8,7 @@
 		<input type="submit" value="Rescan" id="rescan" />
 	</div>
 </form>
+{{/if}}
 
 {{> internal/listen }}
 <hr/>
