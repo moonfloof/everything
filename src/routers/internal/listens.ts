@@ -1,8 +1,17 @@
 import express from 'express';
-import { countListens, deleteListen, getListens, insertScrobble, updateListen } from '../../database/listens.js';
+import {
+	countListens,
+	deleteListen,
+	getListens,
+	getTracksWithMissingMetadata,
+	insertScrobble,
+	updateListen,
+	updateListenTrack,
+} from '../../database/listens.js';
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { searchTrack } from '../../adapters/subsonic.js';
 
 const router = express.Router();
 
@@ -19,16 +28,38 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
+router.post('/update_metadata', async (_req, res) => {
+	const tracks = getTracksWithMissingMetadata();
+	for (const track of tracks) {
+		try {
+			const search = await searchTrack(track.title, track.album, track.artist);
+			if (!search) continue;
+
+			const newTrack = { ...track, track_id: track.id, id: '', created_at: '' };
+			if (!newTrack.genre) newTrack.genre = search.genre;
+			if (!newTrack.duration_secs) newTrack.duration_secs = search.duration;
+			if (!newTrack.release_year) newTrack.release_year = search.year;
+			if (!newTrack.track_number) newTrack.track_number = search.track;
+			updateListenTrack(newTrack);
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	res.redirect('/listens');
+});
+
 router.post('/', (req: RequestFrontend, res) => {
-	const { artist, album, title, tracknumber, release_year, genre, created_at } = req.body;
+	const { artist, album, title, track_number, release_year, genre, duration_secs, created_at } = req.body;
 
 	insertScrobble({
 		artist,
 		album,
 		title,
-		tracknumber: Number(tracknumber) || null,
+		track_number: Number(track_number) || null,
 		release_year: Number(release_year) || null,
 		genre,
+		duration_secs: Number(duration_secs) || null,
 		created_at,
 		device_id: config.defaultDeviceId,
 	});
@@ -38,7 +69,8 @@ router.post('/', (req: RequestFrontend, res) => {
 
 router.post('/:id', (req: RequestFrontend, res) => {
 	const { id } = req.params;
-	const { crudType, artist, album, title, tracknumber, release_year, genre, created_at } = req.body;
+	const { crudType, artist, album, title, track_number, release_year, genre, duration_secs, created_at } =
+		req.body;
 
 	switch (crudType) {
 		case 'delete': {
@@ -52,9 +84,10 @@ router.post('/:id', (req: RequestFrontend, res) => {
 				artist,
 				album,
 				title,
-				tracknumber: Number(tracknumber) || null,
+				track_number: Number(track_number) || null,
 				release_year: Number(release_year) || null,
 				genre,
+				duration_secs: Number(duration_secs) || null,
 				created_at,
 			});
 			break;

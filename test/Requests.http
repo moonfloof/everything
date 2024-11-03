@@ -172,4 +172,15 @@ GET https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?ke
 Content-Type: application/json
 Accept: application/json
 
+### SUBSONIC - Search Track
+
+@subsonicUrl={{$dotenv TOMBOIS_SUBSONIC_URL}}
+@subsonicUser={{$dotenv TOMBOIS_SUBSONIC_USERNAME}}
+# This variable is an MD5 hash of your subsonic password
+# immediately followed by "salt" (eg. "MyPasswordIsSoRandomsalt")
+@subsonicPass={{$dotenv TOMBOIS_TEST_SUBSONICHASH}}
+@subsonicQuery=Espresso
+
+GET {{subsonicUrl}}rest/search3?v=1.15.0&c=everything&f=json&u={{subsonicUser}}&t={{subsonicPass}}&s=salt&query={{subsonicQuery}}
+
 ###

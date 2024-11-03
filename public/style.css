@@ -226,7 +226,8 @@ div.info {
 .page--data svg,
 .page--data table,
 .page--data .error,
-.page--data form {
+.page--data form,
+.page--data input[type="submit"] {
 	margin-top: 16px;
 }
 
