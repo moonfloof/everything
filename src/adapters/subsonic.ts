@@ -157,18 +157,41 @@ export const scrobbleTrack = async (trackId: number, timestamp: number) => {
 	return response.body;
 };
 
-export const searchTrack = async (title: string, album: string, artist: string) => {
+const rawSearch = async (query: string, page = 0) => {
 	if (checkEnvironment()) return null;
 
 	const params = new URLSearchParams({
 		...getBaseParams(),
-		query: `${title}`,
+		artistCount: '0',
+		albumCount: '0',
+		songCount: '50',
+		songOffset: `${page * 50}`,
+		query,
 	});
 
 	const url = new URL(`/rest/search3?${params}`, config.subsonic.url);
 
 	const response = await phin<Search3Response>({ url, parse: 'json' });
-	const results = response.body['subsonic-response'].searchResult3;
+	return response.body['subsonic-response'].searchResult3;
+};
 
-	return results.song?.find(song => song.artist === artist && song.album === album) ?? null;
+export const searchTrack = async (title: string, album: string, artist: string) => {
+	let results: Search3Response['subsonic-response']['searchResult3'] | null;
+	let page = 0;
+	do {
+		results = await rawSearch(title, page);
+
+		if (!results?.song) return null;
+
+		const match = results.song.find(
+			song =>
+				song.artist.toLocaleLowerCase().trim() === artist.toLocaleLowerCase().trim() &&
+				song.album.toLocaleLowerCase().trim() === album.toLocaleLowerCase().trim() &&
+				song.title.toLocaleLowerCase().trim() === title.toLocaleLowerCase().trim(),
+		);
+
+		if (match) return match;
+
+		page += 1;
+	} while (results?.song?.length === 20 && page < 20);
 };
