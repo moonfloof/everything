@@ -1,0 +1,32 @@
+<form method="POST" action="/games/session/{{data.id}}">
+	<div class="sectioncontainer">
+		{{> internal/id id=data.id type="game" }}
+
+		{{#if gameId}}
+			<input type="hidden" name="game_id" value="{{gameId}}" />
+			<input type="hidden" name="game_page" value="1" />
+		{{else}}
+			{{> internal/crudRowSelect emoji="🎮" name="game_id" value=data.game_id label=data.name values=gameOptions }}
+		{{/if}}
+
+		{{> internal/crudRowNumber emoji="⌚" name="playtime_mins" value=data.playtime_mins }}
+		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+
+		{{#if data}}
+			{{> internal/crudRow emoji="🕙" name="updated_at" value=data.updated_at }}
+		{{/if}}
+
+		{{#if data.id}}
+		<div class="row">
+			<div class="left">🏆</div>
+			<div class="right">
+				<a href="/games/session/achievements/{{data.id}}">
+					Edit {{data.achievements.length}} {{data.achievementText}}
+				</a>
+			</div>
+		</div>
+		{{/if}}
+
+		{{> internal/crudSubmit }}
+	</div>
+</form>

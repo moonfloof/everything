@@ -4,8 +4,8 @@
 
 		{{> internal/crudRow emoji="📰" name="title" value=data.title }}
 		{{> internal/crudRowParagraph emoji="💬" name="description" value=data.description }}
-		{{> internal/crudRowSelect emoji="📋" name="type" value=data.type values=typeValues }}
-		{{> internal/crudRowSelect emoji="👁" name="status" value=data.status values=statusValues }}
+		{{> internal/crudRowSelect emoji="📋" name="type" value=data.type label=data.type values=typeValues }}
+		{{> internal/crudRowSelect emoji="👁" name="status" value=data.status label=data.status values=statusValues }}
 		{{> internal/crudRow emoji="🔗" name="url" value=data.url }}
 		{{> internal/crudRowParagraph emoji="🐦" name="syndication_json" value=data.syndication_json }}
 		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}

@@ -14,17 +14,17 @@ router.get('/', (req: RequestFrontend, res) => {
 
 	const typeValues = [
 		// Basics
-		'food',
-		'drink',
+		{ value: 'food', label: 'Food' },
+		{ value: 'drink', label: 'Drink' },
 
 		// Specific Drink Types
-		'soft drink',
-		'coffee',
-		'tea',
+		{ value: 'soft drink', label: 'Soft Drink' },
+		{ value: 'coffee', label: 'Coffee' },
+		{ value: 'tea', label: 'Tea' },
 
 		// Specific Food Types
-		'takeaway',
-		'snack',
+		{ value: 'takeaway', label: 'Takeaway' },
+		{ value: 'snack', label: 'Snack' },
 	];
 
 	const food = getFood({ page });

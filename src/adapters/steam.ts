@@ -1,9 +1,14 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import phin from 'phin';
-import { insertNewGameAchievement } from '../database/gameachievements.js';
-import { updateActivity } from '../database/games.js';
+import {
+	type GameAchievement,
+	getGameAchievementsForGame,
+	insertNewGameAchievement,
+	updateGameAchievement,
+} from '../database/gameachievements.js';
+import { type GameSessionInsertResponse, updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
-import { minuteMs } from '../lib/formatDate.js';
+import { dateDefault, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 
 const log = new Logger('Steam');
@@ -51,40 +56,31 @@ interface SteamGetPlayerAchievementsResponse {
 	};
 }
 
-interface LocalAchievement {
-	apiname: string;
-	achieved: number;
-}
-
 let gameActivity: Pick<SteamRecentlyPlayedGame, 'appid' | 'playtime_forever'>[] = [];
-
-let achievements: Record<string, LocalAchievement[] | null> = {};
 
 function loadGamesFromDisk() {
 	log.info('Loading activity cache from disk');
 	if (existsSync(config.steam.dataPath) === false) {
 		log.debug('Cache file does not exist, providing defaults');
 		gameActivity = [];
-		achievements = {};
 		return;
 	}
 
 	const contents = JSON.parse(readFileSync(config.steam.dataPath).toString());
 
 	gameActivity = contents.gameActivity || [];
-	achievements = contents.achievements || {};
 }
 
 function saveGamesToDisk() {
 	log.info('Saving activity cache to disk');
-	const str = JSON.stringify({ gameActivity, achievements }, null, 2);
+	const str = JSON.stringify({ gameActivity }, null, 2);
 	writeFileSync(config.steam.dataPath, str);
 }
 
-async function fetchAchievements(appid: number): Promise<SteamAchievement[] | null> {
+async function fetchAchievements(appid: number): Promise<SteamAchievement[]> {
 	const { apiKey, userId } = config.steam;
 
-	if (!(apiKey && userId)) return null;
+	if (!(apiKey && userId)) return [];
 
 	const apiUrl = `http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appid}&key=${apiKey}&steamid=${userId}&format=json&l=en`;
 
@@ -101,42 +97,58 @@ async function fetchAchievements(appid: number): Promise<SteamAchievement[] | nu
 			throw new Error('No achievements');
 		}
 
-		achievements[`${appid}`] = body.playerstats.achievements.map(achievement => ({
-			apiname: achievement.apiname,
-			achieved: achievement.achieved,
-		}));
-
 		return body.playerstats.achievements;
 	} catch (err) {
 		const error = err as Error;
 		log.error(error);
-		log.warn(
-			'Marking this game as achievement-less. You will not recieve achievement updates for this game',
-		);
-		achievements[`${appid}`] = null;
-		return null;
+		return [];
 	}
 }
 
-async function compareAchievements(appid: number): Promise<SteamAchievement[]> {
-	const localAchievements = achievements[`${appid}`];
-	if (localAchievements === null) return [];
-
+async function updateAchievementsDatabase(appid: number, session: GameSessionInsertResponse) {
 	const remoteAchievements = await fetchAchievements(appid);
-	if (!remoteAchievements) return [];
+	const achievementsForGame = getGameAchievementsForGame(session.game_id);
 
-	return remoteAchievements.filter(remoteAchievement => {
-		// Skip achievements the first time they are loaded
-		// TODO: Calculate based on the "unlocktime" property
-		if (localAchievements === undefined) return false;
+	for (const achievement of remoteAchievements) {
+		// Unlock Time is 0 if not achieved (therefore defaults to current time)
+		const created_at = dateDefault(achievement.unlocktime * 1000);
+		const achieved = achievement.achieved === 1;
 
-		return localAchievements.some(
-			localAchievement =>
-				localAchievement.apiname === remoteAchievement.apiname &&
-				localAchievement.achieved === 0 &&
-				remoteAchievement.achieved === 1,
+		// Match local achievements based on apiname (preferred) or name (fallback)
+		const existsInDatabase = achievementsForGame.find(
+			local => local.apiname === achievement.apiname || local.name === achievement.name,
 		);
-	});
+
+		if (!existsInDatabase) {
+			insertNewGameAchievement({
+				name: achievement.name,
+				description: achievement.description || null,
+				game_id: session.game_id,
+				unlocked_session_id: achieved ? session.id : null,
+				apiname: achievement.apiname,
+				created_at,
+			});
+			continue;
+		}
+
+		const updates: Partial<GameAchievement> = {};
+
+		if (existsInDatabase.unlocked_session_id === null && achievement.achieved === 1) {
+			updates.unlocked_session_id = session.id;
+			updates.updated_at = created_at;
+		}
+
+		if (existsInDatabase.apiname === null) {
+			updates.apiname = achievement.apiname;
+		}
+
+		if (Object.keys(updates).length > 0) {
+			updateGameAchievement({
+				...existsInDatabase,
+				...updates,
+			});
+		}
+	}
 }
 
 function calculateNewActivity(games: SteamRecentlyPlayedGame[]) {
@@ -172,7 +184,7 @@ function calculateNewActivity(games: SteamRecentlyPlayedGame[]) {
 export function pollForGameActivity() {
 	const { apiKey, userId } = config.steam;
 
-	const intervalMs = (Number(config.steam.pollIntervalMinutes) ?? 5) * minuteMs;
+	const intervalMs = config.steam.pollIntervalMinutes * minuteMs;
 	if (intervalMs === 0) {
 		log.warn('Polling is disabled, no games will be tracked');
 		return;
@@ -180,7 +192,6 @@ export function pollForGameActivity() {
 
 	loadGamesFromDisk();
 
-	const device_id = config.steam.steamDeviceId ?? config.defaultDeviceId;
 	const apiUrl = `https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${apiKey}&steamid=${userId}&format=json`;
 
 	const fetchGames = async () => {
@@ -195,28 +206,17 @@ export function pollForGameActivity() {
 
 		// Update all new same-game activity
 		for (const game of newActivity) {
-			const activity = updateActivity(
+			const session = updateGameSession(
 				{
 					name: game.name,
 					playtime_mins: game.newPlaytime,
 					url: `https://store.steampowered.com/app/${game.appid}/`,
-					device_id,
+					device_id: config.steam.steamDeviceId,
 				},
 				intervalMs,
 			);
 
-			const newAchievements = await compareAchievements(game.appid);
-
-			for (const achievement of newAchievements) {
-				insertNewGameAchievement({
-					name: achievement.name,
-					description: achievement.description || null,
-					game_name: game.name,
-					game_id: activity.id,
-					device_id,
-					created_at: '',
-				});
-			}
+			updateAchievementsDatabase(game.appid, session);
 		}
 
 		gameActivity = body.response.games.map(game => ({

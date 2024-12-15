@@ -1,9 +1,9 @@
 <div class="row">
 	<div class="left">{{emoji}}</div>
 	<select class="right" name="{{name}}">
-		<option value="{{value}}" hidden selected>{{value}}</option>
-		{{#each values}}
-			<option value="{{this}}">{{this}}</option>
+		<option value="{{value}}" hidden selected>{{label}}</option>
+		{{#each values as |option|}}
+			<option value="{{option.value}}">{{option.label}}</option>
 		{{/each}}
 	</select>
 </div>

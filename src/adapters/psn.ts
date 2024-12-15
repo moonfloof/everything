@@ -4,6 +4,7 @@ import type {
 	AuthTokensResponse,
 	BasicPresenceResponse,
 	TitleTrophiesResponse,
+	UserTitlesResponse,
 	UserTrophiesEarnedForTitleResponse,
 } from 'psn-api';
 const {
@@ -15,9 +16,13 @@ const {
 	getUserTitles,
 	getUserTrophiesEarnedForTitle,
 } = createRequire(import.meta.url)('psn-api');
-
-import { insertNewGameAchievement } from '../database/gameachievements.js';
-import { updateActivity } from '../database/games.js';
+import {
+	type GameAchievement,
+	getGameAchievementsForGame,
+	insertNewGameAchievement,
+	updateGameAchievement,
+} from '../database/gameachievements.js';
+import { type GameSessionInsertResponse, updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
@@ -27,19 +32,13 @@ const log = new Logger('PSN');
 /** Used to map `npTitleId` to `npCommunicationId` */
 let gameIdMap: Record<string, string> = {};
 
-interface UserTrophies {
-	trophyId: number;
-	earned: boolean;
-	earnedDateTime?: string;
-}
-
 interface ServerTrophies {
 	trophyId: number;
 	trophyName?: string;
 	trophyDetail?: string;
 }
 
-let trophies: Record<string, { user: UserTrophies[]; server: ServerTrophies[] }> = {};
+let trophies: Record<string, { server: ServerTrophies[] }> = {};
 
 /** This data is private and, as such, the PSN JSON file should NEVER be shared. */
 interface PSNAuthentication {
@@ -96,7 +95,9 @@ async function authenticateApi() {
 		}
 
 		log.info('Access token has expired - fetching a new one.');
-		const newAuthentication = await exchangeRefreshTokenForAuthTokens(authentication.refreshToken);
+		const newAuthentication: AuthTokensResponse = await exchangeRefreshTokenForAuthTokens(
+			authentication.refreshToken,
+		);
 		authentication = convertPsnAuth(newAuthentication);
 		saveGamesToDisk();
 		return;
@@ -108,13 +109,58 @@ async function authenticateApi() {
 	}
 
 	log.info('Fetching an access code based on NPSSO');
-	const accessCode = await exchangeNpssoForCode(config.psn.npsso);
-	const newAuthentication = await exchangeCodeForAccessToken(accessCode);
+	const accessCode: string = await exchangeNpssoForCode(config.psn.npsso);
+	const newAuthentication: AuthTokensResponse = await exchangeCodeForAccessToken(accessCode);
 	authentication = convertPsnAuth(newAuthentication);
 	saveGamesToDisk();
 }
 
-async function compareTrophies(game: { titleName: string; format: 'PS5' | 'ps4' }) {
+async function updateAchievementsDatabase(
+	game: { titleName: string; format: 'PS5' | 'ps4' },
+	session: GameSessionInsertResponse,
+) {
+	const localTrophies = getGameAchievementsForGame(session.game_id);
+	const remoteTrophies = await getTrophiesForGame(game);
+
+	for (const trophy of remoteTrophies) {
+		// Match local achievements based on apiname (preferred) or name (fallback)
+		const existsInDatabase = localTrophies.find(
+			local => local.apiname === trophy.trophyId || local.name === trophy.trophyName,
+		);
+
+		if (!existsInDatabase) {
+			insertNewGameAchievement({
+				name: trophy.trophyName,
+				description: trophy.trophyDetail || null,
+				game_id: session.game_id,
+				unlocked_session_id: trophy.earned ? session.id : null,
+				apiname: trophy.trophyId,
+				created_at: trophy.earnedDateTime ?? '',
+			});
+			continue;
+		}
+
+		const updates: Partial<GameAchievement> = {};
+
+		if (existsInDatabase.unlocked_session_id === null && trophy.earned === true) {
+			updates.unlocked_session_id = session.id;
+			updates.updated_at = trophy.earnedDateTime;
+		}
+
+		if (existsInDatabase.apiname === null) {
+			updates.apiname = trophy.trophyId;
+		}
+
+		if (Object.keys(updates).length > 0) {
+			updateGameAchievement({
+				...existsInDatabase,
+				...updates,
+			});
+		}
+	}
+}
+
+async function getTrophiesForGame(game: { titleName: string; format: 'PS5' | 'ps4' }) {
 	const gameName = game.titleName.replace(/[^a-zA-Z0-9]*/g, '');
 
 	// The communication ID is associated with a specific user's games,
@@ -122,7 +168,7 @@ async function compareTrophies(game: { titleName: string; format: 'PS5' | 'ps4' 
 	let id = gameIdMap[gameName];
 	if (!gameIdMap[gameName]) {
 		log.debug('Fetching recently played games');
-		const response = await getUserTitles(authentication, 'me');
+		const response: UserTitlesResponse = await getUserTitles(authentication, 'me');
 		for (const title of response.trophyTitles) {
 			const titleName = title.trophyTitleName.replace(/[^a-zA-Z0-9]*/g, '');
 			if (!gameIdMap[titleName]) {
@@ -149,29 +195,8 @@ async function compareTrophies(game: { titleName: string; format: 'PS5' | 'ps4' 
 		options,
 	);
 
-	const newTrophies = remoteTrophies.filter(remoteTrophy => {
-		// Skip achievements the first time they are loaded
-		if (trophies[id] === undefined) return false;
-
-		return trophies[id].user.some(
-			localAchievement =>
-				localAchievement.trophyId === remoteTrophy.trophyId &&
-				!localAchievement.earned &&
-				remoteTrophy.earned === true,
-		);
-	});
-
-	if (!trophies[id]) {
-		trophies[id] = { user: [], server: [] };
-	}
-
-	trophies[id].user = remoteTrophies.map(trophy => ({
-		trophyId: trophy.trophyId,
-		earned: trophy.earned ?? false,
-		earnedDateTime: trophy.earnedDateTime,
-	}));
-
-	if (newTrophies.length > 0 && !trophies[id].server) {
+	// Cache full trophy info (name, description), if not already cached
+	if (remoteTrophies.length > 0 && !trophies[id]?.server?.length) {
 		log.debug(`Fetching server trophies for ${game.titleName}`);
 
 		const serverTrophies: TitleTrophiesResponse = await getTitleTrophies(
@@ -189,11 +214,17 @@ async function compareTrophies(game: { titleName: string; format: 'PS5' | 'ps4' 
 	}
 
 	// Add title and description to new trophies
-	return newTrophies.map(trophy => {
+	return remoteTrophies.map(trophy => {
 		const serverTrophy = trophies[id].server.find(server => server.trophyId === trophy.trophyId);
+
+		// A pretty ugly fallback, something like "GranTurismo7 - 28"
+		// but it'll satisfy the UNIQUE constraint on achievement name.
+		const fallbackTrophyName = `${gameName} - ${trophy.trophyId}`;
+
 		return {
 			...trophy,
-			trophyName: serverTrophy?.trophyName || '',
+			trophyId: `${trophy.trophyId}`,
+			trophyName: serverTrophy?.trophyName || fallbackTrophyName,
 			trophyDetail: serverTrophy?.trophyDetail || null,
 		};
 	});
@@ -208,49 +239,30 @@ async function fetchGameActivity() {
 
 	if (!gameTitleInfoList) return;
 
-	const device_id = config.psn.deviceId ?? config.defaultDeviceId;
-
 	for (const game of gameTitleInfoList) {
-		const newTrophies = await compareTrophies(game);
-
-		if (newTrophies.length > 0) {
-			log.info(`${newTrophies.length} new trophies for ${game.titleName}`);
-		}
-
-		const activity = updateActivity(
+		const session = updateGameSession(
 			{
 				name: game.titleName,
-				playtime_mins: config.psn.pollInterval,
+				playtime_mins: config.psn.pollIntervalMinutes,
 				url: null,
-				device_id,
+				device_id: config.psn.deviceId,
 			},
-			config.psn.pollInterval * minuteMs,
+			config.psn.pollIntervalMinutes * minuteMs,
 		);
 
-		for (const trophy of newTrophies) {
-			insertNewGameAchievement({
-				name: trophy.trophyName,
-				description: trophy.trophyDetail,
-				game_name: game.titleName,
-				game_id: activity.id,
-				device_id,
-				created_at: '',
-			});
-		}
+		await updateAchievementsDatabase(game, session);
 	}
 
 	saveGamesToDisk();
 }
 
 export function pollForPsnActivity() {
-	const pollIntervalMs = config.psn.pollInterval * minuteMs;
+	const pollIntervalMs = config.psn.pollIntervalMinutes * minuteMs;
 	if (pollIntervalMs === 0) {
 		log.warn('Polling disabled, no games will be tracked');
 		return;
 	}
 
 	loadGamesFromDisk();
-
-	fetchGameActivity();
 	setInterval(fetchGameActivity, pollIntervalMs);
 }

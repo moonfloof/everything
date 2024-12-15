@@ -1,11 +1,13 @@
-<form method="POST" action="/games/{{game_id}}/achievements">
+<form method="POST" action="/games/session/achievements/{{session_id}}">
 	<div class="sectioncontainer">
 		{{> internal/id id=data.id }}
 		<input type="hidden" name="id" value="{{data.id}}" />
 
 		{{> internal/crudRow emoji="🎮" name="name" value=data.name }}
 		{{> internal/crudRow emoji="📓" name="description" value=data.description }}
+		{{> internal/crudRow emoji="🎫" name="apiname" value=data.apiname }}
 		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+		{{> internal/crudRow emoji="🕗" name="updated_at" value=data.updated_at }}
 		{{#unless data.id}}
 			<input type="hidden" name="crudType" value="new" />
 		{{/unless}}

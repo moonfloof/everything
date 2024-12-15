@@ -30,7 +30,7 @@ export const CATEGORIES = {
 	NAP: 'Nap',
 } as const;
 
-export const categoryValues = Object.values(CATEGORIES);
+export const categoryValues = Object.values(CATEGORIES).map(value => ({ value, label: value }));
 
 function insertNewRecord(session: Insert<Timetracking>) {
 	const statement = getStatement(

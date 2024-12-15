@@ -3,7 +3,7 @@
 		{{> internal/id id=data.id}}
 
 		{{> internal/crudRow emoji="🍕" name="name" value=data.name }}
-		{{> internal/crudRowSelect emoji="☕" name="type" value=data.type }}
+		{{> internal/crudRowSelect emoji="☕" name="type" value=data.type label=data.type }}
 		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
 
 		{{> internal/crudSubmit }}

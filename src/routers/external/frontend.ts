@@ -8,12 +8,12 @@ import { countBooks, getBooks } from '../../database/books.js';
 import { getDevices } from '../../database/devices.js';
 import { countFilms, getFilms } from '../../database/films.js';
 import {
-	countGameActivity,
-	getGameActivity,
-	getGameActivityGroupedByDay,
+	countGameSessions,
+	getGameSessions,
+	getGameSessionsGroupedByDay,
 	getGameStats,
 	getPopularGames,
-} from '../../database/games.js';
+} from '../../database/gamesession.js';
 import {
 	countListens,
 	getListenDashboardGraph,
@@ -249,7 +249,7 @@ router.get('/youtube/:id', (req, res) => {
 
 router.get('/games', (req: RequestFrontend, res) => {
 	const { page = 0, days = '60' } = req.query;
-	const pagination = handlebarsPagination(page, countGameActivity());
+	const pagination = handlebarsPagination(page, countGameSessions());
 
 	const daysInt = Number(days);
 	const dayOptions = [
@@ -262,8 +262,8 @@ router.get('/games', (req: RequestFrontend, res) => {
 		throw new Error('"days" query must be a number between 1 and 60');
 	}
 
-	const gameActivity = getGameActivity({ page });
-	const gamesByDay = getGameActivityGroupedByDay();
+	const gameActivity = getGameSessions({ page });
+	const gamesByDay = getGameSessionsGroupedByDay();
 	const popular = getPopularGames(daysInt);
 	const svg = generateBarGraph(
 		addMissingDates(gamesByDay, day => ({ day, y: 0, label: shortDate(day) })),
@@ -285,7 +285,7 @@ router.get('/games', (req: RequestFrontend, res) => {
 });
 
 router.get('/game/:id', (req, res) => {
-	const [gameActivity] = getGameActivity({ id: req.params.id });
+	const [gameActivity] = getGameSessions({ id: req.params.id });
 
 	if (!gameActivity) {
 		throw new NotFoundError('Game not found');
@@ -480,7 +480,7 @@ router.get('/feed', async (_req, res) => {
 	// TODO: Benchmark Promise.all vs. one by one
 	const entries = (
 		await Promise.all([
-			typeMap('game', getGameActivity(parameters)),
+			typeMap('game', getGameSessions(parameters)),
 			typeMap('listen', groupListens(getListens(parameters))),
 			typeMap('note', getNotes({ ...parameters, status: 'public' })),
 			typeMap('episode', getEpisodes(parameters)),
