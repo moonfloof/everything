@@ -267,9 +267,9 @@ export function updateGameSessionInternal(game: Update<Omit<Game, 'id'> & GameSe
 }
 
 export function getPopularGames(days: number, limit = 10) {
-	const statement = getStatement<{ name: string; count: number }>(
+	const statement = getStatement<{ id: number; name: string; count: number }>(
 		'getPopularGames',
-		`SELECT g.name, ceil(sum(s.playtime_mins) / 60.0) as count
+		`SELECT g.id, g.name, ceil(sum(s.playtime_mins) / 60.0) as count
 		FROM game_session AS s
 		JOIN games AS g ON g.id = s.game_id
 		WHERE created_at >= $created_at

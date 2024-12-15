@@ -7,6 +7,7 @@
 
 	--primary-fg: #3e3475;
 	--primary-bg: #f9f8fc;
+	--primary-bg-dark: #e0dfe2;
 
 	--secondary-fg: #347441;
 	--secondary-bg: #f8fcf9;
@@ -372,6 +373,67 @@ table td {
 
 .game-achievements--list li {
 	padding-left: 8px;
+}
+
+.game-achievements--bar__container {
+	flex: 1;
+	border-radius: 6px;
+	background-color: var(--primary-bg-dark);
+	height: 32px;
+	margin-top: 8px;
+	margin-bottom: 24px;
+	display: flex;
+}
+
+.game-achievements--bar {
+	border-radius: 6px;
+	background-color: var(--primary-fg);
+	font-weight: 700;
+	color: var(--primary-bg);
+	overflow: hidden;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-shadow: 0 0 4px #000, 0 2px 24px #000;
+}
+
+.game-achievements--bar.pct-100 {
+	background-color: #fbb03b;
+	box-shadow: 0 4px 16px #fbb03b;
+}
+
+.game-achievements--list__large {
+	padding: 10px 0;
+	display: flex;
+	border-bottom: 1px solid var(--border);
+}
+
+.game-achievements--check {
+	width: 40px;
+	flex-shrink: 0;
+	font-size: 28px;
+	margin-right: 10px;
+	line-height: 40px;
+}
+
+.game-achievements--check::before {
+	opacity: 0.2;
+}
+
+.game-achievements--check.unlocked::before {
+	opacity: 1;
+}
+
+.game-achievements--details {
+	min-height: 40px;
+	font-size: 14px;
+	line-height: 20px;
+	color: #888;
+}
+
+.game-achievements--details.unlocked {
+	color: var(--text);
 }
 
 /** PAGINATION **/

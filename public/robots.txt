@@ -2,6 +2,7 @@ User-agent: *
 Disallow: /music/*
 Disallow: /youtube/*
 Disallow: /game/*
+Disallow: /game-session/*
 Disallow: /tv/*
 Disallow: /film/*
 Disallow: /book/*

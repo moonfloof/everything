@@ -1,14 +1,10 @@
 <div class="sectioncontainer h-entry">
-	<div class="row p-play-of h-cite">
+	<div class="row">
 		<span class="left">🎮</span>
 		<span class="right">
-			{{#if data.url}}
-			<a href="{{data.url}}" target="_blank" class="u-url" rel="noopener">
+			<a href="/game/{{data.game_id}}" rel="noopener">
 				<strong class="p-name">{{data.name}}</strong>
 			</a>
-			{{else}}
-				<strong class="p-name">{{data.name}}</strong>
-			{{/if}}
 		</span>
 	</div>
 	<div class="row">
@@ -40,17 +36,27 @@
 	{{/if}}
 	<div class="row">
 		<span class="left"></span>
-		<time
-			title="{{data.created_at}}"
-			datetime="{{data.created_at}}"
-			class="right dt-published"
-		>
+		<div class="right">
 			<small>
-				<a href="/game/{{data.id}}" class="u-url u-uid">
-					{{data.timeago}}
+				<time
+					title="{{data.created_at}}"
+					datetime="{{data.created_at}}"
+					class="dt-published"
+				>
+						<a href="/game-session/{{data.id}}" class="u-url u-uid">
+							{{data.timeago}}
+						</a>
+				</time>
+
+				{{#if data.url}}
+				&bull;
+				<a href="{{data.url}}" target="_blank" class="p-play-of h-cite u-url" rel="noopener">
+					view store page
 				</a>
+				{{/if}}
+
 			</small>
-		</time>
+		</div>
 	</div>
 
 	{{> author }}
