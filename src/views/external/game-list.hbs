@@ -21,7 +21,7 @@
 		{{#each popular as |game| }}
 		<tr>
 			<td class="align-r">
-				{{game.name}}
+				<a href="/game/{{game.id}}">{{game.name}}</a>
 			</td>
 			<td class="table-flex-1">
 				<span class="artist-count" style="width: {{game.popularityPercentage}}%">
@@ -41,8 +41,8 @@
 	<h3>Playtime by day</h3>
 	{{{svg}}}
 
-	{{#each gameActivity as |game|}}
-		{{> gameActivity data=game }}
+	{{#each sessions as |session|}}
+		{{> gameActivity data=session }}
 	{{/each}}
 
 	<hr/>

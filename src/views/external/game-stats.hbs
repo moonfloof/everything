@@ -1,0 +1,81 @@
+<div class="page--date">
+	{{> pageHeader title=game.name url="/games" }}
+	<br/>
+	<div class="row">
+		<span class="left">🕑</span>
+		<span class="right">
+			Played: <strong>{{game.playtime_hours}} hours</strong>
+		</span>
+	</div>
+	<div class="row">
+		<span class="left">📆</span>
+		<span class="right">
+			Last Played: <strong>{{game.timeago}}</strong>
+		</span>
+	</div>
+
+	{{#if game.url}}
+	<div class="row">
+		<span class="left">🛒</span>
+		<span class="right">
+			Store Page:
+			<strong>
+				<a href="{{game.url}}" target="_blank" rel="noopener">
+					{{gameUrlPretty}}
+				</a>
+			</strong>
+		</span>
+	</div>
+	{{/if}}
+
+	{{#if achievements.length}}
+	<div class="row">
+		<span class="left">🏆</span>
+		<span class="right">
+			Completion:
+			<strong>
+				{{achievementsUnlockedCount}} of {{achievements.length}}
+			</strong><br/>
+
+			{{#if playedRecently}}
+			<div class="game-achievements--bar__container">
+				<div
+					class="game-achievements--bar pct-{{achievementPercentage}}"
+					style="width: {{achievementPercentage}}%"
+				>{{achievementPercentage}}%</div>
+			</div>
+			{{else}}
+			<div class="info rounded-panel" style="margin:16px 0;padding: 6px;font-size: 14px">
+				<strong>Note:</strong> completion progress might
+				be inaccurate if I haven't played a game since
+				December 2024.
+			</div>
+			{{/if}}
+
+			{{#each achievements as |achievement|}}
+			<div class="game-achievements--list__large">
+
+			<div class="game-achievements--check {{#if achievement.unlocked_session_id}}unlocked{{/if}}">
+				{{#if achievement.unlocked_session_id}}✅{{else}}🔶{{/if}}
+			</div>
+
+			<div class="game-achievements--details {{#if achievement.unlocked_session_id}}unlocked{{/if}}">
+				<strong>{{achievement.name}}</strong>
+				<br/>{{achievement.description}}
+
+				{{#if achievement.unlocked_session_id}}
+				<br/>
+				<small>
+					<a href="/game-session/{{achievement.unlocked_session_id}}">
+						{{achievement.timeago}}
+					</a>
+				</small>
+				{{/if}}
+			</div>
+
+			</div>
+			{{/each}}
+		</span>
+	</div>
+	{{/if}}
+</div>

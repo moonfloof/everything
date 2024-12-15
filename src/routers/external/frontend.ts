@@ -43,6 +43,7 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
 import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { getAchievementsForGame, getGameAndTotalPlaytime } from '../../database/game.js';
 
 const router = express.Router();
 
@@ -262,19 +263,22 @@ router.get('/games', (req: RequestFrontend, res) => {
 		throw new Error('"days" query must be a number between 1 and 60');
 	}
 
-	const gameActivity = getGameSessions({ page });
+	const sessions = getGameSessions({ page });
 	const gamesByDay = getGameSessionsGroupedByDay();
 	const popular = getPopularGames(daysInt);
+	const durationHoursTotal = popular.reduce((total, game) => total + game.count, 0);
 	const svg = generateBarGraph(
 		addMissingDates(gamesByDay, day => ({ day, y: 0, label: shortDate(day) })),
 		'hours',
 	);
 
+	const title = `played video games for ${durationHoursTotal} hours in the last ${daysInt} days`;
+
 	res.render('external/game-list', {
-		gameActivity,
+		sessions,
 		svg,
 		pagination,
-		title: 'plays video games',
+		title,
 		canonicalUrl: getCanonicalUrl(req),
 
 		// Popular chart
@@ -284,22 +288,54 @@ router.get('/games', (req: RequestFrontend, res) => {
 	});
 });
 
-router.get('/game/:id', (req, res) => {
-	const [gameActivity] = getGameSessions({ id: req.params.id });
+router.get('/game-session/:id', (req, res) => {
+	const [session] = getGameSessions({ id: req.params.id });
 
-	if (!gameActivity) {
+	if (!session) {
 		throw new NotFoundError('Game not found');
 	}
 
-	const description = `I played ${gameActivity.name} for ${gameActivity.duration} on ${prettyDate(
-		new Date(gameActivity.created_at),
-	)}`;
+	const title = `played ${session.name} for ${session.duration} on ${prettyDate(new Date(session.created_at))}`;
+	const description = `and got ${session.achievements.length} ${session.achievementText}`;
 
-	res.render('external/game-single', {
-		gameActivity,
+	res.render('external/game-session', {
+		session,
 		description,
-		title: 'played...',
+		title,
 		canonicalUrl: getCanonicalUrl(req),
+	});
+});
+
+router.get('/game/:id', (req, res) => {
+	const { id } = req.params;
+
+	const game_id = Number(id);
+	if (!Number.isSafeInteger(game_id) || game_id < 0) {
+		throw new Error('Invalid game ID');
+	}
+
+	const game = getGameAndTotalPlaytime(game_id);
+	if (!game) {
+		throw new Error('Game does not exist');
+	}
+
+	const title = `has played ${game.name} for ${game.playtime_hours} hours`;
+	const gameUrlPretty = game.url ? new URL(game.url).host : null;
+	const achievements = getAchievementsForGame(game_id);
+	const achievementsUnlockedCount = achievements.filter(a => a.unlocked_session_id !== null).length;
+	const achievementPercentage = Math.round((achievementsUnlockedCount / achievements.length) * 100);
+
+	// TODO: Remove after a substantial amount of time, once achievements can be properly updated.
+	const playedRecently = new Date(game.last_played).getTime() > new Date('2024-12-14').getTime();
+
+	res.render('external/game-stats', {
+		game,
+		gameUrlPretty,
+		title,
+		playedRecently,
+		achievements,
+		achievementsUnlockedCount,
+		achievementPercentage,
 	});
 });
 

@@ -1,3 +1,4 @@
+import { timeago } from '../adapters/timeago.js';
 import type { Insert, Optional } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
@@ -78,13 +79,18 @@ export function getSessionsForGame(game_id: number): GameSessionRaw[] {
 		});
 }
 
-export function getAchievementsForGame(game_id: number): GameAchievement[] {
+export function getAchievementsForGame(game_id: number) {
 	return getStatement<GameAchievement>(
 		'getAchievementsForGame',
 		`SELECT * FROM game_achievements
 		WHERE game_id = $game_id
-		ORDER BY created_at DESC`,
-	).all({ game_id });
+		ORDER BY unlocked_session_id IS NULL, created_at DESC`,
+	)
+		.all({ game_id })
+		.map(achievement => ({
+			...achievement,
+			timeago: timeago.format(new Date(achievement.updated_at)),
+		}));
 }
 
 /**
@@ -111,4 +117,26 @@ export function getGamesAsOptions() {
 		'getGamesAsOptions',
 		'SELECT id AS value, name AS label FROM games ORDER BY name ASC',
 	).all();
+}
+
+export function getGameAndTotalPlaytime(game_id: number) {
+	const game = getStatement<Game & { last_played: string; playtime_hours: number }>(
+		'getGameAndTotalPlaytime',
+		`SELECT
+			g.id, g.name, g.url,
+			MAX(s.updated_at) AS last_played,
+			ROUND((SELECT SUM(s.playtime_mins) FROM game_session AS s WHERE s.game_id = g.id) / 60.0, 1) AS playtime_hours
+		FROM games AS g
+		JOIN game_session AS s ON s.game_id = g.id
+		WHERE g.id = $game_id
+		GROUP BY g.id
+		LIMIT 1;`,
+	).get({ game_id });
+
+	if (!game) return null;
+
+	return {
+		...game,
+		timeago: timeago.format(new Date(game.last_played)),
+	};
 }
