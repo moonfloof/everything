@@ -417,11 +417,11 @@ table td {
 	line-height: 40px;
 }
 
-.game-achievements--check::before {
+.game-achievements--check {
 	opacity: 0.2;
 }
 
-.game-achievements--check.unlocked::before {
+.game-achievements--check.unlocked {
 	opacity: 1;
 }
 
