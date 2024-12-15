@@ -1,6 +1,11 @@
 import phin from 'phin';
-import { insertNewGameAchievement } from '../database/gameachievements.js';
-import { updateActivity } from '../database/games.js';
+import {
+	type GameAchievement,
+	getGameAchievementsForGame,
+	insertNewGameAchievement,
+	updateGameAchievement,
+} from '../database/gameachievements.js';
+import { updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
@@ -26,6 +31,12 @@ const request = <T>(url: string, params: URLSearchParams = new URLSearchParams()
 		},
 	});
 };
+
+interface RaSession {
+	raGameId: number;
+	game_id: number;
+	session_id: string;
+}
 
 interface RecentlyPlayedGame {
 	GameID: number;
@@ -64,6 +75,58 @@ interface RecentAchievement {
 	GameURL: string;
 }
 
+interface RemoteAchievements {
+	ID: number;
+	Title: string;
+	ConsoleID: number;
+	ForumTopicID: number;
+	ImageIcon: string;
+	ImageTitle: string;
+	ImageIngame: string;
+	ImageBoxArt: string;
+	Publisher: string;
+	Developer: string;
+	Genre: string;
+	Released: string;
+	ReleasedAtGranularity: string;
+	IsFinal: 0 | 1;
+	RichPresencePatch: string;
+	GuideURL: null;
+	ConsoleName: string;
+	ParentGameID: null;
+	NumDistinctPlayers: number;
+	NumAchievements: number;
+	Achievements: Record<
+		string,
+		{
+			ID: number;
+			NumAwarded: number;
+			NumAwardedHardcore: number;
+			Title: string;
+			Description: string;
+			Points: number;
+			TrueRatio: number;
+			Author: string;
+			DateModified: string;
+			DateCreated: string;
+			BadgeName: string;
+			DisplayOrder: number;
+			MemAddr: string;
+			type: string;
+
+			// Only shows up if earned
+			DateEarnedHardcore?: string;
+			DateEarned?: string;
+		}
+	>;
+	NumAwardedToUser: number;
+	NumAwardedToUserHardcore: number;
+	NumDistinctPlayersCasual: number;
+	NumDistinctPlayersHardcore: number;
+	UserCompletion: string;
+	UserCompletionHardcore: string;
+}
+
 async function fetchRecentlyPlayedGames(): Promise<RecentlyPlayedGame[]> {
 	const { body } = await request<RecentlyPlayedGame[]>(
 		'https://retroachievements.org/API/API_GetUserRecentlyPlayedGames.php',
@@ -74,12 +137,105 @@ async function fetchRecentlyPlayedGames(): Promise<RecentlyPlayedGame[]> {
 async function fetchRecentAchievements(): Promise<RecentAchievement[]> {
 	const { body } = await request<RecentAchievement[]>(
 		'https://retroachievements.org/API/API_GetUserRecentAchievements.php',
-		new URLSearchParams({ m: `${config.retroachievements.pollInterval}` }),
+		new URLSearchParams({ m: `${config.retroachievements.pollIntervalMinutes}` }),
 	);
 	return body;
 }
 
-function parseDateTime(dateTime: string): Date {
+async function fetchUserAchievementsForGame(raGameId: number): Promise<RemoteAchievements> {
+	const { body } = await request<RemoteAchievements>(
+		'https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php',
+		new URLSearchParams({ g: `${raGameId}` }),
+	);
+	return body;
+}
+
+async function addRemoteAchievementsToDatabase(
+	session: RaSession,
+	localAchievements: Omit<GameAchievement, 'game_id'>[],
+) {
+	const game = await fetchUserAchievementsForGame(session.raGameId);
+	const remoteAchievements = Object.values(game.Achievements);
+	let inserted = 0;
+	let updated = 0;
+
+	for (const achievement of remoteAchievements) {
+		const apiname = `${achievement.ID}`;
+		// Find achievement based on apiname, but fallback to name search
+		const exists = localAchievements.find(
+			local => local.apiname === apiname || local.name === achievement.Title,
+		);
+		const dateEarned = achievement.DateEarnedHardcore || achievement.DateEarned;
+		const achieved = dateEarned !== undefined;
+		const created_at = parseDateTime(dateEarned).toISOString();
+
+		if (!exists) {
+			insertNewGameAchievement({
+				name: achievement.Title,
+				description: achievement.Description,
+				unlocked_session_id: achieved ? session.session_id : null,
+				game_id: session.game_id,
+				created_at,
+				apiname,
+			});
+			inserted++;
+			continue;
+		}
+
+		const updates: Partial<GameAchievement> = {};
+
+		if (exists.unlocked_session_id === null && achieved) {
+			updates.unlocked_session_id = session.session_id;
+			updates.updated_at = created_at;
+		}
+
+		if (exists.apiname === null) {
+			updates.apiname = apiname;
+		}
+
+		if (Object.keys(updates).length > 0) {
+			updateGameAchievement({
+				...exists,
+				...updates,
+			});
+			updated++;
+		}
+	}
+	log.warn('Achievement Stuff!!', { inserted, updated });
+}
+
+async function updateAchievementsForNewSession(sessions: RaSession[]) {
+	const allRecentAchievements = await fetchRecentAchievements();
+
+	for (const session of sessions) {
+		const localAchievements = getGameAchievementsForGame(session.game_id);
+		const recentAchievements = allRecentAchievements.filter(a => a.GameID === session.raGameId);
+
+		for (const achievement of recentAchievements) {
+			const { Title, GameTitle, AchievementID } = achievement;
+			const apiname = `${AchievementID}`;
+			const existsInDatabase = localAchievements.find(l => l.apiname === apiname || l.name === Title);
+
+			if (!existsInDatabase) {
+				log.debug(`Not all achievements stored for '${GameTitle}', fetching now...`);
+				addRemoteAchievementsToDatabase(session, localAchievements);
+				break;
+			}
+
+			updateGameAchievement({
+				...existsInDatabase,
+				unlocked_session_id: session.session_id,
+				updated_at: parseDateTime(achievement.Date).toISOString(),
+				apiname,
+			});
+			log.debug(`Achieved '${Title}' for '${GameTitle}'!`);
+		}
+	}
+}
+
+function parseDateTime(dateTime?: string): Date {
+	if (dateTime === undefined) return new Date();
+
 	// eg. 2024-10-13 11:47:54
 	const regex = /^(?<date>\d\d\d\d-\d\d-\d\d) (?<time>\d\d:\d\d:\d\d)$/;
 	const match = regex.exec(dateTime);
@@ -89,10 +245,9 @@ function parseDateTime(dateTime: string): Date {
 }
 
 export function pollForRetroAchievementsActivity() {
-	const { deviceId, pollInterval, apiKey, username } = config.retroachievements;
-	const insertDeviceId = deviceId || config.defaultDeviceId;
+	const { deviceId, pollIntervalMinutes, apiKey, username } = config.retroachievements;
 
-	const intervalMs = pollInterval * minuteMs;
+	const intervalMs = pollIntervalMinutes * minuteMs;
 	if (intervalMs === 0 || !(apiKey && username)) {
 		log.warn('Polling is disabled, no games will be tracked');
 		return;
@@ -101,7 +256,7 @@ export function pollForRetroAchievementsActivity() {
 	const fetchGames = async () => {
 		log.info('Polling RetroAchievements for new game activity');
 		const recentlyPlayedGames = await fetchRecentlyPlayedGames();
-		const recentlyInsertedGames: { id: string; gameId: number }[] = [];
+		const recentlyInsertedGames: RaSession[] = [];
 
 		for (const game of recentlyPlayedGames) {
 			const lastPlayed = parseDateTime(game.LastPlayed);
@@ -114,9 +269,9 @@ export function pollForRetroAchievementsActivity() {
 
 			log.info(`Logging '${game.Title}' for ${playtime_mins} minutes`);
 
-			const gameActivity = updateActivity(
+			const gameActivity = updateGameSession(
 				{
-					device_id: insertDeviceId,
+					device_id: deviceId,
 					name: game.Title,
 					playtime_mins,
 					url: `https://retroachievements.org/game/${game.GameID}`,
@@ -125,8 +280,9 @@ export function pollForRetroAchievementsActivity() {
 			);
 
 			recentlyInsertedGames.push({
-				id: gameActivity.id,
-				gameId: game.GameID,
+				session_id: gameActivity.id,
+				game_id: gameActivity.game_id,
+				raGameId: game.GameID,
 			});
 		}
 
@@ -134,25 +290,7 @@ export function pollForRetroAchievementsActivity() {
 
 		log.debug('New games detected, fetching achievements');
 
-		const recentAchievements = await fetchRecentAchievements();
-
-		for (const achievement of recentAchievements) {
-			const game = recentlyInsertedGames.find(game => game.gameId === achievement.GameID);
-
-			// NOTE: Achievement found for a game not recently played?
-			if (!game) continue;
-
-			log.debug(`Achieved '${achievement.Title}' for '${achievement.GameTitle}'!`);
-
-			insertNewGameAchievement({
-				name: achievement.Title,
-				description: achievement.Description,
-				created_at: parseDateTime(achievement.Date).toISOString(),
-				device_id: insertDeviceId,
-				game_id: game.id,
-				game_name: achievement.GameTitle,
-			});
-		}
+		await updateAchievementsForNewSession(recentlyInsertedGames);
 	};
 
 	setInterval(fetchGames, intervalMs);

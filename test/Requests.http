@@ -172,6 +172,16 @@ GET https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?ke
 Content-Type: application/json
 Accept: application/json
 
+### RETROACHIEVEMENTS
+
+@raUsername={{$dotenv TOMBOIS_RETROACHIEVEMENTS_USERNAME}}
+@raApiKey={{$dotenv TOMBOIS_RETROACHIEVEMENTS_APIKEY}}
+@raGameId=20580
+
+GET https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u={{raUsername}}&y={{raApiKey}}&g={{raGameId}}
+Content-Type: application/json
+Accept: application/json
+
 ### SUBSONIC - Search Track
 
 @subsonicUrl={{$dotenv TOMBOIS_SUBSONIC_URL}}

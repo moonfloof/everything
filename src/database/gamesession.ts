@@ -9,20 +9,29 @@ import {
 	prettyDuration,
 	shortDate,
 } from '../lib/formatDate.js';
-import type { Insert, Optional, Update } from '../types/database.js';
+import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
+import { type Game, selectOrInsertGame } from './game.js';
 import { getGameAchievementsForSession } from './gameachievements.js';
 
-interface Game {
+export interface GameSessionRaw {
 	id: string;
-	name: string;
+	game_id: number;
 	playtime_mins: number;
-	url: Optional<string>;
 	created_at: string;
 	updated_at: string;
 	device_id: string;
 }
+
+type GameSessionInsert = Insert<Game & Omit<GameSessionRaw, 'game_id'>>;
+type GameSession = Omit<Game, 'id'> & GameSessionRaw;
+export type GameSessionInsertResponse = {
+	id: string;
+	game_id: number;
+	changes: number;
+	lastInsertRowid: number | bigint;
+};
 
 interface GameStats {
 	totalPlaytime: number;
@@ -33,14 +42,16 @@ interface GameStats {
 	favouriteGame: string;
 }
 
-export function insertNewGameActivity(game: Insert<Game>) {
+export function insertGameSession(game: GameSessionInsert): GameSessionInsertResponse {
+	const gameRecord = selectOrInsertGame(game);
+
 	const id = uuid();
 	const statement = getStatement(
-		'insertGameActivity',
-		`INSERT INTO games
-		(id, name, playtime_mins, url, created_at, updated_at, device_id)
+		'insertGameSession',
+		`INSERT INTO game_session
+		(id, game_id, playtime_mins, created_at, updated_at, device_id)
 		VALUES
-		($id, $name, $playtime_mins, $url, $created_at, $updated_at, $device_id)`,
+		($id, $game_id, $playtime_mins, $created_at, $updated_at, $device_id)`,
 	);
 
 	const created_at = game.created_at
@@ -50,6 +61,7 @@ export function insertNewGameActivity(game: Insert<Game>) {
 	const result = statement.run({
 		...game,
 		id,
+		game_id: gameRecord.id,
 		created_at,
 		updated_at: new Date().toISOString(),
 	});
@@ -57,32 +69,39 @@ export function insertNewGameActivity(game: Insert<Game>) {
 	return {
 		...result,
 		id,
+		game_id: gameRecord.id,
 	};
 }
 
-export function updateActivity(game: Omit<Game, 'id' | 'created_at' | 'updated_at'>, intervalDurationMs: number) {
-	const selectStatement = getStatement<Game>(
-		'getGameActivityByName',
-		`SELECT * FROM games WHERE name = $name
+export function updateGameSession(
+	game: Omit<GameSessionInsert, 'created_at'>,
+	intervalDurationMs: number,
+): GameSessionInsertResponse {
+	const gameRecord = selectOrInsertGame(game);
+
+	const selectStatement = getStatement<GameSessionRaw>(
+		'getGameSessionByName',
+		`SELECT * FROM game_session
+		WHERE game_id = $game_id
 		ORDER BY created_at DESC LIMIT 1;`,
 	);
 
-	const row = selectStatement.get({ name: game.name });
+	const row = selectStatement.get({ game_id: gameRecord.id });
 
 	if (row === undefined) {
-		return insertNewGameActivity({ ...game, created_at: '' });
+		return insertGameSession({ ...game, created_at: '' });
 	}
 
 	const lastUpdated = new Date(row.updated_at || Date.now()).getTime();
 	const lastCheck = Date.now() - intervalDurationMs - game.playtime_mins * minuteMs - minuteMs;
 
 	if (lastUpdated < lastCheck) {
-		return insertNewGameActivity({ ...game, created_at: '' });
+		return insertGameSession({ ...game, created_at: '' });
 	}
 
 	const updateStatement = getStatement(
-		'updateGameActivityInternal',
-		`UPDATE games
+		'updateGameSession',
+		`UPDATE game_session
 		SET playtime_mins = $playtime_mins,
 		    updated_at = $updated_at
 		WHERE id = $id`,
@@ -95,17 +114,19 @@ export function updateActivity(game: Omit<Game, 'id' | 'created_at' | 'updated_a
 	});
 
 	return {
-		id: row.id,
 		...result,
+		id: row.id,
+		game_id: gameRecord.id,
 	};
 }
 
-export function getGameActivity(parameters: Partial<Parameters> = {}) {
-	const statement = getStatement<Game>(
-		'getGameActivity',
-		`SELECT * FROM games
-		WHERE id LIKE $id AND created_at >= $created_at
-		ORDER BY updated_at DESC
+export function getGameSessions(parameters: Partial<Parameters> = {}) {
+	const statement = getStatement<GameSession>(
+		'getGameSessions',
+		`SELECT s.*, g.name, g.url FROM game_session AS s
+		JOIN games AS g ON g.id = s.game_id
+		WHERE s.id LIKE $id AND s.created_at >= $created_at
+		ORDER BY s.updated_at DESC
 		LIMIT $limit OFFSET $offset`,
 	);
 
@@ -125,12 +146,13 @@ export function getGameActivity(parameters: Partial<Parameters> = {}) {
 	});
 }
 
-export function getGameActivityByDay(days = 7) {
-	const statement = getStatement<Game>(
-		'getGameActivityByDay',
-		`SELECT * FROM games
-		WHERE created_at >= $created_at
-		ORDER BY updated_at DESC`,
+export function getGameSessionsByDay(days = 7) {
+	const statement = getStatement<GameSession>(
+		'getGameSessionsByDay',
+		`SELECT s.*, g.name, g.url FROM game_session AS s
+		JOIN games AS g ON g.id = s.game_id
+		WHERE s.created_at >= $created_at
+		ORDER BY s.updated_at DESC`,
 	);
 
 	return statement
@@ -145,16 +167,16 @@ export function getGameActivityByDay(days = 7) {
 		}));
 }
 
-export function getGameActivityGroupedByDay(days = 14) {
+export function getGameSessionsGroupedByDay(days = 14) {
 	const daysAgo = new Date(Date.now() - days * dayMs);
 	const created_at = getStartOfDay(daysAgo).toISOString();
 
 	const statement = getStatement<{ day: string; playtime_mins: number }>(
-		'getGameActivityGroupedByDay',
+		'getGameSessionsGroupedByDay',
 		`SELECT
 			DATE(created_at) as day,
 			SUM(playtime_mins) as playtime_mins
-		FROM games
+		FROM game_session
 		WHERE created_at >= $created_at
 		GROUP BY day
 		ORDER BY day DESC`,
@@ -168,25 +190,6 @@ export function getGameActivityGroupedByDay(days = 14) {
 	}));
 }
 
-export function getGameDashboardGraph() {
-	const statement = getStatement<{ day: string; playtime_mins: number }>(
-		'getGameDashboardGraph',
-		`SELECT
-			DATE(created_at) as day,
-			SUM(playtime_mins) as playtime_mins
-		FROM games
-		GROUP BY day
-		ORDER BY day DESC
-		LIMIT $limit`,
-	);
-
-	return statement.all().map(row => ({
-		...row,
-		min: 0,
-		max: row.playtime_mins,
-	}));
-}
-
 export function getGameStats() {
 	const emptyStats: GameStats = {
 		totalPlaytime: 0,
@@ -196,9 +199,12 @@ export function getGameStats() {
 		totalPlaytimeHuman: '',
 		favouriteGame: '',
 	};
-	const games = getGameActivityByDay(7);
 
-	if (games.length === 0) return null;
+	const games = getGameSessionsByDay(7);
+
+	if (games.length === 0) {
+		return null;
+	}
 
 	const stats = games.reduce((stats, cur) => {
 		stats.games[cur.name] =
@@ -211,9 +217,9 @@ export function getGameStats() {
 		return stats;
 	}, emptyStats);
 
-	stats.averagePlaytime = prettyDuration((stats.totalPlaytime / games.length) * 60000);
+	stats.averagePlaytime = prettyDuration((stats.totalPlaytime / games.length) * minuteMs);
 	stats.totalSessions = games.length;
-	stats.totalPlaytimeHuman = prettyDuration(stats.totalPlaytime * 60000);
+	stats.totalPlaytimeHuman = prettyDuration(stats.totalPlaytime * minuteMs);
 	stats.favouriteGame = Object.entries(stats.games).reduce(
 		(acc, cur) => {
 			const [game, duration] = cur;
@@ -229,31 +235,31 @@ export function getGameStats() {
 	return stats;
 }
 
-export function countGameActivity() {
-	const statement = getStatement<{ total: number }>('countGameActivity', 'SELECT COUNT(*) as total FROM games');
+export function countGameSessions() {
+	const statement = getStatement<{ total: number }>('countGameSessions', 'SELECT COUNT(*) as total FROM games');
 	return statement.get()?.total || 0;
 }
 
-export function deleteGameActivity(id: string) {
-	const statement = getStatement('deleteGameActivity', 'DELETE FROM games WHERE id = $id');
-
-	return statement.run({ id });
+export function deleteGameSession(id: string) {
+	return getStatement('deleteGameSession', 'DELETE FROM game_session WHERE id = $id').run({ id });
 }
 
-export function updateGameActivity(game: Update<Game>) {
+export function updateGameSessionInternal(game: Update<Omit<Game, 'id'> & GameSessionRaw>) {
+	const gameRecord = selectOrInsertGame(game);
+
 	const statement = getStatement(
-		'updateGameActivity',
-		`UPDATE games
-		SET name = $name,
+		'updateGameSessionInternal',
+		`UPDATE game_session
+		SET game_id = $game_id,
 		    playtime_mins = $playtime_mins,
-		    url = $url,
 		    created_at = $created_at,
 		    updated_at = $updated_at
 		WHERE id = $id`,
 	);
 
 	return statement.run({
-		...game,
+		id: game.id,
+		game_id: gameRecord.id,
 		playtime_mins: Number(game.playtime_mins),
 		created_at: dateDefault(game.created_at),
 		updated_at: dateDefault(game.updated_at),
@@ -263,8 +269,9 @@ export function updateGameActivity(game: Update<Game>) {
 export function getPopularGames(days: number, limit = 10) {
 	const statement = getStatement<{ name: string; count: number }>(
 		'getPopularGames',
-		`SELECT name, sum(playtime_mins) as count
-		FROM games
+		`SELECT g.name, ceil(sum(s.playtime_mins) / 60.0) as count
+		FROM game_session AS s
+		JOIN games AS g ON g.id = s.game_id
 		WHERE created_at >= $created_at
 		GROUP BY name
 		ORDER BY count DESC, name ASC
@@ -276,7 +283,6 @@ export function getPopularGames(days: number, limit = 10) {
 
 	return rows.map(row => ({
 		...row,
-		count: Math.round(row.count / 60),
 		popularityPercentage: (row.count / rows[0].count) * 100,
 	}));
 }

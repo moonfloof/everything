@@ -1,14 +1,16 @@
-{{> pageHeader title="Game Achievements" url="/games" }}
+{{> pageHeader title=title url=backUrl }}
 
-<p class="sectioncontainer">
-	Editing <strong>{{achievements}}</strong> achievements for
-	<strong>{{game.name}}</strong> session, which lasted
-	<strong>{{game.duration}}</strong>.
-</p>
+{{#if session}}
+	<p class="sectioncontainer">
+		Editing <strong>{{achievements.length}}</strong> achievements for
+		<strong>{{session.name}}</strong> session,
+		which lasted <strong>{{session.duration}}</strong>.
+	</p>
+{{/if}}
 
-{{> internal/game-achievement game_id=id }}
+{{> internal/game-achievement session_id=id }}
 <hr />
 
-{{#each game.achievements as |achievement| }}
-	{{> internal/game-achievement game_id=../id data=achievement }}
+{{#each achievements as |achievement| }}
+	{{> internal/game-achievement session_id=../id data=achievement }}
 {{/each}}

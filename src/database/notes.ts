@@ -15,14 +15,17 @@ export const ENTRY_TYPES = {
 	repost: '🔁',
 } as const;
 
-export const entryTypeValues = Object.keys(ENTRY_TYPES);
+export const entryTypeValues = Object.entries(ENTRY_TYPES).map(([value, emoji]) => ({
+	value,
+	label: `${emoji} ${value}`,
+}));
 
 export const ENTRY_STATUS = {
 	PUBLIC: 'public',
 	PRIVATE: 'private',
 } as const;
 
-export const entryStatusValues = Object.values(ENTRY_STATUS);
+export const entryStatusValues = Object.values(ENTRY_STATUS).map(value => ({ value, label: value }));
 
 export type EntryType = keyof typeof ENTRY_TYPES;
 export type EntryStatus = (typeof ENTRY_STATUS)[keyof typeof ENTRY_STATUS];
