@@ -2,7 +2,7 @@ import { timeago } from '../adapters/timeago.js';
 import type { Insert, Optional } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
-import { getGameAchievementsForSession, type GameAchievement } from './gameachievements.js';
+import { type GameAchievement, getGameAchievementsForSession } from './gameachievements.js';
 import type { GameSessionRaw } from './gamesession.js';
 
 export interface Game {
@@ -60,12 +60,12 @@ export function getGames(parameters: Partial<Parameters> = {}) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
-export function getSessionsForGame(game_id: number): GameSessionRaw[] {
+export function getSessionsForGame(game_id: number, order: 'DESC' | 'ASC' = 'DESC'): GameSessionRaw[] {
 	return getStatement<GameSessionRaw>(
-		'getSessionsForGame',
+		`getSessionsForGame-${order}`,
 		`SELECT * FROM game_session
 		WHERE game_id = $game_id
-		ORDER BY created_at DESC`,
+		ORDER BY created_at ${order}`,
 	)
 		.all({ game_id })
 		.map(session => {
@@ -84,7 +84,7 @@ export function getAchievementsForGame(game_id: number) {
 		'getAchievementsForGame',
 		`SELECT * FROM game_achievements
 		WHERE game_id = $game_id
-		ORDER BY unlocked_session_id IS NULL, created_at DESC`,
+		ORDER BY unlocked_session_id IS NULL, updated_at DESC`,
 	)
 		.all({ game_id })
 		.map(achievement => ({

@@ -1,4 +1,6 @@
 import express from 'express';
+import { addRemoteRetroAchievementsToDatabase } from '../../adapters/retroachievements.js';
+import { updateSteamAchievementsDatabase } from '../../adapters/steam.js';
 import {
 	countGames,
 	deleteGameEntirely,
@@ -36,7 +38,7 @@ router.get('/', (req: RequestFrontend, res) => {
 
 	const games = getGames({ page });
 
-	res.render('internal/games', { games, pagination });
+	res.render('internal/games', { games, pagination, page });
 });
 
 router.post('/game', (req: RequestFrontend, res) => {
@@ -73,6 +75,64 @@ router.post('/game/:game_id', (req: RequestFrontend, res) => {
 	}
 
 	res.redirect('/games');
+});
+
+router.get('/game/update-achievements/:game_id', async (req: RequestFrontend, res) => {
+	const { game_id } = req.params;
+	const game = getGames({ id: game_id, limit: 1 })?.[0];
+
+	const redirect = (): void => {
+		const page = req.query.page;
+		let url = '/games';
+		if (page) url += `?page=${page}`;
+		url += `#game-${game.id}`;
+		res.redirect(url);
+	};
+
+	if (!game || game.url === null) return redirect();
+
+	// TODO: Figure out how to get PSN game ID for API? Looks difficult given the store URLs...
+	const stores = {
+		steam: new RegExp(/store\.steampowered\.com\/app\/([0-9]+)/),
+		retroachievements: new RegExp(/retroachievements\.org\/game\/([0-9]+)/),
+	} as const;
+
+	let matchingStore: { appid: number; store: string } | null = null;
+
+	for (const [store, regex] of Object.entries(stores)) {
+		const match = game.url.match(regex);
+		if (!match) continue;
+
+		matchingStore = {
+			appid: Number(match[1]),
+			store,
+		};
+		break;
+	}
+
+	if (matchingStore === null) return redirect();
+
+	const oldestSession = getSessionsForGame(game.id, 'ASC')[0];
+
+	if (!oldestSession) return redirect();
+
+	switch (matchingStore.store) {
+		case 'steam': {
+			await updateSteamAchievementsDatabase(matchingStore.appid, oldestSession);
+			break;
+		}
+
+		case 'retroachievements': {
+			const achievements = getAchievementsForGame(game.id);
+			await addRemoteRetroAchievementsToDatabase(
+				{ game_id: game.id, raGameId: matchingStore.appid, session_id: oldestSession.id },
+				achievements,
+			);
+			break;
+		}
+	}
+
+	return redirect();
 });
 
 router.get('/:id/sessions', (req: RequestFrontend, res) => {
@@ -139,6 +199,7 @@ router.post('/session/achievements', (req: RequestFrontend, res) => {
 				description,
 				apiname,
 				created_at,
+				updated_at,
 				game_id: game.id,
 				unlocked_session_id: null,
 			});
@@ -190,6 +251,7 @@ router.post('/session/achievements/:unlocked_session_id', (req: RequestFrontend,
 				game_id: session.game_id,
 				unlocked_session_id,
 				created_at,
+				updated_at,
 				apiname,
 			});
 			break;

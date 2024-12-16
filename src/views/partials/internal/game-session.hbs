@@ -1,6 +1,6 @@
 <form method="POST" action="/games/session/{{data.id}}">
 	<div class="sectioncontainer">
-		{{> internal/id id=data.id type="game" }}
+		{{> internal/id id=data.id type="game-session" }}
 
 		{{#if gameId}}
 			<input type="hidden" name="game_id" value="{{gameId}}" />

@@ -17,16 +17,30 @@
 	</form>
 
 	{{#if popular}}
-	<table>
+	<table class="games-popular">
 		{{#each popular as |game| }}
-		<tr>
-			<td class="align-r">
+		<tr class="games-popular--game">
+			<td class="games-popular--title">
 				<a href="/game/{{game.id}}">{{game.name}}</a>
 			</td>
-			<td class="table-flex-1">
-				<span class="artist-count" style="width: {{game.popularityPercentage}}%">
-					{{game.count}} hrs
-				</span>
+			<td class="games-popular--meta">
+				<div
+					class="artist-count games-popular--bar bar-{{game.popularityPercentage}}"
+					style="width: {{game.popularityPercentage}}%"
+				>
+					{{game.playtime_hours}} hrs
+				</div>
+				<div class="games-popular--stats">
+					<span>last played <a href="/game-session/{{game.session_id}}">
+					<strong>{{game.timeago}}</strong></a></span>
+
+					{{#if game.achievement_percentage}}
+					<span class="{{#if game.perfected}}rainbow-text{{/if}}">
+						{{game.achievement_percentage}}%
+						completion{{#if game.perfected}}!{{/if}}
+					</span>
+					{{/if}}
+				</div>
 			</td>
 		</tr>
 		{{/each}}
@@ -37,9 +51,6 @@
 	</div>
 	{{/if}}
 	{{/xif}}
-
-	<h3>Playtime by day</h3>
-	{{{svg}}}
 
 	{{#each sessions as |session|}}
 		{{> gameActivity data=session }}

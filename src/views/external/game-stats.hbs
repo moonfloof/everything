@@ -10,7 +10,13 @@
 	<div class="row">
 		<span class="left">📆</span>
 		<span class="right">
-			Last Played: <strong>{{game.timeago}}</strong>
+			Last Played: <strong>
+				{{#if lastSession}}
+				<a href="/game-session/{{lastSession.id}}">{{game.timeago}}</a>
+				{{else}}
+				{{game.timeago}}
+				{{/if}}
+			</strong>
 		</span>
 	</div>
 

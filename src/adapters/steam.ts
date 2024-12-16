@@ -1,12 +1,8 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import phin from 'phin';
-import {
-	type GameAchievement,
-	getGameAchievementsForGame,
-	insertNewGameAchievement,
-	updateGameAchievement,
-} from '../database/gameachievements.js';
-import { type GameSessionInsertResponse, updateGameSession } from '../database/gamesession.js';
+import { getAchievementsForGame } from '../database/game.js';
+import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
+import { updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { dateDefault, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
@@ -105,13 +101,15 @@ async function fetchAchievements(appid: number): Promise<SteamAchievement[]> {
 	}
 }
 
-async function updateAchievementsDatabase(appid: number, session: GameSessionInsertResponse) {
+export async function updateSteamAchievementsDatabase(appid: number, session: { id: string; game_id: number }) {
 	const remoteAchievements = await fetchAchievements(appid);
-	const achievementsForGame = getGameAchievementsForGame(session.game_id);
+	const achievementsForGame = getAchievementsForGame(session.game_id);
+	let inserted = 0;
+	let updated = 0;
 
 	for (const achievement of remoteAchievements) {
 		// Unlock Time is 0 if not achieved (therefore defaults to current time)
-		const created_at = dateDefault(achievement.unlocktime * 1000);
+		const updated_at = dateDefault(achievement.unlocktime * 1000);
 		const achieved = achievement.achieved === 1;
 
 		// Match local achievements based on apiname (preferred) or name (fallback)
@@ -126,8 +124,10 @@ async function updateAchievementsDatabase(appid: number, session: GameSessionIns
 				game_id: session.game_id,
 				unlocked_session_id: achieved ? session.id : null,
 				apiname: achievement.apiname,
-				created_at,
+				created_at: '',
+				updated_at,
 			});
+			inserted++;
 			continue;
 		}
 
@@ -135,7 +135,7 @@ async function updateAchievementsDatabase(appid: number, session: GameSessionIns
 
 		if (existsInDatabase.unlocked_session_id === null && achievement.achieved === 1) {
 			updates.unlocked_session_id = session.id;
-			updates.updated_at = created_at;
+			updates.updated_at = updated_at;
 		}
 
 		if (existsInDatabase.apiname === null) {
@@ -147,8 +147,11 @@ async function updateAchievementsDatabase(appid: number, session: GameSessionIns
 				...existsInDatabase,
 				...updates,
 			});
+			updated++;
 		}
 	}
+
+	log.info(`${inserted} achievements inserted, ${updated} updated`);
 }
 
 function calculateNewActivity(games: SteamRecentlyPlayedGame[]) {
@@ -199,6 +202,9 @@ export function pollForGameActivity() {
 
 		const { body } = await phin<SteamRecentlyPlayedGamesResponse>({
 			url: apiUrl,
+			headers: {
+				'User-Agent': config.versionString,
+			},
 			parse: 'json',
 		});
 
@@ -216,7 +222,7 @@ export function pollForGameActivity() {
 				intervalMs,
 			);
 
-			updateAchievementsDatabase(game.appid, session);
+			await updateSteamAchievementsDatabase(game.appid, session);
 		}
 
 		gameActivity = body.response.games.map(game => ({
