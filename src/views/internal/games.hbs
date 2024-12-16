@@ -4,7 +4,7 @@
 <hr/>
 
 {{#each games as |game| }}
-	{{> internal/game data=game }}
+	{{> internal/game data=game page=../page }}
 {{/each}}
 
 {{> pagination route="/games" pagination=pagination }}

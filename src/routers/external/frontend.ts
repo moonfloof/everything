@@ -7,13 +7,7 @@ import helmet from 'helmet';
 import { countBooks, getBooks } from '../../database/books.js';
 import { getDevices } from '../../database/devices.js';
 import { countFilms, getFilms } from '../../database/films.js';
-import {
-	countGameSessions,
-	getGameSessions,
-	getGameSessionsGroupedByDay,
-	getGameStats,
-	getPopularGames,
-} from '../../database/gamesession.js';
+import { countGameSessions, getGameSessions, getGameStats, getPopularGames } from '../../database/gamesession.js';
 import {
 	countListens,
 	getListenDashboardGraph,
@@ -41,9 +35,9 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
+import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
 import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { getAchievementsForGame, getGameAndTotalPlaytime } from '../../database/game.js';
 
 const router = express.Router();
 
@@ -264,19 +258,12 @@ router.get('/games', (req: RequestFrontend, res) => {
 	}
 
 	const sessions = getGameSessions({ page });
-	const gamesByDay = getGameSessionsGroupedByDay();
 	const popular = getPopularGames(daysInt);
-	const durationHoursTotal = popular.reduce((total, game) => total + game.count, 0);
-	const svg = generateBarGraph(
-		addMissingDates(gamesByDay, day => ({ day, y: 0, label: shortDate(day) })),
-		'hours',
-	);
-
+	const durationHoursTotal = popular.reduce((total, game) => total + game.playtime_hours, 0);
 	const title = `played video games for ${durationHoursTotal} hours in the last ${daysInt} days`;
 
 	res.render('external/game-list', {
 		sessions,
-		svg,
 		pagination,
 		title,
 		canonicalUrl: getCanonicalUrl(req),
@@ -324,15 +311,27 @@ router.get('/game/:id', (req, res) => {
 	const achievements = getAchievementsForGame(game_id);
 	const achievementsUnlockedCount = achievements.filter(a => a.unlocked_session_id !== null).length;
 	const achievementPercentage = Math.round((achievementsUnlockedCount / achievements.length) * 100);
+	const lastSession = getSessionsForGame(game_id)[0];
 
 	// TODO: Remove after a substantial amount of time, once achievements can be properly updated.
-	const playedRecently = new Date(game.last_played).getTime() > new Date('2024-12-14').getTime();
+	const lastUpdateCutoff = new Date('2024-12-14').getTime();
+	const lastPlayedTime = new Date(game.last_played).getTime();
+	const lastUpdatedAchievements = achievements.reduce((time, achievement) => {
+		const newTime = new Date(achievement.created_at).getTime();
+		return newTime > time ? newTime : time;
+	}, 0);
+
+	const playedRecently =
+		achievementPercentage < 100 ||
+		lastPlayedTime > lastUpdateCutoff ||
+		lastUpdatedAchievements > lastUpdateCutoff;
 
 	res.render('external/game-stats', {
 		game,
 		gameUrlPretty,
 		title,
 		playedRecently,
+		lastSession,
 		achievements,
 		achievementsUnlockedCount,
 		achievementPercentage,

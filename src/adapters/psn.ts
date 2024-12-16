@@ -16,12 +16,8 @@ const {
 	getUserTitles,
 	getUserTrophiesEarnedForTitle,
 } = createRequire(import.meta.url)('psn-api');
-import {
-	type GameAchievement,
-	getGameAchievementsForGame,
-	insertNewGameAchievement,
-	updateGameAchievement,
-} from '../database/gameachievements.js';
+import { getAchievementsForGame } from '../database/game.js';
+import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { type GameSessionInsertResponse, updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
@@ -119,8 +115,10 @@ async function updateAchievementsDatabase(
 	game: { titleName: string; format: 'PS5' | 'ps4' },
 	session: GameSessionInsertResponse,
 ) {
-	const localTrophies = getGameAchievementsForGame(session.game_id);
+	const localTrophies = getAchievementsForGame(session.game_id);
 	const remoteTrophies = await getTrophiesForGame(game);
+	let inserted = 0;
+	let updated = 0;
 
 	for (const trophy of remoteTrophies) {
 		// Match local achievements based on apiname (preferred) or name (fallback)
@@ -135,8 +133,10 @@ async function updateAchievementsDatabase(
 				game_id: session.game_id,
 				unlocked_session_id: trophy.earned ? session.id : null,
 				apiname: trophy.trophyId,
-				created_at: trophy.earnedDateTime ?? '',
+				created_at: '',
+				updated_at: trophy.earnedDateTime ?? '',
 			});
+			inserted++;
 			continue;
 		}
 
@@ -156,8 +156,11 @@ async function updateAchievementsDatabase(
 				...existsInDatabase,
 				...updates,
 			});
+			updated++;
 		}
 	}
+
+	log.info(`${inserted} achievements inserted, ${updated} updated`);
 }
 
 async function getTrophiesForGame(game: { titleName: string; format: 'PS5' | 'ps4' }) {

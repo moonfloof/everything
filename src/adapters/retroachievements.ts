@@ -1,10 +1,6 @@
 import phin from 'phin';
-import {
-	type GameAchievement,
-	getGameAchievementsForGame,
-	insertNewGameAchievement,
-	updateGameAchievement,
-} from '../database/gameachievements.js';
+import { getAchievementsForGame } from '../database/game.js';
+import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
@@ -150,7 +146,7 @@ async function fetchUserAchievementsForGame(raGameId: number): Promise<RemoteAch
 	return body;
 }
 
-async function addRemoteAchievementsToDatabase(
+export async function addRemoteRetroAchievementsToDatabase(
 	session: RaSession,
 	localAchievements: Omit<GameAchievement, 'game_id'>[],
 ) {
@@ -167,7 +163,7 @@ async function addRemoteAchievementsToDatabase(
 		);
 		const dateEarned = achievement.DateEarnedHardcore || achievement.DateEarned;
 		const achieved = dateEarned !== undefined;
-		const created_at = parseDateTime(dateEarned).toISOString();
+		const updated_at = parseDateTime(dateEarned).toISOString();
 
 		if (!exists) {
 			insertNewGameAchievement({
@@ -175,7 +171,8 @@ async function addRemoteAchievementsToDatabase(
 				description: achievement.Description,
 				unlocked_session_id: achieved ? session.session_id : null,
 				game_id: session.game_id,
-				created_at,
+				created_at: '',
+				updated_at,
 				apiname,
 			});
 			inserted++;
@@ -186,7 +183,7 @@ async function addRemoteAchievementsToDatabase(
 
 		if (exists.unlocked_session_id === null && achieved) {
 			updates.unlocked_session_id = session.session_id;
-			updates.updated_at = created_at;
+			updates.updated_at = updated_at;
 		}
 
 		if (exists.apiname === null) {
@@ -201,14 +198,15 @@ async function addRemoteAchievementsToDatabase(
 			updated++;
 		}
 	}
-	log.warn('Achievement Stuff!!', { inserted, updated });
+
+	log.info(`${inserted} achievements inserted, ${updated} updated`);
 }
 
 async function updateAchievementsForNewSession(sessions: RaSession[]) {
 	const allRecentAchievements = await fetchRecentAchievements();
 
 	for (const session of sessions) {
-		const localAchievements = getGameAchievementsForGame(session.game_id);
+		const localAchievements = getAchievementsForGame(session.game_id);
 		const recentAchievements = allRecentAchievements.filter(a => a.GameID === session.raGameId);
 
 		for (const achievement of recentAchievements) {
@@ -218,7 +216,7 @@ async function updateAchievementsForNewSession(sessions: RaSession[]) {
 
 			if (!existsInDatabase) {
 				log.debug(`Not all achievements stored for '${GameTitle}', fetching now...`);
-				addRemoteAchievementsToDatabase(session, localAchievements);
+				await addRemoteRetroAchievementsToDatabase(session, localAchievements);
 				break;
 			}
 

@@ -267,14 +267,26 @@ export function updateGameSessionInternal(game: Update<Omit<Game, 'id'> & GameSe
 }
 
 export function getPopularGames(days: number, limit = 10) {
-	const statement = getStatement<{ id: number; name: string; count: number }>(
+	const statement = getStatement<{
+		id: number;
+		name: string;
+		last_played: string;
+		session_id: string;
+		playtime_hours: number;
+		achievement_percentage: number;
+	}>(
 		'getPopularGames',
-		`SELECT g.id, g.name, ceil(sum(s.playtime_mins) / 60.0) as count
+		`SELECT
+			g.id AS id, g.name AS name,
+			MAX(s.created_at) AS last_played,
+			s.id AS session_id,
+			CEIL(SUM(s.playtime_mins) / 60.0) AS playtime_hours,
+			CEIL(CAST((SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id AND a.unlocked_session_id IS NOT NULL) AS REAL)/CAST((SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id) AS REAL)*100.0) AS achievement_percentage
 		FROM game_session AS s
 		JOIN games AS g ON g.id = s.game_id
 		WHERE created_at >= $created_at
 		GROUP BY name
-		ORDER BY count DESC, name ASC
+		ORDER BY playtime_hours DESC, name ASC
 		LIMIT $limit`,
 	);
 
@@ -283,6 +295,8 @@ export function getPopularGames(days: number, limit = 10) {
 
 	return rows.map(row => ({
 		...row,
-		popularityPercentage: (row.count / rows[0].count) * 100,
+		perfected: row.achievement_percentage === 100,
+		popularityPercentage: (row.playtime_hours / rows[0].playtime_hours) * 100,
+		timeago: timeago.format(new Date(row.last_played)),
 	}));
 }

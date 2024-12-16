@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
-import type { Insert, Optional } from '../types/database.js';
+import type { Optional } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -16,7 +16,7 @@ export interface GameAchievement {
 	updated_at: string;
 }
 
-export function insertNewGameAchievement(achievement: Insert<GameAchievement>) {
+export function insertNewGameAchievement(achievement: Omit<GameAchievement, 'id'>) {
 	const statement = getStatement(
 		'insertGameAchievement',
 		`INSERT INTO game_achievements
@@ -29,7 +29,7 @@ export function insertNewGameAchievement(achievement: Insert<GameAchievement>) {
 		...achievement,
 		id: uuid(),
 		created_at: dateDefault(achievement.created_at),
-		updated_at: new Date().toISOString(),
+		updated_at: dateDefault(achievement.updated_at),
 	});
 }
 
@@ -48,23 +48,12 @@ export function getGameAchievement(parameters: Partial<Parameters> = {}) {
 	}));
 }
 
-export function getGameAchievementsForGame(game_id: number) {
-	const statement = getStatement<Omit<GameAchievement, 'game_id'>>(
-		'getGameAchievementsForGame',
-		`SELECT id, name, description, apiname, unlocked_session_id, created_at, updated_at FROM game_achievements
-		WHERE game_id = $game_id
-		ORDER BY updated_at ASC`,
-	);
-
-	return statement.all({ game_id });
-}
-
 export function getGameAchievementsForSession(unlocked_session_id: string) {
 	const statement = getStatement<Omit<GameAchievement, 'unlocked_session_id'>>(
 		'getGameAchievementsForSession',
 		`SELECT id, name, description, apiname, game_id, created_at, updated_at FROM game_achievements
 		WHERE unlocked_session_id = $unlocked_session_id
-		ORDER BY updated_at ASC`,
+		ORDER BY updated_at DESC`,
 	);
 
 	return statement.all({ unlocked_session_id });

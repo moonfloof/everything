@@ -34,14 +34,8 @@ html {
 	margin: 0;
 }
 
-a {
-	color: var(--primary-fg);
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
+/** HEADER **/
+/*#region header */
 
 .container {
 	width: 100%;
@@ -79,7 +73,10 @@ a:hover {
 	text-decoration: underline;
 }
 
+/*#endregion header */
+
 /** ALERTS **/
+/*#region alerts */
 
 div.error,
 div.info {
@@ -97,7 +94,10 @@ div.info {
 	border: 1px solid var(--secondary-fg);
 }
 
+/*#endregion alerts */
+
 /** DASHBOARD **/
+/*#region dashboard */
 
 .rounded-panel {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -218,7 +218,19 @@ div.info {
 	max-width: 75%;
 }
 
+/*#endregion dashboard */
+
 /** MAIN CONTENTS **/
+/*#region main */
+
+a {
+	color: var(--primary-fg);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
 
 .page--data h2,
 .page--data h3,
@@ -319,7 +331,10 @@ summary {
 	font-size: 12px;
 }
 
+/*#endregion main */
+
 /** MUSIC STATS **/
+/*#region music-stats */
 
 #now-playing {
 	background-color: var(--secondary-bg);
@@ -358,7 +373,74 @@ table td {
 	background-color: var(--primary-fg);
 }
 
+/*#endregion music-stats */
+
+/** GAME STATS **/
+/*#region game-stats */
+
+.games-popular--title {
+	text-align: right;
+	font-size: 20px;
+	font-weight: 700;
+	max-width: 40%;
+	padding: 0 8px;
+}
+
+.games-popular--meta {
+	width: 99%;
+	padding: 6px;
+}
+
+.games-popular--bar {
+	margin-top: 2px;
+	line-height: 24px;
+	overflow: hidden;
+}
+
+.games-popular--stats {
+	padding-top: 4px;
+	line-height: 16px;
+	display: flex;
+	justify-content: space-between;
+	column-gap: 8px;
+	font-size: 12px;
+}
+
+.rainbow-text {
+	font-weight: 700;
+	background-image: linear-gradient(to left, violet, indigo, blue, green, orange, red);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 660px) {
+
+	.games-popular--game,
+	.games-popular--title {
+		display: block;
+	}
+
+	.games-popular--game {
+		padding: 8px 0;
+	}
+
+	.games-popular--title {
+		text-align: left;
+		max-width: 100%;
+		margin-top: 4px;
+	}
+
+	.games-popular--meta {
+		display: block;
+		width: 100%;
+	}
+}
+
+/*#endregion game-stats */
+
 /** GAME ACHIEVEMENTS **/
+/*#region game-achievements */
 
 .game-achievements--container,
 .listen-compact--tracklist {
@@ -436,7 +518,10 @@ table td {
 	color: var(--text);
 }
 
+/*#endregion game-achievements */
+
 /** PAGINATION **/
+/*#region pagination */
 
 .pagination a {
 	flex: 1;
@@ -457,7 +542,10 @@ table td {
 	display: flex;
 }
 
+/*#endregion pagination */
+
 /** NOTES **/
+/*#region notes */
 
 .e-content {
 	line-height: 1.618;
@@ -471,7 +559,10 @@ table td {
 	display: none;
 }
 
+/*#endregion notes */
+
 /** INTERNAL USE ONLY **/
+/*#region internal */
 
 code,
 pre {
@@ -566,6 +657,8 @@ select {
 	margin-top: 0;
 	margin-bottom: 4px;
 }
+
+/*#endregion internal */
 
 @media (max-width: 660px) {
 	.container {
