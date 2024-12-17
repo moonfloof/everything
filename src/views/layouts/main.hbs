@@ -6,12 +6,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" href="/style.css">
 	<link rel="icon" type="image/png" href="/favicon.png" />
-	{{#if canonicalUrl}}
 	<link rel="canonical" href="{{canonicalUrl}}" />
-	{{/if}}
 	<title>{{person}}{{#if title}} {{title}}{{/if}}</title>
 </head>
 <body>
+	{{#if isHomepage}}
 	<div class="container">
 		<header id="header">
 			<div id="header--left">
@@ -25,9 +24,12 @@
 				<a href="https://floof.fm/" target="_blank">music</a>
 			</div>
 		</header>
-
-		{{{body}}}
 	</div>
+	{{else}}
+	<h1 id="header--small"><a href="/">{{person}}'s</a> quantified-self data archive</h1>
+	{{/if}}
+
+	<div class="container">{{{body}}}</div>
 	{{{footerHtml}}}
 </body>
 </html>

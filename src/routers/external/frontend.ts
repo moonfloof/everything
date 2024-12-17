@@ -28,7 +28,6 @@ import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../da
 // Lib
 import addMissingDates from '../../lib/addMissingDates.js';
 import { formatTime, prettyDate, shortDate } from '../../lib/formatDate.js';
-import { getCanonicalUrl } from '../../lib/getCanonicalUrl.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
@@ -77,7 +76,6 @@ router.get('/', (req, res) => {
 		device,
 		steps,
 		location,
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -151,7 +149,6 @@ router.get('/music', (req: RequestFrontend, res) => {
 		listens,
 		pagination,
 		svg,
-		canonicalUrl: getCanonicalUrl(req),
 		title: 'listens to music',
 		description,
 
@@ -179,7 +176,6 @@ router.get('/music/:id', (req, res) => {
 		listen,
 		title: 'listened to...',
 		description,
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -213,7 +209,6 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 		pagination,
 		title: 'watches YouTube',
 		description,
-		canonicalUrl: getCanonicalUrl(req),
 
 		// Popular chart
 		days,
@@ -237,7 +232,6 @@ router.get('/youtube/:id', (req, res) => {
 		youtubeLike,
 		title: 'watched...',
 		description,
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -267,7 +261,6 @@ router.get('/games', (req: RequestFrontend, res) => {
 		sessions,
 		pagination,
 		title,
-		canonicalUrl: getCanonicalUrl(req),
 
 		// Popular chart
 		popular,
@@ -290,7 +283,6 @@ router.get('/game-session/:id', (req, res) => {
 		session,
 		description,
 		title,
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -353,7 +345,6 @@ router.get('/tv', (req: RequestFrontend, res) => {
 		episodes,
 		pagination,
 		title: 'watches TV',
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -372,7 +363,6 @@ router.get('/tv/:id', (req, res) => {
 		episode,
 		description,
 		title: 'watched...',
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -388,7 +378,6 @@ router.get('/films', (req: RequestFrontend, res) => {
 		films,
 		pagination,
 		title: 'watches films',
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -405,7 +394,6 @@ router.get('/film/:id', (req, res) => {
 		film,
 		description,
 		title: 'watched...',
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -421,7 +409,6 @@ router.get('/books', (req: RequestFrontend, res) => {
 		books,
 		pagination,
 		title: 'reads books',
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -450,7 +437,6 @@ router.get('/book/:id', (req, res) => {
 		book,
 		description,
 		title: prefixTitle,
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -480,7 +466,6 @@ router.get('/notes', (req: RequestFrontend, res) => {
 		notes,
 		pagination,
 		title: 'rambles',
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 
@@ -495,7 +480,6 @@ router.get('/note/:id', (req, res) => {
 		note,
 		description: note.summary,
 		title: note.title || 'rambled...',
-		canonicalUrl: getCanonicalUrl(req),
 	});
 });
 

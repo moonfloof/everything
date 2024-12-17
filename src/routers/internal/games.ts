@@ -1,6 +1,7 @@
 import express from 'express';
 import { addRemoteRetroAchievementsToDatabase } from '../../adapters/retroachievements.js';
 import { updateSteamAchievementsDatabase } from '../../adapters/steam.js';
+import { searchForImages } from '../../adapters/steamgriddb.js';
 import {
 	countGames,
 	deleteGameEntirely,
@@ -28,7 +29,6 @@ import {
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { searchForImages } from '../../adapters/steamgriddb.js';
 
 const router = express.Router();
 
