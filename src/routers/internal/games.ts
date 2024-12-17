@@ -5,6 +5,7 @@ import {
 	countGames,
 	deleteGameEntirely,
 	getAchievementsForGame,
+	getGameById,
 	getGames,
 	getGamesAsOptions,
 	getSessionsForGame,
@@ -27,6 +28,7 @@ import {
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { searchForImages } from '../../adapters/steamgriddb.js';
 
 const router = express.Router();
 
@@ -51,7 +53,7 @@ router.post('/game', (req: RequestFrontend, res) => {
 
 router.post('/game/:game_id', (req: RequestFrontend, res) => {
 	const { game_id } = req.params;
-	const game = getGames({ id: game_id, limit: 1 })?.[0];
+	const game = getGameById(game_id);
 	if (!game) {
 		res.redirect('/games');
 		return;
@@ -77,15 +79,34 @@ router.post('/game/:game_id', (req: RequestFrontend, res) => {
 	res.redirect('/games');
 });
 
-router.get('/game/update-achievements/:game_id', async (req: RequestFrontend, res) => {
+router.get('/game/update-images/:game_id', async (req: RequestFrontend, res) => {
 	const { game_id } = req.params;
-	const game = getGames({ id: game_id, limit: 1 })?.[0];
+	const game = getGameById(game_id);
 
 	const redirect = (): void => {
 		const page = req.query.page;
 		let url = '/games';
 		if (page) url += `?page=${page}`;
-		url += `#game-${game.id}`;
+		if (game) url += `#game-${game.id}`;
+		res.redirect(url);
+	};
+
+	if (!game) return redirect();
+
+	await searchForImages(game.name, game);
+
+	redirect();
+});
+
+router.get('/game/update-achievements/:game_id', async (req: RequestFrontend, res) => {
+	const { game_id } = req.params;
+	const game = getGameById(game_id);
+
+	const redirect = (): void => {
+		const page = req.query.page;
+		let url = '/games';
+		if (page) url += `?page=${page}`;
+		if (game) url += `#game-${game.id}`;
 		res.redirect(url);
 	};
 
@@ -137,7 +158,7 @@ router.get('/game/update-achievements/:game_id', async (req: RequestFrontend, re
 
 router.get('/:id/sessions', (req: RequestFrontend, res) => {
 	const { id } = req.params;
-	const game = getGames({ id, limit: 1 })?.[0];
+	const game = getGameById(id);
 	if (!game) {
 		res.redirect('/games');
 		return;
@@ -152,7 +173,7 @@ router.get('/:id/sessions', (req: RequestFrontend, res) => {
 
 router.get('/:id/achievements', (req: RequestFrontend, res) => {
 	const { id } = req.params;
-	const game = getGames({ id, limit: 1 })?.[0];
+	const game = getGameById(id);
 	if (!game) {
 		res.redirect('/games');
 		return;
@@ -185,7 +206,7 @@ router.get('/session/achievements/:id', (req, res) => {
 router.post('/session/achievements', (req: RequestFrontend, res) => {
 	const { game_id, id, crudType, name, description, apiname, created_at, updated_at } = req.body;
 
-	const game = getGames({ id: game_id, limit: 1 })?.[0];
+	const game = getGameById(game_id);
 	if (!game) {
 		res.redirect('/games');
 		return;
@@ -303,7 +324,7 @@ router.post('/session', (req: RequestFrontend, res) => {
 	let redirectUri = '/games/session';
 
 	if (game_id) {
-		const game = getGames({ id: game_id, limit: 1 })?.[0];
+		const game = getGameById(game_id);
 		if (game !== undefined) {
 			name = game.name;
 		}
@@ -333,7 +354,7 @@ router.post('/session/:id', (req: RequestFrontend, res) => {
 	let redirectUri = '/games/session';
 
 	if (game_id) {
-		const game = getGames({ id: game_id, limit: 1 })?.[0];
+		const game = getGameById(game_id);
 		if (game) {
 			name = game.name;
 		}

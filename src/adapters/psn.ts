@@ -16,12 +16,13 @@ const {
 	getUserTitles,
 	getUserTrophiesEarnedForTitle,
 } = createRequire(import.meta.url)('psn-api');
-import { getAchievementsForGame } from '../database/game.js';
+import { getAchievementsForGame, getGameById } from '../database/game.js';
 import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { type GameSessionInsertResponse, updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
+import { searchForImages } from './steamgriddb.js';
 
 const log = new Logger('PSN');
 
@@ -254,6 +255,15 @@ async function fetchGameActivity() {
 		);
 
 		await updateAchievementsDatabase(game, session);
+
+		try {
+			const gameRecord = getGameById(session.game_id);
+			if (!gameRecord) continue;
+
+			await searchForImages(game.titleName, gameRecord);
+		} catch (err) {
+			/* do nothing */
+		}
 	}
 
 	saveGamesToDisk();

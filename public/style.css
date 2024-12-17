@@ -414,6 +414,18 @@ table td {
 	-webkit-text-fill-color: transparent;
 }
 
+.game--banner {
+	margin: 0 -24px -40px;
+	background-size: cover;
+}
+
+.game--banner__overlay {
+	width: 100%;
+	aspect-ratio: 192/62;
+	background: transparent;
+	background: linear-gradient(0deg, var(--primary-bg) 0%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0) 100%);
+}
+
 @media (max-width: 660px) {
 
 	.games-popular--game,

@@ -38,6 +38,7 @@ import { getNowPlaying } from '../../adapters/listenbrainz.js';
 import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
 import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { imageExists } from '../../adapters/steamgriddb.js';
 
 const router = express.Router();
 
@@ -312,6 +313,7 @@ router.get('/game/:id', (req, res) => {
 	const achievementsUnlockedCount = achievements.filter(a => a.unlocked_session_id !== null).length;
 	const achievementPercentage = Math.round((achievementsUnlockedCount / achievements.length) * 100);
 	const lastSession = getSessionsForGame(game_id)[0];
+	const hasImage = imageExists(`hero-${game.id}.jpg`);
 
 	// TODO: Remove after a substantial amount of time, once achievements can be properly updated.
 	const lastUpdateCutoff = new Date('2024-12-14').getTime();
@@ -332,6 +334,7 @@ router.get('/game/:id', (req, res) => {
 		title,
 		playedRecently,
 		lastSession,
+		hasImage,
 		achievements,
 		achievementsUnlockedCount,
 		achievementPercentage,

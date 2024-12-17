@@ -60,6 +60,10 @@ export function getGames(parameters: Partial<Parameters> = {}) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
+export function getGameById(id: string | number) {
+	return getStatement<Game>('getGameById', 'SELECT * FROM games WHERE id = $id LIMIT 1;').get({ id });
+}
+
 export function getSessionsForGame(game_id: number, order: 'DESC' | 'ASC' = 'DESC'): GameSessionRaw[] {
 	return getStatement<GameSessionRaw>(
 		`getSessionsForGame-${order}`,
