@@ -1,4 +1,9 @@
 <div class="page--date">
+	{{#if hasImage}}
+	<div class="game--banner" style="background-image: url(/game-images/hero-{{game.id}}.jpg)">
+		<div class="game--banner__overlay"></div>
+	</div>
+	{{/if}}
 	{{> pageHeader title=game.name url="/games" }}
 	<br/>
 	<div class="row">

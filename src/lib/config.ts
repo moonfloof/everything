@@ -73,6 +73,11 @@ export const config = {
 			(process.env.TOMBOIS_DEFAULT_DEVICE_ID as string),
 	},
 
+	steamgriddb: {
+		apiKey: process.env.TOMBOIS_STEAMGRIDDB_APIKEY,
+		apiBaseUrl: 'https://www.steamgriddb.com/api/v2',
+	},
+
 	bluesky: {
 		dataPath: resolve(process.env.TOMBOIS_BLUESKY_DATA_FILE ?? 'data/bluesky.json'),
 		username: process.env.TOMBOIS_BLUESKY_USERNAME,

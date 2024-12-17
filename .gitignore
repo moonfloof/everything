@@ -43,3 +43,4 @@ public/*.js
 data/*.json
 *.db
 dist/
+/public/game-images/*.jpg

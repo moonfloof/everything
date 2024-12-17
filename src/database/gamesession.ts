@@ -278,7 +278,7 @@ export function getPopularGames(days: number, limit = 10) {
 		'getPopularGames',
 		`SELECT
 			g.id AS id, g.name AS name,
-			MAX(s.created_at) AS last_played,
+			MAX(s.updated_at) AS last_played,
 			s.id AS session_id,
 			CEIL(SUM(s.playtime_mins) / 60.0) AS playtime_hours,
 			CEIL(CAST((SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id AND a.unlocked_session_id IS NOT NULL) AS REAL)/CAST((SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id) AS REAL)*100.0) AS achievement_percentage

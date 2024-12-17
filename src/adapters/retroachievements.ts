@@ -1,10 +1,11 @@
 import phin from 'phin';
-import { getAchievementsForGame } from '../database/game.js';
+import { getAchievementsForGame, getGameById } from '../database/game.js';
 import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
+import { searchForImages } from './steamgriddb.js';
 
 const log = new Logger('RetroAchievements');
 
@@ -267,7 +268,7 @@ export function pollForRetroAchievementsActivity() {
 
 			log.info(`Logging '${game.Title}' for ${playtime_mins} minutes`);
 
-			const gameActivity = updateGameSession(
+			const session = updateGameSession(
 				{
 					device_id: deviceId,
 					name: game.Title,
@@ -278,10 +279,18 @@ export function pollForRetroAchievementsActivity() {
 			);
 
 			recentlyInsertedGames.push({
-				session_id: gameActivity.id,
-				game_id: gameActivity.game_id,
+				session_id: session.id,
+				game_id: session.game_id,
 				raGameId: game.GameID,
 			});
+
+			try {
+				const gameRecord = getGameById(session.game_id);
+				if (!gameRecord) continue;
+				await searchForImages(game.Title, gameRecord);
+			} catch (err) {
+				/* do nothing */
+			}
 		}
 
 		if (recentlyInsertedGames.length === 0) return;

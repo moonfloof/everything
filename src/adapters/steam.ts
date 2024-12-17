@@ -6,6 +6,7 @@ import { updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { dateDefault, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
+import { saveImageToDisk } from './steamgriddb.js';
 
 const log = new Logger('Steam');
 
@@ -73,12 +74,22 @@ function saveGamesToDisk() {
 	writeFileSync(config.steam.dataPath, str);
 }
 
+export async function saveImages(appid: number, game_id: number) {
+	const heroPath = `hero-${game_id}.jpg`;
+	const heroUrl = `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/library_hero.jpg`;
+	await saveImageToDisk(heroUrl, heroPath);
+
+	const libraryPath = `library-${game_id}.jpg`;
+	const libraryUrl = `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/library_600x900.jpg`;
+	await saveImageToDisk(libraryUrl, libraryPath);
+}
+
 async function fetchAchievements(appid: number): Promise<SteamAchievement[]> {
 	const { apiKey, userId } = config.steam;
 
 	if (!(apiKey && userId)) return [];
 
-	const apiUrl = `http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appid}&key=${apiKey}&steamid=${userId}&format=json&l=en`;
+	const apiUrl = `https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appid}&key=${apiKey}&steamid=${userId}&format=json&l=en`;
 
 	try {
 		const { body } = await phin<SteamGetPlayerAchievementsResponse>({
@@ -223,6 +234,7 @@ export function pollForGameActivity() {
 			);
 
 			await updateSteamAchievementsDatabase(game.appid, session);
+			await saveImages(game.appid, session.game_id);
 		}
 
 		gameActivity = body.response.games.map(game => ({
