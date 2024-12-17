@@ -58,6 +58,8 @@ better way to do it).
     [PSN API](https://github.com/achievements-app/psn-api)
   * [**RetroAchievements**](https://retroachievements.org/): Polls the
     [RetroAchievements API](https://api-docs.retroachievements.org/)
+  * [**SteamGridDB**](https://www.steamgriddb.com/): Fetches images for
+    non-Steam games
 * **Films/Movies** - Polls your [Letterboxd](https://letterboxd.com) profile for
   newly logged films to your diary.
 * **Card purchases** - Create a
