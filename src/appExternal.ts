@@ -2,9 +2,9 @@ import type { HTTPError } from '@tombofry/stdlib/types/errors/http.js';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import helmet from 'helmet';
 import appCreate from './lib/appCreate.js';
+import { config } from './lib/config.js';
 import Logger from './lib/logger.js';
 import { validatePageNumber } from './lib/middleware/validatePageNumber.js';
-import { config } from './lib/config.js';
 
 // Routers
 import bookmarks from './routers/external/bookmarks.js';

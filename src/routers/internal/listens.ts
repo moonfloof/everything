@@ -1,4 +1,5 @@
 import express from 'express';
+import { searchTrack } from '../../adapters/subsonic.js';
 import {
 	countListens,
 	deleteListen,
@@ -11,7 +12,6 @@ import {
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { searchTrack } from '../../adapters/subsonic.js';
 
 const router = express.Router();
 

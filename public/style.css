@@ -37,11 +37,12 @@ html {
 /** HEADER **/
 /*#region header */
 
-.container {
+.container,
+#header--small {
 	width: 100%;
 	max-width: 720px;
 	margin: 0 auto;
-	padding: 48px;
+	padding: 0 24px;
 }
 
 #header {
@@ -49,6 +50,7 @@ html {
 	flex-direction: row;
 	align-items: center;
 	margin-bottom: 24px;
+	padding-top: 48px;
 }
 
 #header--left {
@@ -71,6 +73,17 @@ html {
 	margin-left: 24px;
 	font-weight: 700;
 	text-decoration: underline;
+}
+
+#header--small {
+	font-size: 18px;
+	line-height: 48px;
+	font-weight: 400;
+	border-bottom: 1px solid var(--border);
+}
+
+#header--small a {
+	font-weight: 700;
 }
 
 /*#endregion header */
@@ -256,6 +269,7 @@ a:hover {
 	display: flex;
 	align-items: center;
 	width: 100%;
+	padding-top: 32px;
 }
 
 .page--data__header a {
@@ -414,16 +428,23 @@ table td {
 	-webkit-text-fill-color: transparent;
 }
 
-.game--banner {
-	margin: 0 -24px -40px;
+.image--banner {
+	margin: 0 -24px -72px;
 	background-size: cover;
 }
 
-.game--banner__overlay {
+.image--banner__overlay {
 	width: 100%;
-	aspect-ratio: 192/62;
 	background: transparent;
-	background: linear-gradient(0deg, var(--primary-bg) 0%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0) 100%);
+	background: linear-gradient(0deg, var(--primary-bg) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.image--banner__steam {
+	aspect-ratio: 192/62;
+}
+
+.image--banner__16x9 {
+	aspect-ratio: 16/9;
 }
 
 @media (max-width: 660px) {
@@ -673,10 +694,6 @@ select {
 /*#endregion internal */
 
 @media (max-width: 660px) {
-	.container {
-		padding: 48px 24px;
-	}
-
 	#header {
 		display: block;
 		text-align: center;
