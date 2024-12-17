@@ -14,6 +14,9 @@
 
 	--error-fg: #6e2828;
 	--error-bg: #fddcdc;
+
+	--tertiary-fg: #fbb03b;
+	--tertiary-fg-dark: #ba7911;
 }
 
 body,
@@ -43,6 +46,10 @@ html {
 	max-width: 720px;
 	margin: 0 auto;
 	padding: 0 24px;
+}
+
+.container {
+	padding-bottom: 48px;
 }
 
 #header {
@@ -420,12 +427,59 @@ table td {
 	font-size: 12px;
 }
 
+.games-popular--pie {
+	margin-top: -3px !important;
+	margin-left: 4px;
+	vertical-align: middle;
+	transform: rotate(-90deg);
+	width: 16px;
+	height: 16px;
+}
+
+.games-popular--pie__circle {
+	fill: transparent;
+	stroke: var(--primary-fg);
+	stroke-width: 32;
+}
+
+.perfected .games-popular--pie__circle {
+	stroke: var(--tertiary-fg);
+}
+
+.games-popular--pie__outline {
+	fill: transparent;
+	stroke: var(--text);
+	stroke-width: 4;
+}
+
+.perfected .games-popular--pie__outline {
+	stroke: var(--tertiary-fg-dark);
+}
+
+.rainbow-text,
+.game-achievements--bar.pct-100 {
+	background-repeat: repeat;
+	background-image: linear-gradient(30deg in hsl longer hue, red 0 0, red 0 0);
+	background-image: linear-gradient(30deg in oklch longer hue, oklch(65% 0.1381 0), oklch(65% 0.1381 0));
+}
+
 .rainbow-text {
 	font-weight: 700;
-	background-image: linear-gradient(to left, violet, indigo, blue, green, orange, red);
+	background-size: 240px 100%;
 	background-clip: text;
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
+	animation: 3s rainbow-text linear infinite;
+}
+
+@keyframes rainbow-text {
+	from {
+		background-position-x: 0;
+	}
+
+	to {
+		background-position-x: 240px;
+	}
 }
 
 .image--banner {
@@ -514,8 +568,18 @@ table td {
 }
 
 .game-achievements--bar.pct-100 {
-	background-color: #fbb03b;
-	box-shadow: 0 4px 16px #fbb03b;
+	background-size: 1800px;
+	animation: 2s rainbow-progress-bar linear infinite;
+}
+
+@keyframes rainbow-progress-bar {
+	from {
+		background-position-x: 0;
+	}
+
+	to {
+		background-position-x: 1800px;
+	}
 }
 
 .game-achievements--list__large {
@@ -728,5 +792,21 @@ select {
 
 	.page--data .form-inline {
 		margin-left: 0;
+	}
+}
+
+/* Disable animation completely when reduced-motion enabled */
+@media (prefers-reduced-motion: reduce) {
+
+	*,
+	::before,
+	::after {
+		animation-delay: -1ms !important;
+		animation-duration: 1ms !important;
+		animation-iteration-count: 1 !important;
+		background-attachment: initial !important;
+		scroll-behavior: auto !important;
+		transition-delay: 0s !important;
+		transition-duration: 0s !important;
 	}
 }

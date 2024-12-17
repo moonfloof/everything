@@ -35,9 +35,15 @@
 					<strong>{{game.timeago}}</strong></a></span>
 
 					{{#if game.achievement_percentage}}
-					<span class="{{#if game.perfected}}rainbow-text{{/if}}">
-						{{game.achievement_percentage}}%
-						completion{{#if game.perfected}}!{{/if}}
+					<span>
+						<span{{#if game.perfected}} class="rainbow-text" style="animation-delay: -{{game.id}}0ms"{{/if}}>
+							{{game.achievement_percentage}}%
+							completion{{#if game.perfected}}!{{/if}}
+						</span>
+						<svg class="games-popular--pie {{#if game.perfected}}perfected{{/if}}" viewBox="0 0 70 70">
+							<circle class="games-popular--pie__circle" r="15.92" cx="35" cy="35" stroke-dasharray="{{game.achievement_percentage}} 100" />
+							<circle class="games-popular--pie__outline" r="30" cx="35" cy="35" />
+						</svg>
 					</span>
 					{{/if}}
 				</div>
