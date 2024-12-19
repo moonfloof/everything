@@ -7,7 +7,13 @@ import helmet from 'helmet';
 import { countBooks, getBooks } from '../../database/books.js';
 import { getDevices } from '../../database/devices.js';
 import { countFilms, getFilms } from '../../database/films.js';
-import { countGameSessions, getGameSessions, getGameStats, getPopularGames } from '../../database/gamesession.js';
+import {
+	countGameSessions,
+	getAllPerfectedGames,
+	getGameSessions,
+	getGameStats,
+	getPopularGames,
+} from '../../database/gamesession.js';
 import {
 	countListens,
 	getListenDashboardGraph,
