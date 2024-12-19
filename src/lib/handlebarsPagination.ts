@@ -4,7 +4,7 @@ const handlebarsPagination = (page: number | string, recordCount: number) => {
 	const totalPages = Math.min(Math.ceil(recordCount / RECORDS_PER_PAGE) - 1, MAX_PAGE);
 
 	return {
-		page: page,
+		page: Number(page),
 		totalPages,
 
 		showPrev: Number(page) > 0,

@@ -2,19 +2,16 @@
 	{{> pageHeader title="Gaming" url="/" }}
 
 	{{#xif pagination.page '==' 0}}
-	<h3>Top 10 played games (last {{days}} days)</h3>
-
-	<form action="/games" method="get" name="days">
-		<select name="days">
-			{{#each dayOptions as |option|}}
-				<option
-					{{#if option.selected}}selected{{/if}}
-					value="{{option.value}}"
-				>{{option.value}} days</option>
-			{{/each}}
-		</select>
-		<input type="submit" value="Go" />
-	</form>
+	<div class="link-bar">
+		<span class="link-bar--title">
+			top {{popular.length}} played games ({{days}})
+		</span>
+		<div class="link-bar--links">
+			<a href="/games?days=60">60 days</a>
+			<a href="/games?days=365">365 days</a>
+			<a href="/games?days=alltime">all time</a>
+		</div>
+	</div>
 
 	{{#if popular}}
 	<table class="games-popular">
@@ -53,7 +50,7 @@
 	</table>
 	{{else}}
 	<div class="error rounded-panel">
-		<p class="lead">I haven't played any games within the last {{days}} days! 😭</p>
+		<p class="lead">I haven't played any games within the {{days}}! 😭</p>
 	</div>
 	{{/if}}
 	{{/xif}}
