@@ -4,12 +4,17 @@
 	{{#xif pagination.page '==' 0}}
 	<div class="link-bar">
 		<span class="link-bar--title">
+			{{#if showPerfect}}
+			perfected games (100% completion)
+			{{else}}
 			top {{popular.length}} played games ({{days}})
+			{{/if}}
 		</span>
 		<div class="link-bar--links">
 			<a href="/games?days=60">60 days</a>
 			<a href="/games?days=365">365 days</a>
 			<a href="/games?days=alltime">all time</a>
+			<a href="/games?perfect">perfect</a>
 		</div>
 	</div>
 
