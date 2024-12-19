@@ -300,3 +300,38 @@ export function getPopularGames(days: number, limit = 10) {
 		timeago: timeago.format(new Date(row.last_played)),
 	}));
 }
+
+// The same output format as the function above, but it retrieves the data based
+// on the achievements table first, which reduces the query from about 300ms, to
+// 20ms!
+export function getAllPerfectedGames() {
+	return getStatement<{
+		id: number;
+		name: string;
+		last_played: string;
+		session_id: string;
+		playtime_hours: number;
+		perfected: 0 | 1;
+		achievement_percentage: 100;
+	}>(
+		'getAllPerfectedGames',
+		`SELECT
+			g.id AS id, g.name AS name,
+			(SELECT CEIL(SUM(playtime_mins) / 60.0) FROM game_session AS s WHERE s.game_id = g.id) AS playtime_hours,
+			(SELECT updated_at FROM game_session AS s WHERE s.game_id = g.id ORDER BY updated_at DESC LIMIT 1) AS last_played,
+			(SELECT id FROM game_session AS s WHERE s.game_id = g.id ORDER BY updated_at DESC LIMIT 1) AS session_id,
+			COUNT(*) = COUNT(unlocked_session_id) AS perfected,
+			100 as achievement_percentage
+		FROM game_achievements AS a
+		JOIN games AS g ON g.id = a.game_id
+		GROUP BY g.name
+		ORDER BY playtime_hours DESC, g.name ASC;`,
+	)
+		.all()
+		.filter(row => row.perfected === 1)
+		.map((row, _, rows) => ({
+			...row,
+			popularityPercentage: (row.playtime_hours / rows[0].playtime_hours) * 100,
+			timeago: timeago.format(new Date(row.last_played)),
+		}));
+}

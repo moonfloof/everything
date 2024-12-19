@@ -238,7 +238,7 @@ router.get('/youtube/:id', (req, res) => {
 // STEAM ACTIVITY
 
 router.get('/games', (req: RequestFrontend, res) => {
-	const { page = 0, days = '60' } = req.query;
+	const { page = 0, days = '60', perfect } = req.query;
 	const pagination = handlebarsPagination(page, countGameSessions());
 
 	// Set "alltime" to 6000 days, which is 16.4 years - I think this'll cover it!
@@ -249,8 +249,9 @@ router.get('/games', (req: RequestFrontend, res) => {
 		throw new Error('"days" query must be a number between 14 and 365');
 	}
 
+	const showPerfect = perfect !== undefined;
 	const sessions = getGameSessions({ page });
-	const popular = getPopularGames(daysInt);
+	const popular = showPerfect ? getAllPerfectedGames() : getPopularGames(daysInt);
 	const durationHoursTotal = popular.reduce((total, game) => total + game.playtime_hours, 0);
 	const title = `played video games for ${durationHoursTotal} hours in the last ${daysInt} days`;
 
@@ -262,6 +263,7 @@ router.get('/games', (req: RequestFrontend, res) => {
 		// Popular chart
 		popular,
 		days: daysString,
+		showPerfect,
 	});
 });
 
