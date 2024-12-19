@@ -399,6 +399,30 @@ table td {
 /** GAME STATS **/
 /*#region game-stats */
 
+.link-bar {
+	margin-top: 48px;
+	font-weight: 700;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.link-bar--title {
+	flex: 1;
+}
+
+.link-bar--links {
+	display: flex;
+}
+
+.link-bar--links a:not(:last-of-type)::after {
+	text-decoration: none;
+	color: var(--text);
+	border-bottom: 0;
+	margin: 0 8px;
+	display: inline-block;
+	content: '•';
+}
+
 .games-popular--title {
 	text-align: right;
 	font-size: 20px;
@@ -499,29 +523,6 @@ table td {
 
 .image--banner__16x9 {
 	aspect-ratio: 16/9;
-}
-
-@media (max-width: 660px) {
-
-	.games-popular--game,
-	.games-popular--title {
-		display: block;
-	}
-
-	.games-popular--game {
-		padding: 8px 0;
-	}
-
-	.games-popular--title {
-		text-align: left;
-		max-width: 100%;
-		margin-top: 4px;
-	}
-
-	.games-popular--meta {
-		display: block;
-		width: 100%;
-	}
 }
 
 /*#endregion game-stats */
@@ -792,6 +793,36 @@ select {
 
 	.page--data .form-inline {
 		margin-left: 0;
+	}
+
+	.games-popular--game,
+	.games-popular--title {
+		display: block;
+	}
+
+	.games-popular--game {
+		padding: 8px 0;
+	}
+
+	.games-popular--title {
+		text-align: left;
+		max-width: 100%;
+		margin-top: 4px;
+	}
+
+	.games-popular--meta {
+		display: block;
+		width: 100%;
+	}
+
+	.desktop {
+		display: none;
+	}
+
+	.link-bar,
+	.link-bar--title {
+		display: block;
+		margin-bottom: 8px;
 	}
 }
 

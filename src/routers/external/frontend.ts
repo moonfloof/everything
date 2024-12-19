@@ -241,15 +241,12 @@ router.get('/games', (req: RequestFrontend, res) => {
 	const { page = 0, days = '60' } = req.query;
 	const pagination = handlebarsPagination(page, countGameSessions());
 
-	const daysInt = Number(days);
-	const dayOptions = [
-		{ value: 60, selected: daysInt === 60 },
-		{ value: 180, selected: daysInt === 180 },
-		{ value: 365, selected: daysInt === 365 },
-	];
-
-	if (!Number.isSafeInteger(daysInt) || daysInt < 60 || daysInt > 365) {
-		throw new Error('"days" query must be a number between 1 and 60');
+	// Set "alltime" to 6000 days, which is 16.4 years - I think this'll cover it!
+	const alltime = days === 'alltime';
+	const daysInt = Number(alltime ? 6000 : days);
+	const daysString = days === 'alltime' ? 'all time' : `last ${daysInt} days`;
+	if (!Number.isSafeInteger(daysInt) || (daysInt !== 6000 && (daysInt < 14 || daysInt > 365))) {
+		throw new Error('"days" query must be a number between 14 and 365');
 	}
 
 	const sessions = getGameSessions({ page });
@@ -264,8 +261,7 @@ router.get('/games', (req: RequestFrontend, res) => {
 
 		// Popular chart
 		popular,
-		days,
-		dayOptions,
+		days: daysString,
 	});
 });
 
