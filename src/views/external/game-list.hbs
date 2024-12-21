@@ -18,6 +18,15 @@
 		</div>
 	</div>
 
+	{{#if showPerfect}}
+	<p>
+		<small>
+			<strong>Note:</strong>
+			Games are sorted by most recently played first!
+		</small>
+	</p>
+	{{/if}}
+
 	{{#if popular}}
 	<table class="games-popular">
 		{{#each popular as |game| }}
