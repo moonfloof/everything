@@ -210,7 +210,7 @@ export function getListensPopular(days: number) {
 		WHERE created_at >= $created_at
 		GROUP BY artist
 		ORDER BY count DESC, artist ASC
-		LIMIT 30`,
+		LIMIT 10`,
 	);
 
 	const created_at = new Date(Date.now() - days * dayMs).toISOString();
