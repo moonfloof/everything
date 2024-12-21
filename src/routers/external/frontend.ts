@@ -124,17 +124,10 @@ router.get('/music', (req: RequestFrontend, res) => {
 	const { page = 0, days = '7' } = req.query;
 	const pagination = handlebarsPagination(page, countListens());
 
-	const daysInt = Number(days);
-	const dayOptions = [
-		{ value: 7, selected: daysInt === 7 },
-		{ value: 14, selected: daysInt === 14 },
-		{ value: 30, selected: daysInt === 30 },
-		{ value: 60, selected: daysInt === 60 },
-	];
-
-	if (!Number.isSafeInteger(daysInt) || daysInt < 1 || daysInt > 60) {
-		throw new Error('"days" query must be a number between 1 and 60');
+	if (!['7', '30', '60', '365'].includes(days)) {
+		throw new Error('"days" must be 7, 30, 60, or 365');
 	}
+	const daysInt = Number(days);
 
 	const nowPlaying = getNowPlaying();
 	const listens = getListens({ page });
@@ -144,6 +137,8 @@ router.get('/music', (req: RequestFrontend, res) => {
 		addMissingDates(graphPoints, day => ({ day, y: 0, label: shortDate(day) })),
 		'scrobbles',
 	);
+
+	const title = popular.length === 0 ? 'listens to music (sometimes, apparently)' : 'listens to music';
 
 	const description =
 		popular.length > 0
@@ -155,12 +150,11 @@ router.get('/music', (req: RequestFrontend, res) => {
 		listens,
 		pagination,
 		svg,
-		title: 'listens to music',
+		title,
 		description,
 
 		// Popular chart
 		days,
-		dayOptions,
 		popular,
 	});
 });
@@ -188,19 +182,13 @@ router.get('/music/:id', (req, res) => {
 // YOUTUBE LIKES
 
 router.get('/youtube', (req: RequestFrontend, res) => {
-	const { page = 0, days = '60' } = req.query;
+	const { page = 0, days = '180' } = req.query;
 	const pagination = handlebarsPagination(page, countYouTubeLikes());
 
-	const daysInt = Number(days);
-	const dayOptions = [
-		{ value: 60, selected: daysInt === 60 },
-		{ value: 180, selected: daysInt === 180 },
-		{ value: 365, selected: daysInt === 365 },
-	];
-
-	if (!Number.isSafeInteger(daysInt) || daysInt < 60 || daysInt > 365) {
-		throw new Error('"days" query must be a number between 60 and 365');
+	if (!['14', '30', '180', '365'].includes(days)) {
+		throw new Error('"days" must be 14, 30, 180, or 365');
 	}
+	const daysInt = Number(days);
 
 	const youtubeLikes = getLikes({ page });
 	const popular = getPopularYouTubeChannels(daysInt);
@@ -218,13 +206,12 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 
 		// Popular chart
 		days,
-		dayOptions,
 		popular,
 	});
 });
 
 router.get('/youtube/:id', (req, res) => {
-	const [youtubeLike] = getLikes({ id: req.params.id });
+	const [youtubeLike] = getLikes({ id: req.params.id, limit: 1 });
 
 	if (!youtubeLike) {
 		throw new NotFoundError('Like not found');
@@ -236,7 +223,7 @@ router.get('/youtube/:id', (req, res) => {
 
 	res.render('external/youtubelike-single', {
 		youtubeLike,
-		title: 'watched...',
+		title: `watched ${youtubeLike.channel} on ${prettyDate(new Date(youtubeLike.created_at))}`,
 		description,
 	});
 });
