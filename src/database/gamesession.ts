@@ -273,7 +273,9 @@ export function getPopularGames(days: number, limit = 10) {
 		last_played: string;
 		session_id: string;
 		playtime_hours: number;
-		achievement_percentage: number;
+		achievements_unlocked: number;
+		achievements_total: number;
+		achievements_unlocked_in_time: number;
 	}>(
 		'getPopularGames',
 		`SELECT
@@ -281,7 +283,9 @@ export function getPopularGames(days: number, limit = 10) {
 			MAX(s.updated_at) AS last_played,
 			s.id AS session_id,
 			CEIL(SUM(s.playtime_mins) / 60.0) AS playtime_hours,
-			CEIL(CAST((SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id AND a.unlocked_session_id IS NOT NULL) AS REAL)/CAST((SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id) AS REAL)*100.0) AS achievement_percentage
+			(SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id AND a.unlocked_session_id IS NOT NULL AND updated_at >= $created_at) AS achievements_unlocked_in_time,
+			(SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id AND a.unlocked_session_id IS NOT NULL) AS achievements_unlocked,
+			(SELECT COUNT(id) FROM game_achievements AS a WHERE a.game_id = g.id) AS achievements_total
 		FROM game_session AS s
 		JOIN games AS g ON g.id = s.game_id
 		WHERE created_at >= $created_at
@@ -295,7 +299,8 @@ export function getPopularGames(days: number, limit = 10) {
 
 	return rows.map(row => ({
 		...row,
-		perfected: row.achievement_percentage === 100,
+		achievement_percentage: Math.round((row.achievements_unlocked / row.achievements_total) * 100),
+		perfected: row.achievements_unlocked === row.achievements_total,
 		popularityPercentage: (row.playtime_hours / rows[0].playtime_hours) * 100,
 		timeago: timeago.format(new Date(row.last_played)),
 	}));
@@ -305,7 +310,7 @@ export function getPopularGames(days: number, limit = 10) {
 // on the achievements table first, which reduces the query from about 300ms, to
 // 20ms!
 export function getAllPerfectedGames() {
-	return getStatement<{
+	type PerfectGame = {
 		id: number;
 		name: string;
 		last_played: string;
@@ -313,25 +318,40 @@ export function getAllPerfectedGames() {
 		playtime_hours: number;
 		perfected: 0 | 1;
 		achievement_percentage: 100;
-	}>(
+		achievements_unlocked: number;
+		achievements_total: number;
+		achievements_unlocked_in_time: number;
+	};
+
+	const games = getStatement<PerfectGame>(
 		'getAllPerfectedGames',
 		`SELECT
 			g.id AS id, g.name AS name,
 			(SELECT CEIL(SUM(playtime_mins) / 60.0) FROM game_session AS s WHERE s.game_id = g.id) AS playtime_hours,
 			(SELECT updated_at FROM game_session AS s WHERE s.game_id = g.id ORDER BY updated_at DESC LIMIT 1) AS last_played,
 			(SELECT id FROM game_session AS s WHERE s.game_id = g.id ORDER BY updated_at DESC LIMIT 1) AS session_id,
-			COUNT(*) = COUNT(unlocked_session_id) AS perfected,
+			COUNT(unlocked_session_id) AS achievements_unlocked,
+			COUNT(unlocked_session_id) AS achievements_unlocked_in_time,
+			COUNT(*) AS achievements_total,
+			1 as perfected,
 			100 as achievement_percentage
 		FROM game_achievements AS a
 		JOIN games AS g ON g.id = a.game_id
 		GROUP BY g.name
-		ORDER BY playtime_hours DESC, g.name ASC;`,
-	)
-		.all()
-		.filter(row => row.perfected === 1)
-		.map((row, _, rows) => ({
-			...row,
-			popularityPercentage: (row.playtime_hours / rows[0].playtime_hours) * 100,
-			timeago: timeago.format(new Date(row.last_played)),
-		}));
+		HAVING achievements_unlocked = achievements_total
+		ORDER BY last_played DESC;`,
+	).all();
+
+	if (games.length === 0) return [];
+
+	const longestGame: PerfectGame = games.reduce(
+		(longest, game) => (game.playtime_hours > longest.playtime_hours ? game : longest),
+		games[0],
+	);
+
+	return games.map(row => ({
+		...row,
+		popularityPercentage: (row.playtime_hours / longestGame.playtime_hours) * 100,
+		timeago: timeago.format(new Date(row.last_played)),
+	}));
 }

@@ -259,17 +259,25 @@ router.get('/games', (req: RequestFrontend, res) => {
 	const sessions = getGameSessions({ page });
 	const popular = showPerfect ? getAllPerfectedGames() : getPopularGames(daysInt);
 	const durationHoursTotal = popular.reduce((total, game) => total + game.playtime_hours, 0);
-	const title = `played video games for ${durationHoursTotal} hours in the last ${daysInt} days`;
+	const achievementsTotal = popular.reduce((count, game) => count + game.achievements_unlocked_in_time, 0);
+	const title = alltime
+		? `spent ${durationHoursTotal} hours playing video games (all time)`
+		: showPerfect
+			? `has 100% perfected ${popular.length} video games, taking a total of ${durationHoursTotal} hours`
+			: `played video games for ${durationHoursTotal} hours in the last ${daysInt} days`;
+	const description = `and earned ${achievementsTotal} achievements in that time`;
 
 	res.render('external/game-list', {
 		sessions,
 		pagination,
 		title,
+		description,
 
 		// Popular chart
 		popular,
 		days: daysString,
 		showPerfect,
+		achievementsTotal,
 	});
 });
 
