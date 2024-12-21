@@ -210,6 +210,14 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 	});
 });
 
+// Configure helmet to allow youtube-nocookie iframes for this URL ONLY
+router.use(
+	helmet({
+		contentSecurityPolicy: {
+			directives: { 'frame-src': 'https://www.youtube-nocookie.com' },
+		},
+	}),
+);
 router.get('/youtube/:id', (req, res) => {
 	const [youtubeLike] = getLikes({ id: req.params.id, limit: 1 });
 
@@ -227,6 +235,7 @@ router.get('/youtube/:id', (req, res) => {
 		description,
 	});
 });
+router.use(helmet());
 
 // STEAM ACTIVITY
 
