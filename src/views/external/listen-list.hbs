@@ -11,19 +11,17 @@
 	{{/if}}
 
 	{{#xif pagination.page '==' 0}}
-	<h3>Most scrobbled artists ({{days}} days)</h3>
-
-	<form action="/music" method="get" name="days">
-		<select name="days">
-			{{#each dayOptions as |option|}}
-				<option
-					{{#if option.selected}}selected{{/if}}
-					value="{{option.value}}"
-				>{{option.value}} days</option>
-			{{/each}}
-		</select>
-		<input type="submit" value="Go" />
-	</form>
+	<div class="link-bar">
+		<span class="link-bar--title">
+			top {{popular.length}} scrobbled artists ({{days}} days)
+		</span>
+		<div class="link-bar--links">
+			<a href="/music?days=7">7 days</a>
+			<a href="/music?days=30">30 days</a>
+			<a href="/music?days=60">60 days</a>
+			<a href="/music?days=365">365 days</a>
+		</div>
+	</div>
 
 	{{#if popular}}
 	<table>
