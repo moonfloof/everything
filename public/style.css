@@ -351,6 +351,14 @@ summary {
 	font-size: 12px;
 }
 
+iframe.youtube {
+	margin-top: 48px;
+	border: 0;
+	background-color: var(--panel-bg);
+	width: 100%;
+	aspect-ratio: 16/9;
+}
+
 /*#endregion main */
 
 /** MUSIC STATS **/
