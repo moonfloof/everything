@@ -321,6 +321,7 @@ export function getAllPerfectedGames() {
 		achievements_unlocked: number;
 		achievements_total: number;
 		achievements_unlocked_in_time: number;
+		last_achieved: number;
 	};
 
 	const games = getStatement<PerfectGame>(
@@ -333,13 +334,14 @@ export function getAllPerfectedGames() {
 			COUNT(unlocked_session_id) AS achievements_unlocked,
 			COUNT(unlocked_session_id) AS achievements_unlocked_in_time,
 			COUNT(*) AS achievements_total,
+			MAX(a.updated_at) as last_achieved,
 			1 as perfected,
 			100 as achievement_percentage
 		FROM game_achievements AS a
 		JOIN games AS g ON g.id = a.game_id
 		GROUP BY g.name
 		HAVING achievements_unlocked = achievements_total
-		ORDER BY last_played DESC;`,
+		ORDER BY last_achieved DESC;`,
 	).all();
 
 	if (games.length === 0) return [];
