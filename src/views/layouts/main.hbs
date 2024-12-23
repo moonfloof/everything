@@ -4,6 +4,8 @@
 	<meta charset="UTF-8" />
 	<meta name="description" content="{{#if description}}{{description}}{{else}}What is {{person}} up to? Where have they been and what have they listened to lately?{{/if}}" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="prefetch" href="https://rsms.me/inter/inter.css">
+	<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 	<link rel="stylesheet" href="/style.css">
 	<link rel="icon" type="image/png" href="/favicon.png" />
 	<link rel="canonical" href="{{canonicalUrl}}" />
@@ -14,18 +16,17 @@
 	<div class="container">
 		<header id="header">
 			<div id="header--left">
-				<h1 id="header--title"><a href="/">{{person}}'s</a></h1>
+				<h1 id="header--title"><a href="/">{{person}}’s</a></h1>
 				<p id="header--subtitle">quantified-self data archive</p>
 			</div>
 			<div id="header--right">
-				<a href="/">home</a>
 				<a href="https://git.floof.fm/floof/everything" target="_blank">git repo</a>
 				<a href="https://floof.fm/" target="_blank">music</a>
 			</div>
 		</header>
 	</div>
 	{{else}}
-	<h1 id="header--small"><a href="/">{{person}}'s</a> quantified-self data archive</h1>
+	<h1 id="header--small"><a href="/">{{person}}’s</a> quantified-self data archive</h1>
 	{{/if}}
 
 	<div class="container">{{{body}}}</div>

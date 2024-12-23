@@ -1,6 +1,6 @@
-@import url('https://rsms.me/inter/inter.css');
-
 :root {
+	font-feature-settings: "ss03", "cv08", "cv05";
+
 	--text: #333;
 	--border: #CCC;
 	--panel-bg: #fff;
@@ -161,6 +161,7 @@ div.info {
 	margin-bottom: 24px;
 	height: 136px;
 	display: block;
+	font-feature-settings: "tnum";
 }
 
 #dashboard--panel__notes {
@@ -395,6 +396,7 @@ table td {
 }
 
 .artist-count {
+	font-feature-settings: "tnum";
 	font-weight: 700;
 	padding: 4px 8px;
 	border-radius: 6px;
@@ -910,5 +912,11 @@ select {
 		scroll-behavior: auto !important;
 		transition-delay: 0s !important;
 		transition-duration: 0s !important;
+	}
+}
+
+@supports (font-variation-settings: normal) {
+	:root {
+		font-family: InterVariable, sans-serif;
 	}
 }
