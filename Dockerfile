@@ -1,6 +1,6 @@
 FROM node:22
 
-VOLUME [ "/app/data", "/app/public/game-images" ]
+VOLUME [ "/app/data", "/app/public/game-images", "/app/public/film-images" ]
 
 WORKDIR /app
 
