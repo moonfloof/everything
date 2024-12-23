@@ -35,11 +35,12 @@ export type GameSessionInsertResponse = {
 
 interface GameStats {
 	totalPlaytime: number;
-	games: Record<string, number>;
+	games: { [key: string]: { duration: number; game_id: number } };
 	averagePlaytime: string;
 	totalSessions: number;
 	totalPlaytimeHuman: string;
 	favouriteGame: string;
+	favouriteGameId: number;
 }
 
 export function insertGameSession(game: GameSessionInsert): GameSessionInsertResponse {
@@ -198,6 +199,7 @@ export function getGameStats() {
 		totalSessions: 0,
 		totalPlaytimeHuman: '',
 		favouriteGame: '',
+		favouriteGameId: 0,
 	};
 
 	const games = getGameSessionsByDay(7);
@@ -207,11 +209,14 @@ export function getGameStats() {
 	}
 
 	const stats = games.reduce((stats, cur) => {
-		stats.games[cur.name] =
-			stats.games[cur.name] === undefined
-				? cur.playtime_mins
-				: stats.games[cur.name] + cur.playtime_mins;
+		if (stats.games[cur.game_id] === undefined) {
+			stats.games[cur.name] = {
+				duration: cur.playtime_mins,
+				game_id: cur.game_id,
+			};
+		}
 
+		stats.games[cur.name].duration += cur.playtime_mins;
 		stats.totalPlaytime += cur.playtime_mins;
 
 		return stats;
@@ -220,17 +225,20 @@ export function getGameStats() {
 	stats.averagePlaytime = prettyDuration((stats.totalPlaytime / games.length) * minuteMs);
 	stats.totalSessions = games.length;
 	stats.totalPlaytimeHuman = prettyDuration(stats.totalPlaytime * minuteMs);
-	stats.favouriteGame = Object.entries(stats.games).reduce(
+	const favGame = Object.entries(stats.games).reduce(
 		(acc, cur) => {
-			const [game, duration] = cur;
+			const [name, { duration, game_id }] = cur;
 			if (duration >= acc.duration) {
 				acc.duration = duration;
-				acc.game = game;
+				acc.game = name;
+				acc.game_id = game_id;
 			}
 			return acc;
 		},
-		{ game: '', duration: 0 },
-	).game;
+		{ game: '', game_id: 0, duration: 0 },
+	);
+	stats.favouriteGame = favGame.game;
+	stats.favouriteGameId = favGame.game_id;
 
 	return stats;
 }
