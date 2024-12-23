@@ -9,6 +9,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./public/game-images:/app/public/game-images
+      - ./public/film-images:/app/public/film-images
       - "${TOMBOIS_SQLITE_LOCATION}:/app/data/Everything.db"
 
     env_file:
