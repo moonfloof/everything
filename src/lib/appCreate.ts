@@ -13,7 +13,6 @@ const appCreate = () => {
 	app.use((req, res, next) => {
 		res.locals.isHomepage = req.url === '/';
 		res.locals.canonicalUrl = getCanonicalUrl(req);
-		res.locals.referer = req.headers.referer;
 		next();
 	});
 
