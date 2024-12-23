@@ -6,7 +6,7 @@ import { updateGameSession } from '../database/gamesession.js';
 import { config } from '../lib/config.js';
 import { dateDefault, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
-import { saveImageToDisk } from './steamgriddb.js';
+import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
 
 const log = new Logger('Steam');
 
@@ -75,11 +75,11 @@ function saveGamesToDisk() {
 }
 
 export async function saveImages(appid: number, game_id: number) {
-	const heroPath = `hero-${game_id}.jpg`;
+	const heroPath = getImagePath('game', `hero-${game_id}`);
 	const heroUrl = `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/library_hero.jpg`;
 	await saveImageToDisk(heroUrl, heroPath);
 
-	const libraryPath = `library-${game_id}.jpg`;
+	const libraryPath = getImagePath('game', `library-${game_id}`);
 	const libraryUrl = `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/library_600x900.jpg`;
 	await saveImageToDisk(libraryUrl, libraryPath);
 }

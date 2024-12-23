@@ -1,4 +1,86 @@
-<div class="page--data">
-	{{> pageHeader title="Watching (Films)" url="/films" }}
-	{{> film data=film }}
+<div class="h-entry {{#if film.rating}}h-review{{/if}}">
+	{{#if film.heroImageExists}}
+	<div class="image--banner" style="background-image: url(/film-images/hero-{{film.id}}.avif)">
+		<div class="image--banner__overlay image--banner__16x9"></div>
+	</div>
+	{{/if}}
+	{{> pageHeader title=film.title }}
+	<br/>
+
+	{{#if film.rating}}
+		<div class="row">
+			<div class="left align-middle">
+				{{#xif film.rating '==' 10}}
+					❤️
+				{{else}}
+					{{#xif film.rating '<' 5}}
+						👎
+					{{else}}
+						👍
+					{{/xif}}
+				{{/xif}}
+			</div>
+			<div class="right film-rating">
+				<div class="film-rating--stars">
+					{{rating}}
+				</div>
+				<div class="film-rating--text">
+					<strong class="p-rating">{{film.rating}}</strong>
+					<small>/ <span class="p-best">10</span></small>
+				</div>
+			</div>
+		</div>
+		<br/>
+	{{/if}}
+
+	<div class="row">
+		<span class="left">📆</span>
+		<span class="right">{{watchDate}}</span>
+	</div>
+	<br/>
+
+	{{#if film.review}}
+		<div class="row page--data">
+			<span class="left">💬</span>
+			<div class="right e-content">{{{film.review}}}</div>
+		</div>
+		<br/>
+	{{/if}}
+
+	{{#if film.url}}
+		<div class="row">
+			<span class="left">🔗</span>
+			<span class="right">
+				Originally posted on
+				<strong><a class="right u-watch-of h-cite" href="{{film.url}}" target="_blank" rel="noopener">{{film.urlPretty}}</a></strong>
+			</span>
+		</div>
+		<br/>
+	{{/if}}
+
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{film.watched_at}}"
+			datetime="{{film.watched_at}}"
+			class="right dt-published"
+		>
+			<small>
+				<a href="/film/{{film.id}}" class="u-url u-uid">
+					{{film.timeago}}
+				</a>
+			</small>
+		</time>
+	</div>
+
+	{{> author }}
+
+	{{#if film.heroImageExists}}
+	<div class="film-attribution">
+		<small>
+			ℹ️ <strong>Attribution:</strong> The image on this page was retrieved using
+			<a href="https://tmdb.org/" target="_blank" rel="noopener">The Movie Database (tmdb.org)</a>
+		</small>
+	</div>
+	{{/if}}
 </div>

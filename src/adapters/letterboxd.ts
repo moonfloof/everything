@@ -6,6 +6,7 @@ import { insertFilm } from '../database/films.js';
 import { config } from '../lib/config.js';
 import { formatDate } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
+import { searchForImagesById } from './tmdb.js';
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ interface LetterboxdFilm {
 	memberRating?: number;
 	creator: string;
 	description: string;
+	movieId?: number;
+	tvId?: number;
 }
 
 let filmActivity: LetterboxdFilm[] = [];
@@ -117,6 +120,41 @@ async function parseFeed(feed: string): Promise<Partial<LetterboxdFilm>[]> {
 	});
 }
 
+async function logFilm(film: LetterboxdFilm) {
+	// Skip films older than double the interval
+	const intervalMs = config.letterboxd.intervalSecs * 1000;
+	if (film.watchedDate.getTime() < Date.now() - intervalMs * 2) {
+		return;
+	}
+
+	const existsInCache = filmActivity.some(filmCached => film.guid === filmCached.guid);
+	if (existsInCache) return;
+
+	log.info(`Adding new film '${film.filmTitle} (${film.filmYear})'`);
+
+	// Letterboxd descriptions always start with the poster image URL,
+	// so we need to remove that.
+	const review = film.guid.includes('letterboxd-review') ? film.description.replace(/<p>.*?<\/p>/, '') : null;
+
+	const { id } = insertFilm({
+		title: film.filmTitle,
+		year: film.filmYear,
+		rating: film.memberRating ? film.memberRating * 2 : null,
+		review,
+		url: film.link,
+		watched_at: formatDate(film.watchedDate),
+		created_at: film.pubDate.toISOString(),
+		device_id: config.defaultDeviceId,
+	});
+
+	// Finally, fetch the image from TMDB
+	if (film.movieId) {
+		await searchForImagesById(id, film.movieId, 'movie');
+	} else if (film.tvId) {
+		await searchForImagesById(id, film.tvId, 'tv');
+	}
+}
+
 export function fetchFilms() {
 	const intervalMs = config.letterboxd.intervalSecs * 1000;
 	const username = config.letterboxd.username;
@@ -133,35 +171,7 @@ export function fetchFilms() {
 		const newActivity = (await parseFeed(feed)).reverse() as LetterboxdFilm[];
 
 		for (const film of newActivity) {
-			// Skip films older than double the interval
-			if (film.watchedDate.getTime() < Date.now() - intervalMs * 2) {
-				continue;
-			}
-
-			const existsInCache = filmActivity.some(filmCached => {
-				return film.guid === filmCached.guid;
-			});
-
-			if (existsInCache) continue;
-
-			log.info(`Adding new film '${film.filmTitle} (${film.filmYear})'`);
-
-			// Letterboxd descriptions always start with the poster image URL,
-			// so we need to remove that.
-			const review = film.guid.includes('letterboxd-review')
-				? film.description.replace(/<p>.*?<\/p>/, '')
-				: null;
-
-			insertFilm({
-				title: film.filmTitle,
-				year: film.filmYear,
-				rating: film.memberRating ? film.memberRating * 2 : null,
-				review,
-				url: film.link,
-				watched_at: formatDate(film.watchedDate),
-				created_at: film.pubDate.toISOString(),
-				device_id: config.defaultDeviceId,
-			});
+			await logFilm(film);
 		}
 
 		filmActivity = newActivity;
