@@ -39,8 +39,9 @@ node_modules/
 .env.production
 
 # Project-specific
-public/*.js
-data/*.json
 *.db
-dist/
-/public/game-images/*.jpg
+/data/*.json
+/dist
+/public/*.js
+/public/*-images/*.jpg
+/public/*-images/*.avif

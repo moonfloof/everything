@@ -1,5 +1,6 @@
 import { errors } from '@tombofry/stdlib';
 const { NotFoundError } = errors;
+import { existsSync } from 'node:fs';
 import express from 'express';
 import helmet from 'helmet';
 
@@ -42,8 +43,9 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
 import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
 import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
+import { getImagePath } from '../../lib/mediaFiles.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { imageExists } from '../../adapters/steamgriddb.js';
+import { config } from '../../lib/config.js';
 
 const router = express.Router();
 
@@ -213,6 +215,7 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 // Configure helmet to allow youtube-nocookie iframes for this URL ONLY
 router.use(
 	helmet({
+		...config.helmet,
 		contentSecurityPolicy: {
 			directives: { 'frame-src': 'https://www.youtube-nocookie.com' },
 		},
@@ -235,7 +238,7 @@ router.get('/youtube/:id', (req, res) => {
 		description,
 	});
 });
-router.use(helmet());
+router.use(helmet(config.helmet));
 
 // STEAM ACTIVITY
 
@@ -313,7 +316,7 @@ router.get('/game/:id', (req, res) => {
 	const achievementsUnlockedCount = achievements.filter(a => a.unlocked_session_id !== null).length;
 	const achievementPercentage = Math.round((achievementsUnlockedCount / achievements.length) * 100);
 	const lastSession = getSessionsForGame(game_id)[0];
-	const hasImage = imageExists(`hero-${game.id}.jpg`);
+	const hasImage = existsSync(getImagePath('game', `hero-${game.id}`));
 
 	// TODO: Remove after a substantial amount of time, once achievements can be properly updated.
 	const lastUpdateCutoff = new Date('2024-12-14').getTime();
@@ -396,12 +399,17 @@ router.get('/film/:id', (req, res) => {
 		throw new NotFoundError('Film not found');
 	}
 
-	const description = `I watched ${film.title} (${film.year}) on ${prettyDate(new Date(film.watched_at))}`;
+	const title = `watched ${film.title} (${film.year}) on ${prettyDate(new Date(film.watched_at))}`;
+	const description = film.rating !== null ? `and rated it ${film.rating}/10` : null;
+	const rating = film.rating !== null ? '⭐'.repeat(film.rating) : '';
+	const watchDate = prettyDate(new Date(film.watched_at));
 
 	res.render('external/film-single', {
 		film,
+		title,
 		description,
-		title: 'watched...',
+		rating,
+		watchDate,
 	});
 });
 
@@ -455,6 +463,7 @@ router.get('/book/:id', (req, res) => {
 // reliable/trust-worthy sources (eg. from your own domains).
 router.use(
 	helmet({
+		...config.helmet,
 		contentSecurityPolicy: {
 			directives: {
 				'media-src': 'https:',

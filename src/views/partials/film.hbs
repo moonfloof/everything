@@ -1,14 +1,17 @@
-<div class="sectioncontainer h-entry h-review">
-	<div class="row u-watch-of h-cite">
+<div class="sectioncontainer h-entry {{#if data.rating}}h-review {{/if}}{{#if data.posterImageExists}}film-with-poster{{/if}}">
+	{{#if data.posterImageExists}}
+	<img
+		class="film-poster rounded-panel"
+		alt="Film poster for {{data.title}}"
+		src="/film-images/poster-{{data.id}}.avif"
+	/>
+	{{/if}}
+
+	<div class="film-with-poster-metadata">
+	<div class="row">
 		<span class="left">🎥</span>
 		<span class="right">
-			{{#if data.url}}
-			<a href="{{data.url}}" class="u-url" target="_blank" rel="noopener">
-				<strong class="p-name">{{data.title}}</strong>
-			</a>
-			{{else}}
-				<strong class="p-name">{{data.title}}</strong>
-			{{/if}}
+			<a href="/film/{{data.id}}" class="u-uid u-url"><strong class="p-name p-item">{{data.title}}</strong></a>
 			({{data.year}})
 		</span>
 	</div>
@@ -22,10 +25,21 @@
 		</span>
 	</div>
 	{{/if}}
+
 	{{#if data.review}}
 		<div class="row">
 			<span class="left">💬</span>
 			<div class="right e-content">{{{data.review}}}</div>
+		</div>
+	{{/if}}
+
+	{{#if data.url}}
+		<div class="row metadata">
+			<span class="left">🔗</span>
+			<span class="right">
+				Originally posted on
+				<strong><a class="right u-watch-of" href="{{data.url}}" target="_blank" rel="noopener">{{data.urlPretty}}</a></strong>
+			</span>
 		</div>
 	{{/if}}
 
@@ -45,4 +59,6 @@
 	</div>
 
 	{{> author }}
+
+	</div>
 </div>

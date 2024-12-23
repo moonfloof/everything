@@ -17,6 +17,7 @@ import { pollForPsnActivity } from './adapters/psn.js';
 import { pollForRetroAchievementsActivity } from './adapters/retroachievements.js';
 import { pollForGameActivity } from './adapters/steam.js';
 import { pollForLikedVideos } from './adapters/youtube.js';
+import { convertAllImagesToAvif } from './lib/mediaFiles.js';
 
 const log = new Logger('http');
 
@@ -39,6 +40,9 @@ appInternal();
 
 // Start Discord bot
 getDiscordClient();
+
+// Convert all non-avif images to avif
+convertAllImagesToAvif();
 
 process.on('exit', () => {
 	log.info('Exiting - closing database');

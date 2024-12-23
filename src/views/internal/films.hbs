@@ -1,4 +1,4 @@
-{{> pageHeader title="Films Watched" url="/" }}
+{{> pageHeader title="Films Watched" }}
 
 {{#if rescanerror }}
 <div class="error sectioncontainer page--data">
@@ -21,7 +21,7 @@
 <hr/>
 
 {{#each films as |film| }}
-	{{> internal/film data=film }}
+	{{> internal/film data=film page=../page }}
 {{/each}}
 
 {{> pagination route="/films" pagination=pagination }}

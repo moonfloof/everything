@@ -18,7 +18,7 @@ import youtube from './routers/external/youtube.js';
 const log = new Logger('server-ext');
 
 const app = appCreate();
-app.use(helmet());
+app.use(helmet(config.helmet));
 app.use(validatePageNumber(false));
 
 if (config.bluesky.username?.startsWith('did:plc:')) {

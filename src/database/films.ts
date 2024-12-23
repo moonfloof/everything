@@ -1,9 +1,11 @@
+import { existsSync } from 'node:fs';
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
+import { getImagePath } from '../lib/mediaFiles.js';
 
 interface Film {
 	id: string;
@@ -26,12 +28,17 @@ export function insertFilm(film: Insert<Film>) {
 		($id, $title, $year, $rating, $review, $url, $watched_at, $created_at, $device_id)`,
 	);
 
-	return statement.run({
-		...film,
-		id: uuid(),
-		watched_at: dateDefault(film.watched_at),
-		created_at: dateDefault(film.created_at),
-	});
+	const id = uuid();
+
+	return {
+		...statement.run({
+			...film,
+			id: uuid(),
+			watched_at: dateDefault(film.watched_at),
+			created_at: dateDefault(film.created_at),
+		}),
+		id,
+	};
 }
 
 export function getFilms(parameters: Partial<Parameters> = {}) {
@@ -45,6 +52,9 @@ export function getFilms(parameters: Partial<Parameters> = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => ({
 		...row,
+		heroImageExists: existsSync(getImagePath('film', `hero-${row.id}`)),
+		posterImageExists: existsSync(getImagePath('film', `poster-${row.id}`)),
+		urlPretty: row.url ? new URL(row.url).host : null,
 		timeago: timeago.format(new Date(row.watched_at)),
 	}));
 }

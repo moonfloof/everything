@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import { environment } from '@tombofry/stdlib';
 import dotenv from 'dotenv';
+import type { HelmetOptions } from 'helmet';
 
 dotenv.config();
 
@@ -47,6 +48,11 @@ export const config = {
 		dataPath: resolve(process.env.TOMBOIS_LETTERBOXD_DATA_FILE ?? 'data/letterboxd.json'),
 		username: process.env.TOMBOIS_LETTERBOXD_USERNAME,
 		intervalSecs: Number(process.env.TOMBOIS_LETTERBOXD_POLL_INTERVAL_SECS ?? 86400),
+	},
+
+	tmdb: {
+		apiBaseUrl: 'https://api.themoviedb.org',
+		accessToken: process.env.TOMBOIS_TMDB_ACCESS_TOKEN,
 	},
 
 	steam: {
@@ -96,4 +102,10 @@ export const config = {
 		username: process.env.TOMBOIS_SUBSONIC_USERNAME,
 		password: process.env.TOMBOIS_SUBSONIC_PASSWORD,
 	},
+
+	helmet: {
+		referrerPolicy: {
+			policy: ['same-origin'],
+		},
+	} as HelmetOptions,
 } as const;

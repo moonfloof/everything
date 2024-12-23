@@ -4,6 +4,8 @@ import { countFilms, deleteFilm, getFilms, insertFilm, updateFilm } from '../../
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { searchForImagesByName } from '../../adapters/tmdb.js';
+import { deleteIfExists } from '../../lib/mediaFiles.js';
 
 const router = express.Router();
 
@@ -18,6 +20,7 @@ router.get('/', (req: RequestFrontend, res) => {
 
 	res.render('internal/films', {
 		films,
+		page,
 		pagination,
 		hasLetterboxdConnected,
 		rescanerror: rescanerror !== undefined,
@@ -64,6 +67,8 @@ router.post('/:id', (req: RequestFrontend, res) => {
 	switch (crudType) {
 		case 'delete': {
 			deleteFilm(id);
+			deleteIfExists('film', `hero-${id}`);
+			deleteIfExists('film', `poster-${id}`);
 			break;
 		}
 
@@ -87,6 +92,25 @@ router.post('/:id', (req: RequestFrontend, res) => {
 	}
 
 	res.redirect('/films');
+});
+
+router.get('/update-images/:id', async (req: RequestFrontend, res) => {
+	const { id } = req.params;
+	const film = getFilms({ id, limit: 1 })?.[0];
+
+	const redirect = (): void => {
+		const page = req.query.page;
+		let url = '/films';
+		if (page) url += `?page=${page}`;
+		if (film) url += `#film-${film.id}`;
+		res.redirect(url);
+	};
+
+	if (!film) return redirect();
+
+	await searchForImagesByName(film.id, film.title, film.year);
+
+	redirect();
 });
 
 export default router;
