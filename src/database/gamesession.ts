@@ -209,7 +209,7 @@ export function getGameStats() {
 	}
 
 	const stats = games.reduce((stats, cur) => {
-		if (stats.games[cur.game_id] === undefined) {
+		if (stats.games[cur.name] === undefined) {
 			stats.games[cur.name] = {
 				duration: cur.playtime_mins,
 				game_id: cur.game_id,
