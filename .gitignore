@@ -42,6 +42,4 @@ node_modules/
 *.db
 /data/*.json
 /dist
-/public/*.js
-/public/*-images/*.jpg
 /public/*-images/*.avif
