@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { timeago } from '../adapters/timeago.js';
-import { getImagePath } from '../lib/mediaFiles.js';
+import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
@@ -121,7 +121,12 @@ export function getAchievementsForGame(game_id: number) {
  * including sessions and achievements
  */
 export function deleteGameEntirely(game_id: number) {
-	return getStatement('deleteGameEntirely', 'DELETE FROM games WHERE id = $game_id').run({ game_id });
+	const result = getStatement('deleteGameEntirely', 'DELETE FROM games WHERE id = $game_id').run({ game_id });
+	if (result.changes > 0) {
+		deleteIfExists('game', `hero-${game_id}`);
+		deleteIfExists('game', `library-${game_id}`);
+	}
+	return result;
 }
 
 export function updateGame(game: Game) {
