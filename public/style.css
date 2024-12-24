@@ -161,7 +161,6 @@ div.info {
 	margin-bottom: 24px;
 	height: 136px;
 	display: block;
-	font-feature-settings: "tnum";
 }
 
 #dashboard--panel__notes {
@@ -189,6 +188,7 @@ div.info {
 	font-size: 14px;
 	display: flex;
 	flex-direction: row;
+	font-variant-numeric: tabular-nums;
 }
 
 .dashboard--panel__content,
@@ -396,7 +396,7 @@ table td {
 }
 
 .artist-count {
-	font-feature-settings: "tnum";
+	font-variant-numeric: tabular-nums;
 	font-weight: 700;
 	padding: 4px 8px;
 	border-radius: 6px;
