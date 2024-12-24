@@ -15,17 +15,18 @@ of a better name!).
 For an actual live demo of my data collection, visit
 <https://now.floof.fm>, otherwise here are a couple of screenshots:
 
-![everything dashboard screenshot](./screenshot-dashboard.png)
+![everything dashboard screenshot](./screenshot-dashboard.avif)
 
 This is the landing page dashboard - it contains a brief overview of everything
 being collected (that you'd want public, anyway), and - where it makes sense to
-view more details - you can click `see more >` to view individual tracking
-records. For example, here's the music page:
+view more details - you can click `more ->` to view individual tracking records.
+For example, here's the games page:
 
-![everything listens page screenshot](./screenshot-listens.png)
+![everything games page screenshot](./screenshot-gaming.avif)
 
-Some pages have graphs and tables for some interesting visualisations, however
-most just have records like the ones you see at the bottom of this screenshot.
+Some pages have cool graphs and tables for some interesting visualisations,
+however most just have records like the ones you see at the bottom of this
+screenshot.
 
 ## Data Collection & Sources
 
@@ -36,13 +37,13 @@ better way to do it).
 ### Automatic/External
 
 * **Location Tracking** - Using the
-  [Overland API](https://github.com/aaronpk/Overland-iOS#api) by
+  [**Overland API**](https://github.com/aaronpk/Overland-iOS#api) by
   [Aaron Parecki](https://aaronparecki.com/). Also updates latest phone battery.
 * **Scrobbles** - Custom implementation of the
-  [ListenBrainz API](https://listenbrainz-server.readthedocs.io/en/latest/dev/api.html),
+  [**ListenBrainz API**](https://listenbrainz-server.readthedocs.io/en/latest/dev/api.html),
   by pointing your scrobbler to `/api/listenbrainz`.
 * **YouTube Likes** - Polls the
-  [Google API](https://developers.google.com/youtube/v3/) to get newly liked
+  [**Google API**](https://developers.google.com/youtube/v3/) to get newly liked
   videos, automate POST requests using IFTTT, Zapier or equivalent, or by
   posting a message in Discord.  
   By default, the Google API limits refresh tokens to 7 days, so I've found this
@@ -60,8 +61,10 @@ better way to do it).
     [RetroAchievements API](https://api-docs.retroachievements.org/)
   * [**SteamGridDB**](https://www.steamgriddb.com/): Fetches images for
     non-Steam games
-* **Films/Movies** - Polls your [Letterboxd](https://letterboxd.com) profile for
-  newly logged films to your diary.
+* **Films/Movies**:
+  * Polls your [**Letterboxd**](https://letterboxd.com) profile for newly logged
+    films to your diary.
+  * Connects to [**The Movie Database**](https://tmdb.org) API to fetch images
 * **Card purchases** - Create a
   [Monzo webhook](https://docs.monzo.com/#webhooks) to automatically POST to
   `/api/purchases` whenever you make a purchase (or get paid).
@@ -77,11 +80,12 @@ Data is entered using the internal CRUD API.
   * Steps
   * Food
   * Weight
-* **TV Shows** - [Sonarr](https://sonarr.tv/) installed locally, to get a list
-  of series and episodes to pick from.
-* **Scrobbles** - [Subsonic API](http://www.subsonic.org/pages/api.jsp)
-  installed locally, to get a list of artists and their albums (this is great
-  for listening to physical media, where scrobbling is not automatic).
+* **TV Shows** - Connects to [Sonarr](https://sonarr.tv/), if installed locally,
+  to get a list of series and episodes to pick from.
+* **Scrobbles** - Connects to a
+  [Subsonic API](http://www.subsonic.org/pages/api.jsp), if installed locally,
+  to get a list of artists and their albums (this is great for listening to
+  physical media, where scrobbling is not automatic).
 * **Books** - Stores progress using page numbers (eg. if you've read 48 pages,
   and there are total 230 pages, the progress is therefore 21%)
 * **Web Bookmarks**
