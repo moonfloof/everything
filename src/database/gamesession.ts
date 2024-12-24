@@ -12,7 +12,7 @@ import {
 import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
-import { type Game, selectOrInsertGame } from './game.js';
+import { type Game, getGameById, selectOrInsertGame } from './game.js';
 import { getGameAchievementsForSession } from './gameachievements.js';
 
 export interface GameSessionRaw {
@@ -32,16 +32,6 @@ export type GameSessionInsertResponse = {
 	changes: number;
 	lastInsertRowid: number | bigint;
 };
-
-interface GameStats {
-	totalPlaytime: number;
-	games: { [key: string]: { duration: number; game_id: number } };
-	averagePlaytime: string;
-	totalSessions: number;
-	totalPlaytimeHuman: string;
-	favouriteGame: string;
-	favouriteGameId: number;
-}
 
 export function insertGameSession(game: GameSessionInsert): GameSessionInsertResponse {
 	const gameRecord = selectOrInsertGame(game);
@@ -192,55 +182,30 @@ export function getGameSessionsGroupedByDay(days = 14) {
 }
 
 export function getGameStats() {
-	const emptyStats: GameStats = {
-		totalPlaytime: 0,
-		games: {},
-		averagePlaytime: '',
-		totalSessions: 0,
-		totalPlaytimeHuman: '',
-		favouriteGame: '',
-		favouriteGameId: 0,
+	const daysAgo = new Date(Date.now() - 7 * dayMs);
+	const created_at = getStartOfDay(daysAgo).toISOString();
+
+	const stats = getStatement<{
+		totalPlaytime: number;
+		favouriteGameId: number;
+		achievementsUnlocked: number;
+	}>(
+		'getGameStatsPlaytime',
+		`SELECT
+			(SELECT SUM(playtime_mins)*60000 FROM game_session AS s WHERE created_at >= $created_at) AS totalPlaytime,
+			(SELECT g.id FROM game_session AS s JOIN games AS g ON g.id = s.game_id WHERE created_at >= $created_at GROUP BY g.name ORDER BY SUM(s.playtime_mins) DESC LIMIT 1) AS favouriteGameId,
+			(SELECT COUNT(unlocked_session_id) FROM game_achievements WHERE unlocked_session_id IS NOT NULL AND updated_at >= $created_at) AS achievementsUnlocked`,
+	).get({ created_at });
+
+	if (!stats) return undefined;
+
+	const favouriteGame = getGameById(stats.favouriteGameId);
+
+	return {
+		...stats,
+		favouriteGame,
+		totalPlaytimeHuman: prettyDuration(stats.totalPlaytime),
 	};
-
-	const games = getGameSessionsByDay(7);
-
-	if (games.length === 0) {
-		return null;
-	}
-
-	const stats = games.reduce((stats, cur) => {
-		if (stats.games[cur.name] === undefined) {
-			stats.games[cur.name] = {
-				duration: cur.playtime_mins,
-				game_id: cur.game_id,
-			};
-		}
-
-		stats.games[cur.name].duration += cur.playtime_mins;
-		stats.totalPlaytime += cur.playtime_mins;
-
-		return stats;
-	}, emptyStats);
-
-	stats.averagePlaytime = prettyDuration((stats.totalPlaytime / games.length) * minuteMs);
-	stats.totalSessions = games.length;
-	stats.totalPlaytimeHuman = prettyDuration(stats.totalPlaytime * minuteMs);
-	const favGame = Object.entries(stats.games).reduce(
-		(acc, cur) => {
-			const [name, { duration, game_id }] = cur;
-			if (duration >= acc.duration) {
-				acc.duration = duration;
-				acc.game = name;
-				acc.game_id = game_id;
-			}
-			return acc;
-		},
-		{ game: '', game_id: 0, duration: 0 },
-	);
-	stats.favouriteGame = favGame.game;
-	stats.favouriteGameId = favGame.game_id;
-
-	return stats;
 }
 
 export function countGameSessions() {
