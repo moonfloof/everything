@@ -1,6 +1,6 @@
 <div class="page--date">
-	{{#if hasImage}}
-	<div class="image--banner" style="background-image: url(/game-images/hero-{{game.id}}.avif)">
+	{{#if game.heroUrl}}
+	<div class="image--banner" style="background-image: url({{game.heroUrl}})">
 		<div class="image--banner__overlay image--banner__steam"></div>
 	</div>
 	{{/if}}

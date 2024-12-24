@@ -1,6 +1,6 @@
 <div class="h-entry {{#if film.rating}}h-review{{/if}}">
-	{{#if film.heroImageExists}}
-	<div class="image--banner" style="background-image: url(/film-images/hero-{{film.id}}.avif)">
+	{{#if film.heroUrl}}
+	<div class="image--banner" style="background-image: url({{film.heroUrl}})">
 		<div class="image--banner__overlay image--banner__16x9"></div>
 	</div>
 	{{/if}}
@@ -75,7 +75,7 @@
 
 	{{> author }}
 
-	{{#if film.heroImageExists}}
+	{{#if film.heroUrl}}
 	<div class="film-attribution">
 		<small>
 			ℹ️ <strong>Attribution:</strong> The image on this page was retrieved using

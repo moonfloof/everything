@@ -1,4 +1,6 @@
+import { existsSync } from 'node:fs';
 import { timeago } from '../adapters/timeago.js';
+import { getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
@@ -60,8 +62,24 @@ export function getGames(parameters: Partial<Parameters> = {}) {
 	return statement.all(calculateGetParameters(parameters));
 }
 
+function getGameAssets(id: number) {
+	const hasHeroImage = existsSync(getImagePath('game', `hero-${id}`));
+	const hasPosterImage = existsSync(getImagePath('game', `library-${id}`));
+
+	return {
+		heroUrl: hasHeroImage ? `/game-images/hero-${id}.avif` : null,
+		posterUrl: hasPosterImage ? `/game-images/library-${id}.avif` : null,
+	};
+}
+
 export function getGameById(id: string | number) {
-	return getStatement<Game>('getGameById', 'SELECT * FROM games WHERE id = $id LIMIT 1;').get({ id });
+	const game = getStatement<Game>('getGameById', 'SELECT * FROM games WHERE id = $id LIMIT 1;').get({ id });
+	if (!game) return undefined;
+
+	return {
+		...game,
+		...getGameAssets(game.id),
+	};
 }
 
 export function getSessionsForGame(game_id: number, order: 'DESC' | 'ASC' = 'DESC'): GameSessionRaw[] {
@@ -141,6 +159,7 @@ export function getGameAndTotalPlaytime(game_id: number) {
 
 	return {
 		...game,
+		...getGameAssets(game.id),
 		timeago: timeago.format(new Date(game.last_played)),
 	};
 }

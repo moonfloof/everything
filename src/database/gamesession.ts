@@ -324,7 +324,7 @@ export function getAllPerfectedGames() {
 		last_played: string;
 		session_id: string;
 		playtime_hours: number;
-		perfected: 0 | 1;
+		perfected: 1;
 		achievement_percentage: 100;
 		achievements_unlocked: number;
 		achievements_total: number;
