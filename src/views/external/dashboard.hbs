@@ -3,7 +3,7 @@
 	<div id="dashboard--lead__text">
 		Hello! I personally track everything I listen to, everything I
 		watch on TV, every game I play, and more. And so, I call this
-		project "Everything". You can find out more by visiting the
+		project “Everything”. You can find out more by visiting the
 		<a href="https://github.com/tomboFry/everything#readme" target="_blank"><strong>code repository homepage</strong></a>.
 	</div>
 </div>
@@ -87,7 +87,7 @@
 					<a href="{{url}}" target="_blank" rel="noopener">
 						<strong>{{ title }}</strong>
 					</a>
-					<small>{{channel}}</small>
+					<small>{{channel}} &bull; {{timeago}}</small>
 				</li>
 			{{/each}}
 			</ul>
@@ -100,7 +100,7 @@
 			{{#each tvEpisodes}}
 				<li class="dashboard--panel__li">
 					<strong>{{episode_title}}</strong>
-					<small>from "<em>{{series_title}}</em>"</small>
+					<small>from “<em>{{series_title}}</em>” &bull; {{timeago}}</small>
 				</li>
 			{{/each}}
 			</ul>
@@ -116,8 +116,8 @@
 						<strong>{{title}} ({{year}})</strong>
 					</a>
 					<small>
+						{{#if rating}} ⭐ {{rating}} / 10 &bull;{{/if}}
 						{{timeago}}
-						{{#if rating}} &bull; {{rating}} / 10 ⭐{{/if}}
 					</small>
 				</li>
 			{{/each}}
