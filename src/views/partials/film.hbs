@@ -1,9 +1,9 @@
-<div class="sectioncontainer h-entry {{#if data.rating}}h-review {{/if}}{{#if data.posterImageExists}}film-with-poster{{/if}}">
-	{{#if data.posterImageExists}}
+<div class="sectioncontainer h-entry {{#if data.rating}}h-review {{/if}}{{#if data.posterUrl}}film-with-poster{{/if}}">
+	{{#if data.posterUrl}}
 	<img
 		class="film-poster rounded-panel"
 		alt="Film poster for {{data.title}}"
-		src="/film-images/poster-{{data.id}}.avif"
+		src="{{data.posterUrl}}"
 	/>
 	{{/if}}
 

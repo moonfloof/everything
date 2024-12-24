@@ -80,7 +80,7 @@ export function shortDate(date: Date) {
 
 export function prettyDuration(durationMs: number) {
 	// 60 mins * 60 secs * 1000 ms
-	const hoursTotal = durationMs / 3600000;
+	const hoursTotal = durationMs / hourMs;
 
 	// Calculate minutes based on decimal from hours
 	const hoursRounded = Math.floor(hoursTotal);

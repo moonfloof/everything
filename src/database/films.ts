@@ -52,8 +52,12 @@ export function getFilms(parameters: Partial<Parameters> = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => ({
 		...row,
-		heroImageExists: existsSync(getImagePath('film', `hero-${row.id}`)),
-		posterImageExists: existsSync(getImagePath('film', `poster-${row.id}`)),
+
+		heroUrl: existsSync(getImagePath('film', `hero-${row.id}`)) ? `/film-images/hero-${row.id}.avif` : null,
+		posterUrl: existsSync(getImagePath('film', `poster-${row.id}`))
+			? `/film-images/poster-${row.id}.avif`
+			: null,
+
 		urlPretty: row.url ? new URL(row.url).host : null,
 		timeago: timeago.format(new Date(row.watched_at)),
 	}));
