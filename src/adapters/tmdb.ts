@@ -93,9 +93,11 @@ function tmbdSearch(query: string, year?: string | number): Promise<SearchRespon
 
 const tmdbGetImageUrl = (path: string) => `https://image.tmdb.org/t/p/original${path}`;
 
-function getEnImageOrDefault(images: TmdbImage[]): TmdbImage {
-	const en = images.find(image => image.iso_639_1 === 'en');
-	if (en) return en;
+function getPreferredImage(images: TmdbImage[], preferredLanguage?: string): TmdbImage {
+	if (preferredLanguage !== undefined) {
+		const image = images.find(image => image.iso_639_1 === preferredLanguage);
+		if (image) return image;
+	}
 
 	const nullImage = images.find(image => image.iso_639_1 === null);
 	if (nullImage) return nullImage;
@@ -119,14 +121,14 @@ export async function searchForImagesById(watchId: string, movieId: number, type
 
 		if (!heroPathExists && response.backdrops.length > 0) {
 			await saveImageToDisk(
-				tmdbGetImageUrl(getEnImageOrDefault(response.backdrops).file_path),
+				tmdbGetImageUrl(getPreferredImage(response.backdrops).file_path),
 				heroPath,
 			);
 		}
 
 		if (!posterPathExists && response.posters.length > 0) {
 			await saveImageToDisk(
-				tmdbGetImageUrl(getEnImageOrDefault(response.posters).file_path),
+				tmdbGetImageUrl(getPreferredImage(response.posters, 'en').file_path),
 				posterPath,
 			);
 		}
