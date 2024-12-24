@@ -15,31 +15,31 @@
 	"license": "AGPL-3.0-or-later",
 	"dependencies": {
 		"@tombofry/stdlib": "^0.11.1",
-		"better-sqlite3": "^11.4.0",
+		"better-sqlite3": "^11.7.0",
 		"discord.js": "^14.16.3",
-		"dotenv": "^16.3.1",
+		"dotenv": "^16.4.7",
 		"express": "^5.0.1",
 		"express-handlebars": "^8.0.1",
 		"googleapis": "^144.0.0",
 		"helmet": "^8.0.0",
 		"javascript-time-ago": "^2.5.11",
 		"node-cron": "^3.0.3",
-		"nodemon": "^3.1.7",
+		"nodemon": "^3.1.9",
 		"on-finished": "^2.4.1",
 		"phin": "^3.7.0",
 		"psn-api": "^2.10.1",
 		"sax": "^1.2.4",
 		"sharp": "^0.33.5",
-		"uuid": "^11.0.0-0"
+		"uuid": "^11.0.3"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"@types/better-sqlite3": "^7.6.11",
+		"@types/better-sqlite3": "^7.6.12",
 		"@types/express": "^5.0.0",
 		"@types/node-cron": "^3.0.11",
 		"@types/sax": "^1.2.7",
-		"esbuild": "^0.24.0",
-		"typescript": "^5.6.3"
+		"esbuild": "^0.24.2",
+		"typescript": "^5.7.2"
 	},
 	"nodemonConfig": {
 		"ext": "ts",
