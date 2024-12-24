@@ -33,7 +33,7 @@ export function insertFilm(film: Insert<Film>) {
 	return {
 		...statement.run({
 			...film,
-			id: uuid(),
+			id,
 			watched_at: dateDefault(film.watched_at),
 			created_at: dateDefault(film.created_at),
 		}),
