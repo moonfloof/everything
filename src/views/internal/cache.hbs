@@ -15,7 +15,7 @@
 	<ul class="sectioncontainer cache-list">
 	{{#each cachedPages as |page| }}
 		<li>
-			<div class="cache-list--url">{{page.[0]}}</div>
+			<div class="cache-list--url flex">{{page.[0]}}</div>
 			<div class="cache-list--size"><small>{{page.[1].contents.length}} bytes</small></div>
 			<form class="form-inline" method="post" action="/cache/delete"><input type="hidden" name="url" value="{{page.[0]}}" /><input type="submit" value="❌ Delete" /></form>
 		</li>

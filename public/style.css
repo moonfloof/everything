@@ -151,40 +151,43 @@ div.info {
 #dashboard--panels {
 	display: grid;
 	grid-template-columns: calc(50% - 12px) calc(50% - 12px);
-	column-gap: 24px;
+	gap: 24px;
 }
 
 .dashboard--panel {
 	width: 100%;
 	background-color: var(--panel-bg);
 	padding: 12px;
-	margin-bottom: 24px;
 	height: 136px;
 	display: block;
 }
 
 #dashboard--panel__notes {
-	height: initial !important;
+	height: 270px;
+	margin-bottom: 24px;
 }
 
 .dashboard--panel__header {
 	display: flex;
 	align-items: center;
-	margin-bottom: 12px;
+	margin-bottom: 10px;
+	gap: 8px;
 }
 
 .dashboard--panel__header h2 {
 	flex: 1;
 	font-size: 20px;
 	line-height: 1;
+	margin-top: -2px;
 }
 
 .dashboard--panel__header a {
 	font-size: 12px;
 	font-weight: 700;
+	flex-shrink: 0;
 }
 
-.dashboard--panel__content {
+.dashboard--panel .dashboard--panel__content {
 	font-size: 14px;
 	display: flex;
 	flex-direction: row;
@@ -204,6 +207,7 @@ div.info {
 
 .dashboard--panel ul {
 	margin-top: 0;
+	margin-left: 12px;
 	width: calc(100% - 16px);
 }
 
@@ -230,15 +234,23 @@ div.info {
 
 .dashboard--panel--meta__row {
 	font-size: 14px;
-	line-height: 14px;
-	margin-bottom: 8px;
+	line-height: 18px;
+	margin-bottom: 4px;
 	display: flex;
 	justify-content: space-between;
+	gap: 8px;
+}
+
+.dashboard--panel--meta__row span:first-child {
+	flex-shrink: 0;
 }
 
 .dashboard--panel--meta__row span:last-child {
 	text-align: right;
 	max-width: 75%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 /*#endregion dashboard */
@@ -291,6 +303,10 @@ a:hover {
 
 .page--data__header h2 {
 	margin-top: 0;
+}
+
+.flex {
+	flex: 1;
 }
 
 table {
@@ -794,14 +810,14 @@ select {
 	border-bottom: 1px solid var(--border);
 }
 
-.cache-list--url {
-	flex: 1;
-}
-
 .page--data .form-inline {
 	margin-top: 0;
 	margin-left: 16px;
 	display: inline;
+}
+
+.page--data .form-inline input[type=submit] {
+	margin-top: 0;
 }
 
 #setup-page .row {
@@ -819,7 +835,6 @@ select {
 	#header {
 		display: block;
 		text-align: center;
-		margin-bottom: 48px;
 	}
 
 	#header--right {
@@ -831,12 +846,7 @@ select {
 	}
 
 	#dashboard--panels {
-		display: block;
-	}
-
-	.dashboard--panel {
-		margin-bottom: 24px;
-		height: auto;
+		grid-template-columns: 100%;
 	}
 
 	.cache-list li {
