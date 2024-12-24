@@ -2,10 +2,10 @@ import { existsSync } from 'node:fs';
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
+import { getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
-import { getImagePath } from '../lib/mediaFiles.js';
 
 interface Film {
 	id: string;

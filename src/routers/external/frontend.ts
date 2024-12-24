@@ -42,10 +42,10 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
 import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
+import { config } from '../../lib/config.js';
 import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
 import { getImagePath } from '../../lib/mediaFiles.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { config } from '../../lib/config.js';
 
 const router = express.Router();
 

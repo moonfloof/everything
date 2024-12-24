@@ -1,11 +1,11 @@
 import express from 'express';
 import { fetchFilms } from '../../adapters/letterboxd.js';
+import { searchForImagesByName } from '../../adapters/tmdb.js';
 import { countFilms, deleteFilm, getFilms, insertFilm, updateFilm } from '../../database/films.js';
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
-import type { RequestFrontend } from '../../types/express.js';
-import { searchForImagesByName } from '../../adapters/tmdb.js';
 import { deleteIfExists } from '../../lib/mediaFiles.js';
+import type { RequestFrontend } from '../../types/express.js';
 
 const router = express.Router();
 

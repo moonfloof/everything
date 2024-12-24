@@ -1,9 +1,9 @@
-import { existsSync, rmSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { basename } from 'node:path';
 import phin from 'phin';
+import sharp from 'sharp';
 import { config } from './config.js';
 import Logger from './logger.js';
-import sharp from 'sharp';
 
 const log = new Logger('media');
 

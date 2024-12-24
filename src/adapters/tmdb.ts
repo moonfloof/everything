@@ -1,8 +1,8 @@
 import { existsSync } from 'node:fs';
-import { config } from '../lib/config.js';
-import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
 import phin from 'phin';
+import { config } from '../lib/config.js';
 import Logger from '../lib/logger.js';
+import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
 
 const log = new Logger('tmdb');
 

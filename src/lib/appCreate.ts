@@ -2,8 +2,8 @@ import { resolve } from 'node:path';
 import { express as expressHelpers } from '@tombofry/stdlib';
 import express from 'express';
 import { engine } from 'express-handlebars';
-import { helpers } from './handlebarsExtensions.js';
 import { getCanonicalUrl } from './getCanonicalUrl.js';
+import { helpers } from './handlebarsExtensions.js';
 
 const appCreate = () => {
 	const app = express();
