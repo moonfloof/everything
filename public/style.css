@@ -157,9 +157,21 @@ div.info {
 .dashboard--panel {
 	width: 100%;
 	background-color: var(--panel-bg);
-	padding: 12px;
 	height: 136px;
-	display: block;
+	position: relative;
+}
+
+.dashboard--panel .dashboard--panel__right {
+	padding: 12px;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	position: absolute;
+}
+
+.dashboard--panel.hasimage .dashboard--panel__right {
+	padding-left: 100px;
 }
 
 #dashboard--panel__notes {
@@ -175,10 +187,14 @@ div.info {
 }
 
 .dashboard--panel__header h2 {
-	flex: 1;
 	font-size: 20px;
 	line-height: 1;
-	margin-top: -2px;
+}
+
+.dashboard--panel__header .subtitle {
+	font-size: 12px;
+	font-weight: 700;
+	flex-shrink: 0;
 }
 
 .dashboard--panel__header a {
@@ -197,6 +213,13 @@ div.info {
 .dashboard--panel__content,
 .dashboard--panel__content>span {
 	line-height: 20px;
+}
+
+.dashboard--panel__image {
+	height: 136px;
+	width: 84px;
+	object-fit: cover;
+	border-radius: 6px 0 0 6px;
 }
 
 .dashboard--panel__graph {

@@ -60,7 +60,7 @@ router.get('/', (req, res) => {
 		return;
 	}
 
-	const listens = getListenPopularDashboard(7);
+	const listens = getListenPopularDashboard(14);
 	const youtubeLikes = getLikes().slice(0, 2);
 	const tvEpisodes = getEpisodes().slice(0, 2);
 	const films = getFilms().slice(0, 2);

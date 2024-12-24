@@ -27,7 +27,7 @@
 
 <div id="dashboard--panels">
 	{{#if listens}}
-		{{#> dashpanel title="listening <small>(7 days)</small>" link="music" }}
+		{{#> dashpanel title="listening" subtitle="(14 days)" link="music" }}
 			<div class="dashboard--panel--meta">
 				<div class="dashboard--panel--meta__row">
 					<span>fav artist</span>
@@ -55,24 +55,20 @@
 	{{/if}}
 
 	{{#if gameStats}}
-		{{#> dashpanel title="gaming <small>(7 days)</small>" link="games" }}
+		{{#> dashpanel title="gaming" subtitle="(14 days)" link="games" background=gameStats.favouriteGame.posterUrl }}
 			<div class="dashboard--panel--meta">
 				<div class="dashboard--panel--meta__row">
 					<span>total playtime</span>
 					<span><strong>{{gameStats.totalPlaytimeHuman}}</strong></span>
 				</div>
 				<div class="dashboard--panel--meta__row">
-					<span>average length</span>
-					<span><strong>{{gameStats.averagePlaytime}}</strong></span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>total sessions</span>
-					<span><strong>{{gameStats.totalSessions}}</strong></span>
+					<span>achievements</span>
+					<span><strong>{{gameStats.achievementsUnlocked}}</strong></span>
 				</div>
 				<div class="dashboard--panel--meta__row">
 					<span>fav game</span>
 					<span><strong>
-						<a href="/game/{{gameStats.favouriteGameId}}">{{gameStats.favouriteGame}}</a>
+						<a href="/game/{{gameStats.favouriteGame.id}}">{{gameStats.favouriteGame.name}}</a>
 					</strong></span>
 				</div>
 			</div>
@@ -108,7 +104,7 @@
 	{{/if}}
 
 	{{#if films}}
-		{{#> dashpanel title="films" link="films" }}
+		{{#> dashpanel title="films" link="films" background=films.[0].posterUrl }}
 			<ul>
 			{{#each films}}
 				<li class="dashboard--panel__li">
