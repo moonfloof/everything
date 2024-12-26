@@ -673,14 +673,18 @@ table td {
 /** FILM PAGE */
 /*#region film */
 
-.film-with-poster {
+.entry-with-poster {
 	display: flex;
 }
 
-.film-poster {
+.entry-poster {
 	margin-right: 16px;
+
 	width: auto;
-	max-height: 200px;
+	max-width: 120px;
+
+	height: auto;
+	max-height: 180px;
 }
 
 .left.align-middle {
@@ -915,19 +919,12 @@ select {
 		margin-bottom: 8px;
 	}
 
-	.film-with-poster,
-	.film-poster {
+	.entry-with-poster,
+	.entry-poster {
 		display: block;
 	}
 
-	.film-poster {
-		width: 100%;
-		max-width: 20vh;
-
-		height: unset;
-		max-height: unset;
-
-		margin: 0 auto;
+	.entry-poster {
 		margin-bottom: 16px;
 	}
 }
