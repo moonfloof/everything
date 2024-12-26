@@ -112,9 +112,12 @@ export function updateGameSession(
 }
 
 export function getGameSessions(parameters: Partial<Parameters> = {}) {
-	const statement = getStatement<GameSession>(
+	const statement = getStatement<GameSession & { perfectedSession: boolean }>(
 		'getGameSessions',
-		`SELECT s.*, g.name, g.url FROM game_session AS s
+		`SELECT
+			s.*, g.name, g.url,
+			(SELECT a.unlocked_session_id FROM game_achievements AS a WHERE a.game_id = s.game_id GROUP BY a.unlocked_session_id ORDER BY a.unlocked_session_id IS NOT NULL, a.updated_at DESC LIMIT 1) = s.id AS perfectedSession
+		FROM game_session AS s
 		JOIN games AS g ON g.id = s.game_id
 		WHERE s.id LIKE $id AND s.created_at >= $created_at
 		ORDER BY s.updated_at DESC
