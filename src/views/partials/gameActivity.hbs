@@ -16,10 +16,17 @@
 			</data>
 		</span>
 	</div>
+
 	{{#if data.achievements}}
 	<div class="row game-achievements--container">
 		<span class="left"></span>
 		<div class="right">
+			{{#if data.perfectedSession}}
+			<p class="game-achievements--bar pct-100" style="padding: 8px 0;">
+				🥳 Got 100% during this session!
+			</p>
+			{{/if}}
+
 			<p>Got <strong>{{data.achievements.length}}</strong> {{data.achievementText}}</p>
 			<ul class="game-achievements--list">
 			{{#each data.achievements as |achievement|}}
@@ -34,6 +41,7 @@
 		</div>
 	</div>
 	{{/if}}
+
 	<div class="row">
 		<span class="left"></span>
 		<div class="right">
