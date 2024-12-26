@@ -1,13 +1,13 @@
-<div class="sectioncontainer h-entry {{#if data.rating}}h-review {{/if}}{{#if data.posterUrl}}film-with-poster{{/if}}">
+<div class="sectioncontainer h-entry {{#if data.rating}}h-review {{/if}}{{#if data.posterUrl}}entry-with-poster{{/if}}">
 	{{#if data.posterUrl}}
 	<img
-		class="film-poster rounded-panel"
+		class="entry-poster rounded-panel"
 		alt="Film poster for {{data.title}}"
 		src="{{data.posterUrl}}"
 	/>
 	{{/if}}
 
-	<div class="film-with-poster-metadata">
+	<div>
 	<div class="row">
 		<span class="left">🎥</span>
 		<span class="right">
