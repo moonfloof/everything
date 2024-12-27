@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import { countBooks, getBooks } from '../../database/books.js';
 import { getDevices } from '../../database/devices.js';
 import { countFilms, getFilms } from '../../database/films.js';
+import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
 import {
 	countGameSessions,
 	getAllPerfectedGames,
@@ -18,7 +19,6 @@ import {
 import {
 	countListens,
 	getListenDashboardGraph,
-	getListenGraph,
 	getListenPopularDashboard,
 	getListens,
 	getListensPopular,
@@ -34,17 +34,15 @@ import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../da
 
 // Lib
 import addMissingDates from '../../lib/addMissingDates.js';
-import { formatTime, prettyDate, shortDate } from '../../lib/formatDate.js';
-import { generateBarGraph } from '../../lib/graphs/bar.js';
+import { config } from '../../lib/config.js';
+import { formatTime, prettyDate } from '../../lib/formatDate.js';
+import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
+import { getImagePath } from '../../lib/mediaFiles.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
 
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
-import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
-import { config } from '../../lib/config.js';
-import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
-import { getImagePath } from '../../lib/mediaFiles.js';
 import type { RequestFrontend } from '../../types/express.js';
 
 const router = express.Router();
@@ -134,12 +132,6 @@ router.get('/music', (req: RequestFrontend, res) => {
 	const nowPlaying = getNowPlaying();
 	const listens = getListens({ page });
 	const popular = getListensPopular(daysInt);
-	const graphPoints = getListenGraph();
-	const svg = generateBarGraph(
-		addMissingDates(graphPoints, day => ({ day, y: 0, label: shortDate(day) })),
-		'scrobbles',
-	);
-
 	const title = popular.length === 0 ? 'listens to music (sometimes, apparently)' : 'listens to music';
 
 	const description =
@@ -151,7 +143,6 @@ router.get('/music', (req: RequestFrontend, res) => {
 		nowPlaying,
 		listens,
 		pagination,
-		svg,
 		title,
 		description,
 
