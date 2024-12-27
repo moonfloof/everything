@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
-import { getImagePath } from '../lib/mediaFiles.js';
+import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
@@ -64,8 +64,12 @@ export function getFilms(parameters: Partial<Parameters> = {}) {
 }
 
 export function deleteFilm(id: string) {
-	const statement = getStatement('deleteFilm', 'DELETE FROM films WHERE id = $id');
-	return statement.run({ id });
+	const result = getStatement('deleteFilm', 'DELETE FROM films WHERE id = $id').run({ id });
+	if (result.changes > 0) {
+		deleteIfExists('film', `poster-${id}`);
+		deleteIfExists('film', `hero-${id}`);
+	}
+	return result;
 }
 
 export function updateFilm(film: Update<Film>) {

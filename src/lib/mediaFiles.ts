@@ -8,9 +8,10 @@ import Logger from './logger.js';
 const log = new Logger('media');
 
 type ImageType = 'game' | 'film';
+type ImagePath = `hero-${string}` | `library-${string}` | `poster-${string}`;
 
 export const getImageDir = (type: ImageType): `public/${ImageType}-images/` => `public/${type}-images/`;
-export const getImagePath = (type: ImageType, path: string) => `${getImageDir(type)}${path}.avif`;
+export const getImagePath = (type: ImageType, path: ImagePath) => `${getImageDir(type)}${path}.avif`;
 
 export async function saveImageToDisk(url: string, path: string) {
 	if (existsSync(path)) return;
@@ -31,7 +32,7 @@ export async function saveImageToDisk(url: string, path: string) {
 	await convertImageToAvif(response.body, path);
 }
 
-export function deleteIfExists(type: ImageType, path: string) {
+export function deleteIfExists(type: ImageType, path: ImagePath) {
 	const actualPath = getImagePath(type, path);
 	if (!existsSync(actualPath)) return;
 
@@ -52,7 +53,7 @@ async function convertAllImagesOfTypeToAvif(type: ImageType) {
 		if (!filename.endsWith('.jpg')) continue;
 		const path = `${dir}${filename}`;
 		const buffer = readFileSync(path);
-		const name = basename(filename, '.jpg');
+		const name = basename(filename, '.jpg') as ImagePath;
 
 		// Convert and remove original
 		log.info(`Converting '${filename}' to AVIF`);
