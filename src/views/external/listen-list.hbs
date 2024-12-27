@@ -44,11 +44,12 @@
 	</div>
 	{{/if}}
 
-	<h3>Scrobble count by day</h3>
-	{{{svg}}}
+	<div class="sectioncontainer">
+		<h3>Recently listened to music</h3>
+	</div>
 
-	<hr/>
 	{{/xif}}
+
 
 	{{#each listens as |listen| }}
 		{{> listen data=listen }}
