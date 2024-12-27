@@ -409,7 +409,7 @@ iframe.youtube {
 
 #now-playing {
 	background-color: var(--secondary-bg);
-	color: var(--secondary-fg);
+	color: var(--text);
 	padding: 24px;
 	border: 1px solid var(--secondary-fg);
 }
@@ -722,12 +722,14 @@ table td {
 	margin: 0 8px;
 	padding: 16px 32px;
 	border-radius: 16px;
-	background-color: rgba(45, 28, 136, 0.05);
+	border: 1px solid transparent;
+	background-color: var(--primary-bg-dark);
 	font-weight: 700;
 }
 
 .pagination a:hover {
-	background-color: rgba(45, 28, 136, 0.1);
+	border: 1px solid var(--primary-fg);
+	background-color: var(--primary-bg);
 	text-decoration: none;
 }
 
@@ -948,5 +950,33 @@ select {
 @supports (font-variation-settings: normal) {
 	:root {
 		font-family: InterVariable, sans-serif;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--text: #f2f2f2;
+		--border: #666;
+		--panel-bg: #271e3d;
+
+		--primary-fg: #cfc5ed;
+		--primary-bg: #161221;
+		--primary-bg-dark: #090418;
+
+		--secondary-fg: #123719;
+		--secondary-bg: #347441;
+
+		--error-fg: #fddcdc;
+		--error-bg: #6e2828;
+	}
+
+	.game-achievements--bar {
+		color: var(--text);
+		background-color: var(--panel-bg);
+	}
+
+	#dashboard--lead__text a {
+		color: var(--text);
+		text-decoration: underline;
 	}
 }
