@@ -18,6 +18,7 @@ import {
 } from '../../database/gamesession.js';
 import {
 	countListens,
+	getListenActivityGraph,
 	getListenDashboardGraph,
 	getListenPopularDashboard,
 	getListens,
@@ -132,6 +133,7 @@ router.get('/music', (req: RequestFrontend, res) => {
 	const nowPlaying = getNowPlaying();
 	const listens = getListens({ page });
 	const popular = getListensPopular(daysInt);
+	const activityGraph = getListenActivityGraph();
 	const title = popular.length === 0 ? 'listens to music (sometimes, apparently)' : 'listens to music';
 
 	const description =
@@ -149,6 +151,7 @@ router.get('/music', (req: RequestFrontend, res) => {
 		// Popular chart
 		days,
 		popular,
+		activityGraph,
 	});
 });
 

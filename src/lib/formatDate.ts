@@ -44,7 +44,7 @@ export function formatDateTime(date: Date) {
 	return `${formatDate(date)} ${formatTime(date)}`;
 }
 
-const months = [
+export const months = [
 	'January',
 	'February',
 	'March',
@@ -58,6 +58,8 @@ const months = [
 	'November',
 	'December',
 ];
+
+export const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export function prettyDate(date: Date) {
 	const year = padString(date.getFullYear(), 4);
