@@ -5,6 +5,7 @@ import { dayMs, getStartOfDay, isSameDate } from './formatDate.js';
 export default function addMissingDates<T extends Record<string, string | number | Date> & { day: Date }>(
 	input: T[],
 	getEmptyValue: (day: Date) => T,
+	limit = RECORDS_PER_PAGE,
 ): T[] {
 	if (input.length <= 1) {
 		return input;
@@ -18,9 +19,9 @@ export default function addMissingDates<T extends Record<string, string | number
 	const dateArray: T[] = [];
 	let dateInProgress = startDate;
 	let inputIndex = 0;
-	let limit = RECORDS_PER_PAGE;
+	let limitReal = limit;
 
-	while (dateInProgress.getTime() >= endDate.getTime() && --limit > 0) {
+	while (dateInProgress.getTime() >= endDate.getTime() && --limitReal > 0) {
 		if (isSameDate(dateInProgress, input[inputIndex].day)) {
 			dateArray.push({
 				...input[inputIndex],

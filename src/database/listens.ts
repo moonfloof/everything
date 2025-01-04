@@ -1,9 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
-import { dateDefault, dayMs, hourMs, shortDate } from '../lib/formatDate.js';
+import { dateDefault, dayMs, formatDate, hourMs, monthsShort, shortDate } from '../lib/formatDate.js';
 import type { Insert, Optional, Select, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
+import addMissingDates from '../lib/addMissingDates.js';
 
 export interface ListenTrack {
 	id: number;
@@ -309,4 +310,73 @@ export function getTracksWithMissingMetadata() {
 		    track_number IS NULL OR
 		    duration_secs IS NULL;`,
 	).all();
+}
+
+const listenActivityGraphCache = {
+	data: '',
+	date: Date.now() - dayMs,
+};
+
+export function getListenActivityGraph() {
+	if (listenActivityGraphCache.date > Date.now() - dayMs) {
+		return listenActivityGraphCache.data;
+	}
+
+	const days = 365;
+	const created_at = formatDate(new Date(Date.now() - dayMs * days));
+	const listensOverTime = addMissingDates(
+		getStatement<{ day: string; count: number }>(
+			'getListenActivityGraph',
+			`SELECT DATE(created_at) AS day, COUNT(id) AS count
+			FROM listens
+			WHERE created_at >= $created_at
+			GROUP BY DATE(created_at)`,
+		)
+			.all({ created_at })
+			.map(row => ({ day: new Date(row.day), count: row.count })),
+		day => ({ day, count: 0 }),
+		days + 1,
+	);
+
+	listensOverTime.reverse();
+	const max = listensOverTime.reduce((max, day) => (day.count > max ? day.count : max), 0);
+
+	// Create graph
+	let col = 0;
+	const colMax = Math.ceil(days / 7);
+	const cellSize = 12;
+	const padding = 2;
+	const leftMargin = 48;
+	const bottomMargin = 20;
+	const width = leftMargin + (cellSize + padding) * colMax - padding;
+	const height = (cellSize + padding) * 7 - padding + bottomMargin;
+	let svg = `<svg class="a-graph" viewBox="0 0 ${width} ${height}">`;
+	for (const { day, count } of listensOverTime) {
+		const dayOfWeek = day.getDay();
+		if (count > 0) {
+			const x = leftMargin + (cellSize + padding) * col;
+			const y = (cellSize + padding) * dayOfWeek;
+			const opacity = Math.round((count * 40) / max) / 40;
+			svg += `\n<rect class="a-graph-cell" style="opacity: ${opacity}" x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" />`;
+		}
+		if (dayOfWeek >= 6) col += 1;
+	}
+	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 2 - 4}" text-anchor="end">mon</text>`;
+	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 4 - 4}" text-anchor="end">wed</text>`;
+	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 6 - 4}" text-anchor="end">fri</text>`;
+
+	const labelEveryWeeks = 9;
+	for (const index of Array.from({ length: Math.ceil(col / labelEveryWeeks) }).map((_, idx) => idx)) {
+		const x = leftMargin + (cellSize + padding) * labelEveryWeeks * index;
+		const day = listensOverTime[Math.ceil(index * labelEveryWeeks * 7)].day;
+		// const label = formatDate(day).slice(0, 7);
+		const label = monthsShort[day.getMonth()];
+		svg += `\n<text class="a-graph-label" x="${x}" y="${height - 4}">${label}</text>`;
+	}
+	svg += '\n</svg>';
+
+	listenActivityGraphCache.data = svg;
+	listenActivityGraphCache.date = Date.now();
+
+	return svg;
 }
