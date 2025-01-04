@@ -12,17 +12,17 @@ of a better name!).
 
 ## Screenshots
 
-For an actual live demo of my data collection, visit
-<https://now.floof.fm>, otherwise here are a couple of screenshots:
+For an actual live demo of my data collection, visit <https://now.floof.fm>,
+otherwise here are a couple of screenshots:
 
-![everything dashboard screenshot](./screenshot-dashboard.avif)
+![dashboard screenshot](./screenshot-dashboard.avif)
 
 This is the landing page dashboard - it contains a brief overview of everything
 being collected (that you'd want public, anyway), and - where it makes sense to
 view more details - you can click `more ->` to view individual tracking records.
 For example, here's the games page:
 
-![everything games page screenshot](./screenshot-gaming.avif)
+![games page screenshot](./screenshot-gaming.avif)
 
 Some pages have cool graphs and tables for some interesting visualisations,
 however most just have records like the ones you see at the bottom of this
