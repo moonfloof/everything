@@ -1,5 +1,5 @@
 {
-	"uid": "tombo-everything",
+	"uid": "everything",
 	"append": true,
 	"watch": false,
 	"script": "src/index.js",

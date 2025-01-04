@@ -191,6 +191,6 @@ Accept: application/json
 @subsonicPass={{$dotenv TOMBOIS_TEST_SUBSONICHASH}}
 @subsonicQuery=Espresso
 
-GET {{subsonicUrl}}rest/search3?v=1.15.0&c=tombo-everything&f=json&u={{subsonicUser}}&t={{subsonicPass}}&s=salt&query={{subsonicQuery}}
+GET {{subsonicUrl}}rest/search3?v=1.15.0&c=everything&f=json&u={{subsonicUser}}&t={{subsonicPass}}&s=salt&query={{subsonicQuery}}
 
 ###

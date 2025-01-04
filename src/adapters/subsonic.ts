@@ -21,7 +21,7 @@ const getBaseParams = () => {
 	return {
 		u: config.subsonic.username || '',
 		v: '1.15.0',
-		c: 'tombo-everything',
+		c: 'everything',
 		t: password,
 		s: salt,
 		f: 'json',
