@@ -19,11 +19,9 @@ import {
 import {
 	countListens,
 	getListenActivityGraph,
-	getListenDashboardGraph,
 	getListenPopularDashboard,
 	getListens,
 	getListensPopular,
-	getPopularAlbumWithArtist,
 	groupListens,
 } from '../../database/listens.js';
 import { getLatestCity } from '../../database/locations.js';
@@ -34,10 +32,8 @@ import { countEpisodes, getEpisodes } from '../../database/tv.js';
 import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../database/youtubelikes.js';
 
 // Lib
-import addMissingDates from '../../lib/addMissingDates.js';
 import { config } from '../../lib/config.js';
 import { formatTime, prettyDate } from '../../lib/formatDate.js';
-import { generateSmallBarRectangles } from '../../lib/graphs/barSmall.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { getImagePath } from '../../lib/mediaFiles.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
@@ -89,34 +85,8 @@ router.get('/', (req, res) => {
 // SVGs
 
 router.get('/music.svg', (req, res) => {
-	const nowPlaying = getNowPlaying();
-	const favourite = getPopularAlbumWithArtist(14);
-	const listenGraph = generateSmallBarRectangles(
-		addMissingDates(getListenDashboardGraph(), day => ({ day, min: 0, max: 0 })),
-	);
-
-	const nowPlayingText =
-		nowPlaying?.artist && nowPlaying.title
-			? `<text style="font-size: 12px; font-weight: 400;" fill="#4d4d4d" x="96" y="92">now playing</text>
-			   <text style="font-size: 16px; font-weight: 700;" fill="#1a1a1a" x="96" y="108">${nowPlaying.title}, by ${nowPlaying.artist}</text>`
-			: '';
-
-	const favouriteText =
-		favourite?.album && favourite?.artist
-			? `<text style="font-size: 12px; font-weight: 400;" fill="#4d4d4d" x="96" y="52">favourite album</text>
-			   <text style="font-size: 16px; font-weight: 700;" fill="#1a1a1a" x="96" y="68">${favourite.album}, by ${favourite.artist}</text>`
-			: '';
-
 	res.header('Cache-Control', 'public, max-age=1200, immutable');
-	res.type('image/svg+xml').send(`<?xml version="1.0" ?>
-	<svg width="400" height="120" viewBox="0 0 400 120" version="1.1" xmlns="http://www.w3.org/2000/svg">
-		<g style="font-family: Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
-			<text style="font-size: 16px; font-weight: 400;" fill="#3e3475" x="8" y="20">scrobble history (last 14 days)</text>
-			${favouriteText}
-			${nowPlayingText}
-		</g>
-		<g transform="translate(8,32)">${listenGraph}</g>
-	</svg>`);
+	res.type('image/svg+xml').send(`<?xml version="1.0" ?>${getListenActivityGraph()}`);
 });
 
 // LISTENS

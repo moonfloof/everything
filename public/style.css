@@ -452,17 +452,11 @@ svg.a-graph {
 }
 
 .a-graph-cell {
-	rx: 3px;
-	ry: 3px;
 	fill: var(--primary-fg);
-	stroke-width: 0px;
 }
 
 .a-graph-label {
-	font-size: 12px;
 	fill: var(--text);
-	font-weight: 700;
-	user-select: none;
 }
 
 /*#endregion music-stats */

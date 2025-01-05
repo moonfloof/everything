@@ -267,39 +267,6 @@ export function getListenGraph() {
 	}));
 }
 
-export function getListenDashboardGraph() {
-	const statement = getStatement<{ day: string; max: number }>(
-		'getListenDashboardGraph',
-		`SELECT DATE(created_at) as day, COUNT(*) as max
-		FROM listens
-		GROUP BY day
-		ORDER BY day DESC
-		LIMIT 14;`,
-	);
-
-	return statement.all().map(row => ({
-		day: new Date(row.day),
-		min: 0,
-		max: row.max,
-	}));
-}
-
-export function getPopularAlbumWithArtist(days = 14) {
-	const statement = getStatement<{ album: string; artist: string; count: number }>(
-		'getPopularAlbumWithArtist',
-		`SELECT t.artist as artist, t.album as album, COUNT(*) AS count FROM listens_track AS t
-		JOIN listens AS l ON l.track_id = t.id
-		WHERE created_at >= $created_at
-		GROUP BY album, artist
-		ORDER BY count DESC
-		LIMIT 1;`,
-	);
-
-	const created_at = new Date(Date.now() - days * dayMs).toISOString();
-
-	return statement.get({ created_at });
-}
-
 export function getTracksWithMissingMetadata() {
 	return getStatement<ListenTrack>(
 		'getTracksWithMissingMetadata',
@@ -350,26 +317,30 @@ export function getListenActivityGraph() {
 	const bottomMargin = 20;
 	const width = leftMargin + (cellSize + padding) * colMax - padding;
 	const height = (cellSize + padding) * 7 - padding + bottomMargin;
-	let svg = `<svg class="a-graph" viewBox="0 0 ${width} ${height}">`;
+	let svg = `<svg class="a-graph" viewBox="0 0 ${width} ${height}" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
+	svg += `\n<style>
+		text { font-family: Inter, sans-serif; font-size: 12px; font-weight: 700; }
+		rect { rx: 3px; ry: 3px; fill: #3e3475; }
+	</style>`;
 	for (const { day, count } of listensOverTime) {
 		const dayOfWeek = day.getDay();
 		if (count > 0) {
 			const x = leftMargin + (cellSize + padding) * col;
 			const y = (cellSize + padding) * dayOfWeek;
 			const opacity = Math.round((count * 40) / max) / 40;
-			svg += `\n<rect class="a-graph-cell" style="opacity: ${opacity}" x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" />`;
+			const date = formatDate(day);
+			svg += `\n<rect class="a-graph-cell" style="opacity: ${opacity}" x="${x}" y="${y}" width="${cellSize}" height="${cellSize}"><title>${date}: ${count}</title></rect>`;
 		}
 		if (dayOfWeek >= 6) col += 1;
 	}
-	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 2 - 4}" text-anchor="end">mon</text>`;
-	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 4 - 4}" text-anchor="end">wed</text>`;
-	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 6 - 4}" text-anchor="end">fri</text>`;
+	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 2 - 4}" text-anchor="end">Mon</text>`;
+	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 4 - 4}" text-anchor="end">Wed</text>`;
+	svg += `\n<text class="a-graph-label" x="${leftMargin - 8}" y="${(cellSize + padding) * 6 - 4}" text-anchor="end">Fri</text>`;
 
 	const labelEveryWeeks = 9;
 	for (const index of Array.from({ length: Math.ceil(col / labelEveryWeeks) }).map((_, idx) => idx)) {
 		const x = leftMargin + (cellSize + padding) * labelEveryWeeks * index;
 		const day = listensOverTime[Math.ceil(index * labelEveryWeeks * 7)].day;
-		// const label = formatDate(day).slice(0, 7);
 		const label = monthsShort[day.getMonth()];
 		svg += `\n<text class="a-graph-label" x="${x}" y="${height - 4}">${label}</text>`;
 	}
