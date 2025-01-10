@@ -253,6 +253,7 @@ div.info {
 
 .dashboard--panel--meta {
 	flex: 1;
+	max-width: 100%;
 }
 
 .dashboard--panel--meta__row {
@@ -488,16 +489,24 @@ svg.a-graph {
 	content: '•';
 }
 
+.games-popular {
+	table-layout: fixed;
+	width: 100%;
+}
+
 .games-popular--title {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	text-align: right;
 	font-size: 20px;
 	font-weight: 700;
-	max-width: 40%;
+	width: 40%;
 	padding: 0 8px;
 }
 
 .games-popular--meta {
-	width: 99%;
+	width: 60%;
 	padding: 6px;
 }
 
@@ -916,7 +925,7 @@ select {
 
 	.games-popular--title {
 		text-align: left;
-		max-width: 100%;
+		width: 100%;
 		margin-top: 4px;
 	}
 
