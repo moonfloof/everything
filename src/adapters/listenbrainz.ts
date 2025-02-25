@@ -5,6 +5,8 @@ import { searchTrack } from './subsonic.js';
 
 const log = new Logger('ListenBrainz');
 
+type NewListen = Omit<ListenInsert, 'id' | 'device_id'>;
+
 interface ListenBrainzTrack {
 	listened_at: number;
 	track_metadata: {
@@ -58,42 +60,48 @@ export function setNowPlaying(track: ListenBrainzTrack) {
 	nowPlaying.updated_at = Date.now();
 }
 
-export async function convertScrobbleIntoListen(
-	scrobble: ListenBrainzPayload['payload'][0],
-): Promise<Omit<ListenInsert, 'id' | 'device_id'>> {
+async function fillMissingData(listen: NewListen): Promise<NewListen> {
+	if (
+		listen.release_year !== null &&
+		listen.track_number !== null &&
+		listen.duration_secs !== null &&
+		listen.genre !== null
+	) {
+		return listen;
+	}
+
+	// Get extra data from subsonic, if available
+	const search = await searchTrack(listen.title, listen.album, listen.artist);
+
+	if (!listen.track_number && search?.track) listen.track_number = search.track;
+	if (!listen.release_year && search?.year) listen.release_year = search.year;
+	if (!listen.duration_secs && search?.duration) listen.duration_secs = search.duration;
+	if (!listen.genre && search?.genre) listen.genre = search.genre;
+
+	return listen;
+}
+
+export async function convertScrobbleIntoListen(scrobble: ListenBrainzPayload['payload'][0]): Promise<NewListen> {
 	// Get payload data
 	const created_at = new Date(scrobble.listened_at * 1000).toISOString();
 	const { artist_name: artist, track_name: title, release_name: album } = scrobble.track_metadata;
 
-	// Apparently additional_info doesn't always get sent
-	const releaseDateISO = scrobble.track_metadata.additional_info?.date;
-	const genres = scrobble.track_metadata.additional_info?.tags;
-	let track_number = scrobble.track_metadata.additional_info?.tracknumber || null;
-	let duration_secs = (scrobble.track_metadata.additional_info?.duration_ms ?? 0) / 1000 || null;
+	// Additional_info doesn't always get sent
+	const { date, tags, tracknumber, duration_ms } = scrobble.track_metadata.additional_info ?? {};
 
-	// Process payload data
-	let release_year = releaseDateISO ? new Date(releaseDateISO).getFullYear() : null;
-	let genre = Array.isArray(genres) && genres[0] !== undefined ? genres[0] : null;
-
-	if (release_year === null || track_number === null || duration_secs === null || genre === null) {
-		// Get extra data from subsonic, if available
-		// The API unfortunately doesn't return genre data nicely.
-		const search = await searchTrack(title, album, artist);
-
-		if (!track_number && search?.track) track_number = search.track;
-		if (!release_year && search?.year) release_year = search.year;
-		if (!duration_secs && search?.duration) duration_secs = search.duration;
-		if (!genre && search?.genre) genre = search.genre;
-	}
-
-	return {
+	let listen = {
 		artist,
-		album,
 		title,
-		track_number,
-		release_year,
-		genre,
-		duration_secs,
+		album,
 		created_at,
+
+		track_number: tracknumber || null,
+		duration_secs: duration_ms !== undefined ? duration_ms / 1000 : null,
+		release_year: date ? new Date(date).getFullYear() : null,
+		genre: Array.isArray(tags) && tags[0] !== undefined ? tags[0] : null,
 	};
+
+	listen = await fillMissingData(listen);
+
+	return listen;
 }
