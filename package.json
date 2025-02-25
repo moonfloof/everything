@@ -15,8 +15,8 @@
 	"license": "AGPL-3.0-or-later",
 	"dependencies": {
 		"@tombofry/stdlib": "^0.11.1",
-		"better-sqlite3": "^11.7.0",
-		"discord.js": "^14.16.3",
+		"better-sqlite3": "^11.8.1",
+		"discord.js": "^14.18.0",
 		"dotenv": "^16.4.7",
 		"express": "^5.0.1",
 		"express-handlebars": "^8.0.1",
@@ -27,10 +27,10 @@
 		"nodemon": "^3.1.9",
 		"on-finished": "^2.4.1",
 		"phin": "^3.7.0",
-		"psn-api": "^2.10.1",
+		"psn-api": "^2.11.0",
 		"sax": "^1.2.4",
 		"sharp": "^0.33.5",
-		"uuid": "^11.0.3"
+		"uuid": "^11.1.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
@@ -38,8 +38,8 @@
 		"@types/express": "^5.0.0",
 		"@types/node-cron": "^3.0.11",
 		"@types/sax": "^1.2.7",
-		"esbuild": "^0.24.2",
-		"typescript": "^5.7.2"
+		"esbuild": "^0.25.0",
+		"typescript": "^5.7.3"
 	},
 	"nodemonConfig": {
 		"ext": "ts",
