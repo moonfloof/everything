@@ -38,9 +38,17 @@ router.post('/1/submit-listens', async (req: RequestFrontend<object, ListenBrain
 		}
 		const { id: device_id } = validateDevice(authToken.substring(6));
 
+		if (req.body.payload.length === 0) {
+			throw new Error('Provide at least one song in the `payload` array');
+		}
+
 		// Set now playing notification
 		if (req.body.listen_type === 'playing_now') {
-			setNowPlaying(req.body.payload);
+			if (req.body.payload[0] === undefined) {
+				throw new Error('Currently playing track cannot be undefined');
+			}
+
+			setNowPlaying(req.body.payload[0]);
 			res.send({ status: 'ok' });
 			return;
 		}

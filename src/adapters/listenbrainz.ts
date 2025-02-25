@@ -5,22 +5,24 @@ import { searchTrack } from './subsonic.js';
 
 const log = new Logger('ListenBrainz');
 
+interface ListenBrainzTrack {
+	listened_at: number;
+	track_metadata: {
+		artist_name: string;
+		track_name: string;
+		release_name: string;
+		additional_info?: {
+			date?: string;
+			tags?: string[];
+			tracknumber?: number;
+			duration_ms?: number;
+		};
+	};
+}
+
 export interface ListenBrainzPayload {
 	listen_type: 'playing_now' | 'single' | 'import';
-	payload: {
-		listened_at: number;
-		track_metadata: {
-			artist_name: string;
-			track_name: string;
-			release_name: string;
-			additional_info?: {
-				date?: string;
-				tags?: string[];
-				tracknumber?: number;
-				duration_ms?: number;
-			};
-		};
-	}[];
+	payload: ListenBrainzTrack[];
 }
 
 const nowPlaying: { artist: string | null; title: string | null; updated_at: number } = {
@@ -46,8 +48,8 @@ export function getNowPlaying() {
 	return nowPlaying;
 }
 
-export function setNowPlaying(payload: ListenBrainzPayload['payload']) {
-	const { artist_name: artist, track_name: title } = payload[0].track_metadata;
+export function setNowPlaying(track: ListenBrainzTrack) {
+	const { artist_name: artist, track_name: title } = track.track_metadata;
 
 	log.debug(`Setting "${title}" by ${artist} as now playing`);
 
@@ -71,7 +73,7 @@ export async function convertScrobbleIntoListen(
 
 	// Process payload data
 	let release_year = releaseDateISO ? new Date(releaseDateISO).getFullYear() : null;
-	let genre = Array.isArray(genres) && genres.length > 0 ? genres[0] : null;
+	let genre = Array.isArray(genres) && genres[0] !== undefined ? genres[0] : null;
 
 	if (release_year === null || track_number === null || duration_secs === null || genre === null) {
 		// Get extra data from subsonic, if available
