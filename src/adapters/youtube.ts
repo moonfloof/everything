@@ -185,7 +185,7 @@ export async function getYouTubeVideoSnippet(url: string) {
 		id: [videoId],
 	});
 
-	if (response?.data?.items?.length !== 1) {
+	if (response?.data?.items?.length !== 1 || response?.data?.items?.[0] === undefined) {
 		throw new Error(`No results returned for video ID: ${videoId}`);
 	}
 

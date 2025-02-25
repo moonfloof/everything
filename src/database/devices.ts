@@ -11,7 +11,7 @@ interface Device {
 	updated_at: string;
 }
 
-export function validateDevice(api_key: string) {
+export function validateDevice(api_key?: string) {
 	const statement = getStatement<Device>(
 		'validateDevice',
 		'SELECT * FROM devices WHERE api_key = $api_key LIMIT 1',

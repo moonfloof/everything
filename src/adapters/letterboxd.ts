@@ -77,8 +77,9 @@ async function parseFeed(feed: string): Promise<Partial<LetterboxdFilm>[]> {
 		parser.onopentag = node => {
 			currentTag = node.name;
 
-			if (currentTag.includes(':')) {
-				currentTag = currentTag.split(':')[1];
+			const tagSplit = currentTag.split(':');
+			if (tagSplit[1] !== undefined) {
+				currentTag = tagSplit[1];
 			}
 
 			if (node.name === 'item') {
@@ -100,11 +101,15 @@ async function parseFeed(feed: string): Promise<Partial<LetterboxdFilm>[]> {
 				value = Number(value);
 			}
 
-			items[currentIndex][currentTag] = value;
+			const item = items[currentIndex] ?? {};
+			item[currentTag] = value;
+			items[currentIndex] = item;
 		};
 
 		parser.oncdata = text => {
-			items[currentIndex][currentTag] = text.trim();
+			const item = items[currentIndex] ?? {};
+			item[currentTag] = text.trim();
+			items[currentIndex] = item;
 		};
 
 		parser.onclosetag = node => {

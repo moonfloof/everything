@@ -22,6 +22,7 @@
 				"noReExportAll": "error"
 			},
 			"style": {
+				"noNonNullAssertion": "warn",
 				"noParameterAssign": "error",
 				"noRestrictedGlobals": "error",
 				"noShoutyConstants": "error",
