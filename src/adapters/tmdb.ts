@@ -93,7 +93,11 @@ function tmbdSearch(query: string, year?: string | number): Promise<SearchRespon
 
 const tmdbGetImageUrl = (path: string) => `https://image.tmdb.org/t/p/original${path}`;
 
-function getPreferredImage(images: TmdbImage[], preferredLanguage?: string): TmdbImage {
+function getPreferredImage(images: TmdbImage[], preferredLanguage?: string): TmdbImage | undefined {
+	if (images.length === 0) {
+		return undefined;
+	}
+
 	if (preferredLanguage !== undefined) {
 		const image = images.find(image => image.iso_639_1 === preferredLanguage);
 		if (image) return image;
@@ -119,18 +123,14 @@ export async function searchForImagesById(watchId: string, movieId: number, type
 		log.debug(`Getting images for movie '${movieId}'`);
 		const response = await tmdbImages(movieId, type);
 
-		if (!heroPathExists && response.backdrops.length > 0) {
-			await saveImageToDisk(
-				tmdbGetImageUrl(getPreferredImage(response.backdrops).file_path),
-				heroPath,
-			);
+		const heroTmdbImage = getPreferredImage(response.backdrops);
+		if (!heroPathExists && heroTmdbImage !== undefined) {
+			await saveImageToDisk(tmdbGetImageUrl(heroTmdbImage.file_path), heroPath);
 		}
 
-		if (!posterPathExists && response.posters.length > 0) {
-			await saveImageToDisk(
-				tmdbGetImageUrl(getPreferredImage(response.posters, 'en').file_path),
-				posterPath,
-			);
+		const posterTmdbImage = getPreferredImage(response.posters, 'en');
+		if (!posterPathExists && posterTmdbImage !== undefined) {
+			await saveImageToDisk(tmdbGetImageUrl(posterTmdbImage.file_path), posterPath);
 		}
 	} catch (err) {
 		log.error((err as Error).message);

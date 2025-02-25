@@ -33,6 +33,8 @@ export function getDiscordClient() {
 }
 
 async function commandYouTube(args: string[], message: Message) {
+	if (args[0] === undefined) return;
+
 	if (args[0] === 'help') {
 		await message.reply('Usage: `youtube <URL> [liked date/time]`');
 		return;

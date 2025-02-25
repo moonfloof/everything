@@ -81,13 +81,13 @@ export async function searchForImages(term: string, game: Game) {
 
 	log.debug(`Searching images for '${term}'`);
 	const search = await searchAutocomplete(term);
-	if (search.data.length === 0) return;
+	if (search.data[0] === undefined) return;
 	const searchGame = search.data[0];
 
 	if (!existsSync(heroImagePath)) {
 		log.debug(`Fetching hero image for '${term}'`);
 		const heroes = await heroesForGame(searchGame.id, { dimensions: '1920x620' });
-		if (heroes.data.length > 0) {
+		if (heroes.data[0] !== undefined) {
 			const heroImageUrl = heroes.data[0].url;
 			saveImageToDisk(heroImageUrl, heroImagePath);
 		}
@@ -96,7 +96,7 @@ export async function searchForImages(term: string, game: Game) {
 	if (!existsSync(libraryImagePath)) {
 		log.debug(`Fetching library image for '${term}'`);
 		const grids = await gridsForGame(searchGame.id, { dimensions: '600x900' });
-		if (grids.data.length > 0) {
+		if (grids.data[0] !== undefined) {
 			const libraryImageUrl = grids.data[0].url;
 			saveImageToDisk(libraryImageUrl, libraryImagePath);
 		}

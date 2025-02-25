@@ -12,6 +12,7 @@
 		"allowSyntheticDefaultImports": true,
 		"outDir": "./dist",
 		"rootDir": "./src",
+		"noUncheckedIndexedAccess": true,
 	},
 	"include": [
 		"src",

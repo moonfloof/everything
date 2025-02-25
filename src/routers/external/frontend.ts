@@ -107,7 +107,7 @@ router.get('/music', (req: RequestFrontend, res) => {
 	const title = popular.length === 0 ? 'listens to music (sometimes, apparently)' : 'listens to music';
 
 	const description =
-		popular.length > 0
+		popular[0] !== undefined
 			? `My favourite artist in the last ${daysInt} days has been ${popular[0].artist}, with ${popular[0].count} listens`
 			: `I haven't listened to any music in the last ${daysInt} days!`;
 
@@ -160,7 +160,7 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 	const popular = getPopularYouTubeChannels(daysInt);
 
 	const description =
-		popular.length > 0
+		popular[0] !== undefined
 			? `My favourite YouTube channel in the last ${daysInt} days has been ${popular[0].channel}, with ${popular[0].count} likes`
 			: `I haven't liked any YouTube videos in the last ${daysInt} days!`;
 

@@ -181,11 +181,14 @@ async function getTrophiesForGame(game: { titleName: string; format: 'PS5' | 'ps
 		}
 
 		id = gameIdMap[gameName];
-		if (!id) {
-			log.error('Could not find Communication ID from user titles. Cannot save achievements');
-			return [];
-		}
 	}
+
+	if (id === undefined) {
+		log.error('Could not find Communication ID from user titles. Cannot save achievements');
+		return [];
+	}
+
+	const gameTrophies = trophies[id] ?? { server: [] };
 
 	let options = undefined;
 	if (game.format !== 'PS5') options = { npServiceName: 'trophy' as const };
@@ -200,7 +203,7 @@ async function getTrophiesForGame(game: { titleName: string; format: 'PS5' | 'ps
 	);
 
 	// Cache full trophy info (name, description), if not already cached
-	if (remoteTrophies.length > 0 && !trophies[id]?.server?.length) {
+	if (remoteTrophies.length > 0 && gameTrophies.server.length === 0) {
 		log.debug(`Fetching server trophies for ${game.titleName}`);
 
 		const serverTrophies: TitleTrophiesResponse = await getTitleTrophies(
@@ -210,16 +213,18 @@ async function getTrophiesForGame(game: { titleName: string; format: 'PS5' | 'ps
 			options,
 		);
 
-		trophies[id].server = serverTrophies.trophies.map(trophy => ({
+		gameTrophies.server = serverTrophies.trophies.map(trophy => ({
 			trophyId: trophy.trophyId,
 			trophyName: trophy.trophyName,
 			trophyDetail: trophy.trophyDetail,
 		}));
 	}
 
+	trophies[id] = gameTrophies;
+
 	// Add title and description to new trophies
 	return remoteTrophies.map(trophy => {
-		const serverTrophy = trophies[id].server.find(server => server.trophyId === trophy.trophyId);
+		const serverTrophy = gameTrophies.server.find(server => server.trophyId === trophy.trophyId);
 
 		// A pretty ugly fallback, something like "GranTurismo7 - 28"
 		// but it'll satisfy the UNIQUE constraint on achievement name.
