@@ -6,7 +6,7 @@ import { insertFilm } from '../database/films.js';
 import { config } from '../lib/config.js';
 import { formatDate } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
-import { searchForImagesById } from './tmdb.js';
+import { searchForImagesById, tmdbMovieDetails } from './tmdb.js';
 
 dotenv.config();
 
@@ -141,12 +141,25 @@ async function logFilm(film: LetterboxdFilm) {
 	// so we need to remove that.
 	const review = film.guid.includes('letterboxd-review') ? film.description.replace(/<p>.*?<\/p>/, '') : null;
 
+	// TODO: Can we get more useful information out of this request?
+	let duration_secs = null;
+	if (film.movieId) {
+		try {
+			const details = await tmdbMovieDetails(film.movieId);
+			duration_secs = details.runtime * 60;
+		} catch (err) {
+			log.error('Failed to retrieve movie details. Ignoring');
+			log.error(err);
+		}
+	}
+
 	const { id } = insertFilm({
 		title: film.filmTitle,
 		year: film.filmYear,
 		rating: film.memberRating ? film.memberRating * 2 : null,
 		review,
 		url: film.link,
+		duration_secs,
 		watched_at: formatDate(film.watchedDate),
 		created_at: film.pubDate.toISOString(),
 		device_id: config.defaultDeviceId,
