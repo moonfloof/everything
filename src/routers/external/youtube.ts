@@ -2,6 +2,7 @@ import express from 'express';
 import { generateAuthUrl, getYouTubeVideoSnippet, retrieveAccessToken } from '../../adapters/youtube.js';
 import { validateDevice } from '../../database/devices.js';
 import { insertYouTubeLike } from '../../database/youtubelikes.js';
+import { isoDurationToSeconds } from '../../lib/formatDate.js';
 import Logger from '../../lib/logger.js';
 import { isLocal } from '../../lib/middleware/isLocal.js';
 import type { RequestFrontend } from '../../types/express.js';
@@ -21,6 +22,7 @@ router.post('/like', async (req: RequestFrontend, res) => {
 			video_id: details.id as string,
 			title: title || details.snippet?.title || '',
 			channel: details.snippet?.channelTitle || 'N/A',
+			duration_secs: isoDurationToSeconds(details.contentDetails?.duration),
 			device_id,
 			created_at,
 		});
