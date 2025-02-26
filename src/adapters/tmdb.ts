@@ -3,49 +3,9 @@ import phin from 'phin';
 import { config } from '../lib/config.js';
 import Logger from '../lib/logger.js';
 import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
+import type { ImagesResponse, SearchResponse, TmbdMovieDetails, TmdbImage } from './tmdbTypes.js';
 
 const log = new Logger('tmdb');
-
-type TmdbImage = {
-	file_path: string;
-	iso_639_1: string | null;
-
-	vote_average: number;
-	vote_count: number;
-
-	aspect_ratio: number;
-	width: number;
-	height: number;
-};
-
-type ImagesResponse = {
-	id: number;
-	backdrops: TmdbImage[];
-	logos: TmdbImage[];
-	posters: TmdbImage[];
-};
-
-type SearchResponse = {
-	page: number;
-	results: {
-		adult: boolean;
-		backdrop_path: string;
-		genre_ids: number[];
-		id: number;
-		original_language: string;
-		original_title: string;
-		overview: string;
-		popularity: string;
-		poster_path: string;
-		release_date: string;
-		title: string;
-		video: boolean;
-		vote_average: number;
-		vote_count: number;
-	}[];
-	total_pages: number;
-	total_results: number;
-};
 
 async function request<T>(path: string, params?: URLSearchParams): Promise<T> {
 	const { accessToken, apiBaseUrl } = config.tmdb;
@@ -89,6 +49,10 @@ function tmbdSearch(query: string, year?: string | number): Promise<SearchRespon
 	}
 
 	return request<SearchResponse>('/3/search/movie', params);
+}
+
+export function tmdbMovieDetails(id: number): Promise<TmbdMovieDetails> {
+	return request<TmbdMovieDetails>(`/3/movie/${id}`);
 }
 
 const tmdbGetImageUrl = (path: string) => `https://image.tmdb.org/t/p/original${path}`;
