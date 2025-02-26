@@ -3,7 +3,7 @@ import { type OAuth2Client, gaxios } from 'google-auth-library';
 import { google } from 'googleapis';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
 import { config } from '../lib/config.js';
-import { minuteMs } from '../lib/formatDate.js';
+import { isoDurationToSeconds, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 
 const log = new Logger('YouTube');
@@ -107,7 +107,7 @@ async function getLatestLikedVideos() {
 
 	const youtube = google.youtube('v3');
 	const { data } = await youtube.videos.list({
-		part: ['snippet'],
+		part: ['snippet', 'contentDetails'],
 		maxResults: 10,
 		myRating: 'like',
 	});
@@ -145,6 +145,7 @@ export function pollForLikedVideos() {
 					video_id: video.id,
 					title: video.snippet.title,
 					channel: video.snippet.channelTitle,
+					duration_secs: isoDurationToSeconds(video.contentDetails?.duration),
 					device_id: config.defaultDeviceId,
 					created_at: '',
 				});
@@ -181,7 +182,7 @@ export async function getYouTubeVideoSnippet(url: string) {
 	});
 
 	const response = await youtube.videos.list({
-		part: ['snippet'],
+		part: ['snippet', 'contentDetails'],
 		id: [videoId],
 	});
 

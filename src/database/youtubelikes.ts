@@ -10,6 +10,7 @@ interface YouTubeLike {
 	video_id: string;
 	title: string;
 	channel: Optional<string>;
+	duration_secs: Optional<number>;
 	device_id: string;
 	created_at: string;
 }
@@ -18,9 +19,9 @@ export function insertYouTubeLike(video: Insert<YouTubeLike>) {
 	const statement = getStatement(
 		'insertYouTubeLike',
 		`INSERT INTO youtubelikes
-		(id, video_id, title, channel, device_id, created_at)
+		(id, video_id, title, channel, duration_secs, device_id, created_at)
 		VALUES
-		($id, $video_id, $title, $channel, $device_id, $created_at)`,
+		($id, $video_id, $title, $channel, $duration_secs, $device_id, $created_at)`,
 	);
 
 	return statement.run({
@@ -67,6 +68,7 @@ export function updateYouTubeLike(video: Update<YouTubeLike>) {
 		SET video_id = $video_id,
 		    title = $title,
 		    channel = $channel,
+		    duration_secs = $duration_secs,
 		    created_at = $created_at
 		WHERE id = $id`,
 	);

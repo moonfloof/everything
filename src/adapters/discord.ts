@@ -2,6 +2,7 @@ import { Client, type Message, Partials } from 'discord.js';
 import { insertBookmark } from '../database/bookmarks.js';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
 import { config } from '../lib/config.js';
+import { isoDurationToSeconds } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { getYouTubeVideoSnippet } from './youtube.js';
 
@@ -46,6 +47,7 @@ async function commandYouTube(args: string[], message: Message) {
 		title: details.snippet?.title as string,
 		video_id: details.id as string,
 		channel: details.snippet?.channelTitle || 'N/A',
+		duration_secs: isoDurationToSeconds(details.contentDetails?.duration),
 		device_id: config.defaultDeviceId,
 		created_at: '',
 	});

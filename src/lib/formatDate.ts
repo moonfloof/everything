@@ -115,6 +115,31 @@ export function msToIsoDuration(durationMs: number) {
 	return output;
 }
 
+export function isoDurationToSeconds(durationPT: string | undefined | null): number | null {
+	if (durationPT === '' || durationPT === undefined || durationPT === null) {
+		return null;
+	}
+
+	// If we've just passed in a plain old number,
+	// assume it's... a plain old number.
+	if (!Number.isNaN(Number(durationPT))) {
+		return Number(durationPT);
+	}
+
+	const regex = new RegExp(/^PT(?:(?<hours>\d+)H)?(?:(?<minutes>\d+)M)?(?:(?<seconds>\d+)S)?$/);
+	const duration = durationPT.match(regex);
+	if (duration === null) {
+		return null;
+	}
+
+	const { hours, minutes, seconds } = duration.groups ?? {};
+	const hoursNumber = Number(hours ?? 0) * 3600;
+	const minutesNumber = Number(minutes ?? 0) * 60;
+	const secondsNumber = Number(seconds ?? 0);
+
+	return hoursNumber + minutesNumber + secondsNumber;
+}
+
 export function getStartOfDay(date = new Date()) {
 	return new Date(`${formatDate(date)}T00:00:00.000Z`);
 }
