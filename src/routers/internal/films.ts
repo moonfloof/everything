@@ -30,7 +30,7 @@ router.get('/', (req: RequestFrontend, res) => {
 // CRUD
 
 router.post('/', (req: RequestFrontend, res) => {
-	const { title, year, rating, review, url, watched_at, created_at } = req.body;
+	const { title, year, rating, review, url, duration_secs, watched_at, created_at } = req.body;
 
 	insertFilm({
 		title,
@@ -38,6 +38,7 @@ router.post('/', (req: RequestFrontend, res) => {
 		rating: Number(rating) || null,
 		review,
 		url,
+		duration_secs: duration_secs?.trim() ? Number(duration_secs) : null,
 		watched_at,
 		created_at,
 		device_id: config.defaultDeviceId,
@@ -62,7 +63,7 @@ router.post('/rescan', async (_req, res) => {
 
 router.post('/:id', (req: RequestFrontend, res) => {
 	const { id } = req.params;
-	const { crudType, title, year, rating, review, url, watched_at, created_at } = req.body;
+	const { crudType, title, year, rating, review, url, duration_secs, watched_at, created_at } = req.body;
 
 	switch (crudType) {
 		case 'delete': {
@@ -80,6 +81,7 @@ router.post('/:id', (req: RequestFrontend, res) => {
 				rating: Number(rating) || null,
 				review: review || null,
 				url,
+				duration_secs: duration_secs?.trim() ? Number(duration_secs) : null,
 				watched_at,
 				created_at,
 			});

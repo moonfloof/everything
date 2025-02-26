@@ -14,6 +14,7 @@ interface Film {
 	rating: Optional<number>;
 	review: Optional<string>;
 	url: Optional<string>;
+	duration_secs: Optional<number>;
 	watched_at: string;
 	created_at: string;
 	device_id: string;
@@ -23,9 +24,9 @@ export function insertFilm(film: Insert<Film>) {
 	const statement = getStatement(
 		'insertFilm',
 		`INSERT INTO films
-		(id, title, year, rating, review, url, watched_at, created_at, device_id)
+		(id, title, year, rating, review, url, duration_secs, watched_at, created_at, device_id)
 		VALUES
-		($id, $title, $year, $rating, $review, $url, $watched_at, $created_at, $device_id)`,
+		($id, $title, $year, $rating, $review, $url, $duration_secs, $watched_at, $created_at, $device_id)`,
 	);
 
 	const id = uuid();
@@ -81,6 +82,7 @@ export function updateFilm(film: Update<Film>) {
 		    rating = $rating,
 		    review = $review,
 		    url = $url,
+		    duration_secs = $duration_secs,
 		    watched_at = $watched_at,
 		    created_at = $created_at
 		WHERE id = $id`,
