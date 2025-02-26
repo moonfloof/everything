@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
-import type { Insert, Update } from '../types/database.js';
+import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
@@ -9,6 +9,7 @@ interface Episode {
 	id: string;
 	series_title: string;
 	episode_title: string;
+	duration_secs: Optional<number>;
 	created_at: string;
 	device_id: string;
 }
@@ -16,8 +17,8 @@ interface Episode {
 export function insertEpisode(episode: Insert<Episode>) {
 	const statement = getStatement(
 		'insertEpisode',
-		`INSERT INTO tv (id, series_title, episode_title, created_at, device_id)
-		VALUES ($id, $series_title, $episode_title, $created_at, $device_id)`,
+		`INSERT INTO tv (id, series_title, episode_title, duration_secs, created_at, device_id)
+		VALUES ($id, $series_title, $episode_title, $duration_secs, $created_at, $device_id)`,
 	);
 
 	return statement.run({
@@ -58,6 +59,7 @@ export function updateEpisode(episode: Update<Episode>) {
 		`UPDATE tv
 		SET series_title = $series_title,
 		    episode_title = $episode_title,
+		    duration_secs = $duration_secs,
 		    created_at = $created_at
 		WHERE id = $id`,
 	);
