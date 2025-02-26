@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import phin from 'phin';
 import { config } from '../lib/config.js';
+import type { Episode, EpisodeWithSeries, Series } from './sonarrTypes.js';
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ const api = <T = unknown>(path: string, params: { seriesId?: string } = {}) => {
 };
 
 export const getSeriesList = async () => {
-	const response = await api<{ title: string; year: number; id: number }[]>('/api/v3/series');
+	const response = await api<Series[]>('/api/v3/series');
 
 	return response.body.map(series => ({
 		title: `${series.title} (${series.year})`,
@@ -30,15 +31,12 @@ export const getSeriesList = async () => {
 };
 
 export const getSeries = async (seriesId: number) => {
-	const response = await api(`/api/v3/series/${seriesId}`);
+	const response = await api<Series>(`/api/v3/series/${seriesId}`);
 	return response.body;
 };
 
 export const getEpisodeList = async (seriesId: string) => {
-	const response = await api<{ id: number; seasonNumber: number; episodeNumber: number; title: string }[]>(
-		'/api/v3/episode',
-		{ seriesId },
-	);
+	const response = await api<Episode[]>('/api/v3/episode', { seriesId });
 
 	return response.body.map(episode => ({
 		title: `S${episode.seasonNumber}E${episode.episodeNumber} - ${episode.title}`,
@@ -47,14 +45,6 @@ export const getEpisodeList = async (seriesId: string) => {
 };
 
 export const getEpisode = async (episodeId: string) => {
-	const response = await api<{
-		seasonNumber: number;
-		episodeNumber: number;
-		title: string;
-		series: {
-			title: string;
-			year: number;
-		};
-	}>(`/api/v3/episode/${episodeId}`);
+	const response = await api<EpisodeWithSeries>(`/api/v3/episode/${episodeId}`);
 	return response.body;
 };

@@ -53,10 +53,12 @@ router.post('/episode', async (req: RequestFrontend, res) => {
 		const episodeNumber = padString(episode.episodeNumber, 2);
 		const episode_title = `S${seasonNumber}E${episodeNumber} - ${episode.title}`;
 		const series_title = `${episode.series.title} (${episode.series.year})`;
+		const duration_secs = episode.runtime === 0 ? null : episode.runtime * 60;
 
 		insertEpisode({
 			series_title,
 			episode_title,
+			duration_secs,
 			device_id: config.defaultDeviceId,
 			created_at: '',
 		});
@@ -71,9 +73,15 @@ router.post('/episode', async (req: RequestFrontend, res) => {
 });
 
 router.post('/', (req: RequestFrontend, res) => {
-	const { series_title, episode_title, created_at } = req.body;
+	const { series_title, episode_title, duration_secs, created_at } = req.body;
 
-	insertEpisode({ series_title, episode_title, device_id: config.defaultDeviceId, created_at });
+	insertEpisode({
+		series_title,
+		episode_title,
+		duration_secs: duration_secs?.trim() ? Number(duration_secs) : null,
+		device_id: config.defaultDeviceId,
+		created_at,
+	});
 
 	log.info(`Logged episode '${episode_title}' from '${series_title}'`);
 
@@ -82,7 +90,7 @@ router.post('/', (req: RequestFrontend, res) => {
 
 router.post('/:id', (req: RequestFrontend, res) => {
 	const { id } = req.params;
-	const { crudType, series_title, episode_title, created_at } = req.body;
+	const { crudType, series_title, episode_title, duration_secs, created_at } = req.body;
 
 	switch (crudType) {
 		case 'delete': {
@@ -91,7 +99,13 @@ router.post('/:id', (req: RequestFrontend, res) => {
 		}
 
 		case 'update': {
-			updateEpisode({ id, series_title, episode_title, created_at });
+			updateEpisode({
+				id,
+				series_title,
+				episode_title,
+				duration_secs: duration_secs?.trim() ? Number(duration_secs) : null,
+				created_at,
+			});
 			break;
 		}
 
