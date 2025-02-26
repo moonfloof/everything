@@ -4,8 +4,8 @@ import {
 	dateDefault,
 	dayMs,
 	getStartOfDay,
-	isoDuration,
 	minuteMs,
+	msToIsoDuration,
 	prettyDuration,
 	shortDate,
 } from '../lib/formatDate.js';
@@ -132,7 +132,7 @@ export function getGameSessions(parameters: Partial<Parameters> = {}) {
 			...row,
 			duration: prettyDuration(row.playtime_mins * minuteMs),
 			durationNumber: row.playtime_mins / 60,
-			durationIso: isoDuration(row.playtime_mins * minuteMs),
+			durationIso: msToIsoDuration(row.playtime_mins * minuteMs),
 			timeago: timeago.format(new Date(row.created_at)),
 			achievements,
 			achievementText,

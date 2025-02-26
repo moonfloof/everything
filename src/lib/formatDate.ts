@@ -94,7 +94,7 @@ export function prettyDuration(durationMs: number) {
 	return duration;
 }
 
-export function isoDuration(durationMs: number) {
+export function msToIsoDuration(durationMs: number) {
 	// 60 mins * 60 secs * 1000 ms
 	const hoursTotal = durationMs / 3600000;
 
