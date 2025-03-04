@@ -25,8 +25,8 @@ function getClient() {
 	if (client !== null) return client;
 
 	client = new google.auth.OAuth2({
-		clientId: config.youtube.clientId,
-		clientSecret: config.youtube.clientSecret,
+		clientId: config.google.clientId,
+		clientSecret: config.google.clientSecret,
 		redirectUri: `${config.serverExternalUri}/api/youtube/callback`,
 	});
 
@@ -53,7 +53,7 @@ export function generateAuthUrl() {
 
 function loadTokensFromDisk() {
 	log.info('Loading tokens and cache data from disk');
-	if (existsSync(config.youtube.tokenPath) === false) {
+	if (existsSync(config.google.tokenPath) === false) {
 		log.debug('Token file does not exist, providing defaults');
 		googleAuth.accessToken = null;
 		googleAuth.refreshToken = null;
@@ -62,7 +62,7 @@ function loadTokensFromDisk() {
 		return;
 	}
 
-	const contents = JSON.parse(readFileSync(config.youtube.tokenPath).toString());
+	const contents = JSON.parse(readFileSync(config.google.tokenPath).toString());
 
 	googleAuth = contents.googleAuth;
 	youtubeLikes = contents.youtubeLikes || [];
@@ -78,7 +78,7 @@ function loadTokensFromDisk() {
 function saveTokensToDisk() {
 	log.info('Saving tokens and cache data to disk');
 	const str = JSON.stringify({ googleAuth, youtubeLikes }, null, 2);
-	writeFileSync(config.youtube.tokenPath, str);
+	writeFileSync(config.google.tokenPath, str);
 }
 
 export async function retrieveAccessToken(authCode: string) {
@@ -116,7 +116,7 @@ async function getLatestLikedVideos() {
 }
 
 export function pollForLikedVideos() {
-	const intervalMs = config.youtube.pollInterval * minuteMs;
+	const intervalMs = config.google.youtubePollIntervalMins * minuteMs;
 
 	if (intervalMs === 0) {
 		log.warn('Polling is disabled, liked videos will not be automatically tracked');
@@ -168,7 +168,7 @@ export function pollForLikedVideos() {
 }
 
 export async function getYouTubeVideoSnippet(url: string) {
-	if (!config.youtube.apiKey || config.youtube.apiKey.length === 0) {
+	if (!config.google.apiKey || config.google.apiKey.length === 0) {
 		throw new Error(
 			'Please provide a YouTube API key using the TOMBOIS_GOOGLE_APIKEY environment variable',
 		);
@@ -178,7 +178,7 @@ export async function getYouTubeVideoSnippet(url: string) {
 
 	const youtube = google.youtube({
 		version: 'v3',
-		auth: config.youtube.apiKey,
+		auth: config.google.apiKey,
 	});
 
 	const response = await youtube.videos.list({

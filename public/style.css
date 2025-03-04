@@ -294,13 +294,17 @@ a:hover {
 .page--data h2,
 .page--data h3,
 .page--data p,
-.page--data hr,
 .page--data svg,
 .page--data table,
 .page--data .error,
 .page--data form,
+.page--data fieldset,
 .page--data input[type="submit"] {
 	margin-top: 16px;
+}
+
+.page--data hr {
+	margin: 16px 0;
 }
 
 .sectioncontainer {
@@ -309,6 +313,16 @@ a:hover {
 
 .page--data p {
 	line-height: 1.618;
+}
+
+.page--data fieldset {
+	padding: 8px;
+	border-radius: 8px;
+	margin-bottom: 8px;
+
+	legend {
+		padding: 0 8px;
+	}
 }
 
 .page--data__header {
@@ -801,14 +815,22 @@ code {
 	font-weight: 700;
 }
 
+.right input,
+input.right,
+.right select,
+select.right,
+.right textarea,
+textarea.right {
+	font-size: 16px;
+	padding: 4px;
+	margin-bottom: 4px;
+}
+
 input.right,
 select.right,
 textarea.right {
 	width: 100%;
 	flex: 1;
-	font-size: 16px;
-	padding: 4px;
-	margin-bottom: 4px;
 }
 
 textarea.right:focus {
@@ -816,6 +838,7 @@ textarea.right:focus {
 }
 
 input[type="submit"],
+input[type="button"],
 input[type="date"],
 select {
 	padding: 6px 12px;

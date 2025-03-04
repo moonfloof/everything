@@ -1,0 +1,45 @@
+<form method="POST" action="/checkins/{{data.id}}" class="sectioncontainer">
+	{{#if data.id}}
+	{{> internal/id id=data.id type="checkin" }}
+	<div class="row">
+		<span class="left">🏢</span>
+		<span class="right">
+			<strong>{{data.name}}</strong>{{#if data.address}}, {{data.address}}{{/if}}
+		</span>
+	</div>
+	{{else}}
+	<fieldset>
+		<legend>Place: Choose or create new</legend>
+		{{> internal/crudRowSelect emoji="🏢" name="place_id" values=places }}
+		<div class="row" id="search_button_container" style="display: none;">
+			<div class="left">🔎</div>
+			<div class="right">
+				<input type="button" id="search_button_cached" value="Search Cached Places">
+				<input type="button" id="search_button_google" value="Search Google Maps">
+			</div>
+		</div>
+		<hr/>
+		{{> internal/crudRow emoji="or" name="name" }}
+		{{> internal/crudRowAutocomplete emoji="📦" name="category" values=categories }}
+		{{> internal/crudRow emoji="🗺️" name="address" }}
+		<div class="row">
+			<span class="left">📍</span>
+			<span class="right">
+				<input type="number" placeholder="lat"  id="new_checkin_lat"  name="lat"  step="0.000001">
+				<input type="number" placeholder="long" id="new_checkin_long" name="long" step="0.000001">
+			</span>
+		</div>
+	</fieldset>
+	{{/if}}
+
+	{{> internal/crudRowParagraph emoji="📜" name="description" value=data.description }}
+	{{> internal/crudRow type="datetime-local" emoji="🕑" name="created_at" value=data.created_at }}
+	{{> internal/crudRow type="datetime-local" emoji="🕖" name="updated_at" value=data.updated_at }}
+
+	<div class="row">
+		<span class="left">🖼️</span>
+		<span class="right">TODO Photos</span>
+	</div>
+
+	{{> internal/crudSubmit }}
+</form>

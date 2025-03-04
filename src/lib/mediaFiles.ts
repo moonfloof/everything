@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { basename } from 'node:path';
 import phin from 'phin';
-import sharp from 'sharp';
+import sharp, { type Sharp } from 'sharp';
 import { config } from './config.js';
 import Logger from './logger.js';
 
@@ -29,7 +29,7 @@ export async function saveImageToDisk(url: string, path: string) {
 	if (response.errored !== null) return;
 
 	log.info(`Saving '${path}' (${Math.round(response.body.byteLength / 1024)} kB)`);
-	await convertImageToAvif(response.body, path);
+	await convertImageToAvif(response.body).toFile(path);
 }
 
 export function deleteIfExists(type: ImageType, path: ImagePath) {
@@ -39,11 +39,10 @@ export function deleteIfExists(type: ImageType, path: ImagePath) {
 	rmSync(actualPath);
 }
 
-function convertImageToAvif(imagedata: Buffer, outputPath: string) {
+export function convertImageToAvif(imagedata: Buffer): Sharp {
 	return sharp(imagedata)
 		.resize({ withoutEnlargement: true, fit: 'inside', width: 1280, height: 720 })
-		.avif({ effort: 6, quality: 50 })
-		.toFile(outputPath);
+		.avif({ effort: 6, quality: 50 });
 }
 
 async function convertAllImagesOfTypeToAvif(type: ImageType) {
@@ -57,7 +56,7 @@ async function convertAllImagesOfTypeToAvif(type: ImageType) {
 
 		// Convert and remove original
 		log.info(`Converting '${filename}' to AVIF`);
-		await convertImageToAvif(buffer, getImagePath(type, name));
+		await convertImageToAvif(buffer).toFile(getImagePath(type, name));
 		rmSync(path);
 	}
 }
