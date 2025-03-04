@@ -6,6 +6,11 @@
 		value="{{value}}"
 		class="right"
 		placeholder="{{name}}"
-		step="1"
+		list="{{name}}-suggestions"
 	/>
+	<datalist id="{{name}}-suggestions">
+		{{#each values}}
+			<option value="{{value}}">{{label}}</option>
+		{{/each}}
+	</datalist>
 </div>

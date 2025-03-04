@@ -1,0 +1,104 @@
+{{> pageHeader title="Check-in" url="/" }}
+
+<div class="page--data">
+
+<p>
+	<small>
+		⚙️ <strong>Note:</strong> This page largely benefits from having
+		JavaScript enabled, to retrieve your location and dynamically
+		fetch nearby places to check-in to.
+	</small>
+</p>
+
+<div id="geolocation" class="info rounded-panel" style="margin-top: 32px; display: none">
+	<p id="geolocation-text">
+		📍 Fetching geolocation, please accept permission and wait.
+	</p>
+</div>
+
+{{> internal/checkin places=places categories=categories }}
+
+<hr>
+
+{{#each checkins as |checkin|}}
+	{{> internal/checkin data=checkin categories=../categories }}
+{{/each}}
+
+</div>
+
+<script type="text/javascript">
+/** @type {HTMLDivElement} */
+const alertContainer = document.getElementById('geolocation');
+
+/** @type {HTMLParagraphElement} */
+const alertText = document.getElementById('geolocation-text');
+
+/** @type {HTMLInputElement} */
+const inputLat = document.getElementById('new_checkin_lat');
+
+/** @type {HTMLInputElement} */
+const inputLong = document.getElementById('new_checkin_long');
+
+/** @type {HTMLSelectElement} */
+const select = document.getElementsByName('place_id')[0];
+
+/** @type {HTMLDivElement} */
+const searchButtonsContainer = document.getElementById('search_button_container');
+
+/** @type {HTMLInputElement} */
+const searchButtonCached = document.getElementById('search_button_cached');
+
+/** @type {HTMLInputElement} */
+const searchButtonGoogle = document.getElementById('search_button_google');
+
+/** @returns {Promise<GeolocationPosition>} */
+const getLocation = async () => new Promise((resolve, reject) => {
+	navigator.geolocation.getCurrentPosition(resolve, reject);
+});
+
+/**
+ * @param {'cached'|'google'} endpoint
+ */
+const searchPlaces = async (endpoint = 'cached') => {
+	if (!("geolocation" in navigator)) return;
+
+	// It should find the select field, but if not, skip geolocation.
+	if (select === undefined) return;
+
+	// Geolocation is available, notify user.
+	alertContainer.style.display = 'block';
+
+	// Attempt to get location. Will prompt for permission when appropriate.
+	try {
+		const { coords: { latitude: lat, longitude: long } } = await getLocation();
+		inputLat.value = lat.toFixed(6);
+		inputLong.value = long.toFixed(6);
+
+		const response = await fetch(`/checkins/places/${endpoint}`, {
+			method: 'POST',
+			body: JSON.stringify({ lat, long }),
+		});
+		const { places } = await response.json();
+
+		searchButtonsContainer.style.display = 'flex';
+		select.innerHTML = '';
+		for (const { value, label } of places) {
+			const option = document.createElement('option');
+			option.value = value;
+			option.textContent = label;
+			select.appendChild(option);
+		}
+
+		alertContainer.style.display = 'none';
+	} catch (err) {
+		alertContainer.classList.remove('info');
+		alertContainer.classList.add('error');
+		alertText.textContent = `🛑 Could not find geolocation: ${err.message}`;
+	}
+};
+
+searchPlaces();
+searchButtonCached.onclick = () => searchPlaces('cached');
+searchButtonGoogle.onclick = () => searchPlaces('google');
+
+</script>
