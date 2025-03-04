@@ -36,12 +36,13 @@ export const config = {
 		channelId: process.env.TOMBOIS_DISCORD_CHANNELID,
 	},
 
-	youtube: {
+	google: {
 		tokenPath: resolve(process.env.TOMBOIS_GOOGLE_TOKENFILE ?? 'data/google-tokens.json'),
 		clientId: process.env.TOMBOIS_GOOGLE_CLIENTID,
 		clientSecret: process.env.TOMBOIS_GOOGLE_CLIENTSECRET,
 		apiKey: process.env.TOMBOIS_GOOGLE_APIKEY,
-		pollInterval: Number(process.env.TOMBOIS_GOOGLE_POLL_INTERVAL ?? 5),
+		youtubePollIntervalMins: Number(process.env.TOMBOIS_GOOGLE_POLL_INTERVAL ?? 5),
+		placesApiEnabled: process.env.TOMBOIS_GOOGLE_PLACESAPI_ENABLED === 'true',
 	},
 
 	letterboxd: {
