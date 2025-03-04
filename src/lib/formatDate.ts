@@ -40,8 +40,8 @@ export function formatDate(date: Date) {
 	return `${year}-${mon}-${day}`;
 }
 
-export function formatDateTime(date: Date) {
-	return `${formatDate(date)} ${formatTime(date)}`;
+export function formatDateTime(date: Date, isIso = false) {
+	return `${formatDate(date)}${isIso ? 'T' : ' '}${formatTime(date)}`;
 }
 
 export const months = [
