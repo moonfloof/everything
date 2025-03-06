@@ -40,8 +40,8 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
-import type { RequestFrontend } from '../../types/express.js';
 import { countCheckins, getCheckins } from '../../database/checkins.js';
+import type { RequestFrontend } from '../../types/express.js';
 
 const router = express.Router();
 
