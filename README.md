@@ -80,6 +80,14 @@ Data is entered using the internal CRUD API.
   * Steps
   * Food
   * Weight
+* **Check-In to Places** - Similar to the [Swarm](https://www.swarmapp.com/)
+  app, you can check-in to places you visit, and upload photos. Unfortunately at
+  the moment this can only be done via the internal CRUD page, so you'll need to
+  be able to VPN into your local network.
+  * This can use Google's
+    [Places API](https://mapsplatform.google.com/maps-products/places/) to
+    search for nearby establishments, but is not enabled by default, due to its
+    requirement for a billing account.
 * **TV Shows** - Connects to [Sonarr](https://sonarr.tv/), if installed locally,
   to get a list of series and episodes to pick from.
 * **Scrobbles** - Connects to a
