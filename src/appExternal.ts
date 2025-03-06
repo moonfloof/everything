@@ -1,4 +1,4 @@
-import type { HTTPError } from '@tombofry/stdlib/types/errors/http.js';
+import type { HTTPError } from '@moonfloof/stdlib/types/errors/http.js';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import helmet from 'helmet';
 import appCreate from './lib/appCreate.js';
