@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid';
+import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 import { ENTRY_STATUS, type EntryStatus } from './notes.js';
-import { timeago } from '../adapters/timeago.js';
 
 export interface CheckinPlace {
 	id: number;
