@@ -524,6 +524,7 @@ router.get('/feed', async (_req, res) => {
 			typeMap('film', getFilms(parameters)),
 			typeMap('book', getBooks(parameters)),
 			typeMap('like', getLikes(parameters)),
+			typeMap('checkin', getCheckins({ ...parameters, status: 'public' })),
 		])
 	).flat(1);
 
