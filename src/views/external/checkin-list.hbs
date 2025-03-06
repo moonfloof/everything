@@ -1,9 +1,17 @@
 <div class="page--data">
 	{{> pageHeader title="Check-ins" url="/" }}
 
-	{{#each checkins as |checkin|}}
-		{{> checkin data=checkin }}
-	{{/each}}
+	{{#if checkins}}
+		{{#each checkins as |checkin|}}
+			{{> checkin data=checkin }}
+		{{/each}}
+	{{else}}
+		<br/>
+		<div class="error rounded-panel">
+			<p class="lead">I've not checked in anywhere! 😭</p>
+		</div>
+	{{/if}}
+
 
 	{{> pagination pagination=pagination route="/checkin" }}
 </div>

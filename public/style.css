@@ -1039,6 +1039,10 @@ select {
 	.entry-poster {
 		margin-bottom: 16px;
 	}
+
+	.checkin-images-single {
+		columns: 1;
+	}
 }
 
 /* Disable animation completely when reduced-motion enabled */
