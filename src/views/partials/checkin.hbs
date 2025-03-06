@@ -1,0 +1,52 @@
+<div class="sectioncontainer h-entry">
+	<div class="row">
+		<span class="left">📍</span>
+		<span class="right">
+			<span class="entry-title">{{data.name}}</span>
+			{{data.address}}
+		</span>
+	</div>
+
+	<div class="row">
+		<span class="left">🏠</span>
+		<span class="right">
+			{{data.category}}
+		</span>
+	</div>
+
+	{{#if data.imageCount}}
+	<div class="row">
+		<span class="left">🖼️</span>
+		<span class="right">
+			{{data.imageCount}} photos
+		</span>
+	</div>
+	{{/if}}
+
+	{{#if data.description}}
+	<br>
+	<div class="row">
+		<span class="left">💬</span>
+		<span class="right">
+			{{{data.description}}}
+		</span>
+	</div>
+	{{/if}}
+
+	<div class="row">
+		<span class="left"></span>
+		<time
+			title="{{data.created_at}}"
+			datetime="{{data.created_at}}"
+			class="right dt-published"
+		>
+			<small>
+				<a class="u-url u-uid" href="/checkin/{{data.id}}">
+					{{data.timeago}}
+				</a>
+			</small>
+		</time>
+	</div>
+
+	{{> author }}
+</div>

@@ -24,7 +24,7 @@ const router = Router();
 
 router.get('/', (req: RequestFrontend, res) => {
 	const { page } = req.query;
-	const checkins = getCheckins({ page });
+	const checkins = getCheckins({ page, status: '%' });
 	const places = getNearestPlaces().map(place => ({
 		value: place.id,
 		label: place.name,
