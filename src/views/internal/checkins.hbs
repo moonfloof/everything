@@ -16,12 +16,12 @@
 	</p>
 </div>
 
-{{> internal/checkin places=places categories=categories }}
+{{> internal/checkin places=places categories=categories entryStatusValues=entryStatusValues }}
 
 <hr>
 
 {{#each checkins as |checkin|}}
-	{{> internal/checkin data=checkin categories=../categories }}
+	{{> internal/checkin data=checkin categories=../categories entryStatusValues=../entryStatusValues }}
 {{/each}}
 
 </div>

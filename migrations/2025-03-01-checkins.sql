@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS "checkin" (
 	"id" TEXT NOT NULL UNIQUE,
 	"place_id" INTEGER NOT NULL,
 	"description" TEXT NOT NULL,
+	"status" TEXT NOT NULL DEFAULT "public",
 	"created_at" TEXT NOT NULL,
 	"updated_at" TEXT NOT NULL,
 	"device_id" TEXT NOT NULL,
