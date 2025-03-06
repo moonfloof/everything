@@ -3,7 +3,8 @@ import { dateDefault } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
-import type { EntryStatus } from './notes.js';
+import { ENTRY_STATUS, type EntryStatus } from './notes.js';
+import { timeago } from '../adapters/timeago.js';
 
 export interface CheckinPlace {
 	id: number;
@@ -131,7 +132,15 @@ function getCheckinImages(checkin_id: string): string[] {
 		});
 }
 
-export function getCheckins(parameters: Partial<Parameters>) {
+function countCheckinImages(checkin_id: string): number {
+	const statement = getStatement<{ total: number }>(
+		'countCheckinImages',
+		'SELECT COUNT(id) AS total FROM checkin_image WHERE checkin_id = $checkin_id',
+	);
+	return statement.get({ checkin_id })?.total || 0;
+}
+
+export function getCheckins(parameters: Partial<Parameters & { status: EntryStatus | '%'; includeImages: boolean }>) {
 	return getStatement<GetCheckin>(
 		'getCheckins',
 		`SELECT
@@ -141,14 +150,19 @@ export function getCheckins(parameters: Partial<Parameters>) {
 			p.name, p.address, p.category
 		FROM checkin AS c
 		JOIN checkin_place AS p ON c.place_id = p.id
-		WHERE c.id LIKE $id AND c.created_at >= $created_at
+		WHERE c.id LIKE $id AND status LIKE $status AND c.created_at >= $created_at
 		ORDER BY c.created_at DESC
 		LIMIT $limit OFFSET $offset`,
 	)
-		.all(calculateGetParameters(parameters))
+		.all({
+			...calculateGetParameters(parameters),
+			status: parameters.status || ENTRY_STATUS.PUBLIC,
+		})
 		.map(checkin => ({
 			...checkin,
-			images: getCheckinImages(checkin.id),
+			timeago: timeago.format(new Date(checkin.created_at)),
+			imageCount: countCheckinImages(checkin.id),
+			images: parameters.includeImages ? getCheckinImages(checkin.id) : [],
 		}));
 }
 
@@ -164,6 +178,14 @@ export function getPlaceCategories() {
 
 export function deleteCheckin(id: string) {
 	return getStatement('deleteCheckin', 'DELETE FROM checkin WHERE id = $id').run({ id });
+}
+
+export function countCheckins(status: EntryStatus | '%' = ENTRY_STATUS.PUBLIC) {
+	const statement = getStatement<{ total: number }>(
+		'countCheckins',
+		'SELECT COUNT(id) AS total FROM checkin WHERE status LIKE $status;',
+	);
+	return statement.get({ status })?.total || 0;
 }
 
 export function updateCheckin(checkin: Update<Checkin>) {
