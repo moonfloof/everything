@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { environment } from '@tombofry/stdlib';
+import { environment } from '@moonfloof/stdlib';
 import dotenv from 'dotenv';
 import type { HelmetOptions } from 'helmet';
 

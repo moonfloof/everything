@@ -1,4 +1,4 @@
-import { errors } from '@tombofry/stdlib';
+import { errors } from '@moonfloof/stdlib';
 const { NotFoundError } = errors;
 import { existsSync } from 'node:fs';
 import express from 'express';

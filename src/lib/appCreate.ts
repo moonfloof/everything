@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { express as expressHelpers } from '@tombofry/stdlib';
+import { express as expressHelpers } from '@moonfloof/stdlib';
 import express from 'express';
 import { engine } from 'express-handlebars';
 import { getCanonicalUrl } from './getCanonicalUrl.js';
