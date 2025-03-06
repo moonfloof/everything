@@ -41,6 +41,7 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { countCheckins, getCheckins } from '../../database/checkins.js';
 
 const router = express.Router();
 
@@ -418,6 +419,37 @@ router.get('/book/:id', (req, res) => {
 		description,
 		title: prefixTitle,
 	});
+});
+
+// CHECK-INS
+
+router.get('/checkin', (req: RequestFrontend, res) => {
+	const { page = 0 } = req.query;
+	const pagination = handlebarsPagination(page, countCheckins());
+
+	const checkins = getCheckins({ page, includeImages: false });
+
+	res.render('external/checkin-list', {
+		checkins,
+		pagination,
+		title: 'goes places',
+	});
+});
+
+router.get('/checkin/:checkin_id', (req, res) => {
+	const [checkin] = getCheckins({ id: req.params.checkin_id, status: 'public', includeImages: true });
+
+	if (checkin === undefined) {
+		throw new NotFoundError('Check-in not found');
+	}
+
+	let title = `went to ${checkin.name} on ${prettyDate(new Date(checkin.created_at))}`;
+
+	if (checkin.imageCount > 0) {
+		title = `${title} and took ${checkin.imageCount} photos`;
+	}
+
+	res.render('external/checkin-single', { checkin, title, description: checkin.description });
 });
 
 // NOTES

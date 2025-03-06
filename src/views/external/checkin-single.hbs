@@ -1,0 +1,16 @@
+<div class="page--data">
+	{{> pageHeader title="Check-ins" url="/checkin" }}
+	{{> checkin data=checkin }}
+
+	{{#if checkin.imageCount }}
+		<br>
+		<div class="row">
+			<span class="left"></span>
+			<span class="right checkin-images-single">
+				{{#each checkin.images as |image|}}
+				<img src="{{image}}" />
+				{{/each}}
+			</span>
+		</div>
+	{{/if}}
+</div>
