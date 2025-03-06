@@ -27,6 +27,12 @@ export interface Checkin {
 	device_id: string;
 }
 
+export interface CheckinImage {
+	id: number;
+	checkin_id: string;
+	data: Buffer;
+}
+
 type GetCheckin = Checkin & Pick<CheckinPlace, 'name' | 'category' | 'address'>;
 
 export type InsertCheckin = Omit<Checkin, 'id' | 'place_id' | 'updated_at'> &
@@ -93,7 +99,7 @@ export function getNearestPlaces(parameters: Partial<CheckinPlace> = {}) {
 export function insertCheckin(checkin: Insert<Checkin>) {
 	const id = uuid();
 
-	return getStatement<Checkin>(
+	const insert = getStatement<Checkin>(
 		'insertCheckin',
 		`INSERT INTO checkin
 		(id, place_id, description, status, created_at, updated_at, device_id)
@@ -106,6 +112,23 @@ export function insertCheckin(checkin: Insert<Checkin>) {
 		created_at: dateDefault(checkin.created_at),
 		updated_at: dateDefault(checkin.created_at),
 	});
+
+	if (insert === undefined) {
+		throw new Error('Adding checkin was not successful!');
+	}
+
+	return insert;
+}
+
+function getCheckinImages(checkin_id: string): string[] {
+	return getStatement<CheckinImage>(
+		'getCheckinImages',
+		'SELECT * FROM checkin_image WHERE checkin_id = $checkin_id',
+	)
+		.all({ checkin_id })
+		.map(image => {
+			return `data:image/avif;base64,${image.data.toString('base64')}`;
+		});
 }
 
 export function getCheckins(parameters: Partial<Parameters>) {
@@ -121,7 +144,12 @@ export function getCheckins(parameters: Partial<Parameters>) {
 		WHERE c.id LIKE $id AND c.created_at >= $created_at
 		ORDER BY c.created_at DESC
 		LIMIT $limit OFFSET $offset`,
-	).all(calculateGetParameters(parameters));
+	)
+		.all(calculateGetParameters(parameters))
+		.map(checkin => ({
+			...checkin,
+			images: getCheckinImages(checkin.id),
+		}));
 }
 
 export function getPlaceCategories() {
@@ -154,4 +182,19 @@ export function updateCheckin(checkin: Update<Checkin>) {
 		created_at: dateDefault(checkin.created_at),
 		updated_at: dateDefault(checkin.updated_at),
 	});
+}
+
+export function insertCheckinImage(image: Insert<CheckinImage>) {
+	const insert = getStatement<CheckinImage>(
+		'insertCheckinImage',
+		`INSERT INTO checkin_image
+			(checkin_id, data)
+		VALUES
+			($checkin_id, $data)
+		RETURNING *;`,
+	).get(image);
+
+	if (insert === undefined) {
+		throw new Error('Image could not be saved');
+	}
 }

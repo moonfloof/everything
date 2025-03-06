@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import sharp from 'sharp';
 import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
 import {
 	type Checkin,
@@ -7,13 +8,17 @@ import {
 	getNearestPlaces,
 	getPlaceCategories,
 	insertCheckin,
+	insertCheckinImage,
 	insertPlace,
 	updateCheckin,
 } from '../../database/checkins.js';
 import { type EntryStatus, entryStatusValues } from '../../database/notes.js';
 import { config } from '../../lib/config.js';
+import Logger from '../../lib/logger.js';
 import type { Insert } from '../../types/database.js';
 import type { RequestFrontend } from '../../types/express.js';
+
+const log = new Logger('checkin');
 
 const router = Router();
 
@@ -74,8 +79,8 @@ router.post('/places/google', async (req: RequestFrontend, res) => {
 	res.send({ places });
 });
 
-router.post('/', (req: RequestFrontend, res) => {
-	const { place_id, name, category, address, lat, long, description, status } = req.body;
+router.post('/', async (req: RequestFrontend<object, Record<string, string> & { photos: string[] }>, res) => {
+	const { place_id, name, category, address, lat, long, description, status, photos } = req.body;
 	const checkinToInsert: Insert<Checkin> = {
 		place_id: Number(place_id),
 		device_id: config.defaultDeviceId,
@@ -95,16 +100,42 @@ router.post('/', (req: RequestFrontend, res) => {
 		}).id;
 	}
 
-	insertCheckin(checkin);
+	const checkin = insertCheckin(checkinToInsert);
+
+	let counter = 0;
+	for (const photo of photos) {
+		if (!photo.startsWith('data:image/jpeg;base64,')) {
+			log.info("Tried to save an image, but it didn't start with 'data:image/jpeg;base64,'");
+			continue;
+		}
+
+		log.info(`Converting photo ${++counter} of ${photos.length} for checkin '${checkin.id}'`);
+		const binary = Buffer.from(photo.slice(23), 'base64');
+		const data = await sharp(binary)
+			.resize({ withoutEnlargement: true, width: 960 })
+			.avif({ effort: 6, quality: 50 })
+			.toBuffer();
+
+		insertCheckinImage({
+			checkin_id: checkin.id,
+			data,
+		});
+	}
 
 	res.redirect('/checkins');
 });
 
 router.post('/:id', (req: RequestFrontend, res) => {
 	const { id } = req.params;
-	const { crudType, description, created_at, updated_at } = req.body;
+	const { crudType, description, status, created_at, updated_at } = req.body;
 
-	if (id === undefined || description === undefined || created_at === undefined || updated_at === undefined) {
+	if (
+		id === undefined ||
+		description === undefined ||
+		created_at === undefined ||
+		updated_at === undefined ||
+		status === undefined
+	) {
 		res.redirect('/checkins');
 		return;
 	}
@@ -119,6 +150,7 @@ router.post('/:id', (req: RequestFrontend, res) => {
 			updateCheckin({
 				id,
 				description,
+				status: status as EntryStatus,
 				created_at,
 				updated_at,
 			});

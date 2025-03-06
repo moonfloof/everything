@@ -4,9 +4,9 @@
 
 <p>
 	<small>
-		⚙️ <strong>Note:</strong> This page largely benefits from having
-		JavaScript enabled, to retrieve your location and dynamically
-		fetch nearby places to check-in to.
+		⚙️ <strong>Note:</strong> This page benefits largely from having
+		JavaScript enabled. It'll retrieve your location and dynamically
+		fetch nearest locations, and allow for photo uploads.
 	</small>
 </p>
 
@@ -38,6 +38,9 @@ const inputLat = document.getElementById('new_checkin_lat');
 
 /** @type {HTMLInputElement} */
 const inputLong = document.getElementById('new_checkin_long');
+
+/** @type {HTMLDivElement} */
+const inputImages = document.getElementById('checkin-image-inputs');
 
 /** @type {HTMLSelectElement} */
 const select = document.getElementsByName('place_id')[0];
@@ -100,5 +103,95 @@ const searchPlaces = async (endpoint = 'cached') => {
 searchPlaces();
 searchButtonCached.onclick = () => searchPlaces('cached');
 searchButtonGoogle.onclick = () => searchPlaces('google');
+
+/**
+ * @param {File} file
+ */
+const resizeImage = async (file) => new Promise((resolve, reject) => {
+	// Create an Image object
+	const img = new Image();
+
+	// Set up the onload event handler
+	img.onload = function() {
+		// Create a canvas
+		const canvas = document.createElement('canvas');
+		const ctx = canvas.getContext('2d', { alpha: false });
+
+		// Calculate the new image dimensions
+		const isLandscape = img.height > img.width;
+		const shouldResize = isLandscape
+			? img.width > 960
+			: img.height > 960;
+
+		const ratio = isLandscape
+			? Math.min(720 / img.width, 960 / img.height)
+			: Math.min(960 / img.width, 720 / img.height);
+
+		const newWidth = shouldResize
+			? img.width * ratio
+			: img.width;
+
+		const newHeight = shouldResize
+			? img.height * ratio
+			: img.height;
+
+		// Set canvas dimensions
+		canvas.width = newWidth;
+		canvas.height = newHeight;
+
+		// Draw the image on the canvas
+		ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+		resolve(canvas.toDataURL('image/jpeg', shouldResize ? 0.8 : 0.9));
+	};
+
+	img.onerror = reject;
+	img.onabort = reject;
+	img.oncancel = reject;
+
+	// Load the image file
+	img.src = URL.createObjectURL(file);
+});
+
+/** @param {string} dataUrl */
+const addImageToCheckin = (dataUrl) => {
+	const container = document.createElement('div');
+	container.classList.add('checkin-image-container');
+	container.onclick = () => {
+		inputImages.removeChild(container);
+	};
+
+	const overlay = document.createElement('div');
+	overlay.classList.add('checkin-image-overlay');
+	overlay.textContent = '× Remove';
+
+	const image = document.createElement('img');
+	image.classList.add('checkin-image');
+	image.src = dataUrl;
+
+	const input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = 'photos[]';
+	input.value = dataUrl;
+
+	container.appendChild(image);
+	container.appendChild(input);
+	container.appendChild(overlay);
+
+	inputImages.appendChild(container);
+};
+
+/** @type {NodeListOf<HTMLInputElement>}*/
+const fileInputs = document.querySelectorAll("input[type=file]")
+
+for (const input of fileInputs) {
+	input.addEventListener("change", async (event) => {
+		for (const file of event.target.files) {
+			addImageToCheckin(await resizeImage(file));
+		}
+
+		input.value = '';
+	});
+}
 
 </script>
