@@ -2,13 +2,13 @@
 	<div class="p-read-of h-cite">
 	<div class="row">
 		<span class="left">📙</span>
-		<span class="right">
+		<span class="right entry-title">
 			{{#if data.url}}
 			<a href="{{data.url}}" target="_blank" rel="noopener" class="u-url">
-				<strong class="p-name">{{data.title}}</strong>
+				<span class="p-name">{{data.title}}</span>
 			</a>
 			{{else}}
-				<strong class="p-name">{{data.title}}</strong>
+				<span class="p-name">{{data.title}}</span>
 			{{/if}}
 			({{data.year}})
 		</span>
