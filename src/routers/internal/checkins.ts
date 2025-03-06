@@ -1,36 +1,37 @@
 import { Router } from 'express';
+import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
 import {
 	type Checkin,
+	deleteCheckin,
 	getCheckins,
-	getPlaceCategories,
 	getNearestPlaces,
+	getPlaceCategories,
 	insertCheckin,
 	insertPlace,
-	deleteCheckin,
 	updateCheckin,
 } from '../../database/checkins.js';
-import type { RequestFrontend } from '../../types/express.js';
+import { type EntryStatus, entryStatusValues } from '../../database/notes.js';
 import { config } from '../../lib/config.js';
 import type { Insert } from '../../types/database.js';
-import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
-import { formatDateTime } from '../../lib/formatDate.js';
+import type { RequestFrontend } from '../../types/express.js';
 
 const router = Router();
 
 router.get('/', (req: RequestFrontend, res) => {
 	const { page } = req.query;
-	const checkins = getCheckins({ page }).map(checkin => ({
-		...checkin,
-		created_at: formatDateTime(new Date(checkin.created_at), true),
-		updated_at: formatDateTime(new Date(checkin.updated_at), true),
-	}));
+	const checkins = getCheckins({ page });
 	const places = getNearestPlaces().map(place => ({
 		value: place.id,
 		label: place.name,
 	}));
 	const categories = getPlaceCategories();
 
-	res.render('internal/checkins', { places, checkins, categories });
+	res.render('internal/checkins', {
+		places,
+		checkins,
+		categories,
+		entryStatusValues,
+	});
 });
 
 // Using a POST here, but this is actually a GET request.
@@ -74,16 +75,17 @@ router.post('/places/google', async (req: RequestFrontend, res) => {
 });
 
 router.post('/', (req: RequestFrontend, res) => {
-	const { place_id, name, category, address, lat, long, description } = req.body;
-	const checkin: Insert<Checkin> = {
+	const { place_id, name, category, address, lat, long, description, status } = req.body;
+	const checkinToInsert: Insert<Checkin> = {
 		place_id: Number(place_id),
 		device_id: config.defaultDeviceId,
 		created_at: new Date().toISOString(),
 		description: description ?? '',
+		status: (status as EntryStatus | undefined) ?? 'public',
 	};
 
 	if (name !== undefined && name !== '') {
-		checkin.place_id = insertPlace({
+		checkinToInsert.place_id = insertPlace({
 			name,
 			category: category || 'other',
 			address: address || null,

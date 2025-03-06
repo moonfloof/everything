@@ -3,6 +3,7 @@ import { dateDefault } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
+import type { EntryStatus } from './notes.js';
 
 export interface CheckinPlace {
 	id: number;
@@ -20,6 +21,7 @@ export interface Checkin {
 	id: string;
 	place_id: number;
 	description: string;
+	status: EntryStatus;
 	created_at: string;
 	updated_at: string;
 	device_id: string;
@@ -94,9 +96,9 @@ export function insertCheckin(checkin: Insert<Checkin>) {
 	return getStatement<Checkin>(
 		'insertCheckin',
 		`INSERT INTO checkin
-		(id, place_id, description, created_at, updated_at, device_id)
+		(id, place_id, description, status, created_at, updated_at, device_id)
 		VALUES
-		($id, $place_id, $description, $created_at, $updated_at, $device_id)
+		($id, $place_id, $description, $status, $created_at, $updated_at, $device_id)
 		RETURNING *;`,
 	).get({
 		...checkin,
@@ -109,7 +111,12 @@ export function insertCheckin(checkin: Insert<Checkin>) {
 export function getCheckins(parameters: Partial<Parameters>) {
 	return getStatement<GetCheckin>(
 		'getCheckins',
-		`SELECT c.*, p.name, p.address, p.category FROM checkin AS c
+		`SELECT
+			c.*,
+			strftime('%FT%T', c.created_at) as created_at,
+			strftime('%FT%T', c.updated_at) as updated_at,
+			p.name, p.address, p.category
+		FROM checkin AS c
 		JOIN checkin_place AS p ON c.place_id = p.id
 		WHERE c.id LIKE $id AND c.created_at >= $created_at
 		ORDER BY c.created_at DESC
@@ -136,6 +143,7 @@ export function updateCheckin(checkin: Update<Checkin>) {
 		'updateFilm',
 		`UPDATE checkin
 		SET description = $description,
+		    status = $status,
 		    created_at = $created_at,
 		    updated_at = $updated_at
 		WHERE id = $id`,
