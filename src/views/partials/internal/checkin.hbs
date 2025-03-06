@@ -37,10 +37,32 @@
 	{{> internal/crudRow type="datetime-local" emoji="🕑" name="created_at" value=data.created_at }}
 	{{> internal/crudRow type="datetime-local" emoji="🕖" name="updated_at" value=data.updated_at }}
 
-	<div class="row">
-		<span class="left">🖼️</span>
-		<span class="right">TODO Photos</span>
-	</div>
+	{{#if data.id}}
+		{{!-- TODO: Allow uploading and deleting photos post-checkin --}}
+
+		{{#if data.images}}
+		<div class="row">
+			<span class="left">🖼️</span>
+			<span class="right">
+				<div class="checkin-image-row">
+					{{#each data.images as |photo|}}
+					<div class="checkin-image-container">
+						<img src="{{photo}}" class="checkin-image">
+					</div>
+					{{/each}}
+				</div>
+			</span>
+		</div>
+		{{/if}}
+	{{else}}
+		<div class="row">
+			<span class="left">🖼️</span>
+			<span class="right">
+				<input type="file" form="" name="photo-picker" accept="image/*,.avif" multiple><br>
+				<div class="checkin-image-row" id="checkin-image-inputs"></div>
+			</span>
+		</div>
+	{{/if}}
 
 	{{> internal/crudSubmit }}
 </form>

@@ -844,6 +844,47 @@ select {
 	padding: 6px 12px;
 }
 
+.checkin-image-row {
+	display: flex;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.checkin-image-container {
+	width: calc(25% - 16px);
+	aspect-ratio: 4/3;
+	position: relative;
+	border-radius: 8px;
+	border: 2px solid var(--primary-fg);
+	overflow: hidden;
+}
+
+.checkin-image {
+	aspect-ratio: 4/3;
+	object-fit: cover;
+}
+
+.checkin-image-overlay {
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--primary-fg);
+	display: flex;
+	color: var(--primary-bg);
+	align-items: center;
+	justify-content: center;
+	font-size: 20px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.checkin-image-overlay:hover {
+	opacity: 0.75;
+}
+
 [data-tooltip] {
 	cursor: help;
 	text-decoration: dotted underline;
