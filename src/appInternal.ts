@@ -1,6 +1,6 @@
-import { errors } from '@tombofry/stdlib';
+import { errors } from '@moonfloof/stdlib';
 const { NotFoundError } = errors;
-import type { HTTPError } from '@tombofry/stdlib/types/errors/http.js';
+import type { HTTPError } from '@moonfloof/stdlib/types/errors/http.js';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import appCreate from './lib/appCreate.js';
 import Logger from './lib/logger.js';
