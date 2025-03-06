@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS "checkin" (
 CREATE TABLE IF NOT EXISTS "checkin_image" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"checkin_id" TEXT NOT NULL,
-	-- Images stored as 1280x720 (or smaller) AVIF images, to be compact
+	-- Images stored as 960x720 (or smaller) AVIF images, to be compact
 	"data" BLOB NOT NULL,
 	FOREIGN KEY ("checkin_id") REFERENCES "checkin" ("id") ON DELETE CASCADE
 );
