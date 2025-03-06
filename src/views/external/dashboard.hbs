@@ -170,6 +170,21 @@
 		{{/dashpanel}}
 	{{/if}}
 
+	{{#if checkins}}
+		{{#> dashpanel title="check-ins" link="checkin" }}
+			<ul>
+			{{#each checkins}}
+				<li class="dashboard--panel__li">
+					<a href="/checkin/{{id}}">
+						<strong>{{name}}</strong>
+					</a>
+					<small>{{#if imageCount}}🖼️ {{imageCount}} photos &bull; {{/if}}{{timeago}}</small>
+				</li>
+			{{/each}}
+			</ul>
+		{{/dashpanel}}
+	{{/if}}
+
 	{{#> dashpanel title="misc" }}
 		<div class="dashboard--panel--meta">
 			{{#if location}}
