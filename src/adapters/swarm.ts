@@ -19,11 +19,12 @@ interface SwarmConfigData {
 
 let swarmCacheData: SwarmConfigData = {};
 
-const swarmEndpoints: Record<string, (params: Record<string, string>) => string> = {
+const swarmEndpoints = {
 	authenticate: () => 'https://foursquare.com/oauth2/authenticate',
 	accessToken: () => 'https://foursquare.com/oauth2/access_token',
 	checkins: () => 'https://api.foursquare.com/v2/users/self/checkins',
-	checkinDetails: ({ checkin_id }) => `https://api.foursquare.com/v2/checkins/${checkin_id}`,
+	checkinDetails: ({ checkin_id }: Record<string, string>) =>
+		`https://api.foursquare.com/v2/checkins/${checkin_id}`,
 } as const;
 
 async function callFoursquareAPI<T>(
@@ -68,7 +69,7 @@ export function generateAuthenticateUri() {
 		redirect_uri: `${config.serverExternalUri}/api/swarm/callback`,
 	});
 
-	return `${swarmEndpoints.authenticate}?${params.toString()}`;
+	return `${swarmEndpoints.authenticate()}?${params.toString()}`;
 }
 
 export async function swarmHandleOauthCallback(code: string) {
