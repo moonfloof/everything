@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import sharp from 'sharp';
 import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
+import { convertImageToDatabase } from '../../adapters/swarm.js';
 import {
 	type Checkin,
 	deleteCheckin,
@@ -8,7 +8,6 @@ import {
 	getNearestPlaces,
 	getPlaceCategories,
 	insertCheckin,
-	insertCheckinImage,
 	insertPlace,
 	updateCheckin,
 } from '../../database/checkins.js';
@@ -110,16 +109,8 @@ router.post('/', async (req: RequestFrontend<object, Record<string, string> & { 
 		}
 
 		log.info(`Converting photo ${++counter} of ${photos.length} for checkin '${checkin.id}'`);
-		const binary = Buffer.from(photo.slice(23), 'base64');
-		const data = await sharp(binary)
-			.resize({ withoutEnlargement: true, width: 960 })
-			.avif({ effort: 6, quality: 50 })
-			.toBuffer();
-
-		insertCheckinImage({
-			checkin_id: checkin.id,
-			data,
-		});
+		const buffer = Buffer.from(photo.slice(23), 'base64');
+		await convertImageToDatabase(checkin.id, buffer);
 	}
 
 	res.redirect('/checkins');

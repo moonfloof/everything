@@ -44,6 +44,12 @@ export function formatDateTime(date: Date, isIso = false) {
 	return `${formatDate(date)}${isIso ? 'T' : ' '}${formatTime(date)}`;
 }
 
+export function formatDateTimeWithTimezone(date: Date, timezoneOffsetMinutes = 0) {
+	const { sign, hours, minutes } = formatDuration(timezoneOffsetMinutes * minuteMs);
+	const timezoneString = `${sign < 0 ? '-' : '+'}${padString(hours, 2)}:${padString(minutes, 2)}`;
+	return `${formatDate(date)}T${formatTime(date)}${timezoneString}`;
+}
+
 export const months = [
 	'January',
 	'February',
@@ -80,18 +86,22 @@ export function shortDate(date: Date) {
 	return `${day}/${month}`;
 }
 
-export function prettyDuration(durationMs: number) {
+function formatDuration(durationMs: number) {
+	const sign = Math.sign(durationMs);
+
 	// 60 mins * 60 secs * 1000 ms
-	const hoursTotal = durationMs / hourMs;
+	const hoursTotal = Math.abs(durationMs) / hourMs;
 
 	// Calculate minutes based on decimal from hours
-	const hoursRounded = Math.floor(hoursTotal);
-	const minutes = Math.round((hoursTotal - hoursRounded) * 60);
+	const hours = Math.floor(hoursTotal);
+	const minutes = Math.round((hoursTotal - hours) * 60);
 
-	// Convert into string
-	const duration = hoursRounded > 0 ? `${hoursRounded}h ${minutes}m` : `${minutes}m`;
+	return { hours, minutes, sign };
+}
 
-	return duration;
+export function prettyDuration(durationMs: number) {
+	const { hours, minutes } = formatDuration(durationMs);
+	return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 }
 
 export function msToIsoDuration(durationMs: number) {
