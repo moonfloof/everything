@@ -89,12 +89,12 @@ export async function searchForImagesById(watchId: string, movieId: number, type
 
 		const heroTmdbImage = getPreferredImage(response.backdrops);
 		if (!heroPathExists && heroTmdbImage !== undefined) {
-			await saveImageToDisk(tmdbGetImageUrl(heroTmdbImage.file_path), heroPath);
+			saveImageToDisk(tmdbGetImageUrl(heroTmdbImage.file_path), heroPath);
 		}
 
 		const posterTmdbImage = getPreferredImage(response.posters, 'en');
 		if (!posterPathExists && posterTmdbImage !== undefined) {
-			await saveImageToDisk(tmdbGetImageUrl(posterTmdbImage.file_path), posterPath);
+			saveImageToDisk(tmdbGetImageUrl(posterTmdbImage.file_path), posterPath);
 		}
 	} catch (err) {
 		log.error((err as Error).message);

@@ -13,9 +13,7 @@ type ImagePath = `hero-${string}` | `library-${string}` | `poster-${string}`;
 export const getImageDir = (type: ImageType): `public/${ImageType}-images/` => `public/${type}-images/`;
 export const getImagePath = (type: ImageType, path: ImagePath) => `${getImageDir(type)}${path}.avif`;
 
-export async function saveImageToDisk(url: string, path: string) {
-	if (existsSync(path)) return;
-
+async function saveImageToBuffer(url: string) {
 	const response = await phin({
 		method: 'GET',
 		headers: {
@@ -25,11 +23,21 @@ export async function saveImageToDisk(url: string, path: string) {
 		parse: 'none',
 	});
 
-	if (!response.statusCode || response.statusCode < 200 || response.statusCode > 299) return;
-	if (response.errored !== null) return;
+	if (!response.statusCode || response.statusCode < 200 || response.statusCode > 299) {
+		throw new Error(`Non-2XX response code received: '${response.statusCode}'`);
+	}
 
-	log.info(`Saving '${path}' (${Math.round(response.body.byteLength / 1024)} kB)`);
-	await convertImageToAvif(response.body).toFile(path);
+	if (response.errored !== null) {
+		throw response.errored;
+	}
+
+	return response.body;
+}
+
+export function saveImageToDisk(url: string, path: string) {
+	if (existsSync(path)) return;
+	const onComplete = (buffer: Buffer) => void convertImageToAvif(buffer).toFile(path);
+	mediaQueue.addToQueue({ url, onComplete });
 }
 
 export function deleteIfExists(type: ImageType, path: ImagePath) {
@@ -50,6 +58,7 @@ async function convertAllImagesOfTypeToAvif(type: ImageType) {
 	for (const file of readdirSync(dir, { recursive: false })) {
 		const filename = file.toString();
 		if (!filename.endsWith('.jpg')) continue;
+
 		const path = `${dir}${filename}`;
 		const buffer = readFileSync(path);
 		const name = basename(filename, '.jpg') as ImagePath;
@@ -66,3 +75,44 @@ export async function convertAllImagesToAvif() {
 		await convertAllImagesOfTypeToAvif(type);
 	}
 }
+
+type MediaQueueItem = {
+	url: string;
+	onComplete: (buffer: Buffer) => Promise<void> | void;
+	onError?: (error?: Error) => Promise<void> | void;
+};
+
+class MediaQueue {
+	private queue: MediaQueueItem[] = [];
+
+	private static shortUrl(url: string): string {
+		if (url.length >= 100) {
+			return `${url.slice(0, 97)}...`;
+		}
+		return url;
+	}
+
+	public async addToQueue(item: MediaQueueItem) {
+		const skip = this.queue.length > 0;
+		this.queue.push(item);
+
+		if (skip) return;
+
+		while (this.queue.length > 0) {
+			const { url, onComplete, onError } = this.queue[0];
+
+			try {
+				const buffer = await saveImageToBuffer(url);
+				log.info(`Saving image '${MediaQueue.shortUrl(url)}'`);
+				await onComplete(buffer);
+			} catch (err) {
+				log.info(`Could not download image '${MediaQueue.shortUrl(url)}'`);
+				if (onError) onError(err as Error);
+			}
+
+			this.queue.shift();
+		}
+	}
+}
+
+export const mediaQueue = new MediaQueue();

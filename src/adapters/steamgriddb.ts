@@ -68,7 +68,7 @@ export async function searchForImages(term: string, game: Game) {
 		const appid = game.url.match(/store\.steampowered\.com\/app\/([0-9]+)/)?.[1];
 		if (!appid) return;
 
-		await saveImages(Number(appid), game.id);
+		saveImages(Number(appid), game.id);
 		return;
 	}
 

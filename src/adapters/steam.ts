@@ -74,14 +74,14 @@ function saveGamesToDisk() {
 	writeFileSync(config.steam.dataPath, str);
 }
 
-export async function saveImages(appid: number, game_id: number) {
+export function saveImages(appid: number, game_id: number) {
 	const heroPath = getImagePath('game', `hero-${game_id}`);
 	const heroUrl = `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/library_hero.jpg`;
-	await saveImageToDisk(heroUrl, heroPath);
+	saveImageToDisk(heroUrl, heroPath);
 
 	const libraryPath = getImagePath('game', `library-${game_id}`);
 	const libraryUrl = `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/library_600x900.jpg`;
-	await saveImageToDisk(libraryUrl, libraryPath);
+	saveImageToDisk(libraryUrl, libraryPath);
 }
 
 async function fetchAchievements(appid: number): Promise<SteamAchievement[]> {
@@ -234,7 +234,7 @@ export function pollForGameActivity() {
 			);
 
 			await updateSteamAchievementsDatabase(game.appid, session);
-			await saveImages(game.appid, session.game_id);
+			saveImages(game.appid, session.game_id);
 		}
 
 		gameActivity = body.response.games.map(game => ({
