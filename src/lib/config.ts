@@ -104,6 +104,13 @@ export const config = {
 		password: process.env.TOMBOIS_SUBSONIC_PASSWORD,
 	},
 
+	swarm: {
+		oauthClientId: process.env.EVERYTHING_SWARM_CLIENT_ID,
+		oauthClientSecret: process.env.EVERYTHING_SWARM_CLIENT_SECRET,
+		pushSecret: process.env.EVERYTHING_SWARM_PUSH_SECRET,
+		dataPath: resolve(process.env.EVERYTHING_SWARM_DATA_FILE ?? 'data/swarm.json'),
+	},
+
 	helmet: {
 		referrerPolicy: {
 			policy: ['same-origin'],

@@ -48,6 +48,17 @@ better way to do it).
   posting a message in Discord.  
   By default, the Google API limits refresh tokens to 7 days, so I've found this
   to be unreliable.
+* **Check-In to Places** - Receives push events (webhook) from
+  [Swarm](https://www.swarmapp.com/) using the
+  [**Foursquare API**](https://docs.foursquare.com/developer/reference/personalization-api-overview).
+  * Push events are sent to `/api/swarm/push`
+  * You can also check-in to places you visit manually and upload
+    photos. Unfortunately at the moment this can only be done via the internal
+    CRUD page, so you'll need to be able to VPN into your local network.
+  * Manually checking-in optionally uses Google's
+    [Places API](https://mapsplatform.google.com/maps-products/places/) to
+    search for nearby establishments, but is not enabled by default, due to its
+    requirement for a billing account.
 * **Social media posts**
   * Currently, only [**Bluesky**](https://bsky.social) is supported, using their
     [HTTP API](https://docs.bsky.app/docs/api/app-bsky-feed-get-author-feed)
@@ -80,14 +91,6 @@ Data is entered using the internal CRUD API.
   * Steps
   * Food
   * Weight
-* **Check-In to Places** - Similar to the [Swarm](https://www.swarmapp.com/)
-  app, you can check-in to places you visit, and upload photos. Unfortunately at
-  the moment this can only be done via the internal CRUD page, so you'll need to
-  be able to VPN into your local network.
-  * This can use Google's
-    [Places API](https://mapsplatform.google.com/maps-products/places/) to
-    search for nearby establishments, but is not enabled by default, due to its
-    requirement for a billing account.
 * **TV Shows** - Connects to [Sonarr](https://sonarr.tv/), if installed locally,
   to get a list of series and episodes to pick from.
 * **Scrobbles** - Connects to a

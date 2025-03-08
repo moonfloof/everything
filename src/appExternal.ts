@@ -13,6 +13,7 @@ import frontend from './routers/external/frontend.js';
 import health from './routers/external/health.js';
 import listenbrainz from './routers/external/listenbrainz.js';
 import purchases from './routers/external/purchases.js';
+import swarm from './routers/external/swarm.js';
 import youtube from './routers/external/youtube.js';
 
 const log = new Logger('server-ext');
@@ -32,6 +33,7 @@ if (config.bluesky.username?.startsWith('did:plc:')) {
 app.use('/api/device', device);
 app.use('/api/listenbrainz', listenbrainz);
 app.use('/api/youtube', youtube);
+app.use('/api/swarm', swarm);
 app.use('/api/health', health);
 app.use('/api/purchases', purchases);
 app.use('/api/bookmarks', bookmarks);
