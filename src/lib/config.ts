@@ -108,6 +108,7 @@ export const config = {
 		oauthClientId: process.env.EVERYTHING_SWARM_CLIENT_ID,
 		oauthClientSecret: process.env.EVERYTHING_SWARM_CLIENT_SECRET,
 		pushSecret: process.env.EVERYTHING_SWARM_PUSH_SECRET,
+		userId: process.env.EVERYTHING_SWARM_USER_ID,
 		dataPath: resolve(process.env.EVERYTHING_SWARM_DATA_FILE ?? 'data/swarm.json'),
 	},
 

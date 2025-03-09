@@ -493,3 +493,35 @@ endpoint using the following payload.
   "status": "Information about the error."
 }
 ```
+
+## Swarm
+
+You can log check-ins via Swarm, however there's a little bit of setup required,
+which you can follow via the instructions in `.env.template`. Once that's done,
+you can use the follow endpoints:
+
+### Log in to Swarm - GET `/api/swarm/login`
+
+Visit this URL in your browser - you'll be redirected to login via Swarm.
+
+### Check-in Push Event - POST `/api/swarm/push?apiKey=<API-KEY>`
+
+Be sure to add `apiKey` to your query, using an API key from your `devices`, as
+mentioned at the top of the file. This will be used to authenticate the request.
+
+#### Payload - JSON Object
+
+* **`checkin`:** string, a stringified JSON object containing all the check-in
+  details, which includes `id`, `createdAt`, `user`, `venue`, etc. For more
+  details, see the
+  [check-in details endpoint docs](https://docs.foursquare.com/developer/reference/get-checkin-details).
+  Do keep in mind that this data does not include photos, coins, or stickers,
+  amongst some other important details.
+
+#### Payload example
+
+```json
+{
+  "checkin": "{\"id\":\"12345678\",\"createdAt\":1728327484,\"shout\":\"This is my check-in!\"}"
+}
+```
