@@ -7,13 +7,18 @@ import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { mediaQueue } from '../lib/mediaFiles.js';
-import type { SwarmAccessToken, SwarmCheckinDetails, SwarmPhoto, SwarmPushCheckin } from './swarmTypes.js';
-const { ServerError, BadRequestError } = errors;
+import type {
+	SwarmAccessToken,
+	SwarmCheckinDetails,
+	SwarmPhoto,
+	SwarmPushCheckin,
+	SwarmSelfDetails,
+} from './swarmTypes.js';
+const { ServerError, BadRequestError, ForbiddenError } = errors;
 
 const log = new Logger('swarm');
 
 interface SwarmConfigData {
-	lastCheckinDate?: string;
 	oauthToken?: string;
 }
 
@@ -23,6 +28,7 @@ const swarmEndpoints = {
 	authenticate: () => 'https://foursquare.com/oauth2/authenticate',
 	accessToken: () => 'https://foursquare.com/oauth2/access_token',
 	checkins: () => 'https://api.foursquare.com/v2/users/self/checkins',
+	selfDetails: () => 'https://api.foursquare.com/v2/users/self',
 	checkinDetails: ({ checkin_id }: Record<string, string>) =>
 		`https://api.foursquare.com/v2/checkins/${checkin_id}`,
 } as const;
@@ -57,10 +63,9 @@ async function callFoursquareAPI<T>(
 }
 
 export function generateAuthenticateUri() {
-	const { oauthClientId, oauthClientSecret } = config.swarm;
-
-	if (oauthClientId === undefined || oauthClientSecret === undefined) {
-		throw new Error('Swarm - Missing Client ID or Secret, check your .env file');
+	const { oauthClientId, oauthClientSecret, userId } = config.swarm;
+	if (oauthClientId === undefined || oauthClientSecret === undefined || userId === undefined) {
+		throw new ServerError('Swarm - Missing Client ID, Client Secret, and/or User ID, check your .env file');
 	}
 
 	const params = new URLSearchParams({
@@ -73,11 +78,12 @@ export function generateAuthenticateUri() {
 }
 
 export async function swarmHandleOauthCallback(code: string) {
-	const { oauthClientId, oauthClientSecret } = config.swarm;
-	if (oauthClientId === undefined || oauthClientSecret === undefined) {
-		throw new Error('Swarm - Missing Client ID or Secret, check your .env file');
+	const { oauthClientId, oauthClientSecret, userId } = config.swarm;
+	if (oauthClientId === undefined || oauthClientSecret === undefined || userId === undefined) {
+		throw new ServerError('Swarm - Missing Client ID, Client Secret, and/or User ID, check your .env file');
 	}
 
+	// First, get an access token
 	const params = {
 		client_id: oauthClientId,
 		client_secret: oauthClientSecret,
@@ -86,9 +92,20 @@ export async function swarmHandleOauthCallback(code: string) {
 		code,
 	};
 
-	const response = await callFoursquareAPI<SwarmAccessToken>('accessToken', params);
+	const { access_token } = await callFoursquareAPI<SwarmAccessToken>('accessToken', params);
 
-	swarmCacheData.oauthToken = response.access_token;
+	// Second, verify that the user logging in matches the user we want
+	// push events for.
+	const {
+		response: { user },
+	} = await callFoursquareAPI<SwarmSelfDetails>('selfDetails');
+
+	if (`${user.id}`.toLowerCase() !== `${userId}`.toLowerCase()) {
+		throw new ForbiddenError('Swarm - User logging in does not match user in `.env` file.');
+	}
+
+	// Finally, update the cache data
+	swarmCacheData.oauthToken = access_token;
 	saveSwarmCacheData();
 }
 
@@ -111,7 +128,7 @@ function swarmDownloadPhoto(checkin_id: string, photo: SwarmPhoto) {
 	mediaQueue.addToQueue({ url, onComplete });
 }
 
-export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string) {
+export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string, device_id?: string) {
 	const { pushSecret } = config.swarm;
 
 	if (pushSecret === undefined) {
@@ -136,12 +153,12 @@ export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string
 	const newCheckin = insertCheckin({
 		created_at: new Date(checkin.createdAt * 1000).toISOString(),
 		description: checkin.shout ?? '',
-		device_id: config.defaultDeviceId,
+		device_id: device_id ?? config.defaultDeviceId,
 		place_id: place.id,
 		status: 'public',
 	});
 
-	log.info(`20 minute timer has been set to poll checkin ${newCheckin.id} for images`);
+	log.info(`20 minute timer has been set to poll checkin '${newCheckin.id}' for images`);
 	setTimeout(async () => {
 		const { response } = await callFoursquareAPI<SwarmCheckinDetails>('checkinDetails', {
 			checkin_id: checkin.id,
@@ -164,12 +181,13 @@ function saveSwarmCacheData() {
 }
 
 function loadCacheData() {
+	// We're already authenticated - no need to reload the data.
+	if (swarmCacheData.oauthToken !== undefined) return;
+
 	log.info('Loading activity and token cache from disk');
 	if (existsSync(config.swarm.dataPath) === false) {
 		log.info('Cache file does not exist, providing defaults');
-		swarmCacheData = {
-			lastCheckinDate: new Date().toISOString(),
-		};
+		swarmCacheData = {};
 		saveSwarmCacheData();
 		return;
 	}

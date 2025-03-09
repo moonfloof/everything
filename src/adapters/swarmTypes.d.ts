@@ -98,17 +98,21 @@ export interface SwarmPushCheckin {
 	};
 }
 
-export interface SwarmCheckinDetails {
-	meta: {
-		code: number;
-		requestId: string;
+interface SwarmMeta {
+	code: number;
+	requestId: string;
+}
+
+interface SwarmNotification {
+	type: string;
+	item: {
+		unreadCount: number;
 	};
-	notifications: {
-		type: string;
-		item: {
-			unreadCount: number;
-		};
-	}[];
+}
+
+export interface SwarmCheckinDetails {
+	meta: SwarmMeta;
+	notifications: SwarmNotification[];
 	response: {
 		checkin: SwarmPushCheckin & {
 			source: {
@@ -134,5 +138,13 @@ export interface SwarmCheckinDetails {
 			showStickerUpsell?: boolean;
 			unlockedStickers: SwarmSticker[];
 		};
+	};
+}
+
+export interface SwarmSelfDetails {
+	meta: SwarmMeta;
+	notifications: SwarmNotification[];
+	response: {
+		user: SwarmUser;
 	};
 }
