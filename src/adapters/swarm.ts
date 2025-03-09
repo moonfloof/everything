@@ -53,6 +53,7 @@ async function callFoursquareAPI<T>(
 
 	const url = `${baseUrl}?${new URLSearchParams(params).toString()}`;
 
+	log.info(`Making request to ${baseUrl}`);
 	const response = await phin({
 		url,
 		method,
