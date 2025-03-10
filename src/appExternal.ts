@@ -51,9 +51,10 @@ app.use((err: HTTPError, req: Request, res: Response, _next: NextFunction): void
 });
 
 const startServer = () => {
-	const port = config.portExternal;
-	app.listen(port, () => {
-		log.info(`Running on port ${port}`);
+	const { portExternal } = config;
+
+	app.listen(portExternal, () => {
+		log.info(`Running on port ${portExternal}`);
 	});
 };
 

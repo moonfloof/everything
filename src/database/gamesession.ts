@@ -273,11 +273,17 @@ export function getPopularGames(days: number, limit = 10) {
 	const created_at = new Date(Date.now() - days * dayMs).toISOString();
 	const rows = statement.all({ created_at, limit });
 
+	const topGame = rows[0];
+
+	if (topGame === undefined) {
+		return [];
+	}
+
 	return rows.map(row => ({
 		...row,
 		achievement_percentage: Math.round((row.achievements_unlocked / row.achievements_total) * 100),
 		perfected: row.achievements_unlocked === row.achievements_total,
-		popularityPercentage: (row.playtime_hours / rows[0].playtime_hours) * 100,
+		popularityPercentage: (row.playtime_hours / topGame.playtime_hours) * 100,
 		timeago: timeago.format(new Date(row.last_played)),
 	}));
 }
@@ -320,7 +326,7 @@ export function getAllPerfectedGames() {
 		ORDER BY last_achieved DESC;`,
 	).all();
 
-	if (games.length === 0) return [];
+	if (games.length === 0 || games[0] === undefined) return [];
 
 	const longestGame: PerfectGame = games.reduce(
 		(longest, game) => (game.playtime_hours > longest.playtime_hours ? game : longest),
