@@ -66,7 +66,7 @@ export async function searchNearbyPlaces(lat: number, long: number): Promise<Che
 					latitude: lat,
 					longitude: long,
 				},
-				radius: 250.0,
+				radius: 500.0,
 			},
 		},
 		rankPreference: 'DISTANCE',
