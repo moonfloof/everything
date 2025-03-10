@@ -43,6 +43,7 @@ export const config = {
 		apiKey: process.env.TOMBOIS_GOOGLE_APIKEY,
 		youtubePollIntervalMins: Number(process.env.TOMBOIS_GOOGLE_POLL_INTERVAL ?? 5),
 		placesApiEnabled: process.env.TOMBOIS_GOOGLE_PLACESAPI_ENABLED === 'true',
+		placesApiIgnoredCategories: process.env.TOMBOIS_GOOGLE_PLACESAPI_CATEGORIES_IGNORED?.split(',') ?? [],
 	},
 
 	monzo: {

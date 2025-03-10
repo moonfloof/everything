@@ -51,10 +51,29 @@ credits.
 */
 
 export async function searchNearbyPlaces(lat: number, long: number): Promise<CheckinPlace[]> {
-	const { placesApiEnabled, apiKey } = config.google;
+	const { placesApiEnabled, placesApiIgnoredCategories, apiKey } = config.google;
 	if (placesApiEnabled !== true || !apiKey) {
 		log.warn('Attempting to use Places API, but use of this API is not enabled');
 		return [];
+	}
+
+	const body: Record<string, unknown> = {
+		maxResultCount: 20,
+		languageCode: 'en-GB',
+		locationRestriction: {
+			circle: {
+				center: {
+					latitude: lat,
+					longitude: long,
+				},
+				radius: 250.0,
+			},
+		},
+		rankPreference: 'DISTANCE',
+	};
+
+	if (placesApiIgnoredCategories.length > 0) {
+		body.excludedTypes = placesApiIgnoredCategories;
 	}
 
 	const response = await phin<NearbyPlacesResponse>({
@@ -67,20 +86,7 @@ export async function searchNearbyPlaces(lat: number, long: number): Promise<Che
 			'X-Goog-FieldMask':
 				'places.displayName,places.location,places.formattedAddress,places.primaryTypeDisplayName,places.id',
 		},
-		data: JSON.stringify({
-			maxResultCount: 20,
-			languageCode: 'en-GB',
-			locationRestriction: {
-				circle: {
-					center: {
-						latitude: lat,
-						longitude: long,
-					},
-					radius: 250.0,
-				},
-			},
-			rankPreference: 'DISTANCE',
-		}),
+		data: JSON.stringify(body),
 		parse: 'json',
 	});
 

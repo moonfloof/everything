@@ -45,7 +45,7 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // Using a POST here, but this is actually a GET request.
 // I did not want to include geolocation coordinates in the request URL.
-router.post('/places/cached', (req: RequestFrontend, res) => {
+router.post('/get-places/cached', (req: RequestFrontend, res) => {
 	if (Number.isNaN(Number(req.body.lat)) || Number.isNaN(Number(req.body.long))) {
 		throw new Error('lat or long is not a valid number');
 	}
@@ -63,7 +63,7 @@ router.post('/places/cached', (req: RequestFrontend, res) => {
 
 // Another POST request to conceal the lat/long coordinates. This is a separate
 // endpoint due to Google's Places API potentially being billed.
-router.post('/places/google', async (req: RequestFrontend, res) => {
+router.post('/get-places/google', async (req: RequestFrontend, res) => {
 	if (Number.isNaN(Number(req.body.lat)) || Number.isNaN(Number(req.body.long))) {
 		throw new Error('lat or long is not a valid number');
 	}
