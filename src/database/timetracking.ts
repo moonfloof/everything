@@ -83,7 +83,7 @@ export function insertTimeTracking(session: Insert<Timetracking>) {
 	insertNewRecord(session);
 }
 
-export function getTimeTracking(parameters: Partial<Parameters> = {}) {
+export function getTimeTracking(parameters: Parameters = {}) {
 	const statement = getStatement(
 		'getTimeTracking',
 		`SELECT * FROM timetracking

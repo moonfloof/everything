@@ -42,7 +42,7 @@ export function insertFilm(film: Insert<Film>) {
 	};
 }
 
-export function getFilms(parameters: Partial<Parameters> = {}) {
+export function getFilms(parameters: Parameters = {}) {
 	const statement = getStatement<Film>(
 		'getFilms',
 		`SELECT * FROM films

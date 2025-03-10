@@ -101,7 +101,7 @@ export function insertScrobble(listen: ListenInsert) {
 	});
 }
 
-export function getListens(parameters: Partial<Parameters> = {}) {
+export function getListens(parameters: Parameters = {}) {
 	const statement = getStatement<Listen>(
 		'getListens',
 		`SELECT l.*, t.artist, t.album, t.title, t.track_number, t.release_year, t.genre, t.duration_secs
