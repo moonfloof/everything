@@ -31,7 +31,7 @@ export function insertYouTubeLike(video: Insert<YouTubeLike>) {
 	});
 }
 
-export function getLikes(parameters: Partial<Parameters> = {}) {
+export function getLikes(parameters: Parameters = {}) {
 	const statement = getStatement<YouTubeLike>(
 		'getYouTubeLikes',
 		`SELECT * FROM youtubelikes

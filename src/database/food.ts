@@ -28,7 +28,7 @@ export function insertFood(food: Insert<Food>) {
 	});
 }
 
-export function getFood(parameters: Partial<Parameters> = {}) {
+export function getFood(parameters: Parameters = {}) {
 	const statement = getStatement<Food>(
 		'getFood',
 		`SELECT * FROM food

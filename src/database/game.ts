@@ -46,7 +46,7 @@ export function countGames(): number {
 	return count;
 }
 
-export function getGames(parameters: Partial<Parameters> = {}) {
+export function getGames(parameters: Parameters = {}) {
 	const statement = getStatement<Game & { achievements: number; sessions: number }>(
 		'getGames',
 		`SELECT

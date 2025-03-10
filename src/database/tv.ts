@@ -28,7 +28,7 @@ export function insertEpisode(episode: Insert<Episode>) {
 	});
 }
 
-export function getEpisodes(parameters: Partial<Parameters> = {}) {
+export function getEpisodes(parameters: Parameters = {}) {
 	const statement = getStatement<Episode>(
 		'getEpisodes',
 		`SELECT * FROM tv

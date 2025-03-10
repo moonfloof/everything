@@ -27,7 +27,7 @@ export function insertWeight(weight: Insert<Weight>) {
 	});
 }
 
-export function getWeight(parameters: Partial<Parameters> = {}) {
+export function getWeight(parameters: Parameters = {}) {
 	const statement = getStatement<Weight>(
 		'getWeight',
 		`SELECT * FROM weight

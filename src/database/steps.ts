@@ -27,7 +27,7 @@ export function insertSteps(steps: Insert<Steps>) {
 	});
 }
 
-export function getSteps(parameters: Partial<Parameters> = {}) {
+export function getSteps(parameters: Parameters = {}) {
 	const statement = getStatement<Steps>(
 		'getSteps',
 		`SELECT * FROM steps

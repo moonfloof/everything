@@ -33,7 +33,7 @@ export function insertNewGameAchievement(achievement: Omit<GameAchievement, 'id'
 	});
 }
 
-export function getGameAchievement(parameters: Partial<Parameters> = {}) {
+export function getGameAchievement(parameters: Parameters = {}) {
 	const statement = getStatement<GameAchievement>(
 		'getGameAchievement',
 		`SELECT * FROM game_achievements

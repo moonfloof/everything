@@ -36,7 +36,7 @@ export function countPurchases() {
 	return statement.get()?.total || 0;
 }
 
-export function getPurchases(parameters: Partial<Parameters> = {}) {
+export function getPurchases(parameters: Parameters = {}) {
 	const statement = getStatement<Purchase>(
 		'getPurchases',
 		`SELECT * FROM purchases

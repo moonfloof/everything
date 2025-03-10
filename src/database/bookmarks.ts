@@ -28,7 +28,7 @@ export function insertBookmark(bookmark: Insert<Bookmark>) {
 	});
 }
 
-export function getBookmarks(parameters: Partial<Parameters> = {}) {
+export function getBookmarks(parameters: Parameters = {}) {
 	const statement = getStatement<Bookmark>(
 		'getBookmarks',
 		`SELECT * FROM bookmarks
