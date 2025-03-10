@@ -1,6 +1,6 @@
 import { dateDefault } from '../lib/formatDate.js';
 import type { Optional, Update } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export interface CheckinPlace {
