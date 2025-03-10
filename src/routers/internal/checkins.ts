@@ -78,14 +78,27 @@ router.post('/places/google', async (req: RequestFrontend, res) => {
 	res.send({ places });
 });
 
-router.post('/', async (req: RequestFrontend<object, Record<string, string> & { photos: string[] }>, res) => {
-	const { place_id, name, category, address, lat, long, description, status, photos } = req.body;
+interface InternalInsertCheckin {
+	place_id: string;
+	name: string;
+	category: string;
+	address: string;
+	lat: string;
+	long: string;
+	description: string;
+	status: string;
+	created_at: string;
+	photos?: string[];
+}
+
+router.post('/', async (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
+	const { place_id, name, category, address, lat, long, description, status, created_at, photos } = req.body;
 	const checkinToInsert: Insert<Checkin> = {
 		place_id: Number(place_id),
 		device_id: config.defaultDeviceId,
-		created_at: new Date().toISOString(),
-		description: description ?? '',
-		status: (status as EntryStatus | undefined) ?? 'public',
+		created_at,
+		description,
+		status: (status as EntryStatus | undefined) || 'public',
 	};
 
 	if (name !== undefined && name !== '') {
@@ -100,6 +113,11 @@ router.post('/', async (req: RequestFrontend<object, Record<string, string> & { 
 	}
 
 	const checkin = insertCheckin(checkinToInsert);
+
+	if (photos === undefined) {
+		res.redirect('/checkins');
+		return;
+	}
 
 	let counter = 0;
 	for (const photo of photos) {
@@ -116,20 +134,17 @@ router.post('/', async (req: RequestFrontend<object, Record<string, string> & { 
 	res.redirect('/checkins');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+interface InternalCheckinUpdate {
+	crudType?: 'update' | 'delete';
+	description: string;
+	status: string;
+	created_at: string;
+	updated_at: string;
+}
+
+router.post('/:id', (req: RequestFrontend<object, InternalCheckinUpdate, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, description, status, created_at, updated_at } = req.body;
-
-	if (
-		id === undefined ||
-		description === undefined ||
-		created_at === undefined ||
-		updated_at === undefined ||
-		status === undefined
-	) {
-		res.redirect('/checkins');
-		return;
-	}
 
 	switch (crudType) {
 		case 'delete': {
@@ -141,7 +156,7 @@ router.post('/:id', (req: RequestFrontend, res) => {
 			updateCheckin({
 				id,
 				description,
-				status: status as EntryStatus,
+				status: (status || 'public') as EntryStatus,
 				created_at,
 				updated_at,
 			});

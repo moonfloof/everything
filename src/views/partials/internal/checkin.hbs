@@ -4,7 +4,7 @@
 	<div class="row">
 		<span class="left">🏢</span>
 		<span class="right">
-			<strong>{{data.name}}</strong>{{#if data.address}}, {{data.address}}{{/if}}
+			{{data.place_id}}: <strong>{{data.name}}</strong>{{#if data.address}}, {{data.address}}{{/if}}
 		</span>
 	</div>
 	{{else}}
@@ -35,7 +35,9 @@
 	{{> internal/crudRowParagraph emoji="💬" name="description" value=data.description }}
 	{{> internal/crudRowSelect emoji="🙈" name="status" value=data.status label=data.status values=entryStatusValues }}
 	{{> internal/crudRow type="datetime-local" emoji="🕑" name="created_at" value=data.created_at }}
+	{{#if data.id}}
 	{{> internal/crudRow type="datetime-local" emoji="🕖" name="updated_at" value=data.updated_at }}
+	{{/if}}
 
 	{{#if data.id}}
 		{{!-- TODO: Allow uploading and deleting photos post-checkin --}}
