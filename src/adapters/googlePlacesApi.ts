@@ -1,5 +1,5 @@
 import phin from 'phin';
-import { type CheckinPlace, getCachedPlace } from '../database/checkins.js';
+import { type CheckinPlace, getCachedPlace } from '../database/checkinPlace.js';
 import { config } from '../lib/config.js';
 import Logger from '../lib/logger.js';
 

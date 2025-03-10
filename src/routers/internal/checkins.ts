@@ -1,16 +1,8 @@
 import { Router } from 'express';
 import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
 import { convertImageToDatabase } from '../../adapters/swarm.js';
-import {
-	type Checkin,
-	deleteCheckin,
-	getCheckins,
-	getNearestPlaces,
-	getPlaceCategories,
-	insertCheckin,
-	insertPlace,
-	updateCheckin,
-} from '../../database/checkins.js';
+import { getNearestPlaces, getPlaceCategories, insertPlace } from '../../database/checkinPlace.js';
+import { type Checkin, deleteCheckin, getCheckins, insertCheckin, updateCheckin } from '../../database/checkins.js';
 import { type EntryStatus, entryStatusValues } from '../../database/notes.js';
 import { config } from '../../lib/config.js';
 import Logger from '../../lib/logger.js';
