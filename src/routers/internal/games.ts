@@ -34,6 +34,12 @@ const router = express.Router();
 
 // Games
 
+interface Game {
+	crudType?: 'update' | 'delete';
+	name: string;
+	url?: string;
+}
+
 router.get('/', (req: RequestFrontend, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countGames());
@@ -43,15 +49,18 @@ router.get('/', (req: RequestFrontend, res) => {
 	res.render('internal/games', { games, pagination, page });
 });
 
-router.post('/game', (req: RequestFrontend, res) => {
+router.post('/game', (req: RequestFrontend<object, Game>, res) => {
 	const { name, url } = req.body;
 
-	selectOrInsertGame({ name, url });
+	selectOrInsertGame({
+		name,
+		url: url || null,
+	});
 
 	res.redirect('/games');
 });
 
-router.post('/game/:game_id', (req: RequestFrontend, res) => {
+router.post('/game/:game_id', (req: RequestFrontend<object, Game, { game_id: string }>, res) => {
 	const { game_id } = req.params;
 	const game = getGameById(game_id);
 	if (!game) {
@@ -70,7 +79,7 @@ router.post('/game/:game_id', (req: RequestFrontend, res) => {
 			updateGame({
 				...game,
 				name,
-				url,
+				url: url || null,
 			});
 			break;
 		}
@@ -79,7 +88,7 @@ router.post('/game/:game_id', (req: RequestFrontend, res) => {
 	res.redirect('/games');
 });
 
-router.get('/game/update-images/:game_id', async (req: RequestFrontend, res) => {
+router.get('/game/update-images/:game_id', async (req, res) => {
 	const { game_id } = req.params;
 	const game = getGameById(game_id);
 
@@ -98,9 +107,9 @@ router.get('/game/update-images/:game_id', async (req: RequestFrontend, res) => 
 	redirect();
 });
 
-router.get('/game/update-achievements/:game_id', async (req: RequestFrontend, res) => {
-	const { game_id } = req.params;
-	const game = getGameById(game_id);
+router.get('/game/update-achievements/:id', async (req, res) => {
+	const { id } = req.params;
+	const game = getGameById(id);
 
 	const redirect = (): void => {
 		const page = req.query.page;
@@ -156,7 +165,7 @@ router.get('/game/update-achievements/:game_id', async (req: RequestFrontend, re
 	return redirect();
 });
 
-router.get('/:id/sessions', (req: RequestFrontend, res) => {
+router.get('/:id/sessions', (req, res) => {
 	const { id } = req.params;
 	const game = getGameById(id);
 	if (!game) {
@@ -171,7 +180,7 @@ router.get('/:id/sessions', (req: RequestFrontend, res) => {
 	res.render('internal/game-sessions', { sessions, gameId: id, title, backUrl });
 });
 
-router.get('/:id/achievements', (req: RequestFrontend, res) => {
+router.get('/:id/achievements', (req, res) => {
 	const { id } = req.params;
 	const game = getGameById(id);
 	if (!game) {
@@ -188,6 +197,17 @@ router.get('/:id/achievements', (req: RequestFrontend, res) => {
 
 // Modify Achievements
 
+interface Achievement {
+	crudType?: 'new' | 'update' | 'delete';
+	game_id: string;
+	id: string;
+	name: string;
+	description?: string;
+	apiname?: string;
+	created_at: string;
+	updated_at: string;
+}
+
 router.get('/session/achievements/:id', (req, res) => {
 	const { id } = req.params;
 
@@ -203,7 +223,7 @@ router.get('/session/achievements/:id', (req, res) => {
 	res.render('internal/game-achievements', { id, title, backUrl, session, achievements: session.achievements });
 });
 
-router.post('/session/achievements', (req: RequestFrontend, res) => {
+router.post('/session/achievements', (req: RequestFrontend<object, Achievement>, res) => {
 	const { game_id, id, crudType, name, description, apiname, created_at, updated_at } = req.body;
 
 	const game = getGameById(game_id);
@@ -211,14 +231,13 @@ router.post('/session/achievements', (req: RequestFrontend, res) => {
 		res.redirect('/games');
 		return;
 	}
-	const achievement = getGameAchievement({ id, limit: 1 })?.[0] ?? {};
 
 	switch (crudType) {
 		case 'new': {
 			insertNewGameAchievement({
 				name,
-				description,
-				apiname,
+				description: description || null,
+				apiname: apiname || null,
 				created_at,
 				updated_at,
 				game_id: game.id,
@@ -233,14 +252,19 @@ router.post('/session/achievements', (req: RequestFrontend, res) => {
 		}
 
 		case 'update': {
+			const achievement = getGameAchievement({ id, limit: 1 })[0];
+			if (achievement === undefined) {
+				throw new Error(`Achievement '${id}' does not exist`);
+			}
+
 			updateGameAchievement({
 				...achievement,
 				id,
 				name,
-				description,
+				description: description || null,
 				created_at,
 				updated_at,
-				apiname,
+				apiname: apiname || null,
 			});
 			break;
 		}
@@ -253,7 +277,7 @@ router.post('/session/achievements', (req: RequestFrontend, res) => {
 	res.redirect(`/games/${game.id}/achievements`);
 });
 
-router.post('/session/achievements/:unlocked_session_id', (req: RequestFrontend, res) => {
+router.post('/session/achievements/:unlocked_session_id', (req: RequestFrontend<object, Achievement>, res) => {
 	const { unlocked_session_id } = req.params;
 	const { id, crudType, name, description, created_at, updated_at, apiname } = req.body;
 
@@ -268,12 +292,12 @@ router.post('/session/achievements/:unlocked_session_id', (req: RequestFrontend,
 		case 'new': {
 			insertNewGameAchievement({
 				name,
-				description,
 				game_id: session.game_id,
-				unlocked_session_id,
 				created_at,
 				updated_at,
-				apiname,
+				description: description || null,
+				apiname: apiname || null,
+				unlocked_session_id: unlocked_session_id ?? null,
 			});
 			break;
 		}
@@ -287,11 +311,11 @@ router.post('/session/achievements/:unlocked_session_id', (req: RequestFrontend,
 			updateGameAchievement({
 				id,
 				name,
-				description,
 				created_at,
 				updated_at,
-				apiname,
-				unlocked_session_id,
+				description: description || null,
+				apiname: apiname || null,
+				unlocked_session_id: unlocked_session_id ?? null,
 			});
 			break;
 		}
@@ -318,7 +342,17 @@ router.get('/session', (req: RequestFrontend, res) => {
 	res.render('internal/game-sessions', { sessions, pagination, title, backUrl, gameOptions });
 });
 
-router.post('/session', (req: RequestFrontend, res) => {
+interface Session {
+	crudType?: 'update' | 'delete';
+	game_id?: string;
+	game_page?: string;
+	name: string;
+	playtime_mins: string;
+	created_at: string;
+	updated_at: string;
+}
+
+router.post('/session', (req: RequestFrontend<object, Session>, res) => {
 	const { game_id, game_page, playtime_mins, created_at } = req.body;
 	let { name } = req.body;
 	let redirectUri = '/games/session';
@@ -346,7 +380,7 @@ router.post('/session', (req: RequestFrontend, res) => {
 	res.redirect(redirectUri);
 });
 
-router.post('/session/:id', (req: RequestFrontend, res) => {
+router.post('/session/:id', (req: RequestFrontend<object, Session, { id: string }>, res) => {
 	const { id } = req.params;
 
 	const { crudType, playtime_mins, created_at, updated_at, game_id, game_page } = req.body;

@@ -8,7 +8,6 @@ import Logger from '../../lib/logger.js';
 import type { RequestFrontend } from '../../types/express.js';
 
 const log = new Logger('tv');
-
 const router = express.Router();
 
 // FRONTEND
@@ -24,6 +23,14 @@ router.get('/list', (req: RequestFrontend, res) => {
 
 // CRUD
 
+interface Episode {
+	crudType?: 'update' | 'delete';
+	series_title: string;
+	episode_title: string;
+	duration_secs: string;
+	created_at: string;
+}
+
 router.get('/', async (_req, res) => {
 	try {
 		const seriesList = await getSeriesList();
@@ -35,7 +42,7 @@ router.get('/', async (_req, res) => {
 	}
 });
 
-router.get('/episode', async (req: RequestFrontend, res) => {
+router.get('/episode', async (req: RequestFrontend<{ seriesId: string }>, res) => {
 	try {
 		const episodeList = await getEpisodeList(req.query.seriesId);
 
@@ -46,7 +53,7 @@ router.get('/episode', async (req: RequestFrontend, res) => {
 	}
 });
 
-router.post('/episode', async (req: RequestFrontend, res) => {
+router.post('/episode', async (req: RequestFrontend<object, { episodeId: string }>, res) => {
 	try {
 		const episode = await getEpisode(req.body.episodeId);
 		const seasonNumber = padString(episode.seasonNumber, 2);
@@ -72,8 +79,12 @@ router.post('/episode', async (req: RequestFrontend, res) => {
 	}
 });
 
-router.post('/', (req: RequestFrontend, res) => {
+router.post('/', (req: RequestFrontend<object, Episode>, res) => {
 	const { series_title, episode_title, duration_secs, created_at } = req.body;
+
+	if (!(series_title && episode_title)) {
+		throw new Error('A series title and episode title must be provided');
+	}
 
 	insertEpisode({
 		series_title,
@@ -88,7 +99,7 @@ router.post('/', (req: RequestFrontend, res) => {
 	res.redirect('/tv/list');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Episode, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, series_title, episode_title, duration_secs, created_at } = req.body;
 
@@ -99,6 +110,9 @@ router.post('/:id', (req: RequestFrontend, res) => {
 		}
 
 		case 'update': {
+			if (!(series_title && episode_title)) {
+				throw new Error('A series title and episode title must be provided');
+			}
 			updateEpisode({
 				id,
 				series_title,

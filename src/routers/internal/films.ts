@@ -29,15 +29,27 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Film {
+	crudType?: 'update' | 'delete';
+	title: string;
+	year: string;
+	rating: string;
+	review: string;
+	url: string;
+	duration_secs: string;
+	watched_at: string;
+	created_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Film>, res) => {
 	const { title, year, rating, review, url, duration_secs, watched_at, created_at } = req.body;
 
 	insertFilm({
 		title,
 		year: Number(year || 0),
 		rating: Number(rating) || null,
-		review,
-		url,
+		review: review || null,
+		url: url || null,
 		duration_secs: duration_secs?.trim() ? Number(duration_secs) : null,
 		watched_at,
 		created_at,
@@ -61,7 +73,7 @@ router.post('/rescan', async (_req, res) => {
 	}
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Film, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, title, year, rating, review, url, duration_secs, watched_at, created_at } = req.body;
 
@@ -80,7 +92,7 @@ router.post('/:id', (req: RequestFrontend, res) => {
 				year: Number(year || 0),
 				rating: Number(rating) || null,
 				review: review || null,
-				url,
+				url: url || null,
 				duration_secs: duration_secs?.trim() ? Number(duration_secs) : null,
 				watched_at,
 				created_at,

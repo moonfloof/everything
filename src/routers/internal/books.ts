@@ -23,7 +23,22 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Book {
+	crudType?: 'update' | 'delete';
+	title: string;
+	year: string;
+	author: string;
+	genre: string;
+	pages_total: string;
+	pages_progress: string;
+	rating: string;
+	url: string;
+	started_at: string;
+	completed_at: string;
+	created_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Book>, res) => {
 	const {
 		title,
 		year,
@@ -38,25 +53,30 @@ router.post('/', (req: RequestFrontend, res) => {
 		created_at,
 	} = req.body;
 
+	if (!(title && author && year)) {
+		throw new Error('Title, author, and year must all be provided');
+	}
+
 	insertBook({
 		title,
-		year: Number(year || 0),
-		rating: rating ? Number(rating) : null,
-		url,
 		author,
-		genre,
+		started_at,
+		created_at,
+		year: Number(year),
+
+		url: url || null,
+		genre: genre || null,
+		completed_at: completed_at || null,
+		rating: rating ? Number(rating) : null,
 		pages_total: pages_total ? Number(pages_total) : null,
 		pages_progress: pages_progress ? Number(pages_progress) : null,
-		started_at,
-		completed_at,
-		created_at,
 		device_id: config.defaultDeviceId,
 	});
 
 	res.redirect('/books');
 });
 
-router.post('/:id', (req, res) => {
+router.post('/:id', (req: RequestFrontend<object, Book, { id: string }>, res) => {
 	const { id } = req.params;
 	const {
 		crudType,
@@ -80,19 +100,24 @@ router.post('/:id', (req, res) => {
 		}
 
 		case 'update': {
+			if (!(title && author && year)) {
+				throw new Error('Title, author, and year must all be provided');
+			}
+
 			updateBook({
 				id,
 				title,
-				year: Number(year || 0),
-				rating: rating ? Number(rating) : null,
-				url,
 				author,
-				genre,
+				started_at,
+				created_at,
+				year: Number(year),
+
+				url: url || null,
+				genre: genre || null,
+				completed_at: completed_at || null,
+				rating: rating ? Number(rating) : null,
 				pages_total: pages_total ? Number(pages_total) : null,
 				pages_progress: pages_progress ? Number(pages_progress) : null,
-				started_at,
-				completed_at,
-				created_at,
 			});
 			break;
 		}

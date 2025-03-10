@@ -26,6 +26,7 @@ import timetracking from './routers/internal/timetracking.js';
 import tv from './routers/internal/tv.js';
 import weight from './routers/internal/weight.js';
 import youtubelikes from './routers/internal/youtubelikes.js';
+import { config } from './lib/config.js';
 
 const log = new Logger('server-int');
 
@@ -60,7 +61,7 @@ app.get('*url', () => {
 });
 
 app.use((err: HTTPError, req: Request, res: Response, _next: NextFunction) => {
-	log.error(err.message, err.code, req.originalUrl);
+	log.error(err.message, err.code ?? '', req.originalUrl);
 	if (err.code !== 404) {
 		log.error(err.stack);
 	}
@@ -69,9 +70,9 @@ app.use((err: HTTPError, req: Request, res: Response, _next: NextFunction) => {
 });
 
 const startServer = () => {
-	const port = process.env.TOMBOIS_SERVER_PORT_INTERNAL;
-	app.listen(port, () => {
-		log.info(`Running on port ${port}`);
+	const { portInternal } = config;
+	app.listen(portInternal, () => {
+		log.info(`Running on port ${portInternal}`);
 	});
 };
 

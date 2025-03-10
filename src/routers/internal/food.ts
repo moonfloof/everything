@@ -34,7 +34,14 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Food {
+	crudType?: 'update' | 'delete';
+	name: string;
+	type: string;
+	created_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Food>, res) => {
 	const { name, type, created_at } = req.body;
 
 	insertFood({ name, type, created_at, device_id: config.defaultDeviceId });
@@ -42,7 +49,7 @@ router.post('/', (req: RequestFrontend, res) => {
 	res.redirect('/food');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Food, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, name, type, created_at } = req.body;
 

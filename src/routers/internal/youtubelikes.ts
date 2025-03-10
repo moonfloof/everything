@@ -27,7 +27,16 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', async (req: RequestFrontend, res) => {
+interface YouTubeVideo {
+	crudType?: string;
+	url: string;
+	created_at: string;
+	title: string;
+	channel: string;
+	duration_secs: string;
+}
+
+router.post('/', async (req: RequestFrontend<object, YouTubeVideo>, res) => {
 	try {
 		const { url, created_at } = req.body;
 		let { title, channel, duration_secs } = req.body;
@@ -56,7 +65,7 @@ router.post('/', async (req: RequestFrontend, res) => {
 	}
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, YouTubeVideo, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, url, title, channel, duration_secs, created_at } = req.body;
 	const video_id = validateYouTubeUrl(url);

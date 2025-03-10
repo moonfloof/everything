@@ -38,7 +38,7 @@ router.get('/', async (_req, res) => {
 	}
 });
 
-router.post('/', async (req: RequestFrontend, res) => {
+router.post('/', async (req: RequestFrontend<object, { albumId: string; dateTime: string }>, res) => {
 	try {
 		// Step 1: Get tracks from album
 		const album = await getAlbumTracks(req.body.albumId);

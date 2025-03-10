@@ -26,7 +26,16 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Purchase {
+	crudType?: 'update' | 'delete';
+	amount: string;
+	currency: string;
+	merchant: string;
+	category: string;
+	created_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Purchase>, res) => {
 	const { amount, currency, merchant, category, created_at } = req.body;
 
 	insertPurchase({
@@ -41,7 +50,7 @@ router.post('/', (req: RequestFrontend, res) => {
 	res.redirect('/purchases');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Purchase, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, amount, currency, merchant, category, created_at } = req.body;
 
