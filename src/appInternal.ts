@@ -3,6 +3,7 @@ const { NotFoundError } = errors;
 import type { HTTPError } from '@moonfloof/stdlib/types/errors/http.js';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import appCreate from './lib/appCreate.js';
+import { config } from './lib/config.js';
 import Logger from './lib/logger.js';
 import { trimStrings } from './lib/middleware/trimStrings.js';
 import { validatePageNumber } from './lib/middleware/validatePageNumber.js';
@@ -26,7 +27,6 @@ import timetracking from './routers/internal/timetracking.js';
 import tv from './routers/internal/tv.js';
 import weight from './routers/internal/weight.js';
 import youtubelikes from './routers/internal/youtubelikes.js';
-import { config } from './lib/config.js';
 
 const log = new Logger('server-int');
 
