@@ -1,4 +1,6 @@
-import type { Optional } from '../types/database.js';
+import { dateDefault } from '../lib/formatDate.js';
+import type { Optional, Update } from '../types/database.js';
+import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export interface CheckinPlace {
@@ -77,4 +79,53 @@ export function getPlaceCategories() {
 		GROUP BY category
 		ORDER BY category ASC;`,
 	).all();
+}
+
+export function getCheckinPlaces(parameters: Parameters = {}) {
+	return getStatement<CheckinPlace>(
+		'getCheckinPlaces',
+		`SELECT
+			*,
+			strftime('%FT%T', created_at) as created_at,
+			strftime('%FT%T', updated_at) as updated_at
+		FROM checkin_place
+		WHERE id LIKE $id AND created_at >= $created_at
+		ORDER BY $created_at DESC
+		LIMIT $limit OFFSET $offset`,
+	).all(calculateGetParameters(parameters));
+}
+
+export function countCheckinPlaces() {
+	const statement = getStatement<{ total: number }>(
+		'countCheckinPlaces',
+		'SELECT COUNT(id) AS total FROM checkin_place;',
+	);
+	return statement.get()?.total ?? 0;
+}
+
+export function deleteCheckinPlace(checkin_place_id: number) {
+	const statement = getStatement('deleteCheckinPlace', 'DELETE FROM checkin_place WHERE id = $id;');
+	return statement.run({ id: checkin_place_id });
+}
+
+export function updateCheckinPlace(place: Update<CheckinPlace>) {
+	const statement = getStatement(
+		'updateCheckinPlace',
+		`UPDATE checkin_place
+		SET name = $name,
+		    category = $category,
+		    address = $address,
+		    lat = $lat,
+		    long = $long,
+		    external_id = $external_id,
+		    created_at = $created_at,
+		    updated_at = $updated_at
+		WHERE id = $id;`,
+	);
+
+	return statement.run({
+		...place,
+		created_at: dateDefault(place.created_at),
+		updated_at: dateDefault(place.updated_at),
+	});
 }
