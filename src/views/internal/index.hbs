@@ -1,23 +1,57 @@
 <h2>Internal UI</h2>
 
-<ul>
-	<li><a href="/notes">Notes</a></li>
-	<li><a href="/timetracking">Time Tracking</a></li>
-	<li><a href="/scrobble">Scrobble Album</a></li>
-	<li><a href="/tv">Log a TV episode</a></li>
-	<li><a href="/tv/list">TV episodes</a></li>
-	<li><a href="/films">Films</a></li>
-	<li><a href="/games">Games</a></li>
-	<li><a href="/games/session">Game Sessions</a></li>
-	<li><a href="/weight">Weight</a></li>
-	<li><a href="/food">Food</a></li>
-	<li><a href="/purchases">Purchases</a></li>
-	<li><a href="/bookmarks">Bookmarks</a></li>
-	<li><a href="/listens">Listens</a></li>
-	<li><a href="/youtubelikes">YouTube Likes</a></li>
-	<li><a href="/steps">Steps</a></li>
-	<li><a href="/books">Books</a></li>
-	<li><a href="/location">Location History</a></li>
-	<li><a href="/checkins">Check-in</a></li>
+<style>
+	#list {
+		columns: 2;
+	}
+
+	#list > li {
+		break-inside: avoid-column;
+		margin-bottom: 16px;
+	}
+
+	@media (max-width: 660px) {
+		#list {
+			columns: 1;
+		}
+	}
+</style>
+
+<ul id="list">
+	<li><a href="/notes">📓 Notes</a></li>
+	<li><a href="/listens">🎵 Listens</a>
+		<ul>
+			<li><a href="/scrobble">Scrobble Album</a></li>
+		</ul>
+	</li>
+	<li><a href="/games">🎮 Games</a>
+		<ul>
+			<li><a href="/games/session">Game Sessions</a></li>
+		</ul>
+	</li>
+	<li><a href="/youtubelikes">▶️ YouTube Likes</a></li>
+	<li><a href="/tv/list">📺 TV episodes</a>
+		<ul>
+			<li><a href="/tv">Log a TV episode</a></li>
+		</ul>
+	</li>
+	<li><a href="/location">📍 Location History</a>
+		<ul>
+			<li><a href="/checkins">Check-in</a></li>
+			<li><a href="/checkins/places">Places</a></li>
+		</ul>
+	</li>
+	<li>🧡 Health:
+		<ul>
+			<li><a href="/timetracking">Time Tracking</a></li>
+			<li><a href="/steps">Steps</a></li>
+			<li><a href="/weight">Weight</a></li>
+			<li><a href="/food">Food</a></li>
+		</ul>
+	</li>
+	<li><a href="/films">🎥 Films</a></li>
+	<li><a href="/books">📚 Books</a></li>
+	<li><a href="/bookmarks">🔖 Bookmarks</a></li>
+	<li><a href="/purchases">💳 Purchases</a></li>
 	<li><a href="/cache">Cached Pages</a></li>
 </ul>
