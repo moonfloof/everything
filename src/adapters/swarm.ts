@@ -33,6 +33,17 @@ const swarmEndpoints = {
 		`https://api.foursquare.com/v2/checkins/${checkin_id}`,
 } as const;
 
+function variablesArePresent(includePush = false) {
+	const { oauthClientId, oauthClientSecret, userId, pushSecret } = config.swarm;
+	if (oauthClientId === undefined || oauthClientSecret === undefined || userId === undefined) {
+		throw new ServerError('Swarm - Missing Client ID, Client Secret, and/or User ID, check your .env file');
+	}
+
+	if (includePush && pushSecret === undefined) {
+		throw new ServerError('Swarm - Server does not have a push secret set, check your .env file');
+	}
+}
+
 async function callFoursquareAPI<T>(
 	endpoint: keyof typeof swarmEndpoints,
 	params: Record<string, string> = {},
@@ -64,13 +75,12 @@ async function callFoursquareAPI<T>(
 }
 
 export function generateAuthenticateUri() {
-	const { oauthClientId, oauthClientSecret, userId } = config.swarm;
-	if (oauthClientId === undefined || oauthClientSecret === undefined || userId === undefined) {
-		throw new ServerError('Swarm - Missing Client ID, Client Secret, and/or User ID, check your .env file');
-	}
+	const { oauthClientId } = config.swarm;
+
+	variablesArePresent();
 
 	const params = new URLSearchParams({
-		client_id: oauthClientId,
+		client_id: oauthClientId!,
 		response_type: 'code',
 		redirect_uri: `${config.serverExternalUri}/api/swarm/callback`,
 	});
@@ -80,14 +90,13 @@ export function generateAuthenticateUri() {
 
 export async function swarmHandleOauthCallback(code: string) {
 	const { oauthClientId, oauthClientSecret, userId } = config.swarm;
-	if (oauthClientId === undefined || oauthClientSecret === undefined || userId === undefined) {
-		throw new ServerError('Swarm - Missing Client ID, Client Secret, and/or User ID, check your .env file');
-	}
+
+	variablesArePresent();
 
 	// First, get an access token
 	const params = {
-		client_id: oauthClientId,
-		client_secret: oauthClientSecret,
+		client_id: oauthClientId!,
+		client_secret: oauthClientSecret!,
 		grant_type: 'authorization_code',
 		redirect_uri: `${config.serverExternalUri}/api/swarm/callback`,
 		code,
@@ -102,7 +111,7 @@ export async function swarmHandleOauthCallback(code: string) {
 	} = await callFoursquareAPI<SwarmSelfDetails>('selfDetails');
 
 	if (`${user.id}`.toLowerCase() !== `${userId}`.toLowerCase()) {
-		throw new ForbiddenError('Swarm - User logging in does not match user in `.env` file.');
+		throw new ForbiddenError('Swarm - User logging in does not match required User ID');
 	}
 
 	// Finally, update the cache data
@@ -130,14 +139,16 @@ function swarmDownloadPhoto(checkin_id: string, photo: SwarmPhoto) {
 }
 
 export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string, device_id?: string) {
-	const { pushSecret } = config.swarm;
+	const { pushSecret, userId } = config.swarm;
 
-	if (pushSecret === undefined) {
-		throw new ServerError('Swarm - Server does not have a push secret set');
-	}
+	variablesArePresent(true);
 
 	if (secret !== pushSecret) {
 		throw new BadRequestError('Swarm - Secret does not match server');
+	}
+
+	if (`${checkin.user.id}`.toLowerCase() !== `${userId}`.toLowerCase()) {
+		throw new ForbiddenError('Swarm - User does not match required User ID');
 	}
 
 	const { venue } = checkin;
