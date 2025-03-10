@@ -1,8 +1,8 @@
 import express from 'express';
+import { validateDevice } from '../../database/devices.js';
 import { insertPurchase } from '../../database/purchases.js';
 import { config } from '../../lib/config.js';
 import Logger from '../../lib/logger.js';
-import { validateDevice } from '../../database/devices.js';
 
 const log = new Logger('Purchases');
 
