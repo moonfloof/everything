@@ -1,0 +1,23 @@
+{{> pageHeader title="Check-in Places" url="/" }}
+
+<div class="page--data">
+
+{{> internal/checkin-place categoryValues=categories }}
+
+<hr>
+
+<div class="info rounded-panel">
+	<p>
+		<strong>Warning:</strong> Deleting a place will also delete all
+		check-ins associated with it.
+	</p>
+</div>
+<br>
+
+{{#each places as |place|}}
+	{{> internal/checkin-place data=place categoryValues=../categories }}
+{{/each}}
+
+{{> pagination route="/checkins/places" pagination=pagination }}
+
+</div>
