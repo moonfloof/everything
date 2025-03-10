@@ -64,7 +64,7 @@ export function getNearestPlaces(parameters: Partial<CheckinPlace> = {}) {
 			name || ' (' || category || ')' AS name
 		FROM checkin_place
 		ORDER BY distance IS NULL, distance ASC, updated_at DESC
-		LIMIT 20;`,
+		LIMIT 50;`,
 	).all({
 		lat: parameters.lat,
 		long: parameters.long,
