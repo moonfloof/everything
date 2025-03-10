@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import type { RequestFrontend } from '../../types/express.js';
 import {
 	countCheckinPlaces,
 	deleteCheckinPlace,
@@ -9,6 +8,7 @@ import {
 	updateCheckinPlace,
 } from '../../database/checkinPlace.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
+import type { RequestFrontend } from '../../types/express.js';
 
 const router = Router();
 
