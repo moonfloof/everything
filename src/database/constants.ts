@@ -1,10 +1,10 @@
 import { dayMs } from '../lib/formatDate.js';
 
 export interface Parameters {
-	id: string;
-	limit: number;
-	days: number;
-	page: number | string;
+	id?: string;
+	limit?: number;
+	days?: number;
+	page?: number | string;
 }
 
 export interface PaginationParameters {
@@ -32,7 +32,7 @@ export function calculateGetParameters({
 	limit = RECORDS_PER_PAGE,
 	days = DEFAULT_DAYS,
 	page = 0,
-}: Partial<Parameters> = {}): PaginationParameters {
+}: Parameters = {}): PaginationParameters {
 	return {
 		id,
 		limit,

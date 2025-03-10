@@ -42,7 +42,7 @@ export function insertBook(book: Insert<Book>): RunResult {
 	});
 }
 
-export function getBooks(parameters: Partial<Parameters> = {}) {
+export function getBooks(parameters: Parameters = {}) {
 	const statement = getStatement<Book>(
 		'getBooks',
 		`SELECT * FROM books

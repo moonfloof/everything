@@ -17,7 +17,7 @@ interface SleepStats {
 	averageDurationHuman: string;
 }
 
-export function getSleepCycles(parameters: Partial<Parameters>) {
+export function getSleepCycles(parameters: Parameters) {
 	const statement = getStatement<Timetracking>(
 		'getSleepCycles',
 		`SELECT * FROM timetracking

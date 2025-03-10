@@ -111,7 +111,7 @@ export function updateGameSession(
 	};
 }
 
-export function getGameSessions(parameters: Partial<Parameters> = {}) {
+export function getGameSessions(parameters: Parameters = {}) {
 	const statement = getStatement<GameSession & { perfectedSession: boolean }>(
 		'getGameSessions',
 		`SELECT
