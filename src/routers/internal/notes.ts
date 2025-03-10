@@ -30,25 +30,39 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Note {
+	crudType?: 'update' | 'delete';
+	description: string;
+	title: string;
+	type: string;
+	status: string;
+	url: string;
+	syndication_json: string;
+	created_at: string;
+	updated_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Note>, res) => {
+	const { description, title, type, status, url, syndication_json, created_at } = req.body;
 	insertNote({
-		description: req.body.description,
-		title: req.body.title || null,
-		type: (req.body.type as EntryType) || 'note',
-		status: (req.body.status as EntryStatus) || 'public',
-		url: req.body.url || null,
-		syndication_json: req.body.syndication_json || null,
-		created_at: req.body.created_at,
+		description: description || '',
+		title: title || null,
+		type: (type as EntryType) || 'note',
+		status: (status as EntryStatus) || 'public',
+		url: url || null,
+		syndication_json: syndication_json || null,
+		created_at: created_at,
 		device_id: config.defaultDeviceId,
 	});
 
 	res.redirect('/notes');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Note, { id: string }>, res) => {
 	const { id } = req.params;
+	const { crudType, description, title, type, status, url, syndication_json, created_at, updated_at } = req.body;
 
-	switch (req.body.crudType) {
+	switch (crudType) {
 		case 'delete': {
 			deleteNote(id);
 			break;
@@ -57,14 +71,14 @@ router.post('/:id', (req: RequestFrontend, res) => {
 		case 'update': {
 			updateNote({
 				id,
-				description: req.body.description,
-				title: req.body.title || null,
-				type: (req.body.type as EntryType) || 'note',
-				status: (req.body.status as EntryStatus) || 'public',
-				url: req.body.url || null,
-				syndication_json: req.body.syndication_json?.replace(/\t+/g, '') || null,
-				created_at: req.body.created_at,
-				updated_at: req.body.updated_at,
+				description: description || '',
+				title: title || null,
+				type: (type as EntryType) || 'note',
+				status: (status as EntryStatus) || 'public',
+				url: url || null,
+				syndication_json: syndication_json?.replace(/\t+/g, '') || null,
+				created_at: created_at,
+				updated_at: updated_at,
 			});
 			break;
 		}

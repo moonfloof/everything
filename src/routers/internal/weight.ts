@@ -19,8 +19,18 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Weight {
+	crudType?: string;
+	weight_kgs: string;
+	created_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Weight>, res) => {
 	const { weight_kgs, created_at } = req.body;
+
+	if (!weight_kgs) {
+		throw new Error('A weight must be provided');
+	}
 
 	insertWeight({
 		weight_kgs: Number(weight_kgs || 0),
@@ -31,7 +41,7 @@ router.post('/', (req: RequestFrontend, res) => {
 	res.redirect('/weight');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Weight, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, weight_kgs, created_at } = req.body;
 

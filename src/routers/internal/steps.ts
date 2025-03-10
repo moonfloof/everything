@@ -29,7 +29,13 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Steps {
+	crudType?: 'update' | 'delete';
+	step_count_total: string;
+	created_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Steps>, res) => {
 	const { step_count_total, created_at } = req.body;
 
 	insertSteps({ step_count_total: Number(step_count_total || 0), created_at, device_id: config.defaultDeviceId });
@@ -37,7 +43,7 @@ router.post('/', (req: RequestFrontend, res) => {
 	res.redirect('/steps');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Steps, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, step_count_total, created_at } = req.body;
 

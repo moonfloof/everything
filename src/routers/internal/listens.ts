@@ -29,6 +29,18 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
+interface Listen {
+	crudType?: 'update' | 'delete';
+	artist: string;
+	album: string;
+	title: string;
+	track_number: string;
+	release_year: string;
+	genre: string;
+	duration_secs: string;
+	created_at: string;
+}
+
 router.post('/update_metadata', async (_req, res) => {
 	const tracks = getTracksWithMissingMetadata();
 	for (const track of tracks) {
@@ -50,7 +62,7 @@ router.post('/update_metadata', async (_req, res) => {
 	res.redirect('/listens');
 });
 
-router.post('/', (req: RequestFrontend, res) => {
+router.post('/', (req: RequestFrontend<object, Listen>, res) => {
 	const { artist, album, title, track_number, release_year, genre, duration_secs, created_at } = req.body;
 
 	insertScrobble({
@@ -59,7 +71,7 @@ router.post('/', (req: RequestFrontend, res) => {
 		title,
 		track_number: Number(track_number) || null,
 		release_year: Number(release_year) || null,
-		genre,
+		genre: genre || null,
 		duration_secs: Number(duration_secs) || null,
 		created_at,
 		device_id: config.defaultDeviceId,
@@ -68,7 +80,7 @@ router.post('/', (req: RequestFrontend, res) => {
 	res.redirect('/listens');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Listen, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, artist, album, title, track_number, release_year, genre, duration_secs, created_at } =
 		req.body;
@@ -87,7 +99,7 @@ router.post('/:id', (req: RequestFrontend, res) => {
 				title,
 				track_number: Number(track_number) || null,
 				release_year: Number(release_year) || null,
-				genre,
+				genre: genre || null,
 				duration_secs: Number(duration_secs) || null,
 				created_at,
 			});

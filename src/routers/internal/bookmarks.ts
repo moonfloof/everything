@@ -25,17 +25,32 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Bookmark {
+	crudType?: 'update' | 'delete';
+	url: string;
+	title: string;
+	created_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Bookmark>, res) => {
 	const { url, title, created_at } = req.body;
 
-	insertBookmark({ title, url, created_at, device_id: config.defaultDeviceId });
+	if (!(url && title)) {
+		throw new Error('URL and title must be provided');
+	}
+
+	insertBookmark({ title, url, created_at: created_at || '', device_id: config.defaultDeviceId });
 
 	res.redirect('/bookmarks');
 });
 
-router.post('/:id', (req, res) => {
+router.post('/:id', (req: RequestFrontend<object, Bookmark, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, url, title, created_at } = req.body;
+
+	if (!(url && title)) {
+		throw new Error('URL and title must be provided');
+	}
 
 	switch (crudType) {
 		case 'delete': {
@@ -44,7 +59,7 @@ router.post('/:id', (req, res) => {
 		}
 
 		case 'update': {
-			updateBookmark({ id, title, url, created_at });
+			updateBookmark({ id, title, url, created_at: created_at || '' });
 			break;
 		}
 

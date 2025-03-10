@@ -26,15 +26,26 @@ router.get('/', (req: RequestFrontend, res) => {
 
 // CRUD
 
-router.post('/', (req: RequestFrontend, res) => {
+interface Timetracking {
+	crudType?: 'update' | 'delete';
+	category: string;
+	created_at: string;
+	ended_at: string;
+}
+
+router.post('/', (req: RequestFrontend<object, Timetracking>, res) => {
 	const { category, created_at, ended_at } = req.body;
+
+	if (!category) {
+		throw new Error('Please provide a category');
+	}
 
 	insertTimeTracking({ category, created_at, ended_at, device_id: config.defaultDeviceId });
 
 	res.redirect('/timetracking');
 });
 
-router.post('/:id', (req: RequestFrontend, res) => {
+router.post('/:id', (req: RequestFrontend<object, Timetracking, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, category, created_at, ended_at } = req.body;
 
@@ -45,6 +56,10 @@ router.post('/:id', (req: RequestFrontend, res) => {
 		}
 
 		case 'update': {
+			if (!category) {
+				throw new Error('Please provide a category');
+			}
+
 			updateTimeTracking({ id, category, created_at, ended_at });
 			break;
 		}

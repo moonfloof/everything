@@ -440,7 +440,7 @@ following address: `https://example.com/api/purchases?apiKey=<API-KEY>`.
 Alternatively, if you don't have a Monzo account, you can still post to this
 endpoint using the following payload.
 
-### Add Transaction - POST `/api/purchases`
+### Add Transaction - POST `/api/purchases?apiKey=<API-KEY>`
 
 #### Headers
 
