@@ -79,7 +79,7 @@ const searchPlaces = async (endpoint = 'cached') => {
 		inputLat.value = lat.toFixed(6);
 		inputLong.value = long.toFixed(6);
 
-		const response = await fetch(`/checkins/places/${endpoint}`, {
+		const response = await fetch(`/checkins/get-places/${endpoint}`, {
 			method: 'POST',
 			body: JSON.stringify({ lat, long }),
 		});
