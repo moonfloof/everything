@@ -2,6 +2,7 @@ import express from 'express';
 import { insertPurchase } from '../../database/purchases.js';
 import { config } from '../../lib/config.js';
 import Logger from '../../lib/logger.js';
+import { validateDevice } from '../../database/devices.js';
 
 const log = new Logger('Purchases');
 
@@ -10,6 +11,8 @@ const router = express.Router();
 router.post('/', (req, res) => {
 	try {
 		const { type, data } = req.body;
+		const { apiKey } = req.query;
+		const device = validateDevice(apiKey as string | undefined);
 
 		if (type !== 'transaction.created') {
 			log.info(`Received webhook with type: '${type}'. Quietly ignoring`);
@@ -19,7 +22,7 @@ router.post('/', (req, res) => {
 
 		const { account_id, currency, category } = data;
 
-		if (account_id !== process.env.TOMBOIS_MONZO_ACCOUNT_ID) {
+		if (account_id !== config.monzo.accountId) {
 			throw new Error(`Unexpected account ID '${account_id}'`);
 		}
 
@@ -34,7 +37,7 @@ router.post('/', (req, res) => {
 			category,
 			currency,
 			created_at,
-			device_id: config.defaultDeviceId,
+			device_id: device.id,
 		});
 
 		res.send({ status: 'ok' });

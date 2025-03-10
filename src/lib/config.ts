@@ -45,6 +45,10 @@ export const config = {
 		placesApiEnabled: process.env.TOMBOIS_GOOGLE_PLACESAPI_ENABLED === 'true',
 	},
 
+	monzo: {
+		accountId: process.env.TOMBOIS_MONZO_ACCOUNT_ID,
+	},
+
 	letterboxd: {
 		dataPath: resolve(process.env.TOMBOIS_LETTERBOXD_DATA_FILE ?? 'data/letterboxd.json'),
 		username: process.env.TOMBOIS_LETTERBOXD_USERNAME,
