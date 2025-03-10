@@ -1,6 +1,13 @@
-<h2>Error: {{error.message}}</h2>
+<div class="page--data">
+	<div class="error rounded-panel">
+		<p>Error: {{error.message}}</p>
+	</div>
 
-<p><strong>Code:</strong> {{error.code}}</p>
-<p>
-	<pre>{{error.stack}}</pre>
-</p>
+	{{#if error.code}}
+	<p><strong>Code:</strong> {{error.code}}</p>
+	{{/if}}
+
+	<p>
+		<pre>{{error.stack}}</pre>
+	</p>
+</div>
