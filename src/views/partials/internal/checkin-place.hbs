@@ -1,0 +1,25 @@
+<form method="POST" action="/checkins/places/{{data.id}}" class="sectioncontainer">
+	{{#if data.id}}
+	{{> internal/id id=data.id }}
+	{{/if}}
+
+	{{> internal/crudRow emoji="🏢" name="name" value=data.name }}
+	{{> internal/crudRowAutocomplete emoji="📦" name="category" value=data.category values=categoryValues }}
+	{{> internal/crudRow emoji="🗺️" name="address" value=data.address }}
+	{{> internal/crudRow emoji="🔗" name="external_id" value=data.external_id }}
+
+	<div class="row">
+		<span class="left">📍</span>
+		<span class="right">
+			<input type="number" placeholder="lat"  name="lat"  value="{{data.lat}}"  step="any">
+			<input type="number" placeholder="long" name="long" value="{{data.long}}" step="any">
+		</span>
+	</div>
+
+	{{#if data.id}}
+	{{> internal/crudRow type="datetime-local" emoji="🕑" name="created_at" value=data.created_at }}
+	{{> internal/crudRow type="datetime-local" emoji="🕖" name="updated_at" value=data.updated_at }}
+	{{/if}}
+
+	{{> internal/crudSubmit }}
+</form>

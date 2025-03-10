@@ -2,19 +2,31 @@ import { Router } from 'express';
 import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
 import { convertImageToDatabase } from '../../adapters/swarm.js';
 import { getNearestPlaces, getPlaceCategories, insertPlace } from '../../database/checkinPlace.js';
-import { type Checkin, deleteCheckin, getCheckins, insertCheckin, updateCheckin } from '../../database/checkins.js';
+import {
+	type Checkin,
+	countCheckins,
+	deleteCheckin,
+	getCheckins,
+	insertCheckin,
+	updateCheckin,
+} from '../../database/checkins.js';
 import { type EntryStatus, entryStatusValues } from '../../database/notes.js';
 import { config } from '../../lib/config.js';
 import Logger from '../../lib/logger.js';
 import type { Insert } from '../../types/database.js';
 import type { RequestFrontend } from '../../types/express.js';
+import checkinPlaces from './checkinPlaces.js';
+import handlebarsPagination from '../../lib/handlebarsPagination.js';
 
 const log = new Logger('checkin');
 
 const router = Router();
 
+router.use('/places', checkinPlaces);
+
 router.get('/', (req: RequestFrontend, res) => {
 	const { page } = req.query;
+	const pagination = handlebarsPagination(page, countCheckins());
 	const checkins = getCheckins({ page, status: '%' });
 	const places = getNearestPlaces().map(place => ({
 		value: place.id,
@@ -27,6 +39,7 @@ router.get('/', (req: RequestFrontend, res) => {
 		checkins,
 		categories,
 		entryStatusValues,
+		pagination,
 	});
 });
 
