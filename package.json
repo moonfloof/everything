@@ -39,7 +39,7 @@
 		"@types/node-cron": "^3.0.11",
 		"@types/sax": "^1.2.7",
 		"esbuild": "^0.25.0",
-		"typescript": "^5.7.3"
+		"typescript": "^5.8.2"
 	},
 	"nodemonConfig": {
 		"ext": "ts",
