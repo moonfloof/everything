@@ -36,7 +36,7 @@ export function getLatestCity() {
 
 	// Only return city if the data comes from within two days of the
 	// allowed time period
-	const locationDelayMs = config.locationDelayMins * minuteMs;
+	const locationDelayMs = config.location.delayMins * minuteMs;
 	const created_at_min = Date.now() - 2 * dayMs - locationDelayMs;
 	const created_at_max = Date.now() - locationDelayMs;
 

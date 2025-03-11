@@ -167,13 +167,17 @@ export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string
 		name: venue.name,
 	});
 
-	const newCheckin = insertCheckin({
-		created_at: new Date(checkin.createdAt * 1000).toISOString(),
-		description: checkin.shout ?? '',
-		device_id: device_id ?? config.defaultDeviceId,
-		place_id: place.id,
-		status: 'public',
-	});
+	const newCheckin = insertCheckin(
+		{
+			created_at: new Date(checkin.createdAt * 1000).toISOString(),
+			description: checkin.shout ?? '',
+			device_id: device_id ?? config.defaultDeviceId,
+			place_id: place.id,
+			status: 'public',
+		},
+		venue.location.lat,
+		venue.location.lng,
+	);
 
 	log.info(`20 minute timer has been set to poll checkin '${newCheckin.id}' for images`);
 	setTimeout(async () => {

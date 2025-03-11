@@ -25,7 +25,13 @@ export const config = {
 	footerHtml: process.env.TOMBOIS_FOOTER_HTML,
 	cacheDurationSecs: Number(process.env.TOMBOIS_SERVER_CACHE_DURATION_SECS || 600),
 	cacheIntervalSecs: Number(process.env.TOMBOIS_SERVER_CACHE_INTERVAL_SECS || 1200),
-	locationDelayMins: Number(process.env.EVERYTHING_LOCATION_DELAY_MINS || 1440),
+
+	location: {
+		delayMins: Number(process.env.EVERYTHING_LOCATION_DELAY_MINS || 1440),
+		privateLat: Number(process.env.EVERYTHING_LOCATION_PRIVATE_OVERRIDE_LAT || 0),
+		privateLong: Number(process.env.EVERYTHING_LOCATION_PRIVATE_OVERRIDE_LONG || 0),
+		privateRadius: Number(process.env.EVERYTHING_LOCATION_PRIVATE_OVERRIDE_RADIUS || 0),
+	},
 
 	geocoder: {
 		enabled: process.env.TOMBOIS_GEOCODER_ENABLED !== 'false',

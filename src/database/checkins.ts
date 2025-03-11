@@ -7,6 +7,9 @@ import type { CheckinPlace } from './checkinPlace.js';
 import { DEFAULT_DAYS, type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 import { ENTRY_STATUS, type EntryStatus } from './notes.js';
+import Logger from '../lib/logger.js';
+
+const log = new Logger('checkin');
 
 export interface Checkin {
 	id: string;
@@ -31,8 +34,19 @@ export type InsertCheckin = Omit<Checkin, 'id' | 'place_id' | 'updated_at'> &
 		place_id: number | undefined;
 	};
 
-export function insertCheckin(checkin: Insert<Checkin>) {
+export function insertCheckin(checkin: Insert<Checkin>, lat?: number | null, long?: number | null) {
 	const id = uuid();
+
+	// Location override
+	const { privateLat, privateLong, privateRadius } = config.location;
+	if (privateLat !== 0 && privateLong !== 0 && privateRadius !== 0 && lat && long) {
+		const latDiff = Math.abs(lat - privateLat);
+		const longDiff = Math.abs(long - privateLong);
+		if (latDiff < privateRadius && longDiff < privateRadius) {
+			log.warn("Location is within private region - automatically setting status to 'private'");
+			checkin.status = 'private';
+		}
+	}
 
 	const insert = getStatement<Checkin>(
 		'insertCheckin',
@@ -93,7 +107,7 @@ export function getCheckins(parameters: Partial<Parameters & CheckinParameters>)
 	};
 
 	if (parameters.status === ENTRY_STATUS.PUBLIC) {
-		const locationDelayMs = config.locationDelayMins * minuteMs;
+		const locationDelayMs = config.location.delayMins * minuteMs;
 		const days = (parameters.days ?? DEFAULT_DAYS) * dayMs + locationDelayMs;
 
 		params.created_at = new Date(Date.now() - days).toISOString();
