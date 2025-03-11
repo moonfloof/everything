@@ -6,6 +6,7 @@ import {
 	type Checkin,
 	countCheckins,
 	deleteCheckin,
+	deleteCheckinImage,
 	getCheckins,
 	insertCheckin,
 	updateCheckin,
@@ -27,7 +28,7 @@ router.use('/places', checkinPlaces);
 router.get('/', (req: RequestFrontend, res) => {
 	const { page } = req.query;
 	const pagination = handlebarsPagination(page, countCheckins());
-	const checkins = getCheckins({ page, status: '%' });
+	const checkins = getCheckins({ page, status: '%', includeImages: true });
 	const places = getNearestPlaces().map(place => ({
 		value: place.id,
 		label: place.name,
@@ -39,6 +40,7 @@ router.get('/', (req: RequestFrontend, res) => {
 		checkins,
 		categories,
 		entryStatusValues,
+		page,
 		pagination,
 	});
 });
@@ -96,6 +98,20 @@ interface InternalInsertCheckin {
 	photos?: string[];
 }
 
+async function savePhotos(checkin_id: string, photos: string[]) {
+	let counter = 0;
+	for (const photo of photos) {
+		if (!photo.startsWith('data:image/jpeg;base64,')) {
+			log.info("Tried to save an image, but it didn't start with 'data:image/jpeg;base64,'");
+			continue;
+		}
+
+		log.info(`Converting photo ${++counter} of ${photos.length} for checkin '${checkin_id}'`);
+		const buffer = Buffer.from(photo.slice(23), 'base64');
+		await convertImageToDatabase(checkin_id, buffer);
+	}
+}
+
 router.post('/', async (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
 	const { place_id, name, category, address, lat, long, description, status, created_at, photos } = req.body;
 	const checkinToInsert: Insert<Checkin> = {
@@ -124,17 +140,7 @@ router.post('/', async (req: RequestFrontend<object, InternalInsertCheckin>, res
 		return;
 	}
 
-	let counter = 0;
-	for (const photo of photos) {
-		if (!photo.startsWith('data:image/jpeg;base64,')) {
-			log.info("Tried to save an image, but it didn't start with 'data:image/jpeg;base64,'");
-			continue;
-		}
-
-		log.info(`Converting photo ${++counter} of ${photos.length} for checkin '${checkin.id}'`);
-		const buffer = Buffer.from(photo.slice(23), 'base64');
-		await convertImageToDatabase(checkin.id, buffer);
-	}
+	await savePhotos(checkin.id, photos);
 
 	res.redirect('/checkins');
 });
@@ -145,11 +151,12 @@ interface InternalCheckinUpdate {
 	status: string;
 	created_at: string;
 	updated_at: string;
+	photos?: string[];
 }
 
-router.post('/:id', (req: RequestFrontend<object, InternalCheckinUpdate, { id: string }>, res) => {
+router.post('/:id', async (req: RequestFrontend<object, InternalCheckinUpdate, { id: string }>, res) => {
 	const { id } = req.params;
-	const { crudType, description, status, created_at, updated_at } = req.body;
+	const { crudType, description, status, created_at, updated_at, photos } = req.body;
 
 	switch (crudType) {
 		case 'delete': {
@@ -165,6 +172,9 @@ router.post('/:id', (req: RequestFrontend<object, InternalCheckinUpdate, { id: s
 				created_at,
 				updated_at,
 			});
+
+			if (photos === undefined) break;
+			await savePhotos(id, photos);
 			break;
 		}
 
@@ -174,6 +184,17 @@ router.post('/:id', (req: RequestFrontend<object, InternalCheckinUpdate, { id: s
 	}
 
 	res.redirect('/checkins');
+});
+
+// Photo manipulation
+
+router.get('/photos/:id', (req: RequestFrontend<object, object, { id: string }>, res) => {
+	const { page = 0 } = req.query;
+	const { id } = req.params;
+
+	deleteCheckinImage(Number(id));
+
+	res.redirect(`/checkins?page=${page}`);
 });
 
 export default router;

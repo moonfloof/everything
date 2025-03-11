@@ -21,7 +21,7 @@
 <hr>
 
 {{#each checkins as |checkin|}}
-	{{> internal/checkin data=checkin categories=../categories entryStatusValues=../entryStatusValues }}
+	{{> internal/checkin data=checkin categories=../categories entryStatusValues=../entryStatusValues page=../page }}
 {{/each}}
 
 {{> pagination route="/checkins" pagination=pagination }}
@@ -85,7 +85,6 @@ const searchPlaces = async (endpoint = 'cached') => {
 		});
 		const { places } = await response.json();
 
-		searchButtonsContainer.style.display = 'flex';
 		select.innerHTML = '';
 		for (const { value, label } of places) {
 			const option = document.createElement('option');
@@ -102,7 +101,7 @@ const searchPlaces = async (endpoint = 'cached') => {
 	}
 };
 
-searchPlaces();
+searchButtonsContainer.style.display = 'flex';
 searchButtonCached.onclick = () => searchPlaces('cached');
 searchButtonGoogle.onclick = () => searchPlaces('google');
 
@@ -155,8 +154,11 @@ const resizeImage = async (file) => new Promise((resolve, reject) => {
 	img.src = URL.createObjectURL(file);
 });
 
-/** @param {string} dataUrl */
-const addImageToCheckin = (dataUrl) => {
+/**
+ * @param {string} dataUrl
+ * @param {string} [checkinId]
+ */
+const addImageToCheckin = (dataUrl, checkinId) => {
 	const container = document.createElement('div');
 	container.classList.add('checkin-image-container');
 	container.onclick = () => {
@@ -180,7 +182,13 @@ const addImageToCheckin = (dataUrl) => {
 	container.appendChild(input);
 	container.appendChild(overlay);
 
-	inputImages.appendChild(container);
+	if (checkinId === '') {
+		inputImages.appendChild(container);
+		return;
+	}
+
+	const inputs = document.getElementById(`checkin-image-inputs-${checkinId}`);
+	inputs.appendChild(container);
 };
 
 /** @type {NodeListOf<HTMLInputElement>}*/
@@ -189,7 +197,7 @@ const fileInputs = document.querySelectorAll("input[type=file]")
 for (const input of fileInputs) {
 	input.addEventListener("change", async (event) => {
 		for (const file of event.target.files) {
-			addImageToCheckin(await resizeImage(file));
+			addImageToCheckin(await resizeImage(file), input.name);
 		}
 
 		input.value = '';
