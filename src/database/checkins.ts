@@ -54,15 +54,16 @@ export function insertCheckin(checkin: Insert<Checkin>) {
 	return insert;
 }
 
-function getCheckinImages(checkin_id: string): string[] {
+function getCheckinImages(checkin_id: string) {
 	return getStatement<CheckinImage>(
 		'getCheckinImages',
 		'SELECT * FROM checkin_image WHERE checkin_id = $checkin_id',
 	)
 		.all({ checkin_id })
-		.map(image => {
-			return `data:image/avif;base64,${image.data.toString('base64')}`;
-		});
+		.map(image => ({
+			id: image.id,
+			data: `data:image/avif;base64,${image.data.toString('base64')}`,
+		}));
 }
 
 function countCheckinImages(checkin_id: string): number {
@@ -71,6 +72,11 @@ function countCheckinImages(checkin_id: string): number {
 		'SELECT COUNT(id) AS total FROM checkin_image WHERE checkin_id = $checkin_id',
 	);
 	return statement.get({ checkin_id })?.total || 0;
+}
+
+export function deleteCheckinImage(id: number) {
+	const statement = getStatement('deleteCheckinImage', 'DELETE FROM checkin_image WHERE id = $id');
+	return statement.run({ id });
 }
 
 export function getCheckins(parameters: Partial<Parameters & { status: EntryStatus | '%'; includeImages: boolean }>) {
