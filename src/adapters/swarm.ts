@@ -7,7 +7,8 @@ import { insertCheckin, insertCheckinImage } from '../database/checkins.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
-import { mediaQueue } from '../lib/mediaFiles.js';
+import { saveImageToBuffer } from '../lib/mediaFiles.js';
+import { queue } from '../lib/queue.js';
 import type {
 	SwarmAccessToken,
 	SwarmCheckinDetails,
@@ -135,8 +136,11 @@ export async function convertImageToDatabase(checkin_id: string, buffer: Buffer)
 function swarmDownloadPhoto(checkin_id: string, photo: SwarmPhoto) {
 	const size = photo.width > photo.height ? '960x720' : '720x960';
 	const url = photo.prefix + size + photo.suffix;
-	const onComplete = (buffer: Buffer) => convertImageToDatabase(checkin_id, buffer);
-	mediaQueue.addToQueue({ url, onComplete });
+	const task = async () => {
+		const buffer = await saveImageToBuffer(url);
+		await convertImageToDatabase(checkin_id, buffer);
+	};
+	queue.addToQueue(task);
 }
 
 export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string, device_id?: string) {

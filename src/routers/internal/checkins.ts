@@ -18,6 +18,7 @@ import Logger from '../../lib/logger.js';
 import type { Insert } from '../../types/database.js';
 import type { RequestFrontend } from '../../types/express.js';
 import checkinPlaces from './checkinPlaces.js';
+import { queue } from '../../lib/queue.js';
 
 const log = new Logger('checkin');
 
@@ -98,21 +99,22 @@ interface InternalInsertCheckin {
 	photos?: string[];
 }
 
-async function savePhotos(checkin_id: string, photos: string[]) {
-	let counter = 0;
-	for (const photo of photos) {
+function savePhoto(checkin_id: string, photo: string, index: number, total: number) {
+	const task = async () => {
 		if (!photo.startsWith('data:image/jpeg;base64,')) {
 			log.info("Tried to save an image, but it didn't start with 'data:image/jpeg;base64,'");
-			continue;
+			return;
 		}
 
-		log.info(`Converting photo ${++counter} of ${photos.length} for checkin '${checkin_id}'`);
+		log.info(`Converting photo ${index} of ${total} for checkin '${checkin_id}'`);
 		const buffer = Buffer.from(photo.slice(23), 'base64');
 		await convertImageToDatabase(checkin_id, buffer);
-	}
+	};
+
+	queue.addToQueue(task);
 }
 
-router.post('/', async (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
+router.post('/', (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
 	const { place_id, name, category, address, lat, long, description, status, created_at, photos } = req.body;
 	const checkinToInsert: Insert<Checkin> = {
 		place_id: Number(place_id),
@@ -140,7 +142,10 @@ router.post('/', async (req: RequestFrontend<object, InternalInsertCheckin>, res
 		return;
 	}
 
-	await savePhotos(checkin.id, photos);
+	let counter = 0;
+	for (const photo of photos) {
+		savePhoto(checkin.id, photo, ++counter, photos.length);
+	}
 
 	res.redirect('/checkins');
 });
@@ -154,7 +159,7 @@ interface InternalCheckinUpdate {
 	photos?: string[];
 }
 
-router.post('/:id', async (req: RequestFrontend<object, InternalCheckinUpdate, { id: string }>, res) => {
+router.post('/:id', (req: RequestFrontend<object, InternalCheckinUpdate, { id: string }>, res) => {
 	const { id } = req.params;
 	const { crudType, description, status, created_at, updated_at, photos } = req.body;
 
@@ -174,7 +179,11 @@ router.post('/:id', async (req: RequestFrontend<object, InternalCheckinUpdate, {
 			});
 
 			if (photos === undefined) break;
-			await savePhotos(id, photos);
+
+			let counter = 0;
+			for (const photo of photos) {
+				savePhoto(id, photo, ++counter, photos.length);
+			}
 			break;
 		}
 

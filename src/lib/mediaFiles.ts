@@ -4,6 +4,7 @@ import phin from 'phin';
 import sharp, { type Sharp } from 'sharp';
 import { config } from './config.js';
 import Logger from './logger.js';
+import { queue } from './queue.js';
 
 const log = new Logger('media');
 
@@ -13,7 +14,8 @@ type ImagePath = `hero-${string}` | `library-${string}` | `poster-${string}`;
 export const getImageDir = (type: ImageType): `public/${ImageType}-images/` => `public/${type}-images/`;
 export const getImagePath = (type: ImageType, path: ImagePath) => `${getImageDir(type)}${path}.avif`;
 
-async function saveImageToBuffer(url: string) {
+export async function saveImageToBuffer(url: string) {
+	log.info(`Saving image '${url}'`);
 	const response = await phin({
 		method: 'GET',
 		headers: {
@@ -36,8 +38,11 @@ async function saveImageToBuffer(url: string) {
 
 export function saveImageToDisk(url: string, path: string) {
 	if (existsSync(path)) return;
-	const onComplete = (buffer: Buffer) => void convertImageToAvif(buffer).toFile(path);
-	mediaQueue.addToQueue({ url, onComplete });
+	const task = async () => {
+		const buffer = await saveImageToBuffer(url);
+		await convertImageToAvif(buffer).toFile(path);
+	};
+	queue.addToQueue(task);
 }
 
 export function deleteIfExists(type: ImageType, path: ImagePath) {
@@ -75,44 +80,3 @@ export async function convertAllImagesToAvif() {
 		await convertAllImagesOfTypeToAvif(type);
 	}
 }
-
-type MediaQueueItem = {
-	url: string;
-	onComplete: (buffer: Buffer) => Promise<void> | void;
-	onError?: (error?: Error) => Promise<void> | void;
-};
-
-class MediaQueue {
-	private queue: MediaQueueItem[] = [];
-
-	private static shortUrl(url: string): string {
-		if (url.length >= 100) {
-			return `${url.slice(0, 97)}...`;
-		}
-		return url;
-	}
-
-	public async addToQueue(item: MediaQueueItem) {
-		const skip = this.queue.length > 0;
-		this.queue.push(item);
-
-		if (skip) return;
-
-		while (this.queue.length > 0) {
-			const { url, onComplete, onError } = this.queue[0];
-
-			try {
-				const buffer = await saveImageToBuffer(url);
-				log.info(`Saving image '${MediaQueue.shortUrl(url)}'`);
-				await onComplete(buffer);
-			} catch (err) {
-				log.info(`Could not download image '${MediaQueue.shortUrl(url)}'`);
-				if (onError) onError(err as Error);
-			}
-
-			this.queue.shift();
-		}
-	}
-}
-
-export const mediaQueue = new MediaQueue();
