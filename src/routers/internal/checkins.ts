@@ -15,10 +15,10 @@ import { type EntryStatus, entryStatusValues } from '../../database/notes.js';
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import Logger from '../../lib/logger.js';
+import { queue } from '../../lib/queue.js';
 import type { Insert } from '../../types/database.js';
 import type { RequestFrontend } from '../../types/express.js';
 import checkinPlaces from './checkinPlaces.js';
-import { queue } from '../../lib/queue.js';
 
 const log = new Logger('checkin');
 

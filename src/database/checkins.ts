@@ -1,9 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
-import { dateDefault } from '../lib/formatDate.js';
+import { config } from '../lib/config.js';
+import { dateDefault, dayMs, minuteMs } from '../lib/formatDate.js';
 import type { Insert, Update } from '../types/database.js';
 import type { CheckinPlace } from './checkinPlace.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { DEFAULT_DAYS, type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 import { ENTRY_STATUS, type EntryStatus } from './notes.js';
 
@@ -79,7 +80,26 @@ export function deleteCheckinImage(id: number) {
 	return statement.run({ id });
 }
 
-export function getCheckins(parameters: Partial<Parameters & { status: EntryStatus | '%'; includeImages: boolean }>) {
+interface CheckinParameters {
+	status: EntryStatus | '%';
+	includeImages: boolean;
+}
+
+export function getCheckins(parameters: Partial<Parameters & CheckinParameters>) {
+	const params = {
+		...calculateGetParameters(parameters),
+		status: parameters.status || ENTRY_STATUS.PUBLIC,
+		created_at_max: new Date().toISOString(),
+	};
+
+	if (parameters.status === ENTRY_STATUS.PUBLIC) {
+		const locationDelayMs = config.locationDelayMins * minuteMs;
+		const days = (parameters.days ?? DEFAULT_DAYS) * dayMs + locationDelayMs;
+
+		params.created_at = new Date(Date.now() - days).toISOString();
+		params.created_at_max = new Date(Date.now() - locationDelayMs).toISOString();
+	}
+
 	return getStatement<GetCheckin>(
 		'getCheckins',
 		`SELECT
@@ -89,14 +109,14 @@ export function getCheckins(parameters: Partial<Parameters & { status: EntryStat
 			p.name, p.address, p.category
 		FROM checkin AS c
 		JOIN checkin_place AS p ON c.place_id = p.id
-		WHERE c.id LIKE $id AND status LIKE $status AND c.created_at >= $created_at
+		WHERE c.id LIKE $id
+		  AND status LIKE $status
+		  AND c.created_at >= $created_at
+		  AND c.created_at <= $created_at_max
 		ORDER BY c.created_at DESC
 		LIMIT $limit OFFSET $offset`,
 	)
-		.all({
-			...calculateGetParameters(parameters),
-			status: parameters.status || ENTRY_STATUS.PUBLIC,
-		})
+		.all(params)
 		.map(checkin => ({
 			...checkin,
 			timeago: timeago.format(new Date(checkin.created_at)),
