@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
 import { convertImageToDatabase } from '../../adapters/swarm.js';
-import { getNearestPlaces, getPlaceCategories, insertPlace } from '../../database/checkinPlace.js';
+import {
+	type CheckinPlace,
+	getCheckinPlaceById,
+	getNearestPlaces,
+	getPlaceCategories,
+	insertPlace,
+} from '../../database/checkinPlace.js';
 import {
 	type Checkin,
 	countCheckins,
@@ -124,18 +130,25 @@ router.post('/', (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
 		status: (status as EntryStatus | undefined) || 'public',
 	};
 
+	const latNum = Number(lat) || null;
+	const longNum = Number(long) || null;
+	let place: CheckinPlace | null = null;
+
 	if (name !== undefined && name !== '') {
-		checkinToInsert.place_id = insertPlace({
+		place = insertPlace({
 			name,
 			category: category || 'other',
 			address: address || null,
-			lat: Number(lat) || null,
-			long: Number(long) || null,
+			lat: latNum,
+			long: longNum,
 			external_id: null,
-		}).id;
+		});
+		checkinToInsert.place_id = place.id;
+	} else {
+		place = getCheckinPlaceById(Number(place_id)) ?? null;
 	}
 
-	const checkin = insertCheckin(checkinToInsert);
+	const checkin = insertCheckin(checkinToInsert, latNum ?? place?.lat, longNum ?? place?.long);
 
 	if (photos === undefined) {
 		res.redirect('/checkins');

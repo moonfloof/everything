@@ -32,6 +32,12 @@ export function insertPlace(place: Omit<CheckinPlace, 'id' | 'created_at' | 'upd
 	return insert;
 }
 
+export function getCheckinPlaceById(id: number) {
+	return getStatement<CheckinPlace>('getCheckinPlaceById', 'SELECT * FROM checkin_place WHERE id = $id').get({
+		id,
+	});
+}
+
 export function getCachedPlace(place: Omit<CheckinPlace, 'id' | 'created_at' | 'updated_at'>): CheckinPlace {
 	const exists = getStatement<CheckinPlace>(
 		'getCachedPlace',
