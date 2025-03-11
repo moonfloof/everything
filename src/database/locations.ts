@@ -1,4 +1,5 @@
-import { dayMs } from '../lib/formatDate.js';
+import { config } from '../lib/config.js';
+import { dayMs, minuteMs } from '../lib/formatDate.js';
 import type { Insert } from '../types/database.js';
 import { getStatement } from './database.js';
 
@@ -27,15 +28,19 @@ export function getLatestCity() {
 		'getLatestCity',
 		`SELECT city FROM location
 		WHERE city IS NOT NULL AND
-		      created_at >= $created_at
+		      created_at >= $created_at_min AND
+		      created_at <= $created_at_max
 		ORDER BY created_at DESC
 		LIMIT 1`,
 	);
 
-	// Only return city if the data comes from the last two days
-	const created_at = new Date(Date.now() - 2 * dayMs).getTime();
+	// Only return city if the data comes from within two days of the
+	// allowed time period
+	const locationDelayMs = config.locationDelayMins * minuteMs;
+	const created_at_min = Date.now() - 2 * dayMs - locationDelayMs;
+	const created_at_max = Date.now() - locationDelayMs;
 
-	return statement.get({ created_at })?.city;
+	return statement.get({ created_at_min, created_at_max })?.city;
 }
 
 export function getLocationHistory(date_start: Date, date_end: Date) {

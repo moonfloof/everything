@@ -14,7 +14,7 @@ environment.checkEnvironment({}, [
 ]);
 
 export const config = {
-	versionString: 'everything <hello@moonfloof.com>',
+	versionString: 'everything (quantified-self data archive) <hello@moonfloof.com>',
 	portExternal: process.env.TOMBOIS_SERVER_PORT_EXTERNAL as string,
 	portInternal: process.env.TOMBOIS_SERVER_PORT_INTERNAL as string,
 	sqliteLocation: process.env.TOMBOIS_SQLITE_LOCATION as string,
@@ -25,6 +25,7 @@ export const config = {
 	footerHtml: process.env.TOMBOIS_FOOTER_HTML,
 	cacheDurationSecs: Number(process.env.TOMBOIS_SERVER_CACHE_DURATION_SECS || 600),
 	cacheIntervalSecs: Number(process.env.TOMBOIS_SERVER_CACHE_INTERVAL_SECS || 1200),
+	locationDelayMins: Number(process.env.EVERYTHING_LOCATION_DELAY_MINS || 1440),
 
 	geocoder: {
 		enabled: process.env.TOMBOIS_GEOCODER_ENABLED !== 'false',

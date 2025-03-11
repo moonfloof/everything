@@ -67,7 +67,7 @@ router.get('/', (req, res) => {
 	const sleepStats = getSleepStats();
 	const books = getBooks().slice(0, 2);
 	const notes = getNotes().slice(0, 5);
-	const checkins = getCheckins({ includeImages: false }).slice(0, 2);
+	const checkins = getCheckins({ status: 'public', includeImages: false }).slice(0, 2);
 
 	res.render('external/dashboard', {
 		sleepStats,
