@@ -412,7 +412,8 @@ router.get('/book/:id', (req, res) => {
 
 	const prefixTitle = percentageComplete === 100 ? 'read...' : 'is reading...';
 
-	const suffix = percentageComplete === 100 ? ` on ${prettyDate(new Date(book.completed_at))}` : '';
+	const suffix =
+		percentageComplete === 100 && book.completed_at ? ` on ${prettyDate(new Date(book.completed_at))}` : '';
 
 	const description = `${prefix} '${book.title}' (${book.year}) by ${book.author}${suffix}`;
 

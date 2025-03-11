@@ -35,36 +35,25 @@
 	{{> internal/crudRowParagraph emoji="💬" name="description" value=data.description }}
 	{{> internal/crudRowSelect emoji="🙈" name="status" value=data.status label=data.status values=entryStatusValues }}
 	{{> internal/crudRow type="datetime-local" emoji="🕑" name="created_at" value=data.created_at }}
+
 	{{#if data.id}}
 	{{> internal/crudRow type="datetime-local" emoji="🕖" name="updated_at" value=data.updated_at }}
 	{{/if}}
 
-	{{#if data.id}}
-		{{!-- TODO: Allow uploading and deleting photos post-checkin --}}
-
-		{{#if data.images}}
-		<div class="row">
-			<span class="left">🖼️</span>
-			<span class="right">
-				<div class="checkin-image-row">
-					{{#each data.images as |photo|}}
-					<div class="checkin-image-container">
-						<img src="{{photo}}" class="checkin-image">
-					</div>
-					{{/each}}
-				</div>
-			</span>
-		</div>
-		{{/if}}
-	{{else}}
-		<div class="row">
-			<span class="left">🖼️</span>
-			<span class="right">
-				<input type="file" form="" name="photo-picker" accept="image/*,.avif" multiple><br>
-				<div class="checkin-image-row" id="checkin-image-inputs"></div>
-			</span>
-		</div>
-	{{/if}}
+	<div class="row">
+		<span class="left">🖼️</span>
+		<span class="right">
+			<input type="file" form="" name="{{data.id}}" accept="image/*,.avif" multiple><br>
+			<div class="checkin-image-row" id="checkin-image-inputs{{#if data.id}}-{{data.id}}{{/if}}">
+				{{#each data.images as |photo|}}
+				<a href="/checkins/photos/{{photo.id}}{{#if page}}?page={{page}}{{/if}}" class="checkin-image-container">
+					<img src="{{photo.data}}" class="checkin-image">
+					<div class="checkin-image-overlay">&times; Remove</div>
+				</a>
+				{{/each}}
+			</div>
+		</span>
+	</div>
 
 	{{> internal/crudSubmit }}
 </form>
