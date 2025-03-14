@@ -2,6 +2,12 @@
 	{{> pageHeader title="Check-ins" url="/checkin" }}
 	{{> checkin data=checkin }}
 
+	{{#if checkin.map_svg }}
+	<div id="checkin-map">
+		{{{checkin.map_svg}}}
+	</div>
+	{{/if}}
+
 	{{#if checkin.imageCount }}
 		<br>
 		<div class="checkin-images-single">
