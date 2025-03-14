@@ -855,6 +855,24 @@ svg.a-graph {
 	}
 }
 
+#checkin-map {
+	margin: 32px 0 16px;
+
+	svg {
+		border-radius: 8px;
+		overflow: hidden;
+		margin: 0;
+		background-color: var(--panel-bg);
+	}
+
+	path {
+		fill: transparent;
+		stroke: var(--primary-fg);
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+}
+
 /*#endregion checkins */
 
 /** INTERNAL USE ONLY **/
