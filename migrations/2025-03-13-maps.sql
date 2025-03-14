@@ -1,0 +1,6 @@
+BEGIN TRANSACTION;
+
+ALTER TABLE checkin
+ADD COLUMN "map_svg" TEXT;
+
+COMMIT;

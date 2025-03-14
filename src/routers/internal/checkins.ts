@@ -25,6 +25,7 @@ import { queue } from '../../lib/queue.js';
 import type { Insert } from '../../types/database.js';
 import type { RequestFrontend } from '../../types/express.js';
 import checkinPlaces from './checkinPlaces.js';
+import { generateBoundingBox, generateSvg } from '../../adapters/openstreetmap.js';
 
 const log = new Logger('checkin');
 
@@ -120,7 +121,7 @@ function savePhoto(checkin_id: string, photo: string, index: number, total: numb
 	queue.addToQueue(task);
 }
 
-router.post('/', (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
+router.post('/', async (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
 	const { place_id, name, category, address, lat, long, description, status, created_at, photos } = req.body;
 	const checkinToInsert: Insert<Checkin> = {
 		place_id: Number(place_id),
@@ -128,6 +129,7 @@ router.post('/', (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
 		created_at,
 		description,
 		status: (status as EntryStatus | undefined) || 'public',
+		map_svg: '',
 	};
 
 	let place: CheckinPlace | null = null;
@@ -148,6 +150,10 @@ router.post('/', (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
 
 	const latNumber = place?.lat ?? Number(lat);
 	const longNumber = place?.long ?? Number(long);
+
+	if (!(Number.isNaN(latNumber) && Number.isNaN(longNumber))) {
+		checkinToInsert.map_svg = await generateSvg(generateBoundingBox(latNumber, longNumber));
+	}
 
 	const checkin = insertCheckin(checkinToInsert, latNumber, longNumber);
 
