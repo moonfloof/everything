@@ -130,17 +130,15 @@ router.post('/', (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
 		status: (status as EntryStatus | undefined) || 'public',
 	};
 
-	const latNum = Number(lat) || null;
-	const longNum = Number(long) || null;
 	let place: CheckinPlace | null = null;
 
 	if (name !== undefined && name !== '') {
 		place = insertPlace({
 			name,
-			category: category || 'other',
+			category: category || 'Other',
 			address: address || null,
-			lat: latNum,
-			long: longNum,
+			lat: Number(lat) || null,
+			long: Number(long) || null,
 			external_id: null,
 		});
 		checkinToInsert.place_id = place.id;
@@ -148,7 +146,10 @@ router.post('/', (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
 		place = getCheckinPlaceById(Number(place_id)) ?? null;
 	}
 
-	const checkin = insertCheckin(checkinToInsert, latNum ?? place?.lat, longNum ?? place?.long);
+	const latNumber = place?.lat ?? Number(lat);
+	const longNumber = place?.long ?? Number(long);
+
+	const checkin = insertCheckin(checkinToInsert, latNumber, longNumber);
 
 	if (photos === undefined) {
 		res.redirect('/checkins');
