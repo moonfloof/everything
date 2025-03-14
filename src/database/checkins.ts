@@ -2,12 +2,12 @@ import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { config } from '../lib/config.js';
 import { dateDefault, dayMs, minuteMs } from '../lib/formatDate.js';
-import type { Insert, Update } from '../types/database.js';
+import Logger from '../lib/logger.js';
+import type { Insert, Optional, Update } from '../types/database.js';
 import type { CheckinPlace } from './checkinPlace.js';
 import { DEFAULT_DAYS, type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 import { ENTRY_STATUS, type EntryStatus } from './notes.js';
-import Logger from '../lib/logger.js';
 
 const log = new Logger('checkin');
 
@@ -19,6 +19,7 @@ export interface Checkin {
 	created_at: string;
 	updated_at: string;
 	device_id: string;
+	map_svg: Optional<string>;
 }
 
 export interface CheckinImage {
@@ -51,9 +52,9 @@ export function insertCheckin(checkin: Insert<Checkin>, lat?: number | null, lon
 	const insert = getStatement<Checkin>(
 		'insertCheckin',
 		`INSERT INTO checkin
-		(id, place_id, description, status, created_at, updated_at, device_id)
+		(id, place_id, description, status, map_svg, created_at, updated_at, device_id)
 		VALUES
-		($id, $place_id, $description, $status, $created_at, $updated_at, $device_id)
+		($id, $place_id, $description, $status, $map_svg, $created_at, $updated_at, $device_id)
 		RETURNING *;`,
 	).get({
 		...checkin,
@@ -151,7 +152,7 @@ export function countCheckins(status: EntryStatus | '%' = ENTRY_STATUS.PUBLIC) {
 	return statement.get({ status })?.total || 0;
 }
 
-export function updateCheckin(checkin: Update<Checkin>) {
+export function updateCheckin(checkin: Update<Omit<Checkin, 'map_svg'>>) {
 	const statement = getStatement(
 		'updateFilm',
 		`UPDATE checkin

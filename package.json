@@ -20,6 +20,7 @@
 		"dotenv": "^16.4.7",
 		"express": "^5.0.1",
 		"express-handlebars": "^8.0.1",
+		"fast-xml-parser": "^5.0.8",
 		"googleapis": "^144.0.0",
 		"helmet": "^8.0.0",
 		"javascript-time-ago": "^2.5.11",
