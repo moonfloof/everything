@@ -4,13 +4,10 @@
 
 	{{#if checkin.imageCount }}
 		<br>
-		<div class="row">
-			<span class="left"></span>
-			<span class="right checkin-images-single">
-				{{#each checkin.images as |image|}}
-				<img src="{{image.data}}" />
-				{{/each}}
-			</span>
+		<div class="checkin-images-single">
+			{{#each checkin.images as |image|}}
+			<img src="{{image.data}}" />
+			{{/each}}
 		</div>
 	{{/if}}
 </div>
