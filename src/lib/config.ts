@@ -14,7 +14,7 @@ environment.checkEnvironment({}, [
 ]);
 
 export const config = {
-	versionString: 'everything (quantified-self data archive) <hello@moonfloof.com>',
+	versionString: process.env.EVERYTHING_VERSION_STRING || '',
 	portExternal: process.env.TOMBOIS_SERVER_PORT_EXTERNAL as string,
 	portInternal: process.env.TOMBOIS_SERVER_PORT_INTERNAL as string,
 	sqliteLocation: process.env.TOMBOIS_SQLITE_LOCATION as string,
