@@ -430,7 +430,7 @@ router.get('/checkin', (req: RequestFrontend, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countCheckins());
 
-	const checkins = getCheckins({ page, includeImages: false });
+	const checkins = getCheckins({ page, includeImages: false, status: 'public' });
 
 	res.render('external/checkin-list', {
 		checkins,
