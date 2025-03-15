@@ -31,8 +31,8 @@ export function generateBoundingBox(latDeg: number, longDeg: number): BoundingBo
 	const lon = deg2rad(longDeg); // X
 
 	// aspect ratio of 2:1
-	const halfSideLatMetres = 200;
-	const halfSideLonMetres = 400;
+	const halfSideLatMetres = 400;
+	const halfSideLonMetres = 800;
 
 	// Radius of Earth at given latitude
 	const radius = WGS84EarthRadius(lat);
@@ -145,7 +145,7 @@ export async function generateSvg(bbox: BoundingBox) {
 		},
 		{
 			tag: 'highway',
-			values: ['residential', 'unclassified', 'trunk_link'],
+			values: ['residential', 'unclassified', 'trunk_link', 'service'],
 			styleCss: 'stroke-width: 3px;',
 		},
 		{
