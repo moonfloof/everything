@@ -211,11 +211,7 @@ export async function generateSvg(bbox: BoundingBox) {
 		.join('\n\t');
 
 	const svgHeader = `<svg viewBox="0 0 ${cWidth} ${cHeight}" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
-	const style =
-		name !== undefined && name !== ''
-			? '<style>svg { background: #fff; } path { fill: transparent; stroke: #333; stroke-linecap: round; stroke-linejoin: round; }</style>'
-			: '';
 	const svgFooter = '</svg>';
 
-	return svgHeader + style + svgPaths + svgFooter;
+	return svgHeader + svgPaths + svgFooter;
 }
