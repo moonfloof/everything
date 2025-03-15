@@ -159,10 +159,14 @@ const resizeImage = async (file) => new Promise((resolve, reject) => {
  * @param {string} [checkinId]
  */
 const addImageToCheckin = (dataUrl, checkinId) => {
+	const inputImagesContainer = checkinId === ''
+		? inputImages
+		: document.getElementById(`checkin-image-inputs-${checkinId}`);
+
 	const container = document.createElement('div');
 	container.classList.add('checkin-image-container');
 	container.onclick = () => {
-		inputImages.removeChild(container);
+		inputImagesContainer.removeChild(container);
 	};
 
 	const overlay = document.createElement('div');
@@ -182,13 +186,7 @@ const addImageToCheckin = (dataUrl, checkinId) => {
 	container.appendChild(input);
 	container.appendChild(overlay);
 
-	if (checkinId === '') {
-		inputImages.appendChild(container);
-		return;
-	}
-
-	const inputs = document.getElementById(`checkin-image-inputs-${checkinId}`);
-	inputs.appendChild(container);
+	inputImagesContainer.appendChild(container);
 };
 
 /** @type {NodeListOf<HTMLInputElement>}*/
