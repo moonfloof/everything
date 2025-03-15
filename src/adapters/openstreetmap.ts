@@ -1,8 +1,8 @@
 import { XMLParser } from 'fast-xml-parser';
 import phin from 'phin';
 import { config } from '../lib/config.js';
-import { simplify } from './simplify.js';
 import type { BoundingBox, Filter, FilteredPath, OsmXml, Way } from './openstreetmapTypes.js';
+import { simplify } from './simplify.js';
 
 // #region Calculate Bounding Box
 // Based on: https://stackoverflow.com/a/238558
@@ -39,6 +39,7 @@ export function generateBoundingBox(latDeg: number, longDeg: number): BoundingBo
 	const parallelRadius = radius * Math.cos(lat);
 
 	return {
+		// All coords rounded to 6 d.p.
 		lat_min: Math.round(rad2deg(lat - halfSideLatMetres / radius) * 1000000) / 1000000,
 		lat_max: Math.round(rad2deg(lat + halfSideLatMetres / radius) * 1000000) / 1000000,
 		long_min: Math.round(rad2deg(lon - halfSideLonMetres / parallelRadius) * 1000000) / 1000000,
@@ -48,8 +49,12 @@ export function generateBoundingBox(latDeg: number, longDeg: number): BoundingBo
 
 // #endregion
 
+function formatBoundingBox(bbox: BoundingBox): string {
+	return `${bbox.long_min},${bbox.lat_min},${bbox.long_max},${bbox.lat_max}`;
+}
+
 async function downloadOsm(bbox: BoundingBox): Promise<string> {
-	const param = `?bbox=${bbox.long_min},${bbox.lat_min},${bbox.long_max},${bbox.lat_max}`;
+	const param = `?bbox=${formatBoundingBox(bbox)}`;
 	const response = await phin({
 		url: config.location.osmBaseUrl + param,
 		method: 'GET',
@@ -178,7 +183,16 @@ export async function generateSvg(bbox: BoundingBox) {
 	const cHeight = 400;
 
 	function generatePath(poly: [number, number][]): string {
-		const [firstPoint, ...rest] = simplify(poly, 0.00003, true);
+		// Remove all points waaaay outside the bounding box
+		// (with some padding though!)
+		const points = simplify(poly, 0.00003, true).filter(
+			poly =>
+				poly[0] >= bbox.long_min - 0.01 &&
+				poly[0] <= bbox.long_max + 0.01 &&
+				poly[1] >= bbox.lat_min - 0.01 &&
+				poly[1] <= bbox.lat_max + 0.01,
+		);
+		const [firstPoint, ...rest] = points;
 		if (firstPoint === undefined) return '';
 
 		const [fx, fy] = getXY(firstPoint);
@@ -206,11 +220,13 @@ export async function generateSvg(bbox: BoundingBox) {
 
 	const svgPaths = filteredPaths
 		.map(({ paths, styleCss }) => {
-			return `<path style="${styleCss ?? 'stroke-width: 1.5px;'}" d="${paths.map(generatePath).join('')}"/>`;
+			const style = styleCss ?? 'stroke-width: 1.5px;';
+			const d = paths.map(generatePath).join('');
+			return `<path style="${style}" d="${d}"/>`;
 		})
 		.join('\n\t');
 
-	const svgHeader = `<svg viewBox="0 0 ${cWidth} ${cHeight}" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
+	const svgHeader = `<svg viewBox="0 0 ${cWidth} ${cHeight}" data-boundingbox="${formatBoundingBox(bbox)}" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
 	const svgFooter = '</svg>';
 
 	return svgHeader + svgPaths + svgFooter;
