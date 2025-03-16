@@ -156,7 +156,7 @@ export async function generateSvg(bbox: BoundingBox) {
 		{
 			tag: 'highway',
 			values: ['path', 'footway', 'track', 'pedestrian'],
-			styleCss: 'stroke-width: 2.5px;',
+			styleCss: 'stroke-width: 2.5px;stroke-dasharray: 4,3;',
 		},
 		{
 			tag: 'natural',
