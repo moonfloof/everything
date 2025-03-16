@@ -9,6 +9,7 @@ import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { saveImageToBuffer } from '../lib/mediaFiles.js';
 import { queue } from '../lib/queue.js';
+import { generateBoundingBox, generateSvg } from './openstreetmap.js';
 import type {
 	SwarmAccessToken,
 	SwarmCheckinDetails,
@@ -143,7 +144,7 @@ function swarmDownloadPhoto(checkin_id: string, photo: SwarmPhoto) {
 	queue.addToQueue(task);
 }
 
-export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string, device_id?: string) {
+export async function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string, device_id?: string) {
 	const { pushSecret, userId } = config.swarm;
 
 	variablesArePresent(true);
@@ -157,13 +158,14 @@ export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string
 	}
 
 	const { venue } = checkin;
+	const { lat, lng: long } = venue.location;
 
 	const place = getCachedPlace({
 		external_id: venue.id,
 		address: venue.location.formattedAddress.join(', '),
 		category: venue.categories[0]?.name ?? 'Other',
-		lat: venue.location.lat,
-		long: venue.location.lng,
+		lat,
+		long,
 		name: venue.name,
 	});
 
@@ -174,9 +176,10 @@ export function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: string
 			device_id: device_id ?? config.defaultDeviceId,
 			place_id: place.id,
 			status: 'public',
+			map_svg: await generateSvg(generateBoundingBox(lat, long)),
 		},
-		venue.location.lat,
-		venue.location.lng,
+		lat,
+		long,
 	);
 
 	log.info(`20 minute timer has been set to poll checkin '${newCheckin.id}' for images`);
