@@ -100,14 +100,14 @@ interface CheckinParameters {
 	includeImages: boolean;
 }
 
-export function getCheckins(parameters: Partial<Parameters & CheckinParameters>) {
+export function getCheckins(parameters: Partial<Parameters & CheckinParameters> = {}) {
 	const params = {
 		...calculateGetParameters(parameters),
 		status: parameters.status || ENTRY_STATUS.PUBLIC,
 		created_at_max: new Date().toISOString(),
 	};
 
-	if (parameters.status === ENTRY_STATUS.PUBLIC) {
+	if (params.status === ENTRY_STATUS.PUBLIC && params.id === '%') {
 		const locationDelayMs = config.location.delayMins * minuteMs;
 		const days = (parameters.days ?? DEFAULT_DAYS) * dayMs + locationDelayMs;
 
