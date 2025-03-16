@@ -134,6 +134,18 @@ function filterPaths(ways: Way[], filters: Filter[]): FilteredPath[] {
 	);
 }
 
+function generateCrosshair(x: number, y: number): string {
+	const xleft = Math.round(x - 4);
+	const xright = Math.round(x + 4);
+	const ytop = Math.round(y - 4);
+	const ybottom = Math.round(y + 4);
+
+	const line1 = `<line x1="${xleft}" x2="${xright}" y1="${ytop}" y2="${ybottom}" />`;
+	const line2 = `<line x1="${xleft}" x2="${xright}" y1="${ybottom}" y2="${ytop}" />`;
+
+	return `\n<g class="map-crosshair">${line1}${line2}</g>`;
+}
+
 export async function generateSvg(bbox: BoundingBox) {
 	const osm = await downloadOsm(bbox);
 	const ways = parseOsm(osm);
@@ -227,7 +239,8 @@ export async function generateSvg(bbox: BoundingBox) {
 		.join('\n\t');
 
 	const svgHeader = `<svg viewBox="0 0 ${cWidth} ${cHeight}" data-boundingbox="${formatBoundingBox(bbox)}" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
-	const svgFooter = '</svg>';
+	const svgCrosshair = generateCrosshair(cWidth / 2, cHeight / 2);
+	const svgFooter = '\n</svg>';
 
-	return svgHeader + svgPaths + svgFooter;
+	return svgHeader + svgPaths + svgCrosshair + svgFooter;
 }
