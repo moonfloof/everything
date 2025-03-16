@@ -865,11 +865,21 @@ svg.a-graph {
 		background-color: var(--panel-bg);
 	}
 
-	path {
+	path,
+	line {
 		fill: transparent;
 		stroke: var(--primary-fg);
 		stroke-linecap: round;
 		stroke-linejoin: round;
+	}
+
+	.map-crosshair {
+		filter: drop-shadow(2px 2px var(--panel-bg)) drop-shadow(-2px -2px var(--panel-bg)) drop-shadow(2px -2px var(--panel-bg)) drop-shadow(-2px 2px var(--panel-bg));
+	}
+
+	.map-crosshair line {
+		stroke: var(--error-fg);
+		stroke-width: 4px;
 	}
 }
 
