@@ -1,4 +1,5 @@
 import SqliteDatabase, { type Database, type Statement } from 'better-sqlite3';
+import { v4 as uuid } from 'uuid';
 
 let db: Database | null = null;
 
@@ -9,6 +10,7 @@ export function getDatabase(): Database {
 	if (db !== null) return db;
 
 	db = new SqliteDatabase(process.env.TOMBOIS_SQLITE_LOCATION);
+	db.function('uuid', () => uuid());
 
 	return db;
 }

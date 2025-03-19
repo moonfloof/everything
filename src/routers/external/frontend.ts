@@ -40,8 +40,14 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
-import { countCheckins, getCheckins } from '../../database/checkins.js';
+import {
+	countCheckins,
+	getCheckinImageData,
+	getCheckinImageThumbnailData,
+	getCheckins,
+} from '../../database/checkins.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { getPhotoPositions } from '../../adapters/openstreetmap.js';
 
 const router = express.Router();
 
@@ -67,7 +73,7 @@ router.get('/', (req, res) => {
 	const sleepStats = getSleepStats();
 	const books = getBooks().slice(0, 2);
 	const notes = getNotes().slice(0, 5);
-	const checkins = getCheckins({ status: 'public', includeImages: false }).slice(0, 2);
+	const checkins = getCheckins().slice(0, 2);
 
 	res.render('external/dashboard', {
 		sleepStats,
@@ -430,7 +436,7 @@ router.get('/checkin', (req: RequestFrontend, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countCheckins());
 
-	const checkins = getCheckins({ page, includeImages: false, status: 'public' });
+	const checkins = getCheckins({ page, status: 'public' });
 
 	res.render('external/checkin-list', {
 		checkins,
@@ -440,19 +446,61 @@ router.get('/checkin', (req: RequestFrontend, res) => {
 });
 
 router.get('/checkin/:checkin_id', (req, res) => {
-	const [checkin] = getCheckins({ id: req.params.checkin_id, status: 'public', includeImages: true });
+	const [checkin] = getCheckins({ id: req.params.checkin_id, status: 'public' });
 
 	if (checkin === undefined) {
 		throw new NotFoundError('Check-in not found');
 	}
 
 	let title = `went to ${checkin.name} on ${prettyDate(new Date(checkin.created_at))}`;
+	let metaImage: string | null = null;
+	let mapImages: { id: string; left: number; top: number }[] = [];
 
-	if (checkin.imageCount > 0) {
-		title = `${title} and took ${checkin.imageCount} photos`;
+	if (checkin.images.length > 0 && checkin.images[0] !== undefined) {
+		title = `${title} and took ${checkin.images.length} photos`;
+		metaImage = `/checkin/image/${checkin.images[0].id}.avif`;
+		if (checkin.map_svg !== null) {
+			mapImages = getPhotoPositions(checkin.map_svg, checkin.images);
+		}
 	}
 
-	res.render('external/checkin-single', { checkin, title, description: checkin.description });
+	res.render('external/checkin-single', {
+		checkin,
+		title,
+		description: checkin.description,
+		metaImage,
+		mapImages,
+	});
+});
+
+router.get('/checkin/image/:image_id', (req, res) => {
+	const { image_id } = req.params;
+	const id = image_id.replace('.avif', '');
+	const image = getCheckinImageData(id);
+
+	if (image === undefined) {
+		throw new NotFoundError(`Image '${req.params.image_id}' does not exist`);
+	}
+
+	// Set cache header to 2 weeks
+	res.header('Cache-Control', 'public, max-age=1209600, immutable');
+
+	res.type('image/avif').send(image);
+});
+
+router.get('/checkin/image-thumbnail/:image_id', async (req, res) => {
+	const { image_id } = req.params;
+	const id = image_id.replace('.avif', '');
+	const image = await getCheckinImageThumbnailData(id);
+
+	if (image === undefined) {
+		throw new NotFoundError(`Image '${req.params.image_id}' does not exist`);
+	}
+
+	// Set cache header to 2 weeks
+	res.header('Cache-Control', 'public, max-age=1209600, immutable');
+
+	res.type('image/avif').send(image);
 });
 
 // NOTES
