@@ -32,7 +32,7 @@
  [number, number][] as an input.
 */
 
-type Point = [number, number];
+import type { Point } from './openstreetmapTypes.js';
 
 // square distance between 2 points
 function getSqDist(p1: Point, p2: Point) {
