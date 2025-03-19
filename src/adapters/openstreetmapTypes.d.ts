@@ -61,3 +61,11 @@ export interface FilteredPath {
 	paths: [number, number][][];
 	styleCss?: string;
 }
+
+/** In the format `[long, lat]` (x and y) */
+export type Point = [number, number];
+
+export interface SvgOptions {
+	checkin: Point;
+	pointsOfInterest?: Point[];
+}

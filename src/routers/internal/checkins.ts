@@ -1,6 +1,8 @@
 import { Router } from 'express';
+import { readFileSync } from 'node:fs';
 import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
-import { convertImageToDatabase } from '../../adapters/swarm.js';
+import { generateSvg } from '../../adapters/openstreetmap.js';
+import { convertImageToDataAndThumbnail } from '../../adapters/swarm.js';
 import {
 	type CheckinPlace,
 	getCheckinPlaceById,
@@ -13,8 +15,10 @@ import {
 	countCheckins,
 	deleteCheckin,
 	deleteCheckinImage,
+	getCheckinImageThumbnailData,
 	getCheckins,
 	insertCheckin,
+	insertCheckinImage,
 	updateCheckin,
 } from '../../database/checkins.js';
 import { type EntryStatus, entryStatusValues } from '../../database/notes.js';
@@ -25,18 +29,28 @@ import { queue } from '../../lib/queue.js';
 import type { Insert } from '../../types/database.js';
 import type { RequestFrontend } from '../../types/express.js';
 import checkinPlaces from './checkinPlaces.js';
-import { generateBoundingBox, generateSvg } from '../../adapters/openstreetmap.js';
+import type { Point } from '../../adapters/openstreetmapTypes.js';
+import { parseExifDateTime } from '../../lib/formatDate.js';
 
 const log = new Logger('checkin');
 
 const router = Router();
+
+let exifjs = '';
+
+router.get('/exif.js', (_req, res) => {
+	if (exifjs === '') {
+		exifjs = readFileSync('node_modules/exif-js/exif.js').toString();
+	}
+	res.type('text/javascript').send(exifjs);
+});
 
 router.use('/places', checkinPlaces);
 
 router.get('/', (req: RequestFrontend, res) => {
 	const { page } = req.query;
 	const pagination = handlebarsPagination(page, countCheckins());
-	const checkins = getCheckins({ page, status: '%', includeImages: true });
+	const checkins = getCheckins({ page, status: '%' });
 	const places = getNearestPlaces().map(place => ({
 		value: place.id,
 		label: place.name,
@@ -106,23 +120,56 @@ interface InternalInsertCheckin {
 	photos?: string[];
 }
 
-function savePhoto(checkin_id: string, photo: string, index: number, total: number) {
+interface InputPhoto {
+	dataUrl: string;
+	date?: string;
+	point?: Point;
+}
+
+function savePhoto(checkin_id: string, photo: InputPhoto, index: number, total: number) {
 	const task = async () => {
-		if (!photo.startsWith('data:image/jpeg;base64,')) {
+		if (!photo.dataUrl.startsWith('data:image/jpeg;base64,')) {
 			log.info("Tried to save an image, but it didn't start with 'data:image/jpeg;base64,'");
 			return;
 		}
 
 		log.info(`Converting photo ${index} of ${total} for checkin '${checkin_id}'`);
-		const buffer = Buffer.from(photo.slice(23), 'base64');
-		await convertImageToDatabase(checkin_id, buffer);
+		const buffer = Buffer.from(photo.dataUrl.slice(23), 'base64');
+		const [data, thumbnail_data] = await convertImageToDataAndThumbnail(buffer);
+
+		insertCheckinImage({
+			checkin_id,
+			data,
+			thumbnail_data,
+
+			// TODO: Get from payload/EXIF
+			lat: photo.point?.[1] ?? null,
+			long: photo.point?.[0] ?? null,
+			taken_at: photo.date ? parseExifDateTime(photo.date).toISOString() : null,
+		});
 	};
 
 	queue.addToQueue(task);
 }
 
+function parsePhotos(photos: InternalInsertCheckin['photos']): InputPhoto[] {
+	if (photos === undefined) {
+		return [];
+	}
+
+	return photos.map(photo => JSON.parse(photo));
+}
+
+function getPhotoPoints(photos: InputPhoto[]): Point[] {
+	return photos.reduce((acc, cur) => {
+		if (cur.point === undefined) return acc;
+		acc.push(cur.point);
+		return acc;
+	}, [] as Point[]);
+}
+
 router.post('/', async (req: RequestFrontend<object, InternalInsertCheckin>, res) => {
-	const { place_id, name, category, address, lat, long, description, status, created_at, photos } = req.body;
+	const { place_id, name, category, address, lat, long, description, status, created_at } = req.body;
 	const checkinToInsert: Insert<Checkin> = {
 		place_id: Number(place_id),
 		device_id: config.defaultDeviceId,
@@ -150,9 +197,11 @@ router.post('/', async (req: RequestFrontend<object, InternalInsertCheckin>, res
 
 	const latNumber = place?.lat ?? Number(lat);
 	const longNumber = place?.long ?? Number(long);
+	const photos = parsePhotos(req.body.photos);
+	const pointsOfInterest = getPhotoPoints(photos);
 
 	if (!(Number.isNaN(latNumber) && Number.isNaN(longNumber))) {
-		checkinToInsert.map_svg = await generateSvg(generateBoundingBox(latNumber, longNumber));
+		checkinToInsert.map_svg = await generateSvg({ checkin: [longNumber, latNumber], pointsOfInterest });
 	}
 
 	const checkin = insertCheckin(checkinToInsert, latNumber, longNumber);
@@ -181,7 +230,7 @@ interface InternalCheckinUpdate {
 
 router.post('/:id', (req: RequestFrontend<object, InternalCheckinUpdate, { id: string }>, res) => {
 	const { id } = req.params;
-	const { crudType, description, status, created_at, updated_at, photos } = req.body;
+	const { crudType, description, status, created_at, updated_at } = req.body;
 
 	switch (crudType) {
 		case 'delete': {
@@ -198,7 +247,7 @@ router.post('/:id', (req: RequestFrontend<object, InternalCheckinUpdate, { id: s
 				updated_at,
 			});
 
-			if (photos === undefined) break;
+			const photos = parsePhotos(req.body.photos);
 
 			let counter = 0;
 			for (const photo of photos) {
@@ -217,11 +266,20 @@ router.post('/:id', (req: RequestFrontend<object, InternalCheckinUpdate, { id: s
 
 // Photo manipulation
 
-router.get('/photos/:id', (req: RequestFrontend<object, object, { id: string }>, res) => {
+router.get('/image/thumbnail/:image_id', async (req, res) => {
+	const image = await getCheckinImageThumbnailData(req.params.image_id);
+
+	// Set cache header to 2 weeks
+	res.header('Cache-Control', 'public, max-age=1209600, immutable');
+
+	res.type('image/avif').send(image);
+});
+
+router.get('/image/delete/:id', (req: RequestFrontend<object, object, { id: string }>, res) => {
 	const { page = 0 } = req.query;
 	const { id } = req.params;
 
-	deleteCheckinImage(Number(id));
+	deleteCheckinImage(id);
 
 	res.redirect(`/checkins?page=${page}`);
 });

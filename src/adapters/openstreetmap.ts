@@ -1,8 +1,9 @@
 import { XMLParser } from 'fast-xml-parser';
 import phin from 'phin';
 import { config } from '../lib/config.js';
-import type { BoundingBox, Filter, FilteredPath, OsmXml, Way } from './openstreetmapTypes.js';
+import type { BoundingBox, Filter, FilteredPath, OsmXml, Point, SvgOptions, Way } from './openstreetmapTypes.js';
 import { simplify } from './simplify.js';
+import type { CheckinImage } from '../database/checkins.js';
 
 // #region Calculate Bounding Box
 // Based on: https://stackoverflow.com/a/238558
@@ -26,13 +27,52 @@ function WGS84EarthRadius(lat: number): number {
 	return Math.sqrt((An * An + Bn * Bn) / (Ad * Ad + Bd * Bd));
 }
 
-export function generateBoundingBox(latDeg: number, longDeg: number): BoundingBox {
-	const lat = deg2rad(latDeg); // Y
-	const lon = deg2rad(longDeg); // X
+function haversine(a: Point, b: Point) {
+	const aLat = deg2rad(a[1]);
+	const aLon = deg2rad(a[0]);
+	const bLat = deg2rad(b[1]);
+	const bLon = deg2rad(b[0]);
+	const R = 6371000;
+
+	return R * Math.acos(Math.cos(aLat) * Math.cos(bLat) * Math.cos(bLon - aLon) + Math.sin(aLat) * Math.sin(bLat));
+}
+
+export function generateBoundingBox(options: SvgOptions): BoundingBox {
+	const { checkin, pointsOfInterest } = options;
 
 	// aspect ratio of 2:1
-	const halfSideLatMetres = 400;
-	const halfSideLonMetres = 800;
+	let halfSideLatMetres = 300;
+	let halfSideLonMetres = 600;
+
+	let lon = deg2rad(checkin[0]); // X
+	let lat = deg2rad(checkin[1]); // Y
+
+	// TODO: Exclude POIs whose distance is unusually far away from the others
+	if (pointsOfInterest !== undefined && pointsOfInterest.length > 0) {
+		const longitudes = pointsOfInterest.map(poi => poi[0]);
+		const latitudes = pointsOfInterest.map(poi => poi[1]);
+		longitudes.push(checkin[0]);
+		latitudes.push(checkin[1]);
+
+		const xMin = Math.min(...longitudes);
+		const xMax = Math.max(...longitudes);
+		const yMin = Math.min(...latitudes);
+		const yMax = Math.max(...latitudes);
+
+		// Longitudinal distance
+		const xRad = haversine([xMin, yMin], [xMax, yMin]) / 2;
+
+		// Latitudinal distance
+		const yRad = haversine([xMin, yMin], [xMin, yMax]) / 2;
+
+		// Get mid-point of bounding box
+		lon = deg2rad((xMin + xMax) / 2);
+		lat = deg2rad((yMin + yMax) / 2);
+
+		// Make sure the bounding coordinates are 2:1 (with a little extra padding)
+		halfSideLonMetres = Math.max(halfSideLonMetres, xRad > yRad * 2 ? xRad : yRad * 2) * 1.25;
+		halfSideLatMetres = Math.max(halfSideLatMetres, xRad > yRad * 2 ? xRad / 2 : yRad) * 1.25;
+	}
 
 	// Radius of Earth at given latitude
 	const radius = WGS84EarthRadius(lat);
@@ -51,6 +91,41 @@ export function generateBoundingBox(latDeg: number, longDeg: number): BoundingBo
 
 function formatBoundingBox(bbox: BoundingBox): string {
 	return `${bbox.long_min},${bbox.lat_min},${bbox.long_max},${bbox.lat_max}`;
+}
+
+function parseBoundingBoxFromSvg(svg: string): BoundingBox | null {
+	const match = svg.match(
+		/data-boundingbox="(?<long_min>-?[0-9.]+),(?<lat_min>-?[0-9.]+),(?<long_max>-?[0-9.]+),(?<lat_max>-?[0-9.]+)"/,
+	);
+	if (match === null || match.groups === undefined) {
+		return null;
+	}
+
+	const { long_min, lat_min, long_max, lat_max } = match.groups;
+
+	return {
+		long_min: Number.parseFloat(long_min),
+		lat_max: Number.parseFloat(lat_max),
+		lat_min: Number.parseFloat(lat_min),
+		long_max: Number.parseFloat(long_max),
+	};
+}
+
+export function getPhotoPositions(svg: string, photos: Pick<CheckinImage, 'id' | 'lat' | 'long'>[]) {
+	const bbox = parseBoundingBoxFromSvg(svg);
+	if (bbox === null) return [];
+	const getXY = createGetXY(bbox, 100, 100);
+	return photos.reduce(
+		(mapped, { id, lat, long }) => {
+			if (long === null || lat === null) {
+				return mapped;
+			}
+			const [left, top] = getXY([long, lat]);
+			mapped.push({ id, left, top });
+			return mapped;
+		},
+		[] as { id: string; top: number; left: number }[],
+	);
 }
 
 async function downloadOsm(bbox: BoundingBox): Promise<string> {
@@ -146,7 +221,18 @@ function generateCrosshair(x: number, y: number): string {
 	return `\n<g class="map-crosshair">${line1}${line2}</g>`;
 }
 
-export async function generateSvg(bbox: BoundingBox) {
+function createGetXY(bbox: BoundingBox, width: number, height: number) {
+	/** Gets the ratio of each value between the min and max, and extrapolates */
+	return function getXY([x, y]: [number, number]): [number, number] {
+		return [
+			((x - bbox.long_min) / (bbox.long_max - bbox.long_min)) * width,
+			((y - bbox.lat_max) / (bbox.lat_min - bbox.lat_max)) * height,
+		];
+	};
+}
+
+export async function generateSvg(options: SvgOptions) {
+	const bbox = generateBoundingBox(options);
 	const osm = await downloadOsm(bbox);
 	const ways = parseOsm(osm);
 	const filteredPaths = filterPaths(ways, [
@@ -194,6 +280,8 @@ export async function generateSvg(bbox: BoundingBox) {
 	const cWidth = 800;
 	const cHeight = 400;
 
+	const getXY = createGetXY(bbox, cWidth, cHeight);
+
 	function generatePath(poly: [number, number][]): string {
 		// Remove all points waaaay outside the bounding box
 		// (with some padding though!)
@@ -222,14 +310,7 @@ export async function generateSvg(bbox: BoundingBox) {
 		return commands.join('');
 	}
 
-	/** Gets the ratio of each value between the min and max, and extrapolates */
-	function getXY([x, y]: [number, number]): [number, number] {
-		return [
-			((x - bbox.long_min) / (bbox.long_max - bbox.long_min)) * cWidth,
-			((y - bbox.lat_max) / (bbox.lat_min - bbox.lat_max)) * cHeight,
-		];
-	}
-
+	// Convert all filtered paths into actual SVG paths
 	const svgPaths = filteredPaths
 		.map(({ paths, styleCss }) => {
 			const style = styleCss ?? 'stroke-width: 1.5px;';
@@ -238,8 +319,13 @@ export async function generateSvg(bbox: BoundingBox) {
 		})
 		.join('\n\t');
 
+	// Generate a marker on the SVG to denote the check-in location
+	const svgCrosshair =
+		options?.checkin !== undefined
+			? generateCrosshair(...getXY(options.checkin))
+			: generateCrosshair(cWidth / 2, cHeight / 2);
+
 	const svgHeader = `<svg viewBox="0 0 ${cWidth} ${cHeight}" data-boundingbox="${formatBoundingBox(bbox)}" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
-	const svgCrosshair = generateCrosshair(cWidth / 2, cHeight / 2);
 	const svgFooter = '\n</svg>';
 
 	return svgHeader + svgPaths + svgCrosshair + svgFooter;

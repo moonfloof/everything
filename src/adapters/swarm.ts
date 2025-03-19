@@ -9,7 +9,7 @@ import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { saveImageToBuffer } from '../lib/mediaFiles.js';
 import { queue } from '../lib/queue.js';
-import { generateBoundingBox, generateSvg } from './openstreetmap.js';
+import { generateSvg } from './openstreetmap.js';
 import type {
 	SwarmAccessToken,
 	SwarmCheckinDetails,
@@ -122,16 +122,21 @@ export async function swarmHandleOauthCallback(code: string) {
 	saveSwarmCacheData();
 }
 
-export async function convertImageToDatabase(checkin_id: string, buffer: Buffer) {
-	const data = await sharp(buffer)
-		.resize({ withoutEnlargement: true, width: 960 })
+export function convertImageToThumbnail(buffer: Buffer): Promise<Buffer> {
+	return sharp(buffer)
+		.resize({ withoutEnlargement: true, fit: 'cover', width: 150, height: 150 })
 		.avif({ effort: 6, quality: 50 })
 		.toBuffer();
+}
 
-	insertCheckinImage({
-		checkin_id,
-		data,
-	});
+export function convertImageToDataAndThumbnail(buffer: Buffer): Promise<[Buffer, Buffer]> {
+	return Promise.all([
+		sharp(buffer)
+			.resize({ withoutEnlargement: true, width: 960 })
+			.avif({ effort: 6, quality: 50 })
+			.toBuffer(),
+		convertImageToThumbnail(buffer),
+	]);
 }
 
 function swarmDownloadPhoto(checkin_id: string, photo: SwarmPhoto) {
@@ -139,7 +144,17 @@ function swarmDownloadPhoto(checkin_id: string, photo: SwarmPhoto) {
 	const url = photo.prefix + size + photo.suffix;
 	const task = async () => {
 		const buffer = await saveImageToBuffer(url);
-		await convertImageToDatabase(checkin_id, buffer);
+
+		const [data, thumbnail_data] = await convertImageToDataAndThumbnail(buffer);
+
+		insertCheckinImage({
+			checkin_id,
+			data,
+			thumbnail_data,
+			lat: null,
+			long: null,
+			taken_at: photo.createdAt ? new Date(photo.createdAt * 1000).toISOString() : null,
+		});
 	};
 	queue.addToQueue(task);
 }
@@ -176,7 +191,7 @@ export async function swarmHandlePushCheckin(checkin: SwarmPushCheckin, secret: 
 			device_id: device_id ?? config.defaultDeviceId,
 			place_id: place.id,
 			status: 'public',
-			map_svg: await generateSvg(generateBoundingBox(lat, long)),
+			map_svg: await generateSvg({ checkin: [long, lat] }),
 		},
 		lat,
 		long,

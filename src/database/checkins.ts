@@ -1,4 +1,6 @@
+import { errors } from '@moonfloof/stdlib';
 import { v4 as uuid } from 'uuid';
+import { convertImageToThumbnail } from '../adapters/swarm.js';
 import { timeago } from '../adapters/timeago.js';
 import { config } from '../lib/config.js';
 import { dateDefault, dayMs, minuteMs } from '../lib/formatDate.js';
@@ -8,6 +10,8 @@ import type { CheckinPlace } from './checkinPlace.js';
 import { DEFAULT_DAYS, type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 import { ENTRY_STATUS, type EntryStatus } from './notes.js';
+
+const { ServerError, NotFoundError } = errors;
 
 const log = new Logger('checkin');
 
@@ -23,12 +27,18 @@ export interface Checkin {
 }
 
 export interface CheckinImage {
-	id: number;
+	id: string;
 	checkin_id: string;
 	data: Buffer;
+
+	// Optional fields
+	thumbnail_data: Optional<Buffer>;
+	lat: Optional<number>;
+	long: Optional<number>;
+	taken_at: Optional<string>;
 }
 
-type GetCheckin = Checkin & Pick<CheckinPlace, 'name' | 'category' | 'address'>;
+type GetCheckin = Checkin & Pick<CheckinPlace, 'name' | 'category' | 'address' | 'lat' | 'long'>;
 
 export type InsertCheckin = Omit<Checkin, 'id' | 'place_id' | 'updated_at'> &
 	Omit<CheckinPlace, 'id' | 'created_at' | 'updated_at'> & {
@@ -70,34 +80,60 @@ export function insertCheckin(checkin: Insert<Checkin>, lat?: number | null, lon
 	return insert;
 }
 
-function getCheckinImages(checkin_id: string) {
-	return getStatement<CheckinImage>(
+export function getCheckinImageData(image_id: CheckinImage['id']): CheckinImage['data'] | undefined {
+	const result = getStatement<Pick<CheckinImage, 'data'>>(
+		'getCheckinImageData',
+		'SELECT data FROM checkin_image WHERE id = $image_id',
+	).get({ image_id });
+	return result?.data;
+}
+
+async function convertImageDataToThumbnail(image_id: CheckinImage['id'], data: Buffer): Promise<Buffer> {
+	const thumbnail_data = await convertImageToThumbnail(data);
+
+	const result = getStatement(
+		'updateCheckinImageThumbnail',
+		'UPDATE checkin_image SET thumbnail_data = $thumbnail_data WHERE id = $image_id;',
+	).run({ thumbnail_data, image_id });
+
+	if (result.changes === 0) {
+		throw new ServerError(`Could not generate thumbnail for image '${image_id}'`);
+	}
+
+	return thumbnail_data;
+}
+
+export function getCheckinImageThumbnailData(image_id: CheckinImage['id']): Promise<Buffer> {
+	const result = getStatement<Pick<CheckinImage, 'data' | 'thumbnail_data'>>(
+		'getCheckinImageThumbnailData',
+		'SELECT data, thumbnail_data FROM checkin_image WHERE id = $image_id',
+	).get({ image_id });
+
+	if (result === undefined) {
+		throw new NotFoundError(`Image '${image_id}' does not exist`);
+	}
+
+	if (result.thumbnail_data === null) {
+		return convertImageDataToThumbnail(image_id, result.data);
+	}
+
+	return Promise.resolve(result.thumbnail_data);
+}
+
+function getCheckinImages(checkin_id: CheckinImage['checkin_id']) {
+	return getStatement<Pick<CheckinImage, 'id' | 'lat' | 'long'>>(
 		'getCheckinImages',
-		'SELECT * FROM checkin_image WHERE checkin_id = $checkin_id',
-	)
-		.all({ checkin_id })
-		.map(image => ({
-			id: image.id,
-			data: `data:image/avif;base64,${image.data.toString('base64')}`,
-		}));
+		'SELECT id, lat, long FROM checkin_image WHERE checkin_id = $checkin_id ORDER BY taken_at ASC',
+	).all({ checkin_id });
 }
 
-function countCheckinImages(checkin_id: string): number {
-	const statement = getStatement<{ total: number }>(
-		'countCheckinImages',
-		'SELECT COUNT(id) AS total FROM checkin_image WHERE checkin_id = $checkin_id',
-	);
-	return statement.get({ checkin_id })?.total || 0;
-}
-
-export function deleteCheckinImage(id: number) {
+export function deleteCheckinImage(id: string) {
 	const statement = getStatement('deleteCheckinImage', 'DELETE FROM checkin_image WHERE id = $id');
 	return statement.run({ id });
 }
 
 interface CheckinParameters {
 	status: EntryStatus | '%';
-	includeImages: boolean;
 }
 
 export function getCheckins(parameters: Partial<Parameters & CheckinParameters> = {}) {
@@ -121,7 +157,7 @@ export function getCheckins(parameters: Partial<Parameters & CheckinParameters> 
 			c.*,
 			strftime('%FT%T', c.created_at) as created_at,
 			strftime('%FT%T', c.updated_at) as updated_at,
-			p.name, p.address, p.category
+			p.name, p.address, p.category, p.lat, p.long
 		FROM checkin AS c
 		JOIN checkin_place AS p ON c.place_id = p.id
 		WHERE c.id LIKE $id
@@ -135,8 +171,7 @@ export function getCheckins(parameters: Partial<Parameters & CheckinParameters> 
 		.map(checkin => ({
 			...checkin,
 			timeago: timeago.format(new Date(checkin.created_at)),
-			imageCount: countCheckinImages(checkin.id),
-			images: parameters.includeImages ? getCheckinImages(checkin.id) : [],
+			images: getCheckinImages(checkin.id),
 		}));
 }
 
@@ -174,13 +209,15 @@ export function insertCheckinImage(image: Insert<CheckinImage>) {
 	const insert = getStatement<CheckinImage>(
 		'insertCheckinImage',
 		`INSERT INTO checkin_image
-			(checkin_id, data)
+			(checkin_id, data, thumbnail_data, lat, long, taken_at)
 		VALUES
-			($checkin_id, $data)
+			($checkin_id, $data, $thumbnail_data, $lat, $long, $taken_at)
 		RETURNING *;`,
 	).get(image);
 
 	if (insert === undefined) {
-		throw new Error('Image could not be saved');
+		throw new ServerError('Image could not be saved');
 	}
+
+	return insert;
 }

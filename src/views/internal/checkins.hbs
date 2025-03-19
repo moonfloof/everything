@@ -28,6 +28,7 @@
 
 </div>
 
+<script type="text/javascript" src="/checkins/exif.js"></script>
 <script type="text/javascript">
 /** @type {HTMLDivElement} */
 const alertContainer = document.getElementById('geolocation');
@@ -106,6 +107,47 @@ searchButtonCached.onclick = () => searchPlaces('cached');
 searchButtonGoogle.onclick = () => searchPlaces('google');
 
 /**
+ * @param {number} degrees
+ * @param {number} minutes
+ * @param {number} seconds
+ * @param {'S' | 'W'} direction
+ */
+const deg2dec = (degrees, minutes, seconds, direction) => {
+	var decimal = degrees + (minutes / 60) + (seconds / 3600);
+
+	if (direction === "S" || direction === "W") {
+		decimal *= -1;
+	}
+
+	return Math.round(decimal * 1000000) / 1000000;
+};
+
+/** @param {File} image */
+const getGeoAndDateFromImage = (image) => new Promise((resolve) => {
+	EXIF.getData(image, function () {
+		const metadata = {};
+		const date = EXIF.getTag(this, "DateTime");
+		if (date !== undefined && !date.startsWith("    :  :  ")) {
+			metadata.date = date;
+		}
+
+		const latDeg = EXIF.getTag(this, "GPSLatitude");
+		const latDir = EXIF.getTag(this, "GPSLatitudeRef");
+		const lonDeg = EXIF.getTag(this, "GPSLongitude");
+		const lonDir = EXIF.getTag(this, "GPSLongitudeRef");
+
+		if (latDeg !== undefined && latDir !== undefined && lonDeg !== undefined && lonDir !== undefined) {
+			metadata.point = [
+				deg2dec(lonDeg[0], lonDeg[1], lonDeg[2], lonDir),
+				deg2dec(latDeg[0], latDeg[1], latDeg[2], latDir),
+			];
+		}
+
+		resolve(metadata);
+	})
+});
+
+/**
  * @param {File} file
  */
 const resizeImage = async (file) => new Promise((resolve, reject) => {
@@ -155,10 +197,10 @@ const resizeImage = async (file) => new Promise((resolve, reject) => {
 });
 
 /**
- * @param {string} dataUrl
+ * @param { { dataUrl: string, date?: string, point?: [number, number] } } imageData
  * @param {string} [checkinId]
  */
-const addImageToCheckin = (dataUrl, checkinId) => {
+const addImageToCheckin = (imageData, checkinId) => {
 	const inputImagesContainer = checkinId === ''
 		? inputImages
 		: document.getElementById(`checkin-image-inputs-${checkinId}`);
@@ -175,12 +217,12 @@ const addImageToCheckin = (dataUrl, checkinId) => {
 
 	const image = document.createElement('img');
 	image.classList.add('checkin-image');
-	image.src = dataUrl;
+	image.src = imageData.dataUrl;
 
 	const input = document.createElement('input');
 	input.type = 'hidden';
 	input.name = 'photos[]';
-	input.value = dataUrl;
+	input.value = JSON.stringify(imageData);
 
 	container.appendChild(image);
 	container.appendChild(input);
@@ -195,7 +237,12 @@ const fileInputs = document.querySelectorAll("input[type=file]")
 for (const input of fileInputs) {
 	input.addEventListener("change", async (event) => {
 		for (const file of event.target.files) {
-			addImageToCheckin(await resizeImage(file), input.name);
+			const [metadata,dataUrl] = await Promise.all([
+				getGeoAndDateFromImage(file),
+				resizeImage(file)
+			]);
+
+			addImageToCheckin({ dataUrl, ...metadata }, input.name);
 		}
 
 		input.value = '';

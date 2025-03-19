@@ -170,3 +170,29 @@ export function isSameDate(dateA: Date, dateB: Date) {
 export function dateDefault(input: string | number | Date | undefined | null) {
 	return new Date(input || Date.now()).toISOString();
 }
+
+/**
+ * For some reason, EXIF timestamps are sent as "YYYY:MM:DD HH:mm:ss", with
+ * colons between the date segments instead of hyphens.
+ * @param {string} exifDateTime
+ * @return {Date}
+ */
+export function parseExifDateTime(exifDateTime: string): Date {
+	const regex = new RegExp(
+		/^(?<year>\d{4}):(?<month>\d{2}):(?<day>\d{2}) (?<hours>\d{2}):(?<minutes>\d{2}):(?<seconds>\d{2})$/,
+	);
+	const match = exifDateTime.match(regex);
+	if (match?.groups === undefined) {
+		throw new Error('Invalid EXIF timestamp');
+	}
+	const { year, month, day, hours, minutes, seconds } = match.groups;
+	return new Date(
+		Number(year),
+		Number(month) - 1,
+		Number(day),
+		Number(hours),
+		Number(minutes),
+		Number(seconds),
+		0,
+	);
+}

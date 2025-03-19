@@ -2,35 +2,33 @@
 	<div class="row">
 		<span class="left">📍</span>
 		<span class="right">
-			<span class="entry-title">{{data.name}}</span>
-			{{data.address}}
+			<span class="entry-title p-name"><a href="/checkin/{{data.id}}">{{data.name}}</a></span>
+			<small>{{data.address}}</small>
+			<data class="p-latitude" value="{{data.lat}}"></data>
+			<data class="p-longitude" value="{{data.long}}"></data>
 		</span>
 	</div>
-
-	<div class="row">
-		<span class="left">🔶</span>
-		<span class="right">
-			{{data.category}}
-		</span>
-	</div>
-
-	{{#if data.imageCount}}
-	<div class="row">
-		<span class="left">🖼️</span>
-		<span class="right">
-			{{data.imageCount}} photos
-		</span>
-	</div>
-	{{/if}}
 
 	{{#if data.description}}
-	<br>
 	<div class="row">
 		<span class="left">💬</span>
 		<span class="right">
 			{{{data.description}}}
 		</span>
 	</div>
+	{{/if}}
+
+	{{#if data.images}}
+		<div class="row">
+			<span class="left">🖼️</span>
+			<div class="right checkin-image-row">
+				{{#each data.images as |image|}}
+					<{{#if ../includePopovers}}button popovertarget="{{image.id}}"{{else}}div{{/if}} class="checkin-image-container">
+						<img src="/checkin/image-thumbnail/{{image.id}}.avif" class="checkin-image">
+					</{{#if ../includePopovers}}button{{else}}div{{/if}}>
+				{{/each}}
+			</div>
+		</div>
 	{{/if}}
 
 	<div class="row">

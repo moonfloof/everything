@@ -1,19 +1,27 @@
 <div class="page--data">
 	{{> pageHeader title="Check-ins" url="/checkin" }}
-	{{> checkin data=checkin }}
+	{{> checkin data=checkin includePopovers="yes" }}
 
 	{{#if checkin.map_svg }}
 	<div id="checkin-map">
 		{{{checkin.map_svg}}}
+		{{#if mapImages}}
+		<div id="checkin-map-image-overlay">
+			{{#each mapImages as |image|}}
+			<button class="checkin-map-image" popovertarget="{{image.id}}" style="left:{{image.left}}%;top:{{image.top}}%;">
+				<img src="/checkin/image-thumbnail/{{image.id}}.avif">
+			</button>
+			{{/each}}
+		</div>
+		{{/if}}
 	</div>
 	{{/if}}
 
-	{{#if checkin.imageCount }}
-		<br>
-		<div class="checkin-images-single">
-			{{#each checkin.images as |image|}}
-			<img src="{{image.data}}" />
-			{{/each}}
-		</div>
+	{{#if checkin.images }}
+		{{#each checkin.images as |image|}}
+		<button class="checkin-image-popover" id="{{image.id}}" popover="auto" popovertarget="{{image.id}}" popovertargetaction="hide">
+			<img src="/checkin/image/{{image.id}}.avif">
+		</button>
+		{{/each}}
 	{{/if}}
 </div>

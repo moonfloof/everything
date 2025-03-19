@@ -43,11 +43,12 @@
 	<div class="row">
 		<span class="left">🖼️</span>
 		<span class="right">
-			<input type="file" form="" name="{{data.id}}" accept="image/*,.avif" multiple><br>
+			<label class="checkin-image-input-label" for="image-input{{#if data.id}}-{{data.id}}{{/if}}">Upload images</label>
+			<input type="file" class="hidden" form="" id="image-input{{#if data.id}}-{{data.id}}{{/if}}" name="{{data.id}}" accept="image/*,.avif" multiple>
 			<div class="checkin-image-row" id="checkin-image-inputs{{#if data.id}}-{{data.id}}{{/if}}">
-				{{#each data.images as |photo|}}
-				<a href="/checkins/photos/{{photo.id}}{{#if page}}?page={{page}}{{/if}}" class="checkin-image-container">
-					<img src="{{photo.data}}" class="checkin-image">
+				{{#each data.images as |image|}}
+				<a href="/checkins/image/delete/{{image.id}}{{#if page}}?page={{page}}{{/if}}" class="checkin-image-container">
+					<img src="/checkins/image/thumbnail/{{image.id}}" class="checkin-image">
 					<div class="checkin-image-overlay">&times; Remove</div>
 				</a>
 				{{/each}}
