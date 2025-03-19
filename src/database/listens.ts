@@ -203,24 +203,42 @@ export function countListens() {
 }
 
 export function getListensPopular(days: number) {
-	const statement = getStatement<{ artist: string; count: number }>(
+	const statement = getStatement<{ artist: string; duration: number; count: number }>(
 		'getListensPopular',
-		`SELECT t.artist AS artist, count(*) as count
+		`SELECT
+			t.artist AS artist,
+			SUM(t.duration_secs)/3600.0 AS duration,
+			COUNT(*) AS count
 		FROM listens AS l
 		JOIN listens_track AS t ON t.id = l.track_id
 		WHERE created_at >= $created_at
 		GROUP BY artist
-		ORDER BY count DESC, artist ASC
+		ORDER BY duration DESC, count DESC, artist ASC
 		LIMIT 10`,
 	);
 
 	const created_at = new Date(Date.now() - days * dayMs).toISOString();
 	const rows = statement.all({ created_at });
 
-	return rows.map(row => ({
-		...row,
-		popularityPercentage: (row.count / rows[0].count) * 100,
-	}));
+	if (rows[0] === undefined) {
+		return [];
+	}
+
+	const usingDuration = rows[0].duration !== null;
+	const getCount = (row: { artist: string; duration: number; count: number }) => {
+		return usingDuration ? Math.round(row.duration * 10) / 10 : row.count;
+	};
+
+	const popularCount = getCount(rows[0]);
+
+	return rows.map(row => {
+		const count = getCount(row);
+		return {
+			...row,
+			count,
+			popularityPercentage: (count / popularCount) * 100,
+		};
+	});
 }
 
 export function getListenPopularDashboard(days: number) {

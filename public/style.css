@@ -458,6 +458,18 @@ table td {
 	padding: 6px;
 }
 
+.artists-popular {
+	table-layout: fixed;
+	width: 100%;
+}
+
+.artist-name {
+	width: 30%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .artist-count {
 	font-variant-numeric: tabular-nums;
 	font-weight: 700;
@@ -1123,12 +1135,26 @@ select {
 		margin-left: 0;
 	}
 
+	.artist-name {
+		font-size: 20px;
+		font-weight: 700;
+	}
+
+	.artist-name,
+	.artist-listens,
+	.artists-popular--artist {
+		display: block;
+		width: 100%;
+		text-align: left;
+	}
+
 	.games-popular--game,
 	.games-popular--title {
 		display: block;
 	}
 
-	.games-popular--game {
+	.games-popular--game,
+	.artists-popular--artist {
 		padding: 8px 0;
 	}
 
