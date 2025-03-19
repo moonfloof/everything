@@ -184,8 +184,8 @@ export function getGameSessionsGroupedByDay(days = 14) {
 	}));
 }
 
-export function getGameStats() {
-	const daysAgo = new Date(Date.now() - 7 * dayMs);
+export function getGameStats(days = 14) {
+	const daysAgo = new Date(Date.now() - days * dayMs);
 	const created_at = getStartOfDay(daysAgo).toISOString();
 
 	const stats = getStatement<{
