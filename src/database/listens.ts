@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import addMissingDates from '../lib/addMissingDates.js';
-import { dateDefault, dayMs, formatDate, hourMs, monthsShort, shortDate } from '../lib/formatDate.js';
+import { dateDefault, dayMs, formatDate, hourMs, monthsShort, prettyDuration, shortDate } from '../lib/formatDate.js';
 import type { Insert, Optional, Select, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
@@ -207,7 +207,7 @@ export function getListensPopular(days: number) {
 		'getListensPopular',
 		`SELECT
 			t.artist AS artist,
-			SUM(t.duration_secs)/3600.0 AS duration,
+			ROUND(SUM(t.duration_secs)/3600.0, 1) AS duration,
 			COUNT(*) AS count
 		FROM listens AS l
 		JOIN listens_track AS t ON t.id = l.track_id
@@ -226,7 +226,7 @@ export function getListensPopular(days: number) {
 
 	const usingDuration = rows[0].duration !== null;
 	const getCount = (row: { artist: string; duration: number; count: number }) => {
-		return usingDuration ? Math.round(row.duration * 10) / 10 : row.count;
+		return usingDuration ? row.duration : row.count;
 	};
 
 	const popularCount = getCount(rows[0]);
@@ -243,13 +243,17 @@ export function getListensPopular(days: number) {
 
 export function getListenPopularDashboard(days: number) {
 	const generateStatement = (column: keyof Listen) =>
-		getStatement<{ title: string; count: number }>(
+		getStatement<{ title: string; count: number; duration: number | null }>(
 			`getListenPopularDashboard_${column}`,
-			`SELECT t.${column} as label, count(*) as count FROM listens AS l
+			`SELECT
+				t.${column} as label,
+				COUNT(*) AS count,
+				SUM(t.duration_secs)*1000 AS duration
+			FROM listens AS l
 			JOIN listens_track AS t ON t.id = l.track_id
 			WHERE created_at >= $created_at
 			GROUP BY label
-			ORDER BY count DESC
+			ORDER BY duration DESC, count DESC
 			LIMIT 1;`,
 		);
 
@@ -262,9 +266,18 @@ export function getListenPopularDashboard(days: number) {
 	if (!(artist?.count && album?.count && song?.count)) return null;
 
 	return {
-		artist,
-		album,
-		song,
+		artist: {
+			...artist,
+			duration: artist.duration ? prettyDuration(artist.duration) : null,
+		},
+		album: {
+			...album,
+			duration: album.duration ? prettyDuration(album.duration) : null,
+		},
+		song: {
+			...album,
+			duration: song.duration ? prettyDuration(song.duration) : null,
+		},
 	};
 }
 
