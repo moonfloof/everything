@@ -2,6 +2,7 @@
 	<div class="sectioncontainer">
 		{{> internal/id id=data.id }}
 		<input type="hidden" name="id" value="{{data.id}}" />
+		<input type="hidden" name="game_id" value="{{#if game_id}}{{game_id}}{{else}}{{data.game_id}}{{/if}}" />
 
 		{{> internal/crudRow emoji="🎮" name="name" value=data.name }}
 		{{> internal/crudRow emoji="📓" name="description" value=data.description }}
