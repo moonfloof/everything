@@ -189,7 +189,7 @@ export function countCheckins(status: EntryStatus | '%' = ENTRY_STATUS.PUBLIC) {
 
 export function updateCheckin(checkin: Update<Omit<Checkin, 'map_svg'>>) {
 	const statement = getStatement(
-		'updateFilm',
+		'updateCheckin',
 		`UPDATE checkin
 		SET description = $description,
 		    status = $status,
