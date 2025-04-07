@@ -10,6 +10,7 @@ import type { CheckinPlace } from './checkinPlace.js';
 import { DEFAULT_DAYS, type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 import { ENTRY_STATUS, type EntryStatus } from './notes.js';
+import { shortSummary, unsafe_stripTags } from '../lib/strings.js';
 
 const { ServerError, NotFoundError } = errors;
 
@@ -170,6 +171,7 @@ export function getCheckins(parameters: Partial<Parameters & CheckinParameters> 
 		.all(params)
 		.map(checkin => ({
 			...checkin,
+			summary: shortSummary(unsafe_stripTags(checkin.description)),
 			timeago: timeago.format(new Date(checkin.created_at)),
 			images: getCheckinImages(checkin.id),
 		}));

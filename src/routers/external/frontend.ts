@@ -467,7 +467,7 @@ router.get('/checkin/:checkin_id', (req, res) => {
 	res.render('external/checkin-single', {
 		checkin,
 		title,
-		description: checkin.description,
+		description: checkin.summary,
 		metaImage,
 		mapImages,
 	});
