@@ -4,6 +4,7 @@ import { dateDefault } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
+import { shortSummary, unsafe_stripTags } from '../lib/strings.js';
 
 export const ENTRY_TYPES = {
 	note: '💬',
@@ -97,13 +98,8 @@ export function getNotes(parameters: Partial<Parameters & { status: EntryStatus 
 				...row,
 				emoji: ENTRY_TYPES[row.type || 'note'],
 				timeago: timeago.format(new Date(row.created_at)),
+				summary: shortSummary(unsafe_stripTags(row.description)),
 				syndication,
-
-				// ⚠ Note: I would not normally rely on regex like this.
-				// It's unsafe, but considering the *only* content
-				// stored in notes is content I've generated myself, I
-				// didn't mind in this specific instance.
-				summary: row.description.replace(/<[^>]+?>/g, ''),
 			};
 		});
 }
