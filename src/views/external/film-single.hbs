@@ -48,6 +48,14 @@
 				<div class="left">📆</div>
 				<div class="right">watched on {{watchDate}}</div>
 			</div>
+			{{#if film.durationPretty}}
+			<div class="row">
+				<div class="left">⏱️</div>
+				<data class="right p-duration" value="{{film.durationIso}}">
+					it's {{film.durationPretty}} long
+				</data>
+			</div>
+			{{/if}}
 			{{#if film.url}}
 			<div class="row">
 				<div class="left">🔗</div>

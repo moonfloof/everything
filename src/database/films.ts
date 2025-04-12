@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
-import { dateDefault } from '../lib/formatDate.js';
+import { dateDefault, msToIsoDuration, prettyDuration } from '../lib/formatDate.js';
 import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
@@ -58,6 +58,9 @@ export function getFilms(parameters: Parameters = {}) {
 		posterUrl: existsSync(getImagePath('film', `poster-${row.id}`))
 			? `/film-images/poster-${row.id}.avif`
 			: null,
+
+		durationIso: row.duration_secs ? msToIsoDuration(row.duration_secs * 1000) : null,
+		durationPretty: row.duration_secs ? prettyDuration(row.duration_secs * 1000) : null,
 
 		urlPretty: row.url ? new URL(row.url).host : null,
 		timeago: timeago.format(new Date(row.watched_at)),
