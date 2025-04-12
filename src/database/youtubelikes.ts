@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
-import { dateDefault, dayMs } from '../lib/formatDate.js';
+import { dateDefault, dayMs, prettyDuration } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
@@ -82,7 +82,7 @@ export function updateYouTubeLike(video: Update<YouTubeLike>) {
 export function getPopularYouTubeChannels(days: number, limit = 10) {
 	const statement = getStatement<{ channel: string; count: number }>(
 		'getPopularYouTubeChannels',
-		`SELECT channel, count(*) as count
+		`SELECT channel, sum(duration_secs) as count
 		FROM youtubelikes
 		WHERE created_at >= $created_at
 		GROUP BY channel
@@ -95,6 +95,7 @@ export function getPopularYouTubeChannels(days: number, limit = 10) {
 
 	return rows.map(row => ({
 		...row,
+		durationPretty: prettyDuration(row.count * 1000),
 		popularityPercentage: (row.count / rows[0].count) * 100,
 	}));
 }
