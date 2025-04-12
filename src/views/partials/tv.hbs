@@ -4,12 +4,16 @@
 		<span class="left">📺</span>
 		<span class="right">
 			<span class="p-name entry-title">{{data.episode_title}}</span>
+			<span class="p-author">{{data.series_title}}</span>
 		</span>
 	</div>
+
+	{{#if data.durationPretty}}
 	<div class="row">
-		<span class="left"></span>
-		<span class="right p-author">{{data.series_title}}</span>
+		<div class="left">⏱️</div>
+		<data class="right p-duration" value="{{data.durationIso}}">it's {{data.durationPretty}} long</data>
 	</div>
+	{{/if}}
 	</div>
 
 	<div class="row">

@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
-import { dateDefault } from '../lib/formatDate.js';
+import { dateDefault, msToIsoDuration, prettyDuration } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
@@ -39,6 +39,8 @@ export function getEpisodes(parameters: Parameters = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => ({
 		...row,
+		durationIso: row.duration_secs ? msToIsoDuration(row.duration_secs * 1000) : null,
+		durationPretty: row.duration_secs ? prettyDuration(row.duration_secs * 1000) : null,
 		timeago: timeago.format(new Date(row.created_at)),
 	}));
 }
