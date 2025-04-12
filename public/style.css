@@ -121,6 +121,55 @@ html {
 		cursor: pointer;
 	}
 
+	.links-background {
+		background-color: var(--panel-bg);
+	}
+
+	#links {
+		display: flex;
+		overflow-x: hidden;
+		overflow-y: auto;
+		opacity: 0;
+		flex: 1;
+		align-items: stretch;
+		flex-direction: column;
+		height: 1px;
+		max-height: calc(100vh - 48px);
+		transition: height 0.2s, opacity 0.2s;
+
+		a {
+			text-align: right;
+			font-size: 20px;
+			line-height: 0.1px;
+			padding: 0.1px 12px;
+			transition: line-height 0.2s, padding 0.2s;
+			border-radius: 12px;
+
+			.icon {
+				display: inline-block;
+				text-align: center;
+				min-width: 48px;
+			}
+
+			&:first-child {
+				margin-top: 16px;
+			}
+
+			&:hover {
+				background-color: var(--panel-bg-dark);
+			}
+		}
+	}
+
+	#links-checkbox:checked~#links {
+		height: 472px;
+		opacity: 1;
+
+		a {
+			padding: 12px 12px;
+			line-height: 20px;
+		}
+	}
 }
 
 
@@ -415,11 +464,12 @@ a:hover {
 }
 
 .sectioncontainer {
-	margin-bottom: 32px;
+	padding-bottom: 32px;
 }
 
 .page--data {
 	padding-top: 48px !important;
+	background-color: var(--primary-bg);
 
 	form,
 	fieldset,
