@@ -21,7 +21,10 @@
 	{{#if data.progress}}
 	<div class="row">
 		<span class="left"></span>
-		<data class="right p-read-status" value="{{data.status}}">{{{data.progress}}}</data>
+		<data class="right p-read-status" value="{{data.status}}">
+			{{> svgProgress perfected=data.completed percentage=data.progress_percentage }}
+			{{{data.progress}}}
+		</data>
 	</div>
 	{{/if}}
 

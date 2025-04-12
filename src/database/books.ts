@@ -54,19 +54,20 @@ export function getBooks(parameters: Parameters = {}) {
 	return statement.all(calculateGetParameters(parameters)).map(row => {
 		let progress = null;
 		let status = 'to-read';
+		let progress_percentage = 0;
+		let completed = false;
 
 		if (row.pages_total !== null && row.pages_progress !== null) {
 			const finished = row.pages_total === row.pages_progress;
-			const percent = Math.round((row.pages_progress / row.pages_total) * 100);
+			progress_percentage = Math.round((row.pages_progress / row.pages_total) * 100);
 
-			progress = `read ${percent}% <small>(${row.pages_progress || 0} / ${
-				row.pages_total
-			} pages)</small>`;
+			progress = `read ${progress_percentage}% <small>(${row.pages_progress || 0} / ${row.pages_total} pages)</small>`;
 			status = 'reading';
 
 			if (finished) {
 				progress = `completed on ${prettyDate(new Date(row.completed_at || Date.now()))}`;
 				status = 'finished';
+				completed = true;
 			}
 		}
 
@@ -74,6 +75,8 @@ export function getBooks(parameters: Parameters = {}) {
 			...row,
 			progress,
 			status,
+			progress_percentage,
+			completed,
 			timeago: timeago.format(new Date(row.updated_at || row.created_at)),
 		};
 	});
