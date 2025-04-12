@@ -5,7 +5,7 @@
 		<span class="left"></span>
 		<span class="right">
 			replied to
-			<strong><a href="{{data.url}}" target="_blank" rel="noopener" class="u-in-reply-to">{{data.url}}</a></strong>
+			<strong><a href="{{data.url}}" target="_blank" rel="noopener" class="u-in-reply-to">{{data.url}} {{>svgExternal}}</a></strong>
 		</span>
 	</div>
 	{{/if}}
@@ -17,7 +17,7 @@
 		<span class="left"></span>
 		<span class="right">
 			reposted
-			<strong><a href="{{data.url}}" target="_blank" rel="noopener" class="u-repost-of">{{data.url}}</a></strong>
+			<strong><a href="{{data.url}}" target="_blank" rel="noopener" class="u-repost-of">{{data.url}} {{>svgExternal}}</a></strong>
 		</span>
 	</div>
 	{{/if}}
@@ -92,7 +92,7 @@
 		<div class="right">
 			Originally posted on:
 			{{#each data.syndication as |site|}}
-				<strong><a href="{{site.url}}" target="_blank" class="u-syndication">{{site.name}}</a></strong>&nbsp;&nbsp;
+				<strong><a href="{{site.url}}" target="_blank" class="u-syndication">{{site.name}} {{>svgExternal}}</a></strong>&nbsp;&nbsp;
 			{{/each}}
 		</div>
 	</div>
