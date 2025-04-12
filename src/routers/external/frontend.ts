@@ -27,7 +27,7 @@ import {
 import { getLatestCity } from '../../database/locations.js';
 import { countNotes, getNotes } from '../../database/notes.js';
 import { getSleepStats } from '../../database/sleep.js';
-import { getStepsYesterday } from '../../database/steps.js';
+import { getSteps, getStepsYesterday } from '../../database/steps.js';
 import { countEpisodes, getEpisodes } from '../../database/tv.js';
 import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../database/youtubelikes.js';
 
@@ -574,6 +574,7 @@ router.get('/feed', async (_req, res) => {
 			typeMap('book', getBooks(parameters)),
 			typeMap('like', getLikes(parameters)),
 			typeMap('checkin', getCheckins({ ...parameters, status: 'public' })),
+			typeMap('steps', getSteps(parameters)),
 		])
 	).flat(1);
 

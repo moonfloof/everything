@@ -1,8 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import { dayMs, formatDate } from '../lib/formatDate.js';
+import { dayMs, formatDate, prettyDate } from '../lib/formatDate.js';
 import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
+import { timeago } from '../adapters/timeago.js';
 
 interface Steps {
 	id: string;
@@ -36,7 +37,11 @@ export function getSteps(parameters: Parameters = {}) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement.all(calculateGetParameters(parameters));
+	return statement.all(calculateGetParameters(parameters)).map(row => ({
+		...row,
+		timeago: timeago.format(new Date(row.created_at)),
+		datePretty: prettyDate(new Date(row.created_at)),
+	}));
 }
 
 export function getStepsYesterday() {

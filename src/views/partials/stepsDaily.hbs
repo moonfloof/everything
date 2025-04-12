@@ -1,0 +1,27 @@
+<div class="h-entry">
+	<div class="row">
+		<div class="left">🏃‍♀️</div>
+		<div class="right">
+			<div class="entry-title e-content">
+				took
+				<span class="p-num p-count">{{data.step_count_total}}</span>
+				<span class="p-unit">steps</span>
+			</div>
+			on {{data.datePretty}}
+		</div>
+	</div>
+	<div class="row">
+		<div class="left"></div>
+		<time
+			title="{{data.created_at}}"
+			datetime="{{data.created_at}}"
+			class="right dt-published"
+		>
+			<small>
+				{{data.timeago}}
+			</small>
+		</time>
+	</div>
+
+	{{> author}}
+</div>
