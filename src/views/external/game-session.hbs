@@ -1,4 +1,6 @@
-<div class="page--data">
-	{{> pageHeader title="Gaming" url="/games" }}
-	{{> gameActivity data=session }}
+<div class="panel margin">
+	{{> panelHeader title="recently played game" url="/games"}}
+	<div class="content">
+		{{> gameActivity data=session }}
+	</div>
 </div>

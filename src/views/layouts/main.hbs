@@ -27,10 +27,17 @@
 		</header>
 	</div>
 	{{else}}
-	<h1 id="header--small"><a href="/">{{person}}’s</a> quantified-self data archive</h1>
+	<div id="header--small">
+		<div class="container">
+			<h1>
+				<a href="/">{{person}}’s</a>
+				quantified-self data archive
+			</h1>
+		</div>
+	</div>
 	{{/if}}
 
-	<div class="container">{{{body}}}</div>
+	<div class="container{{#unless isHomepage}} page--data{{/unless}}">{{{body}}}</div>
 	{{{footerHtml}}}
 </body>
 </html>

@@ -1,27 +1,33 @@
-<div class="page--data">
-	{{> pageHeader title="Check-ins" url="/checkin" }}
-	{{> checkin data=checkin includePopovers="yes" }}
-
-	{{#if checkin.map_svg }}
-	<div id="checkin-map">
-		{{{checkin.map_svg}}}
-		{{#if mapImages}}
-		<div id="checkin-map-image-overlay">
-			{{#each mapImages as |image|}}
-			<button class="checkin-map-image" popovertarget="{{image.id}}" style="left:{{image.left}}%;top:{{image.top}}%;">
-				<img src="/checkin/image-thumbnail/{{image.id}}.avif">
-			</button>
-			{{/each}}
-		</div>
-		{{/if}}
+<div class="panel margin">
+	{{> panelHeader title="recent check-in" url="/checkin" }}
+	<div class="content">
+		{{> checkin data=checkin includePopovers="yes" }}
 	</div>
-	{{/if}}
+</div>
 
-	{{#if checkin.images }}
-		{{#each checkin.images as |image|}}
-		<button class="checkin-image-popover" id="{{image.id}}" popover="auto" popovertarget="{{image.id}}" popovertargetaction="hide">
-			<img src="/checkin/image/{{image.id}}.avif">
+{{#if checkin.map_svg }}
+<div id="checkin-map" class="panel margin">
+	{{> panelHeader title="map view" }}
+
+	<div style="position: relative;">
+	{{{checkin.map_svg}}}
+	{{#if mapImages}}
+	<div id="checkin-map-image-overlay">
+		{{#each mapImages as |image|}}
+		<button class="checkin-map-image" popovertarget="{{image.id}}" style="left:{{image.left}}%;top:{{image.top}}%;">
+			<img src="/checkin/image-thumbnail/{{image.id}}.avif">
 		</button>
 		{{/each}}
+	</div>
 	{{/if}}
+	</div>
 </div>
+{{/if}}
+
+{{#if checkin.images }}
+	{{#each checkin.images as |image|}}
+	<button class="checkin-image-popover" id="{{image.id}}" popover="auto" popovertarget="{{image.id}}" popovertargetaction="hide">
+		<img src="/checkin/image/{{image.id}}.avif">
+	</button>
+	{{/each}}
+{{/if}}

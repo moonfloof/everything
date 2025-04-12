@@ -1,16 +1,19 @@
-<div class="page--data">
-	{{> pageHeader title="Watching (Films)" url="/" }}
-
-	{{#each films as |film|}}
-		{{> film data=film }}
-	{{/each}}
-
-	{{> pagination pagination=pagination route="/films" }}
-
-	<div class="film-attribution">
-		<small>
-			ℹ️ <strong>Attribution:</strong> Images on this page were retrieved using
-			<a href="https://tmdb.org/" target="_blank" rel="noopener">The Movie Database (tmdb.org)</a>
-		</small>
+<div class="panel margin">
+	{{> panelHeader title="recently watched films" url="/"}}
+	<div class="content">
+		{{#each films as |film|}}
+			{{> film data=film }}
+		{{/each}}
 	</div>
+</div>
+
+{{> pagination pagination=pagination route="/films" }}
+
+<div class="film-attribution">
+	<small>
+		ℹ️ <strong>Attribution:</strong> Images on this page were retrieved using
+		<a href="https://tmdb.org/" target="_blank" rel="noopener">
+			The Movie Database (tmdb.org)
+		</a>
+	</small>
 </div>

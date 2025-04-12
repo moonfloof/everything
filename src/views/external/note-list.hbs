@@ -1,9 +1,10 @@
-<div class="page--data">
-	{{> pageHeader title="Notes" url="/" }}
-
-	{{#each notes as |note|}}
-		{{> note data=note }}
-	{{/each}}
-
-	{{> pagination pagination=pagination route="/notes" }}
+<div class="panel margin">
+	{{> panelHeader title="i wrote you some notes" url="/" }}
+	<div class="content">
+		{{#each notes as |note|}}
+			{{> note data=note }}
+		{{/each}}
+	</div>
 </div>
+
+{{> pagination pagination=pagination route="/notes" }}

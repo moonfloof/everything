@@ -1,7 +1,7 @@
 {{> pageHeader title="Films Watched" url="/" }}
 
 {{#if rescanerror }}
-<div class="error sectioncontainer page--data">
+<div class="error rounded-panel margin">
 	<p>
 		Did not rescan Letterboxd.
 	</p>
@@ -9,10 +9,12 @@
 {{/if}}
 
 {{#if hasLetterboxdConnected}}
-<form action="/films/rescan" method="POST" class="sectioncontainer">
-	<div class="info rounded-panel page--data">
-		<p><strong>Manually rescan films from Letterboxd</strong></p>
-		<input type="submit" value="Rescan" id="rescan" />
+<form action="/films/rescan" method="POST" class="margin">
+	<div class="panel info">
+		{{> panelHeader title="manually rescan films from Letterboxd" }}
+		<div class="content">
+			<input type="submit" value="Rescan" id="rescan" />
+		</div>
 	</div>
 </form>
 {{/if}}

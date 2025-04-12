@@ -1,4 +1,4 @@
-<div id="dashboard--lead__container" class="rounded-panel">
+<div id="dashboard--lead__container" class="rounded-panel info margin">
 	<img id="dashboard--lead__img" src="/favicon.png" />
 	<div id="dashboard--lead__text">
 		Hello! I personally track everything I listen to, everything I
@@ -10,214 +10,189 @@
 
 {{#if notes.length}}
 	{{#> dashpanel title="notes" link="notes"}}
-		<ul>
-		{{#each notes}}
-			<li class="dashboard--panel__li">
-				<span>
-					{{emoji}} {{#if title}}{{title}}{{else}}{{summary}}{{/if}}
-				</span>
-				<small>
-					<a href="/note/{{id}}">{{timeago}}</a>
-				</small>
-			</li>
-		{{/each}}
-		</ul>
+	{{#each notes}}
+		<a href="/note/{{id}}" class="panel__li">
+			<span class="summary">
+				{{emoji}} {{#if title}}{{title}}{{else}}{{summary}}{{/if}}
+			</span>
+			<small>
+				{{timeago}}
+			</small>
+		</a>
+	{{/each}}
 	{{/dashpanel}}
 {{/if}}
 
-<div id="dashboard--panels">
+<div id="dash-panels">
 	{{#if gameStats}}
 		{{#> dashpanel title="gaming" subtitle="(14 days)" link="games" background=gameStats.favouriteGame.posterUrl }}
-			<div class="dashboard--panel--meta">
-				<div class="dashboard--panel--meta__row">
-					<span>total playtime</span>
-					<span><strong>{{gameStats.totalPlaytimeHuman}}</strong></span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>achievements</span>
-					<span><strong>{{gameStats.achievementsUnlocked}}</strong></span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>fav game</span>
-					<span><strong>
-						<a href="/game/{{gameStats.favouriteGame.id}}">{{gameStats.favouriteGame.name}}</a>
-					</strong></span>
-				</div>
+			<a href="/game/{{gameStats.favouriteGame.id}}" class="panel__li">
+				<span>favourite game</span>
+				<span class="summary"><strong>{{gameStats.favouriteGame.name}}</strong></span>
+			</a>
+			<div class="panel--meta__row">
+				<span>total playtime</span>
+				<span><strong>{{gameStats.totalPlaytimeHuman}}</strong></span>
+			</div>
+			<div class="panel--meta__row">
+				<span>achievements</span>
+				<span><strong>{{gameStats.achievementsUnlocked}}</strong></span>
 			</div>
 		{{/dashpanel}}
 	{{/if}}
 
 	{{#if listens}}
-		{{#> dashpanel title="listening" subtitle="(14 days)" link="music" }}
-			<div class="dashboard--panel--meta">
-				<div class="dashboard--panel--meta__row">
-					<span>fav artist</span>
-					<span>
-						<strong>{{listens.artist.label}}</strong>
-						<small>({{#if listens.artist.duration}}{{listens.artist.duration}}{{else}}x{{listens.artist.count}}{{/if}})</small>
-					</span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>fav album</span>
-					<span>
-						<strong>{{listens.album.label}}</strong>
-						<small>({{#if listens.album.duration}}{{listens.album.duration}}{{else}}x{{listens.album.count}}{{/if}})</small>
-					</span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>fav song</span>
-					<span>
-						<strong>{{listens.song.label}}</strong>
-						<small>({{#if listens.song.duration}}{{listens.song.duration}}{{else}}x{{listens.song.count}}{{/if}})</small>
-					</span>
-				</div>
+		{{#> dashpanel title="listens" subtitle="(14 days)" link="music" }}
+			<div class="panel--meta__row">
+				<span>favourite artist</span>
+				<span>
+					<strong>{{listens.artist.label}}</strong>
+					<small>({{#if listens.artist.duration}}{{listens.artist.duration}}{{else}}x{{listens.artist.count}}{{/if}})</small>
+				</span>
+			</div>
+			<div class="panel--meta__row">
+				<span>favourite album</span>
+				<span>
+					<strong>{{listens.album.label}}</strong>
+					<small>({{#if listens.album.duration}}{{listens.album.duration}}{{else}}x{{listens.album.count}}{{/if}})</small>
+				</span>
+			</div>
+			<div class="panel--meta__row">
+				<span>favourite song</span>
+				<span>
+					<strong>{{listens.song.label}}</strong>
+					<small>({{#if listens.song.duration}}{{listens.song.duration}}{{else}}x{{listens.song.count}}{{/if}})</small>
+				</span>
 			</div>
 		{{/dashpanel}}
 	{{/if}}
 
 	{{#if films}}
-		{{#> dashpanel title="films" link="films" background=films.[0].posterUrl }}
-			<ul>
-			{{#each films}}
-				<li class="dashboard--panel__li">
-					<a href="/film/{{id}}">
-						<strong>{{title}} ({{year}})</strong>
-					</a>
-					<small>
-						{{#if rating}} ⭐ {{rating}} / 10 &bull;{{/if}}
-						{{timeago}}
-					</small>
-				</li>
-			{{/each}}
-			</ul>
+		{{#> dashpanel title="films" link="films" background=films.[0].posterUrl haslist=true }}
+		{{#each films}}
+			<a href="/film/{{id}}" class="panel__li">
+				<span class="summary">
+					<strong>{{title}} ({{year}})</strong>
+				</span>
+				<small>
+					{{#if rating}} ⭐ {{rating}} / 10 &bull;{{/if}}
+					{{timeago}}
+				</small>
+			</a>
+		{{/each}}
 		{{/dashpanel}}
 	{{/if}}
 
 	{{#if youtubeLikes.length}}
-		{{#> dashpanel title="youtube" link="youtube" }}
-			<ul>
-			{{#each youtubeLikes}}
-				<li class="dashboard--panel__li">
-					<a href="{{url}}" target="_blank" rel="noopener">
-						<strong>{{ title }}</strong>
-					</a>
-					<small>{{channel}} &bull; {{timeago}}</small>
-				</li>
-			{{/each}}
-			</ul>
+		{{#> dashpanel title="youtube likes" link="youtube" }}
+		{{#each youtubeLikes}}
+			<a href="{{url}}" target="_blank" rel="noopener" class="panel__li">
+				<span class="summary">
+					<strong>{{ title }}</strong>
+				</span>
+				<small>{{channel}} &bull; {{timeago}}</small>
+			</a>
+		{{/each}}
 		{{/dashpanel}}
 	{{/if}}
 
 	{{#if tvEpisodes}}
 		{{#> dashpanel title="watching" link="tv" }}
-			<ul>
-			{{#each tvEpisodes}}
-				<li class="dashboard--panel__li">
-					<strong>{{episode_title}}</strong>
-					<small>from “<em>{{series_title}}</em>” &bull; {{timeago}}</small>
-				</li>
-			{{/each}}
-			</ul>
+		{{#each tvEpisodes}}
+			<a href="/tv/{{id}}" class="panel__li">
+				<span class="summary"><strong>{{episode_title}}</strong></span>
+				<small>from “<em>{{series_title}}</em>” &bull; {{timeago}}</small>
+			</a>
+		{{/each}}
 		{{/dashpanel}}
 	{{/if}}
 
 	{{#if books}}
 		{{#> dashpanel title="reading" link="books" }}
-			<ul>
-			{{#each books}}
-				<li class="dashboard--panel__li">
-					<a href="/book/{{id}}">
-						<strong>{{title}} ({{year}})</strong>
-					</a>
+		{{#each books}}
+			<a href="/book/{{id}}" class="panel__li">
+				<span class="summary">
+					<strong>{{title}} ({{year}})</strong>
+				</span>
 
-					{{#if progress}}
-						<small>{{{progress}}}</small>
-					{{/if}}
-				</li>
-			{{/each}}
-			</ul>
+				{{#if progress}}
+					<small>{{{progress}}}</small>
+				{{/if}}
+			</a>
+		{{/each}}
 		{{/dashpanel}}
 	{{/if}}
 
 	{{#if sleepStats}}
 		{{#> dashpanel title="sleeping" }}
-			<div class="dashboard--panel--meta">
-				<div class="dashboard--panel--meta__row">
-					<span>average bed time</span>
-					<span>
-						<strong>{{sleepStats.averageSleepStartHuman}}</strong>
-					</span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>average wake time</span>
-					<span>
-						<strong>{{sleepStats.averageSleepEndHuman}}</strong>
-					</span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>average sleep</span>
-					<span>
-						<strong>{{sleepStats.averageDurationHuman}}</strong>
-					</span>
-				</div>
-				<div class="dashboard--panel--meta__row">
-					<span>shortest &amp; longest</span>
-					<span>
-						<strong>{{sleepStats.shortestHuman}} - {{sleepStats.longestHuman}}</strong>
-					</span>
-				</div>
+			<div class="panel--meta__row">
+				<span>average bed time</span>
+				<span>
+					<strong>{{sleepStats.averageSleepStartHuman}}</strong>
+				</span>
+			</div>
+			<div class="panel--meta__row">
+				<span>average wake time</span>
+				<span>
+					<strong>{{sleepStats.averageSleepEndHuman}}</strong>
+				</span>
+			</div>
+			<div class="panel--meta__row">
+				<span>average sleep</span>
+				<span>
+					<strong>{{sleepStats.averageDurationHuman}}</strong>
+				</span>
+			</div>
+			<div class="panel--meta__row">
+				<span>shortest &amp; longest</span>
+				<span>
+					<strong>{{sleepStats.shortestHuman}} - {{sleepStats.longestHuman}}</strong>
+				</span>
 			</div>
 		{{/dashpanel}}
 	{{/if}}
 
 	{{#if checkins}}
 		{{#> dashpanel title="check-ins" link="checkin" }}
-			<ul>
-			{{#each checkins}}
-				<li class="dashboard--panel__li">
-					<a href="/checkin/{{id}}">
-						<strong>{{name}}</strong>
-					</a>
-					<small>{{#if images}}🖼️ {{images.length}} photos &bull; {{/if}}{{timeago}}</small>
-				</li>
-			{{/each}}
-			</ul>
+		{{#each checkins}}
+			<a href="/checkin/{{id}}" class="panel__li">
+				<span class="summary">
+					<strong>{{name}}</strong>
+				</span>
+				<small>{{#if images}}🖼️ {{images.length}} photos &bull; {{/if}}{{timeago}}</small>
+			</a>
+		{{/each}}
 		{{/dashpanel}}
 	{{/if}}
 
 	{{#> dashpanel title="misc" }}
-		<div class="dashboard--panel--meta">
-			{{#if location}}
-			<div class="dashboard--panel--meta__row">
-				<span>🌆 location</span>
-				<span data-tooltip="Name provided by OpenStreetMap">
-					<strong>{{location}}</strong>
-				</span>
-			</div>
-			{{/if}}
-			<div class="dashboard--panel--meta__row">
-				<span>🔋 battery</span>
-				<span>
-					<strong>{{device.battery_level}}%</strong>
-					<small>({{device.battery_status}})</small>
-				</span>
-			</div>
-			{{#if steps}}
-			<div class="dashboard--panel--meta__row">
-				<span>🚶 steps</span>
-				<span data-tooltip="This is only as accurate as my phone is, which might be way off!">
-					<strong>{{steps}}</strong>
-					<small>(yesterday)</small>
-				</span>
-			</div>
-			{{/if}}
-			<div class="dashboard--panel--meta__row">
-				<span>🧪 feed</span>
-				<span>
-					Try
-					<a href="/feed"><strong>The Everything Feed</strong></a>.
-				</span>
-			</div>
+		{{#if location}}
+		<div class="panel--meta__row">
+			<span>🌆 location</span>
+			<span data-tooltip="Name provided by OpenStreetMap">
+				<strong>{{location}}</strong>
+			</span>
+		</div>
+		{{/if}}
+		<div class="panel--meta__row">
+			<span>🔋 battery</span>
+			<span>
+				<strong>{{device.battery_level}}%</strong>
+				<small>({{device.battery_status}})</small>
+			</span>
+		</div>
+		{{#if steps}}
+		<div class="panel--meta__row">
+			<span>🚶 steps</span>
+			<span>
+				<strong>{{steps}}</strong>
+				<small>(yesterday)</small>
+			</span>
+		</div>
+		{{/if}}
+		<div class="panel--meta__row">
+			<span>🧪 feed</span>
+			<a href="/feed"><strong>The Everything Feed</strong></a>
 		</div>
 	{{/dashpanel}}
 </div>

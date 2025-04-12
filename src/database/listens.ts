@@ -348,7 +348,7 @@ export function getListenActivityGraph() {
 	const bottomMargin = 20;
 	const width = leftMargin + (cellSize + padding) * colMax - padding;
 	const height = (cellSize + padding) * 7 - padding + bottomMargin;
-	let svg = `<svg class="a-graph" viewBox="0 0 ${width} ${height}" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
+	let svg = `<svg viewBox="0 0 ${width} ${height}" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
 	svg += `\n<style>
 		text { font-family: Inter, sans-serif; font-size: 12px; font-weight: 700; }
 		rect { rx: 3px; ry: 3px; fill: #3e3475; }

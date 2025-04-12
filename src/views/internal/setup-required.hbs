@@ -1,35 +1,37 @@
-<div class="page--data" id="setup-page">
-	{{#if error}}
-	<div class="rounded-panel error">
-		<p>{{error}}</p>
+{{#if error}}
+<div class="rounded-panel error margin">
+	<strong>{{error}}</strong>
+</div>
+{{/if}}
+
+{{#if device_id}}
+	<div class="rounded-panel info margin">
+		<p>Your new device ID is <code>{{device_id}}</code></p>
+		<p>
+			Please update the <code>TOMBOIS_DEFAULT_DEVICE_ID</code> variable in your
+			<code>.env</code> file and restart the server.
+		</p>
+		<p>
+			If you forget your device ID or API key in the future, you can check the
+			<code>devices</code> table in the database.
+		</p>
 	</div>
-	<br/>
-	{{/if}}
+	<a href="/"><strong>Continue -&gt;</strong></a>
+{{else}}
 
-	{{#if device_id}}
-		<div class="rounded-panel info">
-			<p>Your new device ID is <code>{{device_id}}</code></p>
-			<p>
-				Please update the <code>TOMBOIS_DEFAULT_DEVICE_ID</code> variable in your
-				<code>.env</code> file and restart the server.
-			</p>
-			<p>
-				If you forget your device ID or API key in the future, you can check the
-				<code>devices</code> table in the database.
-			</p>
-		</div>
-		<br/>
-		<a href="/">Continue -&gt;</a>
-	{{else}}
+<div class="panel margin">
+	{{> panelHeader title="setup required" }}
 
-	<h1>Setup Required</h1>
+	<div class="content" id="setup-page">
+		<p>
+			Hello, to start using <em>everything</em>,
+			please add at least one device to your database,
+			using the form below.
+		</p>
 
-	<p>
-		Hello, to start using <em>everything</em>, please add at least
-		one device to your database.
-	</p>
+		<hr>
 
-	<form method="post" action="/setup">
+		<form method="post" action="/setup">
 		<div class="row">
 			<div class="left">👤</div>
 			<div class="right">
@@ -49,6 +51,7 @@
 		</div>
 
 		{{> internal/crudSubmit}}
-	</form>
-	{{/if}}
+		</form>
+	</div>
 </div>
+{{/if}}

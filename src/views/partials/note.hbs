@@ -1,4 +1,4 @@
-<div class="sectioncontainer h-entry">
+<div class="h-entry">
 	{{#xif data.type '==' 'reply'}}
 	{{#if data.url}}
 	<div class="row metadata">
@@ -23,6 +23,7 @@
 	{{/if}}
 	{{/xif}}
 
+	{{#unless hidetitle}}
 	{{#if data.title}}
 	<div class="row">
 		<span class="left">{{data.emoji}}</span>
@@ -31,10 +32,14 @@
 		</span>
 	</div>
 	{{/if}}
+	{{/unless}}
 
 	<div class="row">
 		<span class="left">
 			{{#if data.title}}
+				{{#if hidetitle}}
+					{{data.emoji}}
+				{{/if}}
 			{{else}}
 				{{data.emoji}}
 			{{/if}}

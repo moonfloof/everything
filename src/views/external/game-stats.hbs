@@ -1,92 +1,106 @@
-<div class="page--date">
-	{{#if game.heroUrl}}
-	<div class="image--banner" style="background-image: url({{game.heroUrl}})">
-		<div class="image--banner__overlay image--banner__steam"></div>
-	</div>
-	{{/if}}
-	{{> pageHeader title=game.name url="/games" }}
-	<br/>
-	<div class="row">
-		<span class="left">🕑</span>
-		<span class="right">
-			Played: <strong>{{game.playtime_hours}} hours</strong>
-		</span>
-	</div>
-	<div class="row">
-		<span class="left">📆</span>
-		<span class="right">
-			Last Played: <strong>
-				{{#if lastSession}}
-				<a href="/game-session/{{lastSession.id}}">{{game.timeago}}</a>
-				{{else}}
-				{{game.timeago}}
-				{{/if}}
-			</strong>
-		</span>
-	</div>
-
-	{{#if game.url}}
-	<div class="row">
-		<span class="left">🛒</span>
-		<span class="right">
-			Store Page:
-			<strong>
-				<a href="{{game.url}}" target="_blank" rel="noopener">
-					{{gameUrlPretty}}
-				</a>
-			</strong>
-		</span>
-	</div>
-	{{/if}}
-
-	{{#if achievements.length}}
-	<div class="row">
-		<span class="left">🏆</span>
-		<span class="right">
-			Completion:
-			<strong>
-				{{achievementsUnlockedCount}} of {{achievements.length}}
-			</strong><br/>
-
-			{{#if playedRecently}}
-			<div class="game-achievements--bar__container">
-				<div
-					class="game-achievements--bar pct-{{achievementPercentage}}"
-					style="width: {{achievementPercentage}}%"
-				>{{achievementPercentage}}%</div>
-			</div>
-			{{else}}
-			<div class="info rounded-panel" style="margin:16px 0;padding: 6px;font-size: 14px">
-				<strong>Note:</strong> completion progress might
-				be inaccurate if I haven't played a game since
-				December 2024.
-			</div>
-			{{/if}}
-
-			{{#each achievements as |achievement|}}
-			<div class="game-achievements--list__large">
-
-			<div class="game-achievements--check {{#if achievement.unlocked_session_id}}unlocked{{/if}}">
-				{{#if achievement.unlocked_session_id}}🏆{{else}}🔶{{/if}}
-			</div>
-
-			<div class="game-achievements--details {{#if achievement.unlocked_session_id}}unlocked{{/if}}">
-				<strong>{{achievement.name}}</strong>
-				<br/>{{achievement.description}}
-
-				{{#if achievement.unlocked_session_id}}
-				<br/>
-				<small>
-					<a href="/game-session/{{achievement.unlocked_session_id}}">
-						{{achievement.timeago}}
-					</a>
-				</small>
-				{{/if}}
-			</div>
-
-			</div>
-			{{/each}}
-		</span>
-	</div>
-	{{/if}}
+{{#if game.heroUrl}}
+<div class="image--banner" style="background-image: url({{game.heroUrl}})">
+	<div class="image--banner__overlay image--banner__steam"></div>
 </div>
+{{/if}}
+
+{{> pageHeader title=game.name url="/games" }}
+
+<div class="panel">
+	{{> panelHeader title="gameplay stats" }}
+	<div class="content">
+		<div class="row">
+			<span class="left">🕑</span>
+			<span class="right">
+				Played: <strong>{{game.playtime_hours}} hours</strong>
+			</span>
+		</div>
+		<div class="row">
+			<span class="left">📆</span>
+			<span class="right">
+				Last Played: <strong>
+					{{#if lastSession}}
+					<a href="/game-session/{{lastSession.id}}">{{game.timeago}}</a>
+					{{else}}
+					{{game.timeago}}
+					{{/if}}
+				</strong>
+			</span>
+		</div>
+
+		{{#if game.url}}
+		<div class="row">
+			<span class="left">🛒</span>
+			<span class="right">
+				Store Page:
+				<strong>
+					<a href="{{game.url}}" target="_blank" rel="noopener">
+						{{gameUrlPretty}}
+					</a>
+				</strong>
+			</span>
+		</div>
+		{{/if}}
+
+		{{#if achievements.length}}
+		<div class="row">
+			<span class="left">🏆</span>
+			<span class="right">
+				Completion:
+				<strong>
+					{{achievementsUnlockedCount}} of {{achievements.length}}
+				</strong><br/>
+
+				{{#if playedRecently}}
+				<div class="game-achievements--bar__container">
+					<div
+						class="game-achievements--bar pct-{{achievementPercentage}}"
+						style="width: {{achievementPercentage}}%"
+					>{{achievementPercentage}}%</div>
+				</div>
+				{{else}}
+				<div class="info rounded-panel" style="margin:16px 0;padding: 6px;font-size: 14px">
+					<strong>Note:</strong> completion progress might
+					be inaccurate if I haven't played a game since
+					December 2024.
+				</div>
+				{{/if}}
+			</span>
+		</div>
+		{{/if}}
+
+	</div>
+</div>
+
+{{#if achievements.length}}
+<br>
+<div class="panel">
+	{{> panelHeader title="achievements"}}
+
+	<div class="panel_content game-achievements--list__large">
+		{{#each achievements as |achievement|}}
+		<div>
+
+		<div class="check {{#if achievement.unlocked_session_id}}unlocked{{/if}}">
+			{{#if achievement.unlocked_session_id}}🏆{{else}}🔶{{/if}}
+		</div>
+
+		<div class="details {{#if achievement.unlocked_session_id}}unlocked{{/if}}">
+			<strong>{{achievement.name}}</strong>
+			<br/>{{achievement.description}}
+
+			{{#if achievement.unlocked_session_id}}
+			<br/>
+			<small>
+				<a href="/game-session/{{achievement.unlocked_session_id}}">
+					{{achievement.timeago}}
+				</a>
+			</small>
+			{{/if}}
+		</div>
+
+		</div>
+		{{/each}}
+	</div>
+</div>
+{{/if}}

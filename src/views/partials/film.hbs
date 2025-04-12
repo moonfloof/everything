@@ -1,12 +1,4 @@
-<div class="sectioncontainer h-entry {{#if data.rating}}h-review {{/if}}{{#if data.posterUrl}}entry-with-poster{{/if}}">
-	{{#if data.posterUrl}}
-	<img
-		class="entry-poster rounded-panel"
-		alt="Film poster for {{data.title}}"
-		src="{{data.posterUrl}}"
-	/>
-	{{/if}}
-
+<div class="h-entry {{#if data.rating}}h-review {{/if}}{{#if data.posterUrl}}entry-with-poster{{/if}}">
 	<div>
 	<div class="row">
 		<span class="left">🎥</span>
@@ -61,4 +53,12 @@
 	{{> author }}
 
 	</div>
+
+	{{#if data.posterUrl}}
+	<img
+		class="entry-poster"
+		alt="Film poster for '{{data.title}}'"
+		src="{{data.posterUrl}}"
+	/>
+	{{/if}}
 </div>

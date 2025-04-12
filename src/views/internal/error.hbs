@@ -1,13 +1,11 @@
-<div class="page--data">
-	<div class="error rounded-panel">
-		<p>Error: {{error.message}}</p>
-	</div>
-
-	{{#if error.code}}
-	<p><strong>Code:</strong> {{error.code}}</p>
-	{{/if}}
-
-	<p>
-		<pre>{{error.stack}}</pre>
-	</p>
+<div class="error rounded-panel">
+	<p>Error: {{error.message}}</p>
 </div>
+
+{{#if error.code}}
+<p><strong>Code:</strong> {{error.code}}</p>
+{{/if}}
+
+<p>
+	<pre>{{error.stack}}</pre>
+</p>

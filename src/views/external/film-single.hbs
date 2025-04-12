@@ -1,15 +1,15 @@
-<div class="h-entry {{#if film.rating}}h-review{{/if}}">
+<div class="h-entry entry-film{{#if film.rating}} h-review{{/if}}{{#if film.heroUrl}} hasimage{{/if}}">
 	{{#if film.heroUrl}}
 	<div class="image--banner" style="background-image: url({{film.heroUrl}})">
 		<div class="image--banner__overlay image--banner__16x9"></div>
 	</div>
 	{{/if}}
 	{{> pageHeader title=film.title url="/films" }}
-	<br/>
 
 	{{#if film.rating}}
-		<div class="row">
-			<div class="left align-middle">
+		<div class="panel margin">
+			<div class="header">
+				<span class="icon">
 				{{#xif film.rating '==' 10}}
 					❤️
 				{{else}}
@@ -19,8 +19,10 @@
 						👍
 					{{/xif}}
 				{{/xif}}
+				</span>
+				<h2 class="title">rating</h2>
 			</div>
-			<div class="right film-rating">
+			<div class="content film-rating">
 				<div class="film-rating--stars">
 					{{rating}}
 				</div>
@@ -30,48 +32,45 @@
 				</div>
 			</div>
 		</div>
-		<br/>
 	{{/if}}
-
-	<div class="row">
-		<span class="left">📆</span>
-		<span class="right">{{watchDate}}</span>
-	</div>
-	<br/>
 
 	{{#if film.review}}
-		<div class="row page--data">
-			<span class="left">💬</span>
-			<div class="right e-content">{{{film.review}}}</div>
+		<div class="panel margin">
+			{{> panelHeader icon="💬" title="review" }}
+			<div class="content e-content">{{{film.review}}}</div>
 		</div>
-		<br/>
 	{{/if}}
 
-	{{#if film.url}}
-		<div class="row">
-			<span class="left">🔗</span>
-			<span class="right">
-				Originally posted on
-				<strong><a class="right u-watch-of h-cite" href="{{film.url}}" target="_blank" rel="noopener">{{film.urlPretty}}</a></strong>
-			</span>
+	<div class="panel margin">
+		{{> panelHeader title="details" }}
+		<div class="content">
+			<div class="row">
+				<div class="left">📆</div>
+				<div class="right">watched on {{watchDate}}</div>
+			</div>
+			{{#if film.url}}
+			<div class="row">
+				<div class="left">🔗</div>
+				<div class="right">
+					originally posted on
+					<strong><a class="right u-watch-of h-cite" href="{{film.url}}" target="_blank" rel="noopener">{{film.urlPretty}} {{>svgExternal}}</a></strong>
+				</div>
+			</div>
+			{{/if}}
 		</div>
-		<br/>
-	{{/if}}
-
-	<div class="row">
-		<span class="left"></span>
-		<time
-			title="{{film.watched_at}}"
-			datetime="{{film.watched_at}}"
-			class="right dt-published"
-		>
-			<small>
-				<a href="/film/{{film.id}}" class="u-url u-uid">
-					{{film.timeago}}
-				</a>
-			</small>
-		</time>
 	</div>
+
+	<time
+		title="{{film.watched_at}}"
+		datetime="{{film.watched_at}}"
+		class="right dt-published"
+	>
+		<small>
+			<a href="/film/{{film.id}}" class="u-url u-uid">
+				last updated {{film.timeago}}
+			</a>
+		</small>
+	</time>
 
 	{{> author }}
 

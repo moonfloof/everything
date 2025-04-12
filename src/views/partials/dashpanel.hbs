@@ -1,15 +1,16 @@
-<div class="dashboard--panel rounded-panel {{#if background}}hasimage{{/if}}" id="dashboard--panel__{{title}}">
-	{{#if background}}<img src="{{background}}" alt="" class="dashboard--panel__image">{{/if}}
-	<div class="dashboard--panel__right">
-		<div class="dashboard--panel__header">
-			<h2>{{{title}}}</h2>
+<div class="panel panel__small home {{#if background}}hasimage {{#if haslist}}haslist{{/if}}{{/if}}" id="panel__{{title}}">
+	{{#if background}}<img src="{{background}}" alt="" class="panel__image">{{/if}}
+
+	<div class="panel__right">
+		<div class="header">
+			<h2 class="title">{{{title}}}</h2>
 			{{#if subtitle}}<span class="subtitle">{{subtitle}}</span>{{/if}}
 			{{#if link }}
 				<span class="flex"></span>
 				<a href="/{{link}}">more -&gt;</a>
 			{{/if}}
 		</div>
-		<div class="dashboard--panel__content">
+		<div class="content">
 			{{> @partial-block }}
 		</div>
 	</div>

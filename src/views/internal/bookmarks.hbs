@@ -1,6 +1,5 @@
 {{> pageHeader title="Bookmarks" url="/" }}
 
-<div class="page--data">
 <p>
 	Drag this link onto your bookmark toolbar to make new bookmarks easily:
 	<a href="javascript:(() => { window.open(`{{internalRoot}}/bookmarks?title=${encodeURIComponent(document.title)}&url=${encodeURIComponent(window.location.href)}`, '_blank').focus() })()" title="Bookmark This Page">
@@ -18,4 +17,3 @@
 {{/each}}
 
 {{> pagination route="/bookmarks" pagination=pagination }}
-</div>
