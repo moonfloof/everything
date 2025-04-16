@@ -44,21 +44,21 @@
 	{{#if listens}}
 		{{#> dashpanel title="listens" subtitle="(14 days)" link="music" }}
 			<div class="panel--meta__row">
-				<span>favourite artist</span>
+				<span>fav artist</span>
 				<span>
 					<strong>{{listens.artist.label}}</strong>
 					<small>({{#if listens.artist.duration}}{{listens.artist.duration}}{{else}}x{{listens.artist.count}}{{/if}})</small>
 				</span>
 			</div>
 			<div class="panel--meta__row">
-				<span>favourite album</span>
+				<span>fav album</span>
 				<span>
 					<strong>{{listens.album.label}}</strong>
 					<small>({{#if listens.album.duration}}{{listens.album.duration}}{{else}}x{{listens.album.count}}{{/if}})</small>
 				</span>
 			</div>
 			<div class="panel--meta__row">
-				<span>favourite song</span>
+				<span>fav song</span>
 				<span>
 					<strong>{{listens.song.label}}</strong>
 					<small>({{#if listens.song.duration}}{{listens.song.duration}}{{else}}x{{listens.song.count}}{{/if}})</small>

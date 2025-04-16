@@ -58,7 +58,8 @@ html {
 	width: 100%;
 	max-width: 800px;
 	margin: 0 auto;
-	padding: 0 24px;
+	padding-left: 24px;
+	padding-right: 24px;
 }
 
 #header {
@@ -106,7 +107,6 @@ html {
 
 	h1 {
 		font-size: 18px;
-		line-height: 48px;
 		font-weight: 400;
 		flex: 1;
 	}
@@ -281,8 +281,8 @@ div.info a {
 			text-transform: lowercase;
 		}
 
-		> :first-child:not(a) {
-			padding-left: 16px !important;
+		>:first-child:not(a) {
+			padding-left: 16px;
 		}
 
 		>a:first-child {
@@ -468,7 +468,7 @@ a:hover {
 }
 
 .page--data {
-	padding-top: 48px !important;
+	padding-top: 48px;
 	background-color: var(--primary-bg);
 
 	form,
@@ -513,6 +513,7 @@ a:hover {
 	}
 
 	h2 {
+		font-size: 24px;
 		margin-top: 0;
 	}
 }
@@ -794,7 +795,7 @@ table td {
 }
 
 .games-popular--pie {
-	margin-top: -3px !important;
+	margin-top: -3px;
 	vertical-align: middle;
 	transform: rotate(-90deg);
 	width: 16px;
@@ -886,7 +887,7 @@ table td {
 .game-achievements--list li {
 	padding-left: 8px;
 	font-size: 14px;
-	line-height: 18px;
+	line-height: 1.3;
 }
 
 .game-achievements--bar__container {
@@ -1355,7 +1356,8 @@ select {
 
 @media (max-width: 720px) {
 	.container {
-		padding: 0 12px;
+		padding-left: 12px;
+		padding-right: 12px;
 	}
 
 	#header {
@@ -1480,6 +1482,99 @@ select {
 		max-width: calc(100vw);
 		max-height: calc(100vh);
 		margin: auto 0;
+	}
+}
+
+/* Super small screens! */
+@media (max-width: 360px) {
+	.row {
+		.left {
+			min-width: 40px;
+			margin-right: 8px;
+		}
+	}
+
+	#panel__notes {
+		height: 256px;
+	}
+
+	.panel__small {
+		height: 124px;
+	}
+
+	.panel__image {
+		height: 100%;
+	}
+
+	.panel--meta__row {
+		margin-bottom: 3px;
+	}
+
+	.panel {
+		.header {
+			> :first-child:not(a) {
+				padding-left: 8px;
+			}
+
+			a {
+				padding: 8px;
+			}
+		}
+
+		.content {
+			padding: 8px;
+		}
+
+		&.home .content {
+			padding: 2px 8px;
+		}
+
+		&.hasimage.home .content {
+			padding-left: 92px;
+		}
+	}
+
+	.e-content {
+		font-size: 14px;
+
+	}
+
+	.e-content p:not(:last-of-type) {
+		margin-bottom: 8px;
+	}
+
+	.h-entry .right p:not(:first-child) {
+		margin-top: 8px;
+	}
+
+	.page--data__header {
+		margin: 16px 0;
+
+		h2 {
+			font-size: 20px;
+		}
+	}
+
+	.games-popular--stats {
+		display: block;
+
+		>span {
+			display: block;
+			margin-top: 4px;
+		}
+	}
+
+	.games-popular--bar {
+		font-size: 14px;
+		line-height: 18px;
+	}
+
+	.game-achievements--bar.pct-100 {
+		font-size: 12px;
+	}
+
+	.game-achievements--list li {
+		font-size: 12px;
 	}
 }
 
