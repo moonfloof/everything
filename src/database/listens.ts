@@ -275,7 +275,7 @@ export function getListenPopularDashboard(days: number) {
 			duration: album.duration ? prettyDuration(album.duration) : null,
 		},
 		song: {
-			...album,
+			...song,
 			duration: song.duration ? prettyDuration(song.duration) : null,
 		},
 	};
