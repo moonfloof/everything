@@ -1,11 +1,9 @@
 <form method="POST" action="/food/{{data.id}}">
-	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+	{{> internal/id id=data.id}}
 
-		{{> internal/crudRow emoji="🍕" name="name" value=data.name }}
-		{{> internal/crudRowSelect emoji="☕" name="type" value=data.type label=data.type }}
-		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+	{{> internal/crudRow emoji="🍕" name="name" value=data.name }}
+	{{> internal/crudRowSelect emoji="☕" name="type" value=data.type label=data.type }}
+	{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
 
-		{{> internal/crudSubmit }}
-	</div>
+	{{> internal/crudSubmit }}
 </form>

@@ -1,12 +1,16 @@
+{{#if id}}
 <div class="row">
 	<div class="left">🆔</div>
 	<div class="right">
-		{{#if id}}
-			{{#if type}}<a href="{{externalRoot}}/{{type}}/{{id}}">{{/if}}
-			{{id}}
-			{{#if type}}</a>{{/if}}
-		{{else}}
-			Add New Record
-		{{/if}}
+		{{#if type}}<a href="{{externalRoot}}/{{type}}/{{id}}">{{/if}}
+		{{id}}
+		{{#if type}}</a>{{/if}}
 	</div>
 </div>
+{{else}}
+<div class="panel margin">
+	<div class="header">
+		<h2 class="title">Add New Record</h2>
+	</div>
+	<div class="content">
+{{/if}}

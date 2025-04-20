@@ -1,7 +1,6 @@
 {{> pageHeader title="Time Tracking" url="/" }}
 
 {{> internal/timetracking values=categoryValues }}
-<hr/>
 
 {{#each timetracking as |activity| }}
 	{{> internal/timetracking data=activity values=../categoryValues }}

@@ -1,7 +1,6 @@
 {{> pageHeader title="Food" url="/" }}
 
 {{> internal/food values=typeValues }}
-<hr/>
 
 {{#each food as |entry| }}
 	{{> internal/food data=entry values=../typeValues }}

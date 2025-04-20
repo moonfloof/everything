@@ -1,10 +1,8 @@
 <form method="POST" action="/weight/{{data.id}}">
-	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+	{{> internal/id id=data.id}}
 
-		{{> internal/crudRowNumber emoji="🏋️‍♂️" name="weight_kgs" value=data.weight_kgs step="0.1" }}
-		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+	{{> internal/crudRowNumber emoji="🏋️‍♂️" name="weight_kgs" value=data.weight_kgs step="0.1" }}
+	{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
 
-		{{> internal/crudSubmit }}
-	</div>
+	{{> internal/crudSubmit }}
 </form>

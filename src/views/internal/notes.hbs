@@ -1,7 +1,6 @@
 {{> pageHeader title="Notes" url="/" }}
 
 {{> internal/note typeValues=entryTypeValues statusValues=entryStatusValues }}
-<hr/>
 
 {{#each notes as |note| }}
 	{{> internal/note data=note typeValues=../entryTypeValues statusValues=../entryStatusValues }}

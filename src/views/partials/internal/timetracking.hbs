@@ -1,11 +1,9 @@
 <form method="POST" action="/timetracking/{{data.id}}">
-	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+	{{> internal/id id=data.id}}
 
-		{{> internal/crudRowSelect emoji="📦" name="category" value=data.category label=data.category }}
-		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
-		{{> internal/crudRow emoji="🕙" name="ended_at" value=data.ended_at }}
+	{{> internal/crudRowSelect emoji="📦" name="category" value=data.category label=data.category }}
+	{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+	{{> internal/crudRow emoji="🕙" name="ended_at" value=data.ended_at }}
 
-		{{> internal/crudSubmit }}
-	</div>
+	{{> internal/crudSubmit }}
 </form>

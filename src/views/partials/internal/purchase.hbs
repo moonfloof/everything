@@ -1,13 +1,11 @@
 <form method="POST" action="/purchases/{{data.id}}">
-	<div class="sectioncontainer">
-		{{> internal/id id=data.id}}
+	{{> internal/id id=data.id}}
 
-		{{> internal/crudRow emoji="💸" name="amount" value=data.amount }}
-		{{> internal/crudRow emoji="💴" name="currency" value=data.currency }}
-		{{> internal/crudRow emoji="👤" name="merchant" value=data.merchant }}
-		{{> internal/crudRow emoji="📦" name="category" value=data.category }}
-		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+	{{> internal/crudRow emoji="💸" name="amount" value=data.amount }}
+	{{> internal/crudRow emoji="💴" name="currency" value=data.currency }}
+	{{> internal/crudRow emoji="👤" name="merchant" value=data.merchant }}
+	{{> internal/crudRow emoji="📦" name="category" value=data.category }}
+	{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
 
-		{{> internal/crudSubmit }}
-	</div>
+	{{> internal/crudSubmit }}
 </form>

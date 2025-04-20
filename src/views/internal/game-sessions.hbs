@@ -1,7 +1,6 @@
 {{> pageHeader title=title url=backUrl }}
 
 {{> internal/game-session gameId=gameId gameOptions=gameOptions }}
-<hr/>
 
 {{#each sessions as |session| }}
 	{{> internal/game-session gameId=../gameId data=session gameOptions=../gameOptions }}

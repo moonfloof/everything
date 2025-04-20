@@ -1,48 +1,46 @@
 <form method="POST" id="game-{{data.id}}" action="/games/game/{{data.id}}">
-	<div class="sectioncontainer">
-		{{> internal/id id=data.id type="game" }}
+	{{> internal/id id=data.id type="game" }}
 
-		{{> internal/crudRow emoji="🎮" name="name" value=data.name }}
-		{{> internal/crudRow emoji="🔗" type="url" name="url" value=data.url }}
+	{{> internal/crudRow emoji="🎮" name="name" value=data.name }}
+	{{> internal/crudRow emoji="🔗" type="url" name="url" value=data.url }}
 
-		{{#if data.id}}
-		<div class="row">
-			<div class="left">🕑</div>
-			<div class="right">
-				<a href="/games/{{data.id}}/sessions">
-					Edit {{data.sessions}} Sessions
-				</a>
-			</div>
+	{{#if data.id}}
+	<div class="row">
+		<div class="left">🕑</div>
+		<div class="right">
+			<a href="/games/{{data.id}}/sessions">
+				Edit {{data.sessions}} Sessions
+			</a>
 		</div>
-		<div class="row">
-			<div class="left">🏆</div>
-			<div class="right">
-				<a href="/games/{{data.id}}/achievements">
-					Edit {{data.achievements}} Achievements
-				</a>
-			</div>
-		</div>
-		<div class="row">
-			<div class="left">🖼️</div>
-			<div class="right">
-				<a href="/games/game/update-images/{{data.id}}{{#if page}}?page={{page}}{{/if}}">
-					Fetch images
-				</a>
-			</div>
-		</div>
-		{{/if}}
-
-		{{#if data.url}}
-		<div class="row">
-			<div class="left"></div>
-			<div class="right">
-				<a href="/games/game/update-achievements/{{data.id}}{{#if page}}?page={{page}}{{/if}}">
-					Fetch missing achievements
-				</a>
-			</div>
-		</div>
-		{{/if}}
-
-		{{> internal/crudSubmit }}
 	</div>
+	<div class="row">
+		<div class="left">🏆</div>
+		<div class="right">
+			<a href="/games/{{data.id}}/achievements">
+				Edit {{data.achievements}} Achievements
+			</a>
+		</div>
+	</div>
+	<div class="row">
+		<div class="left">🖼️</div>
+		<div class="right">
+			<a href="/games/game/update-images/{{data.id}}{{#if page}}?page={{page}}{{/if}}">
+				Fetch images
+			</a>
+		</div>
+	</div>
+	{{/if}}
+
+	{{#if data.url}}
+	<div class="row">
+		<div class="left"></div>
+		<div class="right">
+			<a href="/games/game/update-achievements/{{data.id}}{{#if page}}?page={{page}}{{/if}}">
+				Fetch missing achievements
+			</a>
+		</div>
+	</div>
+	{{/if}}
+
+	{{> internal/crudSubmit }}
 </form>

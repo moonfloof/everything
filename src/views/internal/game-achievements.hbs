@@ -1,15 +1,17 @@
 {{> pageHeader title=title url=backUrl }}
 
 {{#if session}}
-	<p class="sectioncontainer">
-		Editing <strong>{{achievements.length}}</strong> achievements for
-		<strong>{{session.name}}</strong> session,
-		which lasted <strong>{{session.duration}}</strong>.
-	</p>
+	<div class="panel info">
+		<div class="content">
+			Editing <strong>{{achievements.length}}</strong>
+			achievements for <strong>{{session.name}}</strong>
+			session, which lasted <strong>{{session.duration}}</strong>.
+		</div>
+	</div>
+	<br>
 {{/if}}
 
 {{> internal/game-achievement session_id=id game_id=game.id }}
-<hr />
 
 {{#each achievements as |achievement| }}
 	{{> internal/game-achievement session_id=../id data=achievement }}

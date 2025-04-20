@@ -1,17 +1,17 @@
 {{> pageHeader title="Cached Pages" url="/" }}
 
 {{#if hasError }}
-	<div class="sectioncontainer error">
+	<div class="error">
 		<p class="error">There was an error deleting this URL.</p>
 	</div>
 {{/if}}
 
-<form class="form-inline" method="post" action="/cache/delete-all">
+<form class="sectioncontainer" method="post" action="/cache/delete-all">
 	<p><input type="submit" value="❌ Purge Entire Cache" /></p>
 </form>
 
 {{#if cachedPages}}
-	<ul class="sectioncontainer cache-list">
+	<ul class="cache-list">
 	{{#each cachedPages as |page| }}
 		<li>
 			<div class="cache-list--url flex">{{page.[0]}}</div>

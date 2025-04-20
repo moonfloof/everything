@@ -1,17 +1,18 @@
 {{> pageHeader title="Listens" url="/" }}
 
 {{#if hasSubsonicConnected}}
-<form action="/listens/update_metadata" method="POST" class="sectioncontainer">
-	<div class="info rounded-panel">
-		<p><strong>Update missing metadata from subsonic.</strong></p>
-		<p>WARNING: This may take a LONG time if you have a lot of missing data.</p>
-		<input type="submit" value="Rescan" id="rescan" />
+<form action="/listens/update_metadata" method="POST">
+	<div class="panel info">
+		<div class="header"><h2 class="title">Update missing metadata from subsonic:</h2></div>
+		<div class="content">
+			<p>WARNING: This may take a LONG time if you have a lot of missing data.</p>
+			<input type="submit" value="Rescan" id="rescan" />
+		</div>
 	</div>
 </form>
 {{/if}}
 
 {{> internal/listen }}
-<hr/>
 
 {{#each listens as |listen| }}
 	{{> internal/listen data=listen }}

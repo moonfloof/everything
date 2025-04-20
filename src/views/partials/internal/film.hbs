@@ -1,29 +1,27 @@
 <form method="POST" id="film-{{data.id}}" action="/films/{{data.id}}">
-	<div class="sectioncontainer">
-		{{> internal/id id=data.id type="film" }}
+	{{> internal/id id=data.id type="film" }}
 
-		{{> internal/crudRow emoji="🎥" name="title" value=data.title }}
-		{{> internal/crudRowNumber emoji="📆" name="year" value=data.year }}
-		{{> internal/crudRowNumber emoji="⭐" name="rating" value=data.rating }}
-		{{> internal/crudRowNumber emoji="⏱" name="duration_secs" value=data.duration_secs }}
-		{{> internal/crudRowParagraph emoji="💬" name="review" value=data.review }}
-		{{> internal/crudRow emoji="🔗" name="url" value=data.url }}
-		{{> internal/crudRow emoji="👀" name="watched_at" value=data.watched_at }}
-		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+	{{> internal/crudRow emoji="🎥" name="title" value=data.title }}
+	{{> internal/crudRowNumber emoji="📆" name="year" value=data.year }}
+	{{> internal/crudRowNumber emoji="⭐" name="rating" value=data.rating }}
+	{{> internal/crudRowNumber emoji="⏱" name="duration_secs" value=data.duration_secs }}
+	{{> internal/crudRowParagraph emoji="💬" name="review" value=data.review }}
+	{{> internal/crudRow emoji="🔗" name="url" value=data.url }}
+	{{> internal/crudRow emoji="👀" name="watched_at" value=data.watched_at }}
+	{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
 
-		{{#if data.id}}
-		<div class="row">
-			<div class="left">🖼️</div>
-			<div class="right">
-				<p>
-				<a href="/films/update-images/{{data.id}}{{#if page}}?page={{page}}{{/if}}">
-					Fetch images
-				</a>
-				</p>
-			</div>
+	{{#if data.id}}
+	<div class="row">
+		<div class="left">🖼️</div>
+		<div class="right">
+			<p>
+			<a href="/films/update-images/{{data.id}}{{#if page}}?page={{page}}{{/if}}">
+				Fetch images
+			</a>
+			</p>
 		</div>
-		{{/if}}
-
-		{{> internal/crudSubmit }}
 	</div>
+	{{/if}}
+
+	{{> internal/crudSubmit }}
 </form>

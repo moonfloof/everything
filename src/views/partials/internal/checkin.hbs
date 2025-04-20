@@ -1,6 +1,7 @@
-<form method="POST" action="/checkins/{{data.id}}" class="sectioncontainer">
-	{{#if data.id}}
+<form method="POST" action="/checkins/{{data.id}}">
 	{{> internal/id id=data.id type="checkin" }}
+
+	{{#if data.id}}
 	<div class="row">
 		<span class="left">🏢</span>
 		<span class="right">

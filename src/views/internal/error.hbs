@@ -1,11 +1,11 @@
-<div class="error rounded-panel">
-	<p>Error: {{error.message}}</p>
+<div class="error panel margin">
+	<div class="header"><h2 class="title">Error: {{error.message}}</h2></div>
+	<div class="content">
+
+		{{#if error.code}}
+		<p><strong>Code:</strong> {{error.code}}</p>
+		{{/if}}
+
+		<p><pre style="padding: 8px 12px; background: rgba(255, 255, 255, 0.2)">{{error.stack}}</pre></p>
+	</div>
 </div>
-
-{{#if error.code}}
-<p><strong>Code:</strong> {{error.code}}</p>
-{{/if}}
-
-<p>
-	<pre>{{error.stack}}</pre>
-</p>

@@ -471,12 +471,6 @@ a:hover {
 	padding-top: 48px;
 	background-color: var(--primary-bg);
 
-	form,
-	fieldset,
-	input[type="submit"] {
-		margin-top: 16px;
-	}
-
 	hr {
 		margin: 16px 0;
 	}

@@ -1,12 +1,12 @@
 {{> pageHeader title="Check-in" url="/" }}
 
-<p>
-	<small>
+<div class="panel info margin">
+	<div class="content metadata">
 		⚙️ <strong>Note:</strong> This page benefits largely from having
 		JavaScript enabled. It'll retrieve your location and dynamically
 		fetch nearest locations, and allow for photo uploads.
-	</small>
-</p>
+	</div>
+</div>
 
 <div id="geolocation" class="info rounded-panel" style="margin-top: 32px; display: none">
 	<p id="geolocation-text">
@@ -15,8 +15,6 @@
 </div>
 
 {{> internal/checkin places=places categories=categories entryStatusValues=entryStatusValues }}
-
-<hr>
 
 {{#each checkins as |checkin|}}
 	{{> internal/checkin data=checkin categories=../categories entryStatusValues=../entryStatusValues page=../page }}

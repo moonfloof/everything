@@ -1,7 +1,5 @@
-<form method="POST" action="/checkins/places/{{data.id}}" class="sectioncontainer">
-	{{#if data.id}}
+<form method="POST" action="/checkins/places/{{data.id}}">
 	{{> internal/id id=data.id }}
-	{{/if}}
 
 	{{> internal/crudRow emoji="🏢" name="name" value=data.name }}
 	{{> internal/crudRowAutocomplete emoji="📦" name="category" value=data.category values=categoryValues }}
