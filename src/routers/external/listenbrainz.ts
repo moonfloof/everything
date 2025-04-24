@@ -36,7 +36,8 @@ router.post('/1/submit-listens', async (req: RequestFrontend<object, ListenBrain
 		if (!authToken || authToken.startsWith('token ') === false) {
 			throw new Error('Provided token is invalid');
 		}
-		const { id: device_id } = validateDevice(authToken.substring(6));
+
+		validateDevice(authToken.substring(6));
 
 		if (req.body.payload.length === 0) {
 			throw new Error('Provide at least one song in the `payload` array');
@@ -56,7 +57,7 @@ router.post('/1/submit-listens', async (req: RequestFrontend<object, ListenBrain
 		for (const scrobble of req.body.payload) {
 			const listen = await convertScrobbleIntoListen(scrobble);
 			log.debug(`Saving "${listen.title}" by ${listen.artist}`);
-			insertScrobble({ ...listen, device_id });
+			insertScrobble(listen);
 		}
 
 		res.send({ status: 'ok' });

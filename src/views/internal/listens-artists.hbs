@@ -1,0 +1,9 @@
+{{> pageHeader title="Artists" url="/" }}
+
+{{> internal/listen-artist }}
+
+{{#each artists as |artist| }}
+	{{> internal/listen-artist data=artist }}
+{{/each}}
+
+{{> pagination route="/listens/artists" pagination=pagination }}

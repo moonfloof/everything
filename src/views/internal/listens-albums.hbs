@@ -1,0 +1,23 @@
+{{#if artist}}
+{{> pageHeader title="Albums" url="/listens/artists" }}
+{{else}}
+{{> pageHeader title="Albums" url="/" }}
+{{/if}}
+
+{{#if artist}}
+	<div class="panel info margin">
+		<div class="content">
+			Editing <strong>{{albums.length}}</strong>
+			album{{#xif albums.length '!=' 1}}s{{/xif}}
+			for <strong>{{artist.artist}}</strong>
+		</div>
+	</div>
+{{/if}}
+
+{{> internal/listen-album artist_id=artist.id }}
+
+{{#each albums as |album| }}
+	{{> internal/listen-album data=album artist_id=../artist.id }}
+{{/each}}
+
+{{> pagination route="/listens/albums" pagination=pagination }}

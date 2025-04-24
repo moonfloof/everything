@@ -29,12 +29,18 @@
 body,
 html {
 	width: 100%;
-	font-family: Inter, 'Helvetica Neue', Arial, sans-serif;
-	font-weight: 400;
 	color: var(--text);
 	background: var(--primary-bg) url(/background.avif);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+}
+
+body,
+html,
+input,
+select {
+	font-family: Inter, 'Helvetica Neue', Arial, sans-serif;
+	font-weight: 400;
 }
 
 * {
@@ -675,13 +681,6 @@ iframe.youtube {
 /** MUSIC STATS **/
 /*#region music-stats */
 
-#now-playing {
-	background-color: var(--secondary-bg);
-	color: var(--text);
-	padding: 24px;
-	border: 1px solid var(--secondary-fg);
-}
-
 table td {
 	padding: 4px 8px 4px 0;
 	white-space: nowrap;
@@ -699,7 +698,6 @@ table td {
 	display: block;
 	width: 100%;
 	margin: 16px 0;
-	padding: 6px;
 }
 
 .artists-popular {
@@ -1123,7 +1121,7 @@ table td {
 	display: block;
 	text-align: center;
 	color: var(--primary-fg);
-	border: 1px solid var(--primary-fg);
+	border: 1.5px solid var(--primary-fg);
 	background-color: var(--primary-bg-dark);
 	padding: 6px 0;
 	font-weight: 700;
@@ -1256,6 +1254,25 @@ code {
 	font-weight: 700;
 }
 
+input,
+textarea,
+select {
+	background-color: var(--panel-bg);
+	color: var(--text);
+	border: 1.5px solid var(--primary-fg);
+	border-radius: 6px;
+}
+
+input[type=submit] {
+	cursor: pointer;
+	background-color: var(--panel-bg-dark);
+	padding: 4px 12px;
+
+	&:hover {
+		background-color: var(--panel-bg);
+	}
+}
+
 .right input,
 input.right,
 .right select,
@@ -1263,7 +1280,6 @@ select.right,
 .right textarea,
 textarea.right {
 	font-size: 16px;
-	padding: 4px;
 	margin-bottom: 4px;
 }
 
@@ -1278,11 +1294,10 @@ textarea.right:focus {
 	height: 10em;
 }
 
-input[type="submit"],
-input[type="button"],
-input[type="date"],
-select {
-	padding: 6px 12px;
+input,
+select,
+textarea {
+	padding: 4px 8px;
 }
 
 [data-tooltip] {

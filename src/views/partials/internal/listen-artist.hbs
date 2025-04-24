@@ -1,0 +1,19 @@
+<form method="POST" action="/listens/artists/{{data.id}}">
+	{{> internal/id id=data.id type="music/artist" }}
+
+	{{> internal/crudRow emoji="👤" name="artist" value=data.artist }}
+
+	{{#if data.id}}
+	<div class="row">
+		<div class="left">🔗</div>
+		<div class="right">
+			<a href="/listens/albums?artist_id={{data.id}}">
+				Edit {{data.albumCount}}
+				album{{#xif data.albumCount '!=' 1}}s{{/xif}}
+			</a>
+		</div>
+	</div>
+	{{/if}}
+
+	{{> internal/crudSubmit }}
+</form>

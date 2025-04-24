@@ -1,0 +1,24 @@
+{{#if album}}
+{{> pageHeader title="Tracks" url="/listens/albums" }}
+{{else}}
+{{> pageHeader title="Tracks" url="/" }}
+{{/if}}
+
+{{#if album}}
+	<div class="panel info margin">
+		<div class="content">
+			Editing <strong>{{tracks.length}}</strong>
+			track{{#xif tracks.length '!=' 1}}s{{/xif}}
+			for <strong>{{album.album}}</strong>,
+			by <strong>{{album.artist}}</strong>
+		</div>
+	</div>
+{{/if}}
+
+{{> internal/listen-track album_id=album.id }}
+
+{{#each tracks as |track| }}
+	{{> internal/listen-track data=track album_id=../album.id }}
+{{/each}}
+
+{{> pagination route="/listens/tracks" pagination=pagination }}

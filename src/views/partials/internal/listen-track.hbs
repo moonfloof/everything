@@ -1,0 +1,11 @@
+<form method="POST" action="/listens/tracks/{{data.id}}">
+	{{> internal/id id=data.id type="music/track" }}
+
+	<input type="hidden" name="album_id" value="{{album_id}}"/>
+
+	{{> internal/crudRow emoji="🎵" name="title" value=data.title }}
+	{{> internal/crudRowNumber emoji="🔢" name="track_number" value=data.track_number }}
+	{{> internal/crudRowNumber emoji="⌚" name="duration_secs" value=data.duration_secs }}
+
+	{{> internal/crudSubmit }}
+</form>
