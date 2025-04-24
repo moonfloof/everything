@@ -1,33 +1,50 @@
-import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import addMissingDates from '../lib/addMissingDates.js';
 import { dateDefault, dayMs, formatDate, hourMs, monthsShort, prettyDuration, shortDate } from '../lib/formatDate.js';
-import type { Insert, Optional, Select, Update } from '../types/database.js';
+import type { Insert, Optional, Select } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
-export interface ListenTrack {
-	id: number;
-	album: string;
+//#region Types
+
+export interface ListenArtist {
+	id: string;
 	artist: string;
-	title: string;
-	track_number: Optional<number>;
-	release_year: Optional<number>;
-	genre: Optional<string>;
-	duration_secs: Optional<number>;
 }
 
-export type ListenInsert = Insert<ListenTrack> & {
-	created_at: string;
-	device_id: string;
-};
-
-export type Listen = Omit<ListenTrack, 'id'> & {
+export interface ListenAlbum {
 	id: string;
-	track_id: number;
+	album: string;
+	release_year: Optional<number>;
+	genre: Optional<string>;
+	artist_id: number;
+}
+
+export interface ListenTrack {
+	id: string;
+	title: string;
+	track_number: Optional<number>;
+	duration_secs: Optional<number>;
+	album_id: number;
+}
+
+export interface ListenRaw {
+	id: string;
+	track_id: string;
 	created_at: string;
-	device_id: string;
-};
+}
+
+export interface Listen {
+	id: string;
+	created_at: string;
+	title: string;
+	album: string;
+	artist: string;
+	track_number: Optional<number>;
+	release_year: Optional<number>;
+	duration_secs: Optional<number>;
+	genre: Optional<string>;
+}
 
 interface ListenGroup {
 	artist: string;
@@ -40,75 +57,123 @@ interface ListenGroup {
 	countText: 'song' | 'songs';
 }
 
-function selectListenTrack(track: Insert<ListenTrack>): number | undefined {
-	const selectResult = getStatement<{ id: number }>(
-		'selectListenTrack',
-		`SELECT id FROM listens_track
-		WHERE artist = $artist AND album = $album AND title = $title
-		LIMIT 1`,
-	).get({
-		artist: track.artist,
-		album: track.album,
-		title: track.title,
-	});
+//#endregion Types
 
-	return selectResult?.id;
+//#region Inserting New Music
+
+export function upsertArtist({ artist }: Pick<Listen, 'artist'>): ListenArtist {
+	const newArtist = getStatement<ListenArtist>(
+		'upsertArtist',
+		`INSERT INTO listens_artist (artist) VALUES ($artist)
+		ON CONFLICT (artist) DO UPDATE SET artist = excluded.artist
+		RETURNING *;`,
+	).get({ artist });
+
+	if (!newArtist) {
+		throw new Error('Artist failed to insert/update');
+	}
+
+	return newArtist;
 }
 
-function selectListenTrackFromListenId(listen: { id: string }) {
-	return getStatement<{ id: number }>(
-		'selectListenTrackFromListenId',
-		`SELECT t.id as id FROM listens AS l
-		JOIN listens_track AS t ON l.track_id = t.id
-		WHERE l.id == $id
-		LIMIT 1;`,
-	).get({ id: listen.id })?.id;
+export function upsertAlbum(
+	{ album, release_year, genre }: Pick<Listen, 'album' | 'release_year' | 'genre'>,
+	artist_id: string,
+): ListenAlbum {
+	const newAlbum = getStatement<ListenAlbum>(
+		'upsertAlbum',
+		`INSERT INTO listens_album
+		(album, release_year, genre, artist_id)
+		VALUES
+		($album, $release_year, $genre, $artist_id)
+		ON CONFLICT (album, artist_id)
+		DO UPDATE SET
+			album = excluded.album,
+			release_year = excluded.release_year,
+			genre = excluded.genre
+		RETURNING *;`,
+	).get({ artist_id, album, release_year, genre });
+
+	if (!newAlbum) {
+		throw new Error('Album failed to insert/update');
+	}
+
+	return newAlbum;
 }
 
-function selectOrInsertTrack(track: Insert<ListenTrack>): number {
-	const id = selectListenTrack(track);
-
-	if (id !== undefined) return id;
-
-	getStatement(
-		'insertListenTrack',
+export function upsertTrack(
+	{ title, track_number, duration_secs }: Pick<Listen, 'title' | 'track_number' | 'duration_secs'>,
+	album_id: string,
+): ListenTrack {
+	const newTrack = getStatement<ListenTrack>(
+		'upsertTrack',
 		`INSERT INTO listens_track
-		(artist, album, title, track_number, release_year, genre, duration_secs)
+		(title, track_number, duration_secs, album_id)
 		VALUES
-		($artist, $album, $title, $track_number, $release_year, $genre, $duration_secs)`,
-	).run(track);
+		($title, $track_number, $duration_secs, $album_id)
+		ON CONFLICT (title, album_id)
+		DO UPDATE SET
+			title = excluded.title,
+			track_number = excluded.track_number,
+			duration_secs = excluded.duration_secs
+		RETURNING *;`,
+	).get({ title, track_number, duration_secs, album_id });
 
-	// biome-ignore lint/style/noNonNullAssertion: Track guaranteed to exist at this point
-	return selectListenTrack(track)!;
+	if (!newTrack) {
+		throw new Error('Track failed to insert/update');
+	}
+
+	return newTrack;
 }
 
-export function insertScrobble(listen: ListenInsert) {
-	const track_id = selectOrInsertTrack(listen);
-	updateListenTrack({ ...listen, track_id, id: '' });
-	const statement = getStatement(
-		'insertListen',
+export function insertListenRaw({ created_at }: Pick<ListenRaw, 'created_at'>, track_id: string): ListenRaw {
+	const newListen = getStatement<ListenRaw>(
+		'insertListenRaw',
 		`INSERT INTO listens
-		(id, track_id, created_at, device_id)
+		(track_id, created_at)
 		VALUES
-		($id, $track_id, $created_at, $device_id)`,
-	);
-
-	return statement.run({
-		id: uuid(),
+		($track_id, $created_at)
+		RETURNING *;`,
+	).get({
+		created_at: dateDefault(created_at),
 		track_id,
-		created_at: dateDefault(listen.created_at),
-		device_id: listen.device_id,
 	});
+
+	if (!newListen) {
+		throw new Error('Listen failed to insert/update');
+	}
+
+	return newListen;
 }
+
+export function insertScrobble(listen: Insert<Listen>) {
+	// Step 1: Make sure artist exists
+	const artist = upsertArtist(listen);
+
+	// Step 2: Make sure album exists
+	const album = upsertAlbum(listen, artist.id);
+
+	// Step 3: Make sure track exists
+	const track = upsertTrack(listen, album.id);
+
+	// Step 4: Insert listen with track ID
+	return insertListenRaw(listen, track.id);
+}
+
+//#endregion Inserting New Music
+
+//#region Getting Existing Music
 
 export function getListens(parameters: Parameters = {}) {
 	const statement = getStatement<Listen>(
 		'getListens',
-		`SELECT l.*, t.artist, t.album, t.title, t.track_number, t.release_year, t.genre, t.duration_secs
+		`SELECT l.id, created_at, title, album, artist, track_number, release_year, duration_secs, genre
 		FROM listens AS l
-		JOIN listens_track AS t ON l.track_id = t.id
-		WHERE l.id LIKE $id AND l.created_at >= $created_at
-		ORDER BY l.created_at DESC
+		JOIN listens_track AS t ON t.id = l.track_id
+		JOIN listens_album AS a ON a.id = t.album_id
+		JOIN listens_artist AS r ON r.id = a.artist_id
+		WHERE l.id LIKE $id AND created_at >= $created_at
+		ORDER BY created_at DESC
 		LIMIT $limit OFFSET $offset`,
 	);
 
@@ -117,6 +182,165 @@ export function getListens(parameters: Parameters = {}) {
 		timeago: timeago.format(new Date(row.created_at)),
 	}));
 }
+
+export function getArtists(parameters: Parameters = {}) {
+	const statement = getStatement<ListenArtist>(
+		'getArtists',
+		`SELECT * FROM listens_artist
+		WHERE id LIKE $id
+		ORDER BY artist ASC
+		LIMIT $limit OFFSET $offset`,
+	);
+
+	return statement.all(calculateGetParameters(parameters)).map(row => ({
+		...row,
+		albumCount: countAlbums(row.id),
+	}));
+}
+
+export function getAlbums(parameters: Parameters = {}, artist_id?: string) {
+	const statement = getStatement<ListenAlbum & { artist: string }>(
+		'getAlbums',
+		`SELECT a.*, r.artist FROM listens_album AS a
+		JOIN listens_artist AS r ON r.id = a.artist_id
+		WHERE a.id LIKE $id AND a.artist_id LIKE $artist_id
+		ORDER BY a.release_year ASC, a.album ASC
+		LIMIT $limit OFFSET $offset`,
+	);
+
+	return statement
+		.all({
+			...calculateGetParameters(parameters),
+			artist_id: artist_id ?? '%',
+		})
+		.map(row => ({
+			...row,
+			trackCount: countTracks(row.id),
+		}));
+}
+
+export function getTracks(parameters: Parameters = {}, album_id?: string) {
+	const statement = getStatement<ListenAlbum & { album: string; artist: string }>(
+		'getTracks',
+		`SELECT t.*, a.album, r.artist FROM listens_track AS t
+		JOIN listens_album AS a ON a.id = t.album_id
+		JOIN listens_artist AS r ON r.id = a.artist_id
+		WHERE t.id LIKE $id AND t.album_id LIKE $album_id
+		ORDER BY t.track_number ASC, t.title ASC
+		LIMIT $limit OFFSET $offset`,
+	);
+
+	return statement.all({
+		...calculateGetParameters(parameters),
+		album_id: album_id ?? '%',
+	});
+}
+
+//#endregion Getting Existing Music
+
+//#region Internal CRUD
+
+export function updateListen(id: string, { track_id, created_at }: Pick<ListenRaw, 'track_id' | 'created_at'>) {
+	return getStatement(
+		'updateListenRaw',
+		`UPDATE listens
+		SET track_id = $track_id,
+		    created_at = $created_at
+		WHERE id = $id`,
+	).run({ id, track_id, created_at });
+}
+
+export function deleteListen(id: string) {
+	const statement = getStatement('deleteListen', 'DELETE FROM listens WHERE id = $id');
+	return statement.run({ id });
+}
+
+export function updateArtist(id: string, { artist }: Pick<ListenArtist, 'artist'>) {
+	const statement = getStatement('updateArtist', 'UPDATE listens_artist SET artist = $artist WHERE id = $id');
+	return statement.run({ id, artist });
+}
+
+export function deleteArtist(id: string) {
+	const statement = getStatement('deleteArtist', 'DELETE FROM listens_artist WHERE id = $id');
+	return statement.run({ id });
+}
+
+export function updateAlbum(
+	id: string,
+	{ album, genre, release_year }: Pick<ListenAlbum, 'album' | 'genre' | 'release_year'>,
+) {
+	return getStatement(
+		'updateAlbum',
+		`UPDATE listens_album
+		SET album = $album,
+		    genre = $genre,
+		    release_year = $release_year
+		WHERE id = $id`,
+	).run({ id, album, genre, release_year });
+}
+
+export function deleteAlbum(id: string) {
+	const statement = getStatement('deleteAlbum', 'DELETE FROM listens_album WHERE id = $id');
+	return statement.run({ id });
+}
+
+export function updateTrack(
+	id: string,
+	{ title, duration_secs, track_number }: Pick<ListenTrack, 'title' | 'duration_secs' | 'track_number'>,
+) {
+	return getStatement(
+		'updateTrack',
+		`UPDATE listens_track
+		SET title = $title,
+		    duration_secs = $duration_secs,
+		    track_number = $track_number
+		WHERE id = $id`,
+	).run({ id, title, duration_secs, track_number });
+}
+
+export function deleteTrack(id: string) {
+	const statement = getStatement('deleteTrack', 'DELETE FROM listens_track WHERE id = $id');
+	return statement.run({ id });
+}
+
+//#endregion Internal CRUD
+
+//#region Pagination
+
+export function countArtists() {
+	const statement = getStatement<{ total: number }>(
+		'countArtists',
+		'SELECT COUNT(*) as total FROM listens_artist',
+	);
+	return statement.get()?.total || 0;
+}
+
+export function countAlbums(artist_id = '%') {
+	const statement = getStatement<{ total: number }>(
+		'countAlbums',
+		`SELECT COUNT(*) as total FROM listens_album
+		WHERE artist_id LIKE $artist_id`,
+	);
+	return statement.get({ artist_id })?.total || 0;
+}
+
+export function countTracks(album_id = '%') {
+	const statement = getStatement<{ total: number }>(
+		'countTracks',
+		`SELECT COUNT(*) as total FROM listens_track
+		WHERE album_id LIKE $album_id`,
+	);
+	return statement.get({ album_id })?.total || 0;
+}
+
+export function countListens() {
+	const statement = getStatement<{ total: number }>('countListens', 'SELECT COUNT(*) as total FROM listens');
+	return statement.get()?.total || 0;
+}
+
+//#endregion Pagination
+
+//#region Stats / Aggregation
 
 export function groupListens(listens: Select<Listen>[]) {
 	return listens.reduce((albums, listen) => {
@@ -152,118 +376,89 @@ export function groupListens(listens: Select<Listen>[]) {
 	}, [] as ListenGroup[]);
 }
 
-export function deleteListen(id: string) {
-	const statement = getStatement('deleteListen', 'DELETE FROM listens WHERE id = $id');
-	return statement.run({ id });
-}
-
-export function updateListenTrack(track: Update<Listen> & { track_id?: number }) {
-	const track_id = track.track_id ?? (track.id ? selectListenTrackFromListenId(track) : selectListenTrack(track));
-	if (!track_id) {
-		throw new Error('Expected to find a track');
-	}
-
-	getStatement(
-		'updateListenTrack',
-		`UPDATE listens_track
-		SET artist = $artist,
-		    album = $album,
-		    title = $title,
-		    track_number = $track_number,
-		    release_year = $release_year,
-		    genre = $genre,
-		    duration_secs = $duration_secs
-		WHERE id = $id`,
-	).run({ ...track, id: track_id });
-
-	return track_id;
-}
-
-export function updateListen(listen: Update<Listen>) {
-	const track_id = updateListenTrack(listen);
-	const statement = getStatement(
-		'updateListen',
-		`UPDATE listens
-		SET track_id = $track_id,
-		    created_at = $created_at
-		WHERE id = $id`,
-	);
-
-	return statement.run({
-		track_id,
-		created_at: dateDefault(listen.created_at),
-		id: listen.id,
-	});
-}
-
-export function countListens() {
-	const statement = getStatement<{ total: number }>('countListens', 'SELECT COUNT(*) as total FROM listens');
-
-	return statement.get()?.total || 0;
-}
-
 export function getListensPopular(days: number) {
-	const statement = getStatement<{ artist: string; duration: number; count: number }>(
-		'getListensPopular',
-		`SELECT
-			t.artist AS artist,
-			ROUND(SUM(t.duration_secs)/3600.0, 1) AS duration,
-			COUNT(*) AS count
-		FROM listens AS l
-		JOIN listens_track AS t ON t.id = l.track_id
-		WHERE created_at >= $created_at
-		GROUP BY artist
-		ORDER BY duration DESC, count DESC, artist ASC
-		LIMIT 10`,
-	);
-
 	const created_at = new Date(Date.now() - days * dayMs).toISOString();
-	const rows = statement.all({ created_at });
+	const rows = getListenPopularDashboardArtist(created_at, 10);
 
 	if (rows[0] === undefined) {
 		return [];
 	}
 
 	const usingDuration = rows[0].duration !== null;
-	const getCount = (row: { artist: string; duration: number; count: number }) => {
-		return usingDuration ? row.duration : row.count;
+	const getCount = ({ count, duration }: { count: number; duration: number | null }): number => {
+		return usingDuration ? (duration ?? count) : count;
 	};
-
 	const popularCount = getCount(rows[0]);
 
 	return rows.map(row => {
 		const count = getCount(row);
 		return {
 			...row,
-			count,
+			duration: Math.round((count / hourMs) * 10) / 10,
 			popularityPercentage: (count / popularCount) * 100,
 		};
 	});
 }
 
-export function getListenPopularDashboard(days: number) {
-	const generateStatement = (column: keyof Listen) =>
-		getStatement<{ title: string; count: number; duration: number | null }>(
-			`getListenPopularDashboard_${column}`,
-			`SELECT
-				t.${column} as label,
-				COUNT(*) AS count,
-				SUM(t.duration_secs)*1000 AS duration
-			FROM listens AS l
-			JOIN listens_track AS t ON t.id = l.track_id
-			WHERE created_at >= $created_at
-			GROUP BY label
-			ORDER BY duration DESC, count DESC
-			LIMIT 1;`,
-		);
+function getListenPopularDashboardTrack(created_at: string) {
+	return getStatement<{ title: string; duration: number | null; count: number }>(
+		'getListenPopularDashboardTrack',
+		`SELECT
+			title AS label,
+			COUNT(*) AS count,
+			SUM(t.duration_secs)*1000 AS duration
+		FROM listens AS l
+		JOIN listens_track AS t ON t.id = l.track_id
+		WHERE created_at >= $created_at
+		GROUP BY label
+		ORDER BY duration DESC, count DESC
+		LIMIT 1;`,
+	).all({ created_at });
+}
 
+function getListenPopularDashboardAlbum(created_at: string) {
+	return getStatement<{ title: string; duration: number | null; count: number }>(
+		'getListenPopularDashboardAlbum',
+		`SELECT
+			album AS label,
+			COUNT(*) AS count,
+			SUM(t.duration_secs)*1000 AS duration
+		FROM listens AS l
+		JOIN listens_track AS t ON t.id = l.track_id
+		JOIN listens_album AS a ON a.id = t.album_id
+		WHERE created_at >= $created_at
+		GROUP BY label
+		ORDER BY duration DESC, count DESC
+		LIMIT 1;`,
+	).all({ created_at });
+}
+
+function getListenPopularDashboardArtist(created_at: string, limit = 1) {
+	return getStatement<{ title: string; duration: number | null; count: number }>(
+		'getListenPopularDashboardArtist',
+		`SELECT
+			artist AS label,
+			COUNT(*) AS count,
+			SUM(t.duration_secs)*1000 AS duration
+		FROM listens AS l
+		JOIN listens_track AS t ON t.id = l.track_id
+		JOIN listens_album AS a ON a.id = t.album_id
+		JOIN listens_artist AS r ON r.id = a.artist_id
+		WHERE created_at >= $created_at
+		GROUP BY label
+		ORDER BY duration DESC, count DESC
+		LIMIT $limit;`,
+	).all({ created_at, limit });
+}
+
+export function getListenPopularDashboard(days: number) {
 	const created_at = new Date(Date.now() - days * dayMs).toISOString();
 
-	const artist = generateStatement('artist').get({ created_at });
-	const album = generateStatement('album').get({ created_at });
-	const song = generateStatement('title').get({ created_at });
+	const [artist] = getListenPopularDashboardArtist(created_at);
+	const [album] = getListenPopularDashboardAlbum(created_at);
+	const [track] = getListenPopularDashboardTrack(created_at);
 
-	if (!(artist?.count && album?.count && song?.count)) return null;
+	if (!(artist?.duration && album?.duration && track?.duration)) return null;
 
 	return {
 		artist: {
@@ -274,9 +469,9 @@ export function getListenPopularDashboard(days: number) {
 			...album,
 			duration: album.duration ? prettyDuration(album.duration) : null,
 		},
-		song: {
-			...song,
-			duration: song.duration ? prettyDuration(song.duration) : null,
+		track: {
+			...track,
+			duration: track.duration ? prettyDuration(track.duration) : null,
 		},
 	};
 }
@@ -298,6 +493,7 @@ export function getListenGraph() {
 	}));
 }
 
+// TODO: Fix!
 export function getTracksWithMissingMetadata() {
 	return getStatement<ListenTrack>(
 		'getTracksWithMissingMetadata',
@@ -382,3 +578,4 @@ export function getListenActivityGraph() {
 
 	return svg;
 }
+//#endregion Stats / Aggregation
