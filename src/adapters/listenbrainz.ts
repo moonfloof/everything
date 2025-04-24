@@ -1,11 +1,12 @@
-import type { ListenInsert } from '../database/listens.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { searchTrack } from './subsonic.js';
+import type { Listen } from '../database/listens.js';
+import type { Insert } from '../types/database.js';
 
 const log = new Logger('ListenBrainz');
 
-type NewListen = Omit<ListenInsert, 'id' | 'device_id'>;
+type NewListen = Insert<Listen>;
 
 interface ListenBrainzTrack {
 	listened_at: number;
@@ -81,7 +82,7 @@ async function fillMissingData(listen: NewListen): Promise<NewListen> {
 	return listen;
 }
 
-export async function convertScrobbleIntoListen(scrobble: ListenBrainzPayload['payload'][0]): Promise<NewListen> {
+export async function convertScrobbleIntoListen(scrobble: ListenBrainzTrack): Promise<NewListen> {
 	// Get payload data
 	const created_at = new Date(scrobble.listened_at * 1000).toISOString();
 	const { artist_name: artist, track_name: title, release_name: album } = scrobble.track_metadata;

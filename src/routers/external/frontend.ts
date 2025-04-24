@@ -117,7 +117,7 @@ router.get('/music', (req: RequestFrontend, res) => {
 
 	const description =
 		popular[0] !== undefined
-			? `My favourite artist in the last ${daysInt} days has been ${popular[0].artist}, with ${popular[0].count} listens`
+			? `My favourite artist in the last ${daysInt} days has been ${popular[0].title}, with ${popular[0].count} listens`
 			: `I haven't listened to any music in the last ${daysInt} days!`;
 
 	res.render('external/listen-list', {

@@ -29,12 +29,12 @@
 <table class="artists-popular">
 	{{#each popular as |artist| }}
 	<tr class="artists-popular--artist">
-		<td class="align-r artist-name" title="{{artist.artist}}">
-			{{artist.artist}}
+		<td class="align-r artist-name" title="{{artist.label}}">
+			{{artist.label}}
 		</td>
 		<td class="artist-listens">
 			<span class="artist-count" style="width: {{artist.popularityPercentage}}%">
-				{{artist.count}} <small>hrs</small>
+				{{artist.duration}} <small>hrs</small>
 			</span>
 		</td>
 	</tr>
