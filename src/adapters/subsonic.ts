@@ -3,8 +3,11 @@ import phin from 'phin';
 
 import dotenv from 'dotenv';
 import { config } from '../lib/config.js';
+import Logger from '../lib/logger.js';
 
 dotenv.config();
+
+const log = new Logger('subsonic');
 
 const getPassword = () => {
 	const salt = randomBytes(5).toString('base64url');
@@ -175,7 +178,7 @@ const rawSearch = async (query: string, page = 0) => {
 	return response.body['subsonic-response'].searchResult3;
 };
 
-export const searchTrack = async (title: string, album: string, artist: string) => {
+export const searchTrack = async (title: string, album: string, artist: string): Promise<Song | null> => {
 	let results: Search3Response['subsonic-response']['searchResult3'] | null;
 	let page = 0;
 	do {
@@ -193,5 +196,10 @@ export const searchTrack = async (title: string, album: string, artist: string) 
 		if (match) return match;
 
 		page += 1;
-	} while (results?.song?.length === 20 && page < 20);
+		log.debug(`Did not find results for '${title}' by '${artist}' on page ${page}, continuing`);
+	} while (results?.song?.length >= 20 && page < 20);
+
+	log.debug(`Searched ${page} pages for '${title}' by '${artist}' and found no results`);
+
+	return null;
 };
