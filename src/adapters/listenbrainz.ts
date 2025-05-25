@@ -1,8 +1,8 @@
+import type { Listen } from '../database/listens.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
-import { searchTrack } from './subsonic.js';
-import type { Listen } from '../database/listens.js';
 import type { Insert } from '../types/database.js';
+import { searchTrack } from './subsonic.js';
 
 const log = new Logger('ListenBrainz');
 

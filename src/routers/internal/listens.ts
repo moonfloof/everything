@@ -23,8 +23,8 @@ import {
 } from '../../database/listens.js';
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
-import type { RequestFrontend } from '../../types/express.js';
 import { validateSafeNumber } from '../../lib/validation.js';
+import type { RequestFrontend } from '../../types/express.js';
 
 const router = express.Router();
 
