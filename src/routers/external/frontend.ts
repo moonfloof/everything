@@ -170,7 +170,7 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 
 	const description =
 		popular[0] !== undefined
-			? `My favourite YouTube channel in the last ${daysInt} days has been ${popular[0].channel}, with ${popular[0].count} likes`
+			? `My favourite YouTube channel in the last ${daysInt} days has been ${popular[0].channel}, who I watched for ${popular[0].durationPretty}`
 			: `I haven't liked any YouTube videos in the last ${daysInt} days!`;
 
 	res.render('external/youtubelike-list', {
