@@ -303,6 +303,29 @@ export function deleteTrack(id: string) {
 	return statement.run({ id });
 }
 
+export function getTracksWithMissingMetadata() {
+	return getStatement<ListenTrack & { album: string; artist: string }>(
+		'getTracksWithMissingMetadata',
+		`SELECT t.*, a.album, r.artist FROM listens_track AS t
+		JOIN listens_album AS a ON a.id = t.album_id
+		JOIN listens_artist AS r ON r.id = a.artist_id
+		WHERE
+		    track_number IS NULL OR
+		    duration_secs IS NULL;`,
+	).all();
+}
+
+export function getAlbumsWithMissingMetadata() {
+	return getStatement<ListenAlbum & { artist: string }>(
+		'getAlbumsWithMissingMetadata',
+		`SELECT a.*, r.artist FROM listens_album AS a
+		JOIN listens_artist AS r ON r.id = a.artist_id
+		WHERE
+		    genre == '' OR genre LIKE 'Unknown%' OR genre IS NULL OR
+		    release_year IS NULL;`,
+	).all();
+}
+
 //#endregion Internal CRUD
 
 //#region Pagination
@@ -491,19 +514,6 @@ export function getListenGraph() {
 		day: new Date(row.day),
 		label: shortDate(new Date(row.day)),
 	}));
-}
-
-// TODO: Fix!
-export function getTracksWithMissingMetadata() {
-	return getStatement<ListenTrack>(
-		'getTracksWithMissingMetadata',
-		`SELECT * FROM listens_track
-		WHERE
-		    genre == '' OR genre LIKE 'Unknown%' OR genre IS NULL OR
-		    release_year IS NULL OR
-		    track_number IS NULL OR
-		    duration_secs IS NULL;`,
-	).all();
 }
 
 const listenActivityGraphCache = {

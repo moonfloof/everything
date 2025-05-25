@@ -13,6 +13,7 @@ import {
 	getArtists,
 	getListens,
 	getTracks,
+	getTracksWithMissingMetadata,
 	insertListenRaw,
 	updateAlbum,
 	updateArtist,
@@ -25,6 +26,7 @@ import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { validateSafeNumber } from '../../lib/validation.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { searchTrack } from '../../adapters/subsonic.js';
 
 const router = express.Router();
 
@@ -177,25 +179,25 @@ router.post('/track/:track_id', (req: RequestFrontend, res) => {
 	res.redirect(redirect_url);
 });
 
-// router.post('/update_metadata', async (_req, res) => {
-// 	const tracks = getTracksWithMissingMetadata();
-// 	for (const track of tracks) {
-// 		try {
-// 			const search = await searchTrack(track.title, track.album, track.artist);
-// 			if (!search) continue;
+router.get('/tracks/update-metadata', async (_req, res) => {
+	const tracks = getTracksWithMissingMetadata();
+	for (const track of tracks) {
+		try {
+			const search = await searchTrack(track.title, track.album, track.artist);
+			if (!search) continue;
 
-// 			const newTrack = { ...track, track_id: track.id, id: '', created_at: '' };
-// 			if (!newTrack.genre) newTrack.genre = search.genre;
-// 			if (!newTrack.duration_secs) newTrack.duration_secs = search.duration;
-// 			if (!newTrack.release_year) newTrack.release_year = search.year;
-// 			if (!newTrack.track_number) newTrack.track_number = search.track;
-// 			updateListenTrack(newTrack);
-// 		} catch (err) {
-// 			console.error(err);
-// 		}
-// 	}
+			const newTrack = { ...track, track_id: track.id, id: '', created_at: '' };
+			// if (!newTrack.genre) newTrack.genre = search.genre;
+			if (!newTrack.duration_secs) newTrack.duration_secs = search.duration;
+			// if (!newTrack.release_year) newTrack.release_year = search.year;
+			if (!newTrack.track_number) newTrack.track_number = search.track;
+			// updateListenTrack(newTrack);
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-// 	res.redirect('/listens');
-// });
+	res.redirect('/listens');
+});
 
 export default router;
