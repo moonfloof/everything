@@ -87,13 +87,13 @@ router.post('/', (req: RequestFrontend, res) => {
 	res.redirect('');
 });
 
-router.post('/artists', (req: RequestFrontend, res) => {
+router.post('/artist', (req: RequestFrontend, res) => {
 	const { artist } = req.body;
 	const newArtist = upsertArtist({ artist });
 	res.redirect(`/listens/albums/?artist_id=${newArtist.id}`);
 });
 
-router.post('/artists/:artist_id', (req: RequestFrontend, res) => {
+router.post('/artist/:artist_id', (req: RequestFrontend, res) => {
 	const { artist_id } = req.params;
 	const { crudType, artist } = req.body;
 
@@ -111,14 +111,14 @@ router.post('/artists/:artist_id', (req: RequestFrontend, res) => {
 	res.redirect('/listens/artists');
 });
 
-router.post('/albums', (req: RequestFrontend, res) => {
+router.post('/album', (req: RequestFrontend, res) => {
 	const { album, genre, artist_id } = req.body;
 	const release_year = validateSafeNumber(req.body.release_year);
 	const newAlbum = upsertAlbum({ album, release_year, genre }, artist_id);
 	res.redirect(`/listens/tracks/?album_id=${newAlbum.id}`);
 });
 
-router.post('/albums/:album_id', (req: RequestFrontend, res) => {
+router.post('/album/:album_id', (req: RequestFrontend, res) => {
 	const { album_id } = req.params;
 	const { crudType, album, genre, artist_id } = req.body;
 
@@ -143,7 +143,7 @@ router.post('/albums/:album_id', (req: RequestFrontend, res) => {
 	res.redirect(redirect_url);
 });
 
-router.post('/tracks', (req: RequestFrontend, res) => {
+router.post('/track', (req: RequestFrontend, res) => {
 	const { title, album_id } = req.body;
 	const track_number = validateSafeNumber(req.body.track_number);
 	const duration_secs = validateSafeNumber(req.body.duration_secs);
@@ -151,7 +151,7 @@ router.post('/tracks', (req: RequestFrontend, res) => {
 	res.redirect(`/listens/tracks/?album_id=${album_id}`);
 });
 
-router.post('/tracks/:track_id', (req: RequestFrontend, res) => {
+router.post('/track/:track_id', (req: RequestFrontend, res) => {
 	const { track_id } = req.params;
 	const { crudType, title, album_id } = req.body;
 
