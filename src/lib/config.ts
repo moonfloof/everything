@@ -125,6 +125,11 @@ export const config = {
 		dataPath: resolve(process.env.EVERYTHING_SWARM_DATA_FILE ?? 'data/swarm.json'),
 	},
 
+	kawa: {
+		apiBaseUrl: process.env.EVERYTHING_KAWA_SERVER_URL,
+		apiKey: process.env.EVERYTHING_KAWA_AUTH_TOKEN,
+	},
+
 	helmet: {
 		referrerPolicy: {
 			policy: ['same-origin'],

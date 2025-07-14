@@ -3,7 +3,7 @@ import phin from 'phin';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
-
+import { getKawaUrl } from './kawa.js';
 import { type Entry, insertNote } from '../database/notes.js';
 import type { Insert } from '../types/database.js';
 import type { AuthorFeedResponse, FeedItem, Post } from './blueskyTypes.js';
@@ -49,7 +49,7 @@ async function fetchPosts(): Promise<AuthorFeedResponse> {
 const getHashtagUrl = (hashtag: string) => `https://bsky.app/hashtag/${hashtag}`;
 const getProfileUrl = (handle: string) => `https://bsky.app/profile/${handle}`;
 const getBlobUrl = (did: string, cid: string) =>
-	`https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${cid}`;
+	getKawaUrl(`https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${cid}`);
 
 function parsePostContents(post: Post): string {
 	const encoder = new TextEncoder();
@@ -104,7 +104,7 @@ function transformAtUri(post: Post): string {
 	return `https://bsky.app/profile/${post.author.handle ?? match.groups.did}/post/${match.groups.id}`;
 }
 
-function getPostMetadata(item: FeedItem): Partial<Entry> {
+async function getPostMetadata(item: FeedItem): Promise<Partial<Entry>> {
 	const { post, reply, reason } = item;
 
 	const metadata: Partial<Entry> & { description: string } = {
@@ -123,14 +123,14 @@ function getPostMetadata(item: FeedItem): Partial<Entry> {
 				const { images } = post.record.embed;
 				if (images.length === 0 || images[0] === undefined) break;
 
-				const blobUrl = getBlobUrl(post.author.did, images[0].image.ref.$link);
+				const blobUrl = await getBlobUrl(post.author.did, images[0].image.ref.$link);
 				const altText = images[0].alt;
 				metadata.description = `<img class='u-photo' src='${blobUrl}' alt='${altText}' />${metadata.description}`;
 				break;
 			}
 			case 'app.bsky.embed.video': {
 				const { embed } = post.record;
-				const blobUrl = getBlobUrl(post.author.did, embed.video.ref.$link);
+				const blobUrl = await getBlobUrl(post.author.did, embed.video.ref.$link);
 				metadata.description = `<video class='u-video' src='${blobUrl}' controls></video>${metadata.description}`;
 			}
 		}
@@ -149,7 +149,7 @@ function getPostMetadata(item: FeedItem): Partial<Entry> {
 
 	switch (post.record.embed.$type) {
 		case 'app.bsky.embed.video': {
-			metadata.url = getBlobUrl(post.author.did, post.record.embed.video.ref.$link);
+			metadata.url = await getBlobUrl(post.author.did, post.record.embed.video.ref.$link);
 			metadata.type = 'video';
 			return metadata;
 		}
@@ -159,7 +159,7 @@ function getPostMetadata(item: FeedItem): Partial<Entry> {
 				break;
 			}
 
-			metadata.url = getBlobUrl(post.author.did, images[0].image.ref.$link);
+			metadata.url = await getBlobUrl(post.author.did, images[0].image.ref.$link);
 			metadata.type = 'photo';
 			return metadata;
 		}
@@ -209,7 +209,7 @@ export function pollForBlueskyPosts() {
 		for (const item of newPosts) {
 			const { post } = item;
 			const syndicationUrl = transformAtUri(post);
-			const metadata = getPostMetadata(item);
+			const metadata = await getPostMetadata(item);
 			const entry: Insert<Entry> = {
 				description: parsePostContents(post),
 				title: null,
