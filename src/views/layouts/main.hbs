@@ -3,6 +3,8 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="description" content="{{#if description}}{{description}}{{else}}What is {{person}} up to? Where have they been and what have they listened to lately?{{/if}}" />
+	<meta name="og:description" content="{{#if description}}{{description}}{{else}}What is {{person}} up to? Where have they been and what have they listened to lately?{{/if}}" />
+	<meta name="og:title" content="{{person}}{{#if title}} {{title}}{{/if}}" />
 	{{#if metaImage}}<meta name="og:image" content="{{metaImage}}" />{{/if}}
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="prefetch" href="https://rsms.me/inter/inter.css">
