@@ -8,7 +8,7 @@ import type {
 	UserTrophiesEarnedForTitleResponse,
 } from 'psn-api';
 const {
-	exchangeCodeForAccessToken,
+	exchangeAccessCodeForAuthTokens,
 	exchangeNpssoForCode,
 	exchangeRefreshTokenForAuthTokens,
 	getBasicPresence,
@@ -43,7 +43,7 @@ interface PSNAuthentication {
 	refreshTokenExpiryDate: Date;
 }
 
-let authentication: AuthTokensResponse & PSNAuthentication;
+let authentication: (AuthTokensResponse & PSNAuthentication) | null = null;
 
 function loadGamesFromDisk() {
 	log.info('Loading activity cache from disk');
@@ -58,9 +58,11 @@ function loadGamesFromDisk() {
 
 	gameIdMap = contents.gameIdMap || {};
 	trophies = contents.trophies || {};
-	authentication = contents.authentication || {};
-	authentication.accessTokenExpiryDate = new Date(authentication.accessTokenExpiryDate);
-	authentication.refreshTokenExpiryDate = new Date(authentication.refreshTokenExpiryDate);
+
+	const cachedAuthentication = contents.authentication || {};
+	cachedAuthentication.accessTokenExpiryDate = new Date(cachedAuthentication.accessTokenExpiryDate);
+	cachedAuthentication.refreshTokenExpiryDate = new Date(cachedAuthentication.refreshTokenExpiryDate);
+	authentication = cachedAuthentication;
 }
 
 function saveGamesToDisk() {
@@ -78,7 +80,7 @@ function convertPsnAuth(auth: AuthTokensResponse) {
 }
 
 async function authenticateApi() {
-	if (authentication.accessToken) {
+	if (authentication?.accessToken !== undefined) {
 		// Access token hasn't expired
 		if ((authentication.accessTokenExpiryDate?.getTime() || 0) - Date.now() > 0) {
 			return;
@@ -107,7 +109,7 @@ async function authenticateApi() {
 
 	log.info('Fetching an access code based on NPSSO');
 	const accessCode: string = await exchangeNpssoForCode(config.psn.npsso);
-	const newAuthentication: AuthTokensResponse = await exchangeCodeForAccessToken(accessCode);
+	const newAuthentication: AuthTokensResponse = await exchangeAccessCodeForAuthTokens(accessCode);
 	authentication = convertPsnAuth(newAuthentication);
 	saveGamesToDisk();
 }
