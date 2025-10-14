@@ -1,9 +1,9 @@
 import { v4 as uuid } from 'uuid';
+import { timeago } from '../adapters/timeago.js';
 import { dayMs, formatDate, prettyDate } from '../lib/formatDate.js';
 import type { Insert, Update } from '../types/database.js';
 import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
-import { timeago } from '../adapters/timeago.js';
 
 interface Steps {
 	id: string;

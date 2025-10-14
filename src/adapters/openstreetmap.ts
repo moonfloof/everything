@@ -1,9 +1,9 @@
 import { XMLParser } from 'fast-xml-parser';
 import phin from 'phin';
+import type { CheckinImage } from '../database/checkins.js';
 import { config } from '../lib/config.js';
 import type { BoundingBox, Filter, FilteredPath, OsmXml, Point, SvgOptions, Way } from './openstreetmapTypes.js';
 import { simplify } from './simplify.js';
-import type { CheckinImage } from '../database/checkins.js';
 
 // #region Calculate Bounding Box
 // Based on: https://stackoverflow.com/a/238558

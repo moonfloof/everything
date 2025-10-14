@@ -40,6 +40,7 @@ import { pageCache } from '../../lib/middleware/cachePage.js';
 
 // Others
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
+import { getPhotoPositions } from '../../adapters/openstreetmap.js';
 import {
 	countCheckins,
 	getCheckinImageData,
@@ -47,7 +48,6 @@ import {
 	getCheckins,
 } from '../../database/checkins.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { getPhotoPositions } from '../../adapters/openstreetmap.js';
 
 const router = express.Router();
 

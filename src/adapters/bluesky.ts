@@ -1,12 +1,12 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import phin from 'phin';
+import { type Entry, insertNote } from '../database/notes.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
-import { getKawaUrl } from './kawa.js';
-import { type Entry, insertNote } from '../database/notes.js';
 import type { Insert } from '../types/database.js';
 import type { AuthorFeedResponse, FeedItem, Post } from './blueskyTypes.js';
+import { getKawaUrl } from './kawa.js';
 
 const log = new Logger('bluesky');
 

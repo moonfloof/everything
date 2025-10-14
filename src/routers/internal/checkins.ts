@@ -1,7 +1,8 @@
-import { Router } from 'express';
 import { readFileSync } from 'node:fs';
+import { Router } from 'express';
 import { searchNearbyPlaces } from '../../adapters/googlePlacesApi.js';
 import { generateSvg } from '../../adapters/openstreetmap.js';
+import type { Point } from '../../adapters/openstreetmapTypes.js';
 import { convertImageToDataAndThumbnail } from '../../adapters/swarm.js';
 import {
 	type CheckinPlace,
@@ -23,14 +24,13 @@ import {
 } from '../../database/checkins.js';
 import { type EntryStatus, entryStatusValues } from '../../database/notes.js';
 import { config } from '../../lib/config.js';
+import { parseExifDateTime } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import Logger from '../../lib/logger.js';
 import { queue } from '../../lib/queue.js';
 import type { Insert } from '../../types/database.js';
 import type { RequestFrontend } from '../../types/express.js';
 import checkinPlaces from './checkinPlaces.js';
-import type { Point } from '../../adapters/openstreetmapTypes.js';
-import { parseExifDateTime } from '../../lib/formatDate.js';
 
 const log = new Logger('checkin');
 
