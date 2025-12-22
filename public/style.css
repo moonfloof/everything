@@ -172,7 +172,6 @@ html {
 	}
 }
 
-
 /*#endregion header */
 
 /** ALERTS **/
@@ -475,7 +474,6 @@ a:hover {
 		margin: 16px 0;
 	}
 
-
 	p {
 		line-height: 1.618;
 	}
@@ -490,7 +488,6 @@ a:hover {
 		}
 	}
 }
-
 
 .page--data__header {
 	display: flex;
@@ -647,7 +644,6 @@ summary {
 		margin-top: 0;
 	}
 }
-
 
 .row.metadata .right {
 	align-self: center;
@@ -1381,7 +1377,7 @@ select {
 	display: inline;
 }
 
-.page--data .form-inline input[type=submit] {
+.page--data .form-inline input[type="submit"] {
 	margin-top: 0;
 }
 
