@@ -199,7 +199,7 @@ export function pollForGameActivity() {
 	const { apiKey, userId } = config.steam;
 
 	const intervalMs = config.steam.pollIntervalMinutes * minuteMs;
-	if (intervalMs === 0) {
+	if (intervalMs === 0 || !apiKey) {
 		log.warn('Polling is disabled, no games will be tracked');
 		return;
 	}
