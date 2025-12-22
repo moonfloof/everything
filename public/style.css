@@ -832,6 +832,55 @@ table td {
 	animation: 3s rainbow-text linear infinite;
 }
 
+.games-overview-container {
+	display: flex;
+	gap: 16px;
+	margin: 8px 0;
+
+	.games-overview-panel {
+		position: relative;
+		padding: 16px;
+		flex: 1;
+		text-align: center;
+		border-radius: 16px;
+		background-color: var(--panel-bg-dark);
+		color: var(--primary-fg-light);
+		/* color: #fff;
+		text-shadow: 0 0 3px #000;
+		background-size: 600%; */
+
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+
+		&.panel-1 {
+			background-position: left 15%;
+		}
+
+		&.panel-2 {
+			background-position: center 15%;
+		}
+
+		&.panel-3 {
+			background-position: right 15%;
+		}
+	}
+
+	.games-overview-stat {
+		font-size: 32px;
+		font-weight: 900;
+		margin: 8px 0;
+		z-index: 11;
+	}
+
+	.games-overview-caption {
+		font-size: 14px;
+		font-weight: 700;
+		z-index: 11;
+	}
+}
+
 @keyframes rainbow-text {
 	from {
 		background-position-x: 0;
@@ -1427,6 +1476,27 @@ select {
 	.games-popular--meta {
 		display: block;
 		width: 100%;
+	}
+
+	.games-overview-container {
+		gap: 8px;
+
+		.games-overview-panel {
+			padding: 16px 8px;
+		}
+
+		.games-overview-stat {
+			font-size: 24px;
+			font-weight: 700;
+			margin-top: 0;
+			margin-bottom: 4px;
+		}
+
+		.games-overview-caption {
+			font-size: 12px;
+			font-weight: 400;
+			line-height: 1;
+		}
 	}
 
 	.image--banner {

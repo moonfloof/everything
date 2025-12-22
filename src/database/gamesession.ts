@@ -216,6 +216,25 @@ export function countGameSessions() {
 	return statement.get()?.total || 0;
 }
 
+export function countGameSessionsForDays(days = 14) {
+	const daysAgo = new Date(Date.now() - days * dayMs);
+	const created_at = getStartOfDay(daysAgo).toISOString();
+
+	const statement = getStatement<{
+		sessionsTotal: number;
+		achievementsTotal: number;
+		durationHoursTotal: number;
+	}>(
+		'countGameSessionsForDays',
+		`SELECT
+			(SELECT COUNT(*) FROM game_session WHERE created_at >= $created_at) AS sessionsTotal,
+			(SELECT COUNT(*) FROM game_achievements WHERE unlocked_session_id IS NOT NULL AND updated_at >= $created_at) AS achievementsTotal,
+			(SELECT ROUND(SUM(playtime_mins) / 60.0, 0) FROM game_session WHERE created_at >= $created_at) AS durationHoursTotal`,
+	);
+
+	return statement.get({ created_at });
+}
+
 export function deleteGameSession(id: string) {
 	return getStatement('deleteGameSession', 'DELETE FROM game_session WHERE id = $id').run({ id });
 }

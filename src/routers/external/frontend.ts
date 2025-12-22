@@ -11,6 +11,7 @@ import { countFilms, getFilms } from '../../database/films.js';
 import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
 import {
 	countGameSessions,
+	countGameSessionsForDays,
 	getAllPerfectedGames,
 	getGameSessions,
 	getGameStats,
@@ -230,8 +231,9 @@ router.get('/games', (req: RequestFrontend, res) => {
 	const showPerfect = perfect !== undefined;
 	const sessions = getGameSessions({ page });
 	const popular = showPerfect ? getAllPerfectedGames() : getPopularGames(daysInt);
-	const durationHoursTotal = popular.reduce((total, game) => total + game.playtime_hours, 0);
-	const achievementsTotal = popular.reduce((count, game) => count + game.achievements_unlocked_in_time, 0);
+	const totalStats = countGameSessionsForDays(daysInt);
+	const durationHoursTotal = totalStats?.durationHoursTotal ?? 0;
+	const achievementsTotal = totalStats?.achievementsTotal ?? 0;
 	const title = alltime
 		? `spent ${durationHoursTotal} hours playing video games (all time)`
 		: showPerfect
@@ -249,7 +251,7 @@ router.get('/games', (req: RequestFrontend, res) => {
 		popular,
 		days: daysString,
 		showPerfect,
-		achievementsTotal,
+		totalStats,
 	});
 });
 

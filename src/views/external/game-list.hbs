@@ -27,6 +27,21 @@
 			Games are sorted by most recently perfected first!
 		</small>
 	</p>
+	{{else}}
+	<div class="games-overview-container">
+		<div class="games-overview-panel panel-1">
+			<div class="games-overview-stat">{{totalStats.achievementsTotal}}</div>
+			<div class="games-overview-caption">achievements</div>
+		</div>
+		<div class="games-overview-panel panel-2">
+			<div class="games-overview-stat">{{totalStats.durationHoursTotal}}</div>
+			<div class="games-overview-caption">hours playtime</div>
+		</div>
+		<div class="games-overview-panel panel-3">
+			<div class="games-overview-stat">{{totalStats.sessionsTotal}}</div>
+			<div class="games-overview-caption">sessions</div>
+		</div>
+	</div>
 	{{/if}}
 
 	{{#if popular}}
