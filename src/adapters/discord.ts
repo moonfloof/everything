@@ -23,7 +23,7 @@ export function getDiscordClient() {
 		intents: ['Guilds', 'GuildMessages', 'MessageContent'],
 	});
 
-	client.on('ready', client => {
+	client.on('clientReady', client => {
 		log.info(`Logged in as ${client.user.tag}!`);
 		client.on('messageCreate', message => handleMessage(message, client));
 	});
