@@ -27,7 +27,10 @@
 			<ul class="game-achievements--list">
 			{{#each data.achievements as |achievement|}}
 				<li>
-					<strong>{{achievement.name}}</strong>
+					<time
+						title="{{achievement.updated_at}}"
+						datetime="{{achievement.updated_at}}"
+					><strong>{{achievement.name}}</strong></time>
 					{{#if achievement.description}}
 					<br/>{{achievement.description}}
 					{{/if}}

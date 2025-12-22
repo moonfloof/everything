@@ -92,9 +92,11 @@
 			{{#if achievement.unlocked_session_id}}
 			<br/>
 			<small>
-				<a href="/game-session/{{achievement.unlocked_session_id}}">
-					{{achievement.timeago}}
-				</a>
+				<time title="{{achievement.updated_at}}" datetime="{{achievement.updated_at}}" class="dt-published">
+					<a href="/game-session/{{achievement.unlocked_session_id}}">
+						{{achievement.timeago}}
+					</a>
+				</time>
 			</small>
 			{{/if}}
 		</div>
