@@ -19,7 +19,7 @@ const ignoredGames = [
 
 interface SteamRecentlyPlayedGame {
 	appid: number;
-	name: string;
+	name?: string;
 	playtime_2weeks: number;
 	playtime_forever: number;
 	img_icon_url: string;
@@ -170,6 +170,7 @@ function calculateNewActivity(games: SteamRecentlyPlayedGame[]) {
 
 	for (const game of games) {
 		if (ignoredGames.includes(game.appid)) continue;
+		if (game.name === undefined) continue;
 
 		const activity = {
 			...game,
