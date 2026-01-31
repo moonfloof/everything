@@ -174,6 +174,7 @@ function calculateNewActivity(games: SteamRecentlyPlayedGame[]) {
 
 		const activity = {
 			...game,
+			name: game.name!,
 			newPlaytime: game.playtime_2weeks,
 		};
 
