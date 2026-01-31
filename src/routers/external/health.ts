@@ -1,4 +1,4 @@
-import express, { type Request, type Response, type NextFunction } from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
 import { validateDevice } from '../../database/devices.js';
 import { insertFood } from '../../database/food.js';
 import { insertSteps } from '../../database/steps.js';

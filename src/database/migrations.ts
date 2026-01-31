@@ -3,6 +3,7 @@ import path from 'node:path';
 import { dateDefault } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { getDatabase, getStatement } from './database.js';
+
 const log = new Logger('migrations');
 
 export function checkMigrations() {

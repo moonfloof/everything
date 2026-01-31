@@ -1,5 +1,4 @@
 import { errors } from '@moonfloof/stdlib';
-const { NotFoundError } = errors;
 import type { HTTPError } from '@moonfloof/stdlib/types/errors/http.js';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import appCreate from './lib/appCreate.js';
@@ -27,6 +26,8 @@ import timetracking from './routers/internal/timetracking.js';
 import tv from './routers/internal/tv.js';
 import weight from './routers/internal/weight.js';
 import youtubelikes from './routers/internal/youtubelikes.js';
+
+const { NotFoundError } = errors;
 
 const log = new Logger('server-int');
 

@@ -1,7 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
-import phin from 'phin';
-
 import dotenv from 'dotenv';
+import phin from 'phin';
 import { config } from '../lib/config.js';
 
 dotenv.config();

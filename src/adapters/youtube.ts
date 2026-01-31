@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { type OAuth2Client, gaxios } from 'google-auth-library';
+import { gaxios, type OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
 import { config } from '../lib/config.js';

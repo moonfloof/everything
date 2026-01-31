@@ -16,7 +16,7 @@ router.post('/delete', (req: RequestFrontend<object, { url: string }>, res) => {
 		const { url } = req.body;
 		pageCache.deleteCacheEntry(url);
 		res.redirect('/cache');
-	} catch (err) {
+	} catch (_err) {
 		res.redirect('/cache?hasError');
 	}
 });

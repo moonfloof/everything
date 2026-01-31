@@ -3,7 +3,7 @@ import { timeago } from '../adapters/timeago.js';
 import addMissingDates from '../lib/addMissingDates.js';
 import { dateDefault, dayMs, formatDate, hourMs, monthsShort, prettyDuration, shortDate } from '../lib/formatDate.js';
 import type { Insert, Optional, Select, Update } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export interface ListenTrack {
@@ -78,7 +78,6 @@ function selectOrInsertTrack(track: Insert<ListenTrack>): number {
 		($artist, $album, $title, $track_number, $release_year, $genre, $duration_secs)`,
 	).run(track);
 
-	// biome-ignore lint/style/noNonNullAssertion: Track guaranteed to exist at this point
 	return selectListenTrack(track)!;
 }
 

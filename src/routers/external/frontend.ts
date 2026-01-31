@@ -1,11 +1,20 @@
-import { errors } from '@moonfloof/stdlib';
-const { NotFoundError } = errors;
 import { existsSync } from 'node:fs';
+import { errors } from '@moonfloof/stdlib';
 import express from 'express';
 import helmet from 'helmet';
 
+// Adapters
+import { getNowPlaying } from '../../adapters/listenbrainz.js';
+import { getPhotoPositions } from '../../adapters/openstreetmap.js';
+
 // Database
 import { countBooks, getBooks } from '../../database/books.js';
+import {
+	countCheckins,
+	getCheckinImageData,
+	getCheckinImageThumbnailData,
+	getCheckins,
+} from '../../database/checkins.js';
 import { getDevices } from '../../database/devices.js';
 import { countFilms, getFilms } from '../../database/films.js';
 import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
@@ -38,17 +47,9 @@ import { formatTime, prettyDate } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { getImagePath } from '../../lib/mediaFiles.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
-
-// Others
-import { getNowPlaying } from '../../adapters/listenbrainz.js';
-import { getPhotoPositions } from '../../adapters/openstreetmap.js';
-import {
-	countCheckins,
-	getCheckinImageData,
-	getCheckinImageThumbnailData,
-	getCheckins,
-} from '../../database/checkins.js';
 import type { RequestFrontend } from '../../types/express.js';
+
+const { NotFoundError } = errors;
 
 const router = express.Router();
 
@@ -56,7 +57,7 @@ const router = express.Router();
 
 router.use(pageCache.getCache());
 
-router.get('/', (req, res) => {
+router.get('/', (_req, res) => {
 	const devices = getDevices();
 	if (devices.length === 0) {
 		res.render('external/setup-required');
@@ -94,7 +95,7 @@ router.get('/', (req, res) => {
 
 // SVGs
 
-router.get('/music.svg', (req, res) => {
+router.get('/music.svg', (_req, res) => {
 	res.header('Cache-Control', 'public, max-age=1200, immutable');
 	res.type('image/svg+xml').send(`<?xml version="1.0" ?>${getListenActivityGraph()}`);
 });

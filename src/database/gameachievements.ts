@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
 import type { Optional } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export interface GameAchievement {

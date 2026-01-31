@@ -17,6 +17,7 @@ import type {
 	SwarmPushCheckin,
 	SwarmSelfDetails,
 } from './swarmTypes.js';
+
 const { ServerError, BadRequestError, ForbiddenError } = errors;
 
 const log = new Logger('swarm');

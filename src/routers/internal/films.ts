@@ -68,7 +68,7 @@ router.post('/rescan', async (_req, res) => {
 	try {
 		await fetchFn();
 		res.redirect('/films');
-	} catch (err) {
+	} catch (_err) {
 		res.redirect('/films?rescanerror');
 	}
 });

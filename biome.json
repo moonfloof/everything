@@ -3,12 +3,16 @@
 		"rules": {
 			"correctness": {
 				"noUndeclaredVariables": "error",
+				"noSwitchDeclarations": "warn",
 				"noUnusedImports": "error"
 			},
 			"suspicious": {
 				"noAssignInExpressions": "error",
 				"noDoubleEquals": "error",
-				"noConsoleLog": "warn",
+				"noConsole": {
+					"level": "warn",
+					"options": { "allow": ["debug", "info", "warn", "error"] }
+				},
 				"noEmptyBlockStatements": "warn",
 				"useAwait": "warn"
 			},
@@ -22,7 +26,7 @@
 				"noReExportAll": "error"
 			},
 			"style": {
-				"noNonNullAssertion": "warn",
+				"noNonNullAssertion": "off",
 				"noParameterAssign": "error",
 				"noRestrictedGlobals": "error",
 				"noShoutyConstants": "error",
@@ -42,7 +46,6 @@
 				"useForOf": "error",
 				"useNodejsImportProtocol": "warn",
 				"useNumberNamespace": "error",
-				"useSingleCaseStatement": "warn",
 				"useTemplate": "error"
 			}
 		}

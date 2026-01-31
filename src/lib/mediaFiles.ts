@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { basename } from 'node:path';
 import phin from 'phin';
 import sharp, { type Sharp } from 'sharp';

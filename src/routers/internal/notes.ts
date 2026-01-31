@@ -1,10 +1,10 @@
 import express from 'express';
 
 import {
-	type EntryStatus,
-	type EntryType,
 	countNotes,
 	deleteNote,
+	type EntryStatus,
+	type EntryType,
 	entryStatusValues,
 	entryTypeValues,
 	getNotes,

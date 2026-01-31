@@ -7,6 +7,7 @@ import type {
 	UserTitlesResponse,
 	UserTrophiesEarnedForTitleResponse,
 } from 'psn-api';
+
 const {
 	exchangeAccessCodeForAuthTokens,
 	exchangeNpssoForCode,
@@ -16,6 +17,7 @@ const {
 	getUserTitles,
 	getUserTrophiesEarnedForTitle,
 } = createRequire(import.meta.url)('psn-api');
+
 import { getAchievementsForGame, getGameById } from '../database/game.js';
 import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { type GameSessionInsertResponse, updateGameSession } from '../database/gamesession.js';
@@ -192,7 +194,7 @@ async function getTrophiesForGame(game: { titleName: string; format: 'PS5' | 'ps
 
 	const gameTrophies = trophies[id] ?? { server: [] };
 
-	let options = undefined;
+	let options: { npServiceName: 'trophy' } | undefined;
 	if (game.format !== 'PS5') options = { npServiceName: 'trophy' as const };
 
 	log.debug(`Fetching user trophies for ${game.titleName}`);
@@ -268,7 +270,7 @@ async function fetchGameActivity() {
 			if (!gameRecord) continue;
 
 			await searchForImages(game.titleName, gameRecord);
-		} catch (err) {
+		} catch (_err) {
 			/* do nothing */
 		}
 	}

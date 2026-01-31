@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { timeago } from '../adapters/timeago.js';
 import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 import { type GameAchievement, getGameAchievementsForSession } from './gameachievements.js';
 import type { GameSessionRaw } from './gamesession.js';

@@ -66,7 +66,7 @@ async function fetchLetterboxdFeed(username: string) {
 	return response.body;
 }
 
-async function parseFeed(feed: string): Promise<Partial<LetterboxdFilm>[]> {
+function parseFeed(feed: string): Promise<Partial<LetterboxdFilm>[]> {
 	return new Promise((resolve, reject) => {
 		const parser = sax.parser(true, { lowercase: true, trim: true });
 		const items: Record<string, string | number | Date>[] = [];

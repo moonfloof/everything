@@ -1,10 +1,11 @@
 import { errors } from '@moonfloof/stdlib';
-const { BadRequestError } = errors;
 import { Router } from 'express';
 import { generateAuthenticateUri, swarmHandleOauthCallback, swarmHandlePushCheckin } from '../../adapters/swarm.js';
 import { validateDevice } from '../../database/devices.js';
 import Logger from '../../lib/logger.js';
 import type { RequestFrontend } from '../../types/express.js';
+
+const { BadRequestError } = errors;
 
 const log = new Logger('swarm-api');
 const router = Router();

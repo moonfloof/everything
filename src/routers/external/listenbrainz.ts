@@ -1,5 +1,5 @@
 import express from 'express';
-import { type ListenBrainzPayload, convertScrobbleIntoListen, setNowPlaying } from '../../adapters/listenbrainz.js';
+import { convertScrobbleIntoListen, type ListenBrainzPayload, setNowPlaying } from '../../adapters/listenbrainz.js';
 import { validateDevice } from '../../database/devices.js';
 import { insertScrobble } from '../../database/listens.js';
 import Logger from '../../lib/logger.js';
@@ -20,7 +20,7 @@ router.get('/1/validate-token', (req: RequestFrontend, res) => {
 			valid: true,
 			user: description,
 		});
-	} catch (err) {
+	} catch (_err) {
 		res.send({
 			code: 200,
 			message: 'Token invalid.',

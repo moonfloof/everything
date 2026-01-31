@@ -1,6 +1,6 @@
 import { timeago } from '../adapters/timeago.js';
 import { dayMs, formatTime, getStartOfDay, hourMs, prettyDate, prettyDuration, shortDate } from '../lib/formatDate.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 import { CATEGORIES, type Timetracking } from './timetracking.js';
 

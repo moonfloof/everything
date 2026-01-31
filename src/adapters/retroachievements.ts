@@ -288,7 +288,7 @@ export function pollForRetroAchievementsActivity() {
 				const gameRecord = getGameById(session.game_id);
 				if (!gameRecord) continue;
 				await searchForImages(game.Title, gameRecord);
-			} catch (err) {
+			} catch (_err) {
 				/* do nothing */
 			}
 		}

@@ -10,7 +10,7 @@ import {
 	shortDate,
 } from '../lib/formatDate.js';
 import type { Insert, Update } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 import { type Game, getGameById, selectOrInsertGame } from './game.js';
 import { getGameAchievementsForSession } from './gameachievements.js';

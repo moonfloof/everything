@@ -4,7 +4,7 @@ import { timeago } from '../adapters/timeago.js';
 import { dateDefault, msToIsoDuration, prettyDuration } from '../lib/formatDate.js';
 import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional, Update } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 interface Film {

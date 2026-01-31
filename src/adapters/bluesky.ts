@@ -94,7 +94,7 @@ function parsePostContents(post: Post): string {
 }
 
 function transformAtUri(post: Post): string {
-	const regex = new RegExp(`at:\/\/(?<did>did:plc:[a-z0-9]+)\/${post.record.$type}\/(?<id>[a-z0-9]+)`);
+	const regex = new RegExp(`at://(?<did>did:plc:[a-z0-9]+)/${post.record.$type}/(?<id>[a-z0-9]+)`);
 
 	const match = post.uri.match(regex);
 	if (match === null || match.groups === undefined) {

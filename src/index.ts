@@ -1,12 +1,4 @@
 import './lib/config.js';
-import { getDatabase } from './database/database.js';
-import { checkMigrations } from './database/migrations.js';
-import Logger from './lib/logger.js';
-import { pageCache } from './lib/middleware/cachePage.js';
-
-// Servers
-import appExternal from './appExternal.js';
-import appInternal from './appInternal.js';
 
 // Adapters
 import { pollForBlueskyPosts } from './adapters/bluesky.js';
@@ -17,7 +9,17 @@ import { pollForPsnActivity } from './adapters/psn.js';
 import { pollForRetroAchievementsActivity } from './adapters/retroachievements.js';
 import { pollForGameActivity } from './adapters/steam.js';
 import { pollForLikedVideos } from './adapters/youtube.js';
+
+// Servers
+import appExternal from './appExternal.js';
+import appInternal from './appInternal.js';
+
+// Others
+import { getDatabase } from './database/database.js';
+import { checkMigrations } from './database/migrations.js';
+import Logger from './lib/logger.js';
 import { convertAllImagesToAvif } from './lib/mediaFiles.js';
+import { pageCache } from './lib/middleware/cachePage.js';
 
 const log = new Logger('http');
 

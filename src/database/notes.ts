@@ -3,7 +3,7 @@ import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
 import { shortSummary, unsafe_stripTags } from '../lib/strings.js';
 import type { Insert, Optional, Update } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export const ENTRY_TYPES = {
@@ -89,7 +89,7 @@ export function getNotes(parameters: Partial<Parameters & { status: EntryStatus 
 			if (row.syndication_json) {
 				try {
 					syndication = JSON.parse(row.syndication_json);
-				} catch (err) {
+				} catch (_err) {
 					console.warn(`Invalid JSON for note with ID '${row.id}'`);
 				}
 			}

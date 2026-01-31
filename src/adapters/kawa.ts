@@ -1,6 +1,7 @@
 import phin from 'phin';
 import { config } from '../lib/config.js';
 import Logger from '../lib/logger.js';
+
 const log = new Logger('kawa');
 
 export async function getKawaUrl(inputUrl: string): Promise<string> {

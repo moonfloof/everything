@@ -52,6 +52,8 @@ router.post('/', (req: RequestFrontend<object, Place>, res) => {
 		long: long ? Number(long) : null,
 		external_id,
 	});
+
+	res.redirect('/checkins/places');
 });
 
 router.post('/:id', (req: RequestFrontend<object, Place, { id: string }>, res) => {
