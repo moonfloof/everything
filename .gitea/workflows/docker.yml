@@ -16,6 +16,9 @@ jobs:
           registry-url: "https://${{ secrets.REGISTRY_HOST }}/api/packages/moonfloof/npm/"
           scope: "@moonfloof"
 
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v5
+
       - name: Login to Registry
         uses: docker/login-action@v3
         with:
