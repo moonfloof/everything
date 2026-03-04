@@ -24,7 +24,7 @@
 {{/if}}
 
 <div id="dash-panels">
-	{{#if gameStats}}
+	{{#if gameStats.totalPlaytime}}
 		{{#> dashpanel title="gaming" subtitle="(14 days)" link="games" background=gameStats.favouriteGame.posterUrl }}
 			<a href="/game/{{gameStats.favouriteGame.id}}" class="panel__li">
 				<span>favourite game</span>
