@@ -1,5 +1,6 @@
 import SqliteDatabase, { type Database, type Statement } from 'better-sqlite3';
 import { v4 as uuid } from 'uuid';
+import { config } from '../lib/config.js';
 
 let db: Database | null = null;
 
@@ -9,7 +10,7 @@ const statements: Record<string, Statement<unknown[], any>> = {};
 export function getDatabase(): Database {
 	if (db !== null) return db;
 
-	db = new SqliteDatabase(process.env.TOMBOIS_SQLITE_LOCATION);
+	db = new SqliteDatabase(config.sqliteLocation);
 	db.function('uuid', () => uuid());
 
 	return db;

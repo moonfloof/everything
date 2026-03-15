@@ -103,11 +103,11 @@ Data is entered using the internal CRUD API.
 
 ## Discord Bot
 
-By providing `TOMBOIS_DISCORD_TOKEN` and `TOMBOIS_DISCORD_CHANNELID` environment
-variables, and creating a custom Discord bot to join a personal server, you can
-have a quick way to post data to the site, which also works quite well with
-automation services who are restricting webhooks behind a paywall (but haven't
-yet made Discord a paid feature).
+By providing `EVERYTHING_DISCORD_TOKEN` and `EVERYTHING_DISCORD_CHANNELID`
+environment variables, and creating a custom Discord bot to join a personal
+server, you can have a quick way to post data to the site, which also works
+quite well with automation services who are restricting webhooks behind a
+paywall (but haven't yet made Discord a paid feature).
 
 It currently supports these commands, following this format:
 
@@ -130,7 +130,7 @@ It currently supports these commands, following this format:
   are specific to each service you'd like to track.
 * Start the server and open the internal API: it'll prompt you to set up a new
   device.
-* Add the new device ID to the `TOMBOIS_DEFAULT_DEVICE_ID` variable in `.env`.
+* Add the new device ID to the `EVERYTHING_DEFAULT_DEVICE_ID` variable in `.env`
 * Now that you've gotten a device added, you can restart the server and start
   collecting data!
 * ⚠ **Note:** You will likely want to change the homepage layout and specific

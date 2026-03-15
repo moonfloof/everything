@@ -448,7 +448,7 @@ endpoint using the following payload.
 
 #### Payload
 
-* `account_id`: string, which MUST match the `TOMBOIS_MONZO_ACCOUNT_ID` value
+* `account_id`: string, which MUST match the `EVERYTHING_MONZO_ACCOUNT_ID` value
   provided in `.env`, otherwise an error will be thrown
 * `amount`: number, an outgoing payment is negative, and 100 times the amount of
   the transaction (eg. 5.49 is `-549`). Income is positive (eg. 15.32 is `1532`)

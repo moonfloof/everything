@@ -170,7 +170,7 @@ export function pollForLikedVideos() {
 export async function getYouTubeVideoSnippet(url: string) {
 	if (!config.google.apiKey || config.google.apiKey.length === 0) {
 		throw new Error(
-			'Please provide a YouTube API key using the TOMBOIS_GOOGLE_APIKEY environment variable',
+			'Please provide a YouTube API key using the EVERYTHING_GOOGLE_APIKEY environment variable',
 		);
 	}
 

@@ -1,5 +1,5 @@
-@baseUrl={{$dotenv TOMBOIS_SERVER_EXTERNAL_URI}}
-@apiKey={{$dotenv TOMBOIS_TEST_APIKEY}}
+@baseUrl={{$dotenv EVERYTHING_SERVER_EXTERNAL_URI}}
+@apiKey={{$dotenv EVERYTHING_TEST_APIKEY}}
 
 ###
 
@@ -140,8 +140,8 @@ Content-Type: application/json
 
 ### SONARR - Get all series
 
-@sonarUrl={{$dotenv TOMBOIS_SONARR_URL}}
-@sonarApiKey={{$dotenv TOMBOIS_SONARR_APIKEY}}
+@sonarUrl={{$dotenv EVERYTHING_SONARR_URL}}
+@sonarApiKey={{$dotenv EVERYTHING_SONARR_APIKEY}}
 
 GET {{sonarUrl}}api/v3/series
 X-Api-Key: {{sonarApiKey}}
@@ -158,8 +158,8 @@ X-Api-Key: {{sonarApiKey}}
 
 ### STEAM - Get user's achievements for a given game
 
-@steamApiKey={{$dotenv TOMBOIS_STEAM_APIKEY}}
-@steamUserId={{$dotenv TOMBOIS_STEAM_USERID}}
+@steamApiKey={{$dotenv EVERYTHING_STEAM_APIKEY}}
+@steamUserId={{$dotenv EVERYTHING_STEAM_USERID}}
 @steamGameId=1029690
 
 GET http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid={{steamGameId}}&key={{steamApiKey}}&steamid={{steamUserId}}&format=json&l=en
@@ -174,8 +174,8 @@ Accept: application/json
 
 ### RETROACHIEVEMENTS
 
-@raUsername={{$dotenv TOMBOIS_RETROACHIEVEMENTS_USERNAME}}
-@raApiKey={{$dotenv TOMBOIS_RETROACHIEVEMENTS_APIKEY}}
+@raUsername={{$dotenv EVERYTHING_RETROACHIEVEMENTS_USERNAME}}
+@raApiKey={{$dotenv EVERYTHING_RETROACHIEVEMENTS_APIKEY}}
 @raGameId=20580
 
 GET https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u={{raUsername}}&y={{raApiKey}}&g={{raGameId}}
@@ -184,11 +184,11 @@ Accept: application/json
 
 ### SUBSONIC - Search Track
 
-@subsonicUrl={{$dotenv TOMBOIS_SUBSONIC_URL}}
-@subsonicUser={{$dotenv TOMBOIS_SUBSONIC_USERNAME}}
+@subsonicUrl={{$dotenv EVERYTHING_SUBSONIC_URL}}
+@subsonicUser={{$dotenv EVERYTHING_SUBSONIC_USERNAME}}
 # This variable is an MD5 hash of your subsonic password
 # immediately followed by "salt" (eg. "MyPasswordIsSoRandomsalt")
-@subsonicPass={{$dotenv TOMBOIS_TEST_SUBSONICHASH}}
+@subsonicPass={{$dotenv EVERYTHING_TEST_SUBSONICHASH}}
 @subsonicQuery=Espresso
 
 GET {{subsonicUrl}}rest/search3?v=1.15.0&c=everything&f=json&u={{subsonicUser}}&t={{subsonicPass}}&s=salt&query={{subsonicQuery}}
