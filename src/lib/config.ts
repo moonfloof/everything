@@ -112,6 +112,7 @@ export const config = {
 	},
 
 	location: {
+		dashboardDisplay: process.env.EVERYTHING_LOCATION_DISPLAY === 'true',
 		delayMins: Number(process.env.EVERYTHING_LOCATION_DELAY_MINS || 1440),
 		privateLat: Number(process.env.EVERYTHING_LOCATION_PRIVATE_OVERRIDE_LAT || 0),
 		privateLong: Number(process.env.EVERYTHING_LOCATION_PRIVATE_OVERRIDE_LONG || 0),

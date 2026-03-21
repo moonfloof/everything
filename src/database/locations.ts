@@ -24,6 +24,8 @@ export function insertLocation(location: Insert<Location>) {
 }
 
 export function getLatestCity() {
+	if (config.location.dashboardDisplay === false) return undefined;
+
 	const statement = getStatement<{ city: string }>(
 		'getLatestCity',
 		`SELECT city FROM location
