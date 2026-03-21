@@ -81,27 +81,32 @@ router.post('/heartrate', (req: RequestFrontend<object, HeartRatePayload>, res) 
 	if (typeof history === 'string') {
 		switch (format) {
 			case 'csv': {
-				history = history.split('\n').map(line => {
-					let [rate, created_at] = line.split(',') as (string | number)[];
-					assert(
-						rate !== undefined && created_at !== undefined,
-						'Malformed CSV. Make sure each line provided is in the format: rate,createdat',
-					);
+				history = history
+					.split('\n')
+					.map(line => {
+						if (line.trim() === '') return null;
 
-					// Heart rate MUST be a number
-					rate = Number(rate);
-					assert(
-						!Number.isNaN(rate),
-						'Malformed CSV. Provided heart rate is not a number',
-					);
+						let [rate, created_at] = line.split(',') as (string | number)[];
+						assert(
+							rate !== undefined && created_at !== undefined,
+							'Malformed CSV. Make sure each line provided is in the format: rate,createdat',
+						);
 
-					// Convert to number, in case we're providing a unix timestamp
-					if (!Number.isNaN(Number(created_at))) {
-						created_at = Number(created_at);
-					}
+						// Heart rate MUST be a number
+						rate = Number(rate);
+						assert(
+							!Number.isNaN(rate),
+							'Malformed CSV. Provided heart rate is not a number',
+						);
 
-					return { rate, created_at };
-				});
+						// Convert to number, in case we're providing a unix timestamp
+						if (!Number.isNaN(Number(created_at))) {
+							created_at = Number(created_at);
+						}
+
+						return { rate, created_at };
+					})
+					.filter(line => line !== null);
 				break;
 			}
 			case 'json': {
