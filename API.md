@@ -295,7 +295,7 @@ follows: `https://example.com/api/device/overland?apiKey=<API-KEY>`
 Make sure you put your API key in the URL query, but otherwise the payload and
 response information can be found in the link above.
 
-## Health (Steps, Weight, Food, Timetracking)
+## Health (Steps, Weight, Food, Timetracking, Heart Rate)
 
 **NOTE:** All endpoints in this category require the following headers, and
 return the same responses:
@@ -428,6 +428,73 @@ time, and end the previous session at that time as well.
 {
   "category": "cooking / eating",
   "created_at": "2024-01-01T09:00:00.000Z"
+}
+```
+
+### Heart Rate - POST `/api/health/heartrate
+
+💡 You could set up an iOS Shortcut to fetch all heart rate records for the
+previous day once per day and send them to this endpoint.
+
+#### Payload
+
+* `history` - either an array or a string (explained below)
+* `format` - (optional) either `json` or `csv`
+
+If you provide `history` as an array, each element must be in the following
+format:
+
+* `rate` - a number, as beats per minute
+* `created_at` - date/time, as an ISO8601 or as a unix timestamp in seconds or
+  milliseconds
+
+If you provide `history` as a string, you MUST provide `format`. If the chosen
+format is JSON, it must be a stringified version of the syntax above, where the
+value is an array of objects. If the chosen format is CSV, the first column must
+be the heart rate, and the second column is the timestamp.
+
+#### Payload Example (without format)
+
+In this example, three heart rate samples were provided, using each of the
+different date/time formats.
+
+```json
+{
+  "history": [
+    {
+      "rate": 70,
+      "created_at": "2026-01-01T09:30:00.000Z"
+    },
+    {
+      "rate": 72,
+      "created_at": 1767259830
+    },
+    {
+      "rate": 74,
+      "created_at": 1767259900000
+    },
+  ]
+}
+```
+
+#### Payload Example (using `json` format)
+
+```json
+{
+  "history": "[{\"rate\":70,\"created_at\":\"2026-01-01T09:30:00.000Z\"}]",
+  "format": "json"
+}
+```
+
+#### Payload Example (using `csv` format)
+
+In this example, the same three heart rate samples were provided, using unix
+timestamps as seconds
+
+```json
+{
+  "history": "70,1767259800\n72,1767259830\n74,1767259900",
+  "format": "csv"
 }
 ```
 

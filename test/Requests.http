@@ -49,6 +49,42 @@ Content-Type: application/json
 	"created_at": "{{$datetime iso8601}}"
 }
 
+### Heart Rate Logging
+
+POST {{baseUrl}}/api/health/heartrate
+Authorization: {{apiKey}}
+Content-Type: application/json
+
+{
+	"history": [
+		{ "rate": 70, "created_at": "{{$datetime iso8601 -2 s}}" },
+		{ "rate": 72, "created_at": "{{$datetime iso8601 -1 s}}" },
+		{ "rate": 74, "created_at": "{{$datetime iso8601}}" }
+	]
+}
+
+### Heart Rate Logging using CSV
+
+POST {{baseUrl}}/api/health/heartrate
+Authorization: {{apiKey}}
+Content-Type: application/json
+
+{
+	"history": "70,{{$datetime iso8601 -2 s}}\n72,{{$timestamp -1 s}}\n74,{{$timestamp}}",
+	"format": "csv"
+}
+
+### Heart Rate Logging using JSON string
+
+POST {{baseUrl}}/api/health/heartrate
+Authorization: {{apiKey}}
+Content-Type: application/json
+
+{
+	"history": "[{\"rate\":70,\"created_at\":\"{{$datetime iso8601}}\"}]",
+	"format": "json"
+}
+
 ###
 
 POST {{baseUrl}}/api/device/battery

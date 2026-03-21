@@ -1,0 +1,8 @@
+BEGIN TRANSACTION;
+
+CREATE TABLE health_heartrate (
+	"rate" NUMERIC NOT NULL,
+	"created_at" NUMERIC NOT NULL
+);
+
+COMMIT;
