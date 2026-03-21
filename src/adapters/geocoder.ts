@@ -60,7 +60,7 @@ function cleanCache() {
 export async function rawReverseLookup(lat: number, long: number) {
 	try {
 		const { body } = await phin<OpenStreetMapResponse>({
-			url: `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&zoom=13&format=json&addressdetails=1`,
+			url: `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&zoom=11&format=json&addressdetails=1`,
 			method: 'GET',
 			parse: 'json',
 			headers: {
@@ -69,12 +69,7 @@ export async function rawReverseLookup(lat: number, long: number) {
 			},
 		});
 		const result = {
-			city:
-				body.address.city ||
-				body.address.town ||
-				body.address.village ||
-				body.address.suburb ||
-				body.address.hamlet,
+			city: body.address.city || body.address.town || body.address.village || body.address.hamlet,
 			state: body.address.state,
 			retrievedAt: Date.now(),
 		};
