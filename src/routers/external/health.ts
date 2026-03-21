@@ -128,7 +128,7 @@ router.post('/heartrate', (req: RequestFrontend<object, HeartRatePayload>, res) 
 		// the raw value is before the year 2000.
 		const isUsingSeconds = typeof created_at === 'number' && created_at < 946684800000;
 		const timestamp = new Date(isUsingSeconds ? created_at * 1000 : created_at).getTime();
-		insertHeartRate({ rate, created_at: timestamp });
+		insertHeartRate({ rate: Math.round(rate), created_at: timestamp });
 	}
 
 	res.send({ status: 'ok' });
