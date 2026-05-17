@@ -97,7 +97,7 @@ function parseFeed(feed: string): Promise<Partial<LetterboxdFilm>[]> {
 
 			if (currentTag.includes('Date')) {
 				value = new Date(value);
-			} else if (!Number.isNaN(Number.parseInt(value, 10))) {
+			} else if (/^-?[0-9.]+$/.test(value)) {
 				value = Number(value);
 			}
 
