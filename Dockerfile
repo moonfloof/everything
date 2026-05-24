@@ -1,4 +1,4 @@
-FROM node:22
+FROM node:24
 
 VOLUME [ "/app/data", "/app/public/game-images", "/app/public/film-images" ]
 
