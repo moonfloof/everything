@@ -125,7 +125,13 @@ function getCheckinImages(checkin_id: CheckinImage['checkin_id']) {
 	return getStatement<Pick<CheckinImage, 'id' | 'lat' | 'long'>>(
 		'getCheckinImages',
 		'SELECT id, lat, long FROM checkin_image WHERE checkin_id = $checkin_id ORDER BY taken_at ASC',
-	).all({ checkin_id });
+	)
+		.all({ checkin_id })
+		.map(row => ({
+			...row,
+			thumbnailUrl: `${config.serverExternalUri}/checkin/image-thumbnail/${row.id}.avif`,
+			fullUrl: `${config.serverExternalUri}/checkin/image/${row.id}.avif`,
+		}));
 }
 
 export function deleteCheckinImage(id: string) {

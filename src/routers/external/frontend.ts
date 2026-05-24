@@ -472,7 +472,7 @@ router.get('/checkin/:checkin_id', (req, res) => {
 
 	if (checkin.images.length > 0 && checkin.images[0] !== undefined) {
 		title = `${title} and took ${checkin.images.length} photos`;
-		metaImage = `/checkin/image/${checkin.images[0].id}.avif`;
+		metaImage = checkin.images[0].thumbnailUrl;
 		if (checkin.map_svg !== null) {
 			mapImages = getPhotoPositions(checkin.map_svg, checkin.images);
 		}

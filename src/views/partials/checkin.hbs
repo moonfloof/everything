@@ -24,7 +24,7 @@
 			<div class="right checkin-image-row">
 				{{#each data.images as |image|}}
 					<{{#if ../includePopovers}}button popovertarget="{{image.id}}"{{else}}div{{/if}} class="checkin-image-container">
-						<img src="/checkin/image-thumbnail/{{image.id}}.avif" class="checkin-image">
+						<img src="{{image.thumbnailUrl}}" class="checkin-image">
 					</{{#if ../includePopovers}}button{{else}}div{{/if}}>
 				{{/each}}
 			</div>

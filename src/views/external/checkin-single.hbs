@@ -15,7 +15,7 @@
 	<div id="checkin-map-image-overlay">
 		{{#each mapImages as |image|}}
 		<button class="checkin-map-image" popovertarget="{{image.id}}" style="left:{{image.left}}%;top:{{image.top}}%;">
-			<img src="/checkin/image-thumbnail/{{image.id}}.avif">
+			<img src="{{image.thumbnailUrl}}">
 		</button>
 		{{/each}}
 	</div>
@@ -27,7 +27,7 @@
 {{#if checkin.images }}
 	{{#each checkin.images as |image|}}
 	<button class="checkin-image-popover" id="{{image.id}}" popover="auto" popovertarget="{{image.id}}" popovertargetaction="hide">
-		<img src="/checkin/image/{{image.id}}.avif">
+		<img src="{{image.fullUrl}}">
 	</button>
 	{{/each}}
 {{/if}}

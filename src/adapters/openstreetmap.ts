@@ -111,17 +111,26 @@ function parseBoundingBoxFromSvg(svg: string): BoundingBox | null {
 	};
 }
 
-export function getPhotoPositions(svg: string, photos: Pick<CheckinImage, 'id' | 'lat' | 'long'>[]) {
+export function getPhotoPositions(
+	svg: string,
+	photos: {
+		id: CheckinImage['id'];
+		lat: CheckinImage['lat'];
+		long: CheckinImage['long'];
+		fullUrl: string;
+		thumbnailUrl: string;
+	}[],
+) {
 	const bbox = parseBoundingBoxFromSvg(svg);
 	if (bbox === null) return [];
 	const getXY = createGetXY(bbox, 100, 100);
 	return photos.reduce(
-		(mapped, { id, lat, long }) => {
+		(mapped, { lat, long, ...rest }) => {
 			if (long === null || lat === null) {
 				return mapped;
 			}
 			const [left, top] = getXY([long, lat]);
-			mapped.push({ id, left, top });
+			mapped.push({ left, top, ...rest });
 			return mapped;
 		},
 		[] as { id: string; top: number; left: number }[],
