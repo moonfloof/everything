@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import { errors } from '@moonfloof/stdlib';
 import express from 'express';
 import helmet from 'helmet';
@@ -17,7 +16,12 @@ import {
 } from '../../database/checkins.js';
 import { getDevices } from '../../database/devices.js';
 import { countFilms, getFilms } from '../../database/films.js';
-import { getAchievementsForGame, getGameAndTotalPlaytime, getSessionsForGame } from '../../database/game.js';
+import {
+	getAchievementsForGame,
+	getGameAndTotalPlaytime,
+	getGameAssets,
+	getSessionsForGame,
+} from '../../database/game.js';
 import {
 	countGameSessions,
 	countGameSessionsForDays,
@@ -45,7 +49,6 @@ import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../da
 import { config } from '../../lib/config.js';
 import { formatTime, prettyDate } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
-import { getImagePath } from '../../lib/mediaFiles.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
 import type { RequestFrontend } from '../../types/express.js';
 
@@ -241,12 +244,14 @@ router.get('/games', (req: RequestFrontend, res) => {
 			? `has 100% perfected ${popular.length} video games, taking a total of ${durationHoursTotal} hours`
 			: `played video games for ${durationHoursTotal} hours in the last ${daysInt} days`;
 	const description = `and earned ${achievementsTotal} achievements in that time`;
+	const assets = popular[0] !== undefined ? getGameAssets(popular[0].id) : null;
 
 	res.render('external/game-list', {
 		sessions,
 		pagination,
 		title,
 		description,
+		metaImage: assets?.posterUrl,
 
 		// Popular chart
 		popular,
@@ -263,6 +268,7 @@ router.get('/game-session/:id', (req, res) => {
 		throw new NotFoundError('Game not found');
 	}
 
+	const assets = getGameAssets(session.game_id);
 	const title = `played ${session.name} for ${session.duration} on ${prettyDate(new Date(session.created_at))}`;
 	const description = `and got ${session.achievements.length} ${session.achievementText}`;
 
@@ -270,6 +276,7 @@ router.get('/game-session/:id', (req, res) => {
 		session,
 		description,
 		title,
+		metaImage: assets?.posterUrl,
 	});
 });
 
@@ -292,7 +299,7 @@ router.get('/game/:id', (req, res) => {
 	const achievementsUnlockedCount = achievements.filter(a => a.unlocked_session_id !== null).length;
 	const achievementPercentage = Math.round((achievementsUnlockedCount / achievements.length) * 100);
 	const lastSession = getSessionsForGame(game_id)[0];
-	const hasImage = existsSync(getImagePath('game', `hero-${game.id}`));
+	const hasImage = game.heroUrl !== null;
 
 	// TODO: Remove after a substantial amount of time, once achievements can be properly updated.
 	const lastUpdateCutoff = new Date('2024-12-14').getTime();
@@ -314,6 +321,7 @@ router.get('/game/:id', (req, res) => {
 		playedRecently,
 		lastSession,
 		hasImage,
+		metaImage: game.posterUrl,
 		achievements,
 		achievementsUnlockedCount,
 		achievementPercentage,
@@ -360,11 +368,13 @@ router.get('/films', (req: RequestFrontend, res) => {
 	const pagination = handlebarsPagination(page, countFilms());
 
 	const films = getFilms({ page });
+	const metaImage = films[0]?.posterUrl;
 
 	res.render('external/film-list', {
 		films,
 		pagination,
 		title: 'watches films',
+		metaImage,
 	});
 });
 
@@ -384,6 +394,7 @@ router.get('/film/:id', (req, res) => {
 		film,
 		title,
 		description,
+		metaImage: film.posterUrl,
 		rating,
 		watchDate,
 	});

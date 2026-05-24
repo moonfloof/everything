@@ -6,6 +6,7 @@ import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
+import { config } from '../lib/config.js';
 
 interface Film {
 	id: string;
@@ -42,6 +43,16 @@ export function insertFilm(film: Insert<Film>) {
 	};
 }
 
+export function getFilmAssets(id: string) {
+	const hasHeroImage = existsSync(getImagePath('film', `hero-${id}`));
+	const hasPosterImage = existsSync(getImagePath('film', `poster-${id}`));
+
+	return {
+		heroUrl: hasHeroImage ? config.serverExternalUri + `/film-images/hero-${id}.avif` : null,
+		posterUrl: hasPosterImage ? config.serverExternalUri + `/film-images/poster-${id}.avif` : null,
+	}
+}
+
 export function getFilms(parameters: Parameters = {}) {
 	const statement = getStatement<Film>(
 		'getFilms',
@@ -53,11 +64,7 @@ export function getFilms(parameters: Parameters = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => ({
 		...row,
-
-		heroUrl: existsSync(getImagePath('film', `hero-${row.id}`)) ? `/film-images/hero-${row.id}.avif` : null,
-		posterUrl: existsSync(getImagePath('film', `poster-${row.id}`))
-			? `/film-images/poster-${row.id}.avif`
-			: null,
+		...getFilmAssets(row.id),
 
 		durationIso: row.duration_secs ? msToIsoDuration(row.duration_secs * 1000) : null,
 		durationPretty: row.duration_secs ? prettyDuration(row.duration_secs * 1000) : null,
