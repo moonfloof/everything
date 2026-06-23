@@ -1,2 +1,2 @@
-./public/film-images/*.avif
-./public/game-images/*.avif
+/public/film-images/*.avif
+/public/game-images/*.avif
