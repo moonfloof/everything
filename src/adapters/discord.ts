@@ -1,7 +1,7 @@
 import { Client, type Message, Partials } from 'discord.js';
 import { insertBookmark } from '../database/bookmarks.js';
 import { insertYouTubeLike } from '../database/youtubelikes.js';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import { isoDurationToSeconds } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { getYouTubeVideoSnippet } from './youtube.js';
@@ -13,6 +13,7 @@ let client: Client;
 export function getDiscordClient() {
 	if (!(config.discord.token && config.discord.channelId)) {
 		log.warn('No token or channel ID provided, bot will not be enabled');
+		if (client) client.destroy();
 		return null;
 	}
 

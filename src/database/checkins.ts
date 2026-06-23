@@ -2,7 +2,7 @@ import { errors } from '@moonfloof/stdlib';
 import { v4 as uuid } from 'uuid';
 import { convertImageToThumbnail } from '../adapters/swarm.js';
 import { timeago } from '../adapters/timeago.js';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import { dateDefault, dayMs, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { shortSummary, unsafe_stripTags } from '../lib/strings.js';

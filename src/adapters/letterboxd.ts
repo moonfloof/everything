@@ -1,14 +1,12 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import dotenv from 'dotenv';
 import phin from 'phin';
 import sax from 'sax';
 import { insertFilm } from '../database/films.js';
-import { config } from '../lib/config.js';
-import { formatDate } from '../lib/formatDate.js';
+import { startOrRestartCron, stopCron } from '../lib/config/cron.js';
+import { config } from '../lib/config/index.js';
+import { dayMs, formatDate } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { searchForImagesById, tmdbMovieDetails } from './tmdb.js';
-
-dotenv.config();
 
 const log = new Logger('Letterboxd');
 
@@ -126,9 +124,8 @@ function parseFeed(feed: string): Promise<Partial<LetterboxdFilm>[]> {
 }
 
 async function logFilm(film: LetterboxdFilm) {
-	// Skip films older than double the interval
-	const intervalMs = config.letterboxd.intervalSecs * 1000;
-	if (film.watchedDate.getTime() < Date.now() - intervalMs * 2) {
+	// Skip films older than 3 days old
+	if (film.watchedDate.getTime() < Date.now() - dayMs * 3) {
 		return;
 	}
 
@@ -174,11 +171,10 @@ async function logFilm(film: LetterboxdFilm) {
 }
 
 export function fetchFilms() {
-	const intervalMs = config.letterboxd.intervalSecs * 1000;
-	const username = config.letterboxd.username;
+	const { pollCron, username } = config.letterboxd;
 
-	if (username === '' || username === undefined || intervalMs === 0) {
-		log.warn(`Will not fetch films due to one of: username = '${username}', intervalMs = '${intervalMs}'.`);
+	if (!(username && pollCron)) {
+		log.warn(`Will not fetch films due to one of: username = '${username}', pollCron = '${pollCron}'.`);
 		return;
 	}
 
@@ -199,10 +195,13 @@ export function fetchFilms() {
 }
 
 export function pollForFilmActivity() {
-	const intervalMs = config.letterboxd.intervalSecs * 1000;
+	const { pollCron } = config.letterboxd;
 
 	const fetchFn = fetchFilms();
-	if (!fetchFn) return;
+	if (!fetchFn) {
+		stopCron('letterboxd');
+		return;
+	}
 
-	setInterval(fetchFn, intervalMs);
+	startOrRestartCron('letterboxd', pollCron!, fetchFn);
 }

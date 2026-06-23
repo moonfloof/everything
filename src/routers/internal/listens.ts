@@ -9,7 +9,7 @@ import {
 	updateListen,
 	updateListenTrack,
 } from '../../database/listens.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
 
@@ -20,7 +20,7 @@ const router = express.Router();
 router.get('/', (req: RequestFrontend, res) => {
 	const { page = 0 } = req.query;
 	const pagination = handlebarsPagination(page, countListens());
-	const hasSubsonicConnected = config.subsonic.url !== '' && config.subsonic.url !== undefined;
+	const hasSubsonicConnected = config.subsonic.url !== '' && config.subsonic.url !== null;
 
 	const listens = getListens({ page });
 

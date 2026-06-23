@@ -498,69 +498,6 @@ timestamps as seconds
 }
 ```
 
-## Purchases (Monzo webhook)
-
-To keep track of your income/outgoings, you'll need to [set up a webhook using
-your Monzo account](https://developers.monzo.com/), and point it to the
-following address: `https://example.com/api/purchases?apiKey=<API-KEY>`.
-
-Alternatively, if you don't have a Monzo account, you can still post to this
-endpoint using the following payload.
-
-### Add Transaction - POST `/api/purchases?apiKey=<API-KEY>`
-
-#### Headers
-
-* **`Content-Type`:** `application/json`
-
-#### Payload
-
-* `account_id`: string, which MUST match the `EVERYTHING_MONZO_ACCOUNT_ID` value
-  provided in `.env`, otherwise an error will be thrown
-* `amount`: number, an outgoing payment is negative, and 100 times the amount of
-  the transaction (eg. 5.49 is `-549`). Income is positive (eg. 15.32 is `1532`)
-* `currency`: The 3-letter code of the currency used by the transaction (eg. £
-  is `GBP`, and $ could be `USD`, `AUD`, `NZD`, etc.)
-* `created`: the date/time of the transaction in ISO8601 format.
-* `category`: arbitrary value used to categorise the transaction.
-* `description`: arbitrary value - will only be used if merchant name is not
-  provided
-* `merchant`: an object containing the following properties:
-  * `name`: The name of the store/website/service the transaction was made with.
-
-#### Payload Example
-
-```json
-{
-  "account_id": "acc_df50c4ee-1333-...",
-  "amount": -500,
-  "currency": "GBP",
-  "created": "2024-01-01T09:00:00.000Z",
-  "category": "groceries",
-  "merchant": {
-    "name": "Tesco"
-  }
-}
-```
-
-#### Responses
-
-200, successful:
-
-```json
-{
-  "status": "ok"
-}
-```
-
-400, failure:
-
-```json
-{
-  "status": "Information about the error."
-}
-```
-
 ## Swarm
 
 You can log check-ins via Swarm, however there's a little bit of setup required,

@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import phin from 'phin';
 import type { Game } from '../database/game.js';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import Logger from '../lib/logger.js';
 import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
 import { saveImages } from './steam.js';
@@ -71,8 +71,6 @@ export async function searchForImages(term: string, game: Game) {
 		saveImages(Number(appid), game.id);
 		return;
 	}
-
-	if (!config.steamgriddb.apiBaseUrl) return;
 
 	const heroImagePath = getImagePath('game', `hero-${game.id}`);
 	const libraryImagePath = getImagePath('game', `library-${game.id}`);

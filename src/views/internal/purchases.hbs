@@ -1,9 +1,0 @@
-{{> pageHeader title="Purchases" url="/" }}
-
-{{> internal/purchase }}
-
-{{#each purchases as |purchase| }}
-	{{> internal/purchase data=purchase }}
-{{/each}}
-
-{{> pagination route="/purchases" pagination=pagination }}

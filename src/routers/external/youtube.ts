@@ -1,10 +1,9 @@
 import express from 'express';
-import { generateAuthUrl, getYouTubeVideoSnippet, retrieveAccessToken } from '../../adapters/youtube.js';
+import { getYouTubeVideoSnippet } from '../../adapters/youtube.js';
 import { validateDevice } from '../../database/devices.js';
 import { insertYouTubeLike } from '../../database/youtubelikes.js';
 import { isoDurationToSeconds } from '../../lib/formatDate.js';
 import Logger from '../../lib/logger.js';
-import { isLocal } from '../../lib/middleware/isLocal.js';
 import type { RequestFrontend } from '../../types/express.js';
 
 const log = new Logger('YouTube');
@@ -32,17 +31,6 @@ router.post('/like', async (req: RequestFrontend, res) => {
 		log.error(err);
 		res.status(400).send({ status: (err as Error).message });
 	}
-});
-
-router.use(isLocal);
-
-router.get('/auth', (_req, res) => {
-	res.redirect(generateAuthUrl());
-});
-
-router.get('/callback', async (req: RequestFrontend, res) => {
-	await retrieveAccessToken(req.query.code);
-	res.redirect('/');
 });
 
 export default router;

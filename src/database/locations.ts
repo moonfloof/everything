@@ -1,4 +1,4 @@
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import { dayMs, minuteMs } from '../lib/formatDate.js';
 import type { Insert } from '../types/database.js';
 import { getStatement } from './database.js';

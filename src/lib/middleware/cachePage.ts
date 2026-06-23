@@ -4,7 +4,8 @@
 
 import type { OutgoingHttpHeaders } from 'node:http';
 import type { NextFunction, Request, Response } from 'express';
-import { config } from '../config.js';
+import { startOrRestartCron, stopCron } from '../config/cron.js';
+import { config } from '../config/index.js';
 import Logger from '../logger.js';
 
 interface CacheObj {
@@ -23,7 +24,7 @@ class PageCache {
 
 	public getCache() {
 		return (req: Request, res: Response, next: NextFunction) => {
-			if (config.cacheDurationSecs === 0 || config.cacheIntervalSecs === 0) {
+			if (config.cacheDurationSecs === 0 || config.cacheClearCron === null) {
 				next();
 				return;
 			}
@@ -71,15 +72,15 @@ class PageCache {
 	}
 
 	public pollForCacheDeletion() {
-		if (config.cacheIntervalSecs <= 0 || config.cacheDurationSecs <= 0) {
+		if (config.cacheClearCron === null || config.cacheDurationSecs <= 0) {
 			this.#logger.warn('Page caching disabled, all requests will be hot');
+			stopCron('cache');
 			return;
 		}
 
-		const intervalDurationMs = config.cacheIntervalSecs * 1000;
 		const cacheDurationMs = config.cacheDurationSecs * 1000;
 
-		setInterval(() => {
+		const deleteCache = () => {
 			for (const [key, value] of this.#cache.entries()) {
 				if (value.lastUpdateUnixMs > Date.now() - cacheDurationMs) {
 					continue;
@@ -89,7 +90,9 @@ class PageCache {
 				this.#logger.info(`Cache for '${key}' expired. Deleting`);
 				this.#cache.delete(key);
 			}
-		}, intervalDurationMs);
+		};
+
+		startOrRestartCron('cache', config.cacheClearCron, deleteCache);
 	}
 }
 

@@ -1,0 +1,9 @@
+BEGIN TRANSACTION;
+
+CREATE TABLE config (
+	"key" TEXT NOT NULL UNIQUE,
+	"value" TEXT,
+	"updated_at" INTEGER NOT NULL
+);
+
+COMMIT;

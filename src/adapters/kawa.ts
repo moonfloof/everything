@@ -1,5 +1,5 @@
 import phin from 'phin';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import Logger from '../lib/logger.js';
 
 const log = new Logger('kawa');

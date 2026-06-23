@@ -1,9 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
-import dotenv from 'dotenv';
 import phin from 'phin';
-import { config } from '../lib/config.js';
-
-dotenv.config();
+import { config } from '../lib/config/index.js';
 
 const getPassword = () => {
 	const salt = randomBytes(5).toString('base64url');
@@ -28,7 +25,7 @@ const getBaseParams = () => {
 };
 
 const checkEnvironment = () => {
-	return !(config.subsonic.url && config.subsonic.username);
+	return config.subsonic.url && config.subsonic.username;
 };
 
 interface AlbumList {
@@ -101,7 +98,7 @@ export const getAlbumList = async (page = 0) => {
 		offset: `${Math.floor(page) * 500}`,
 	}).toString();
 
-	const url = new URL(`/rest/getAlbumList2?${params}`, config.subsonic.url);
+	const url = new URL(`/rest/getAlbumList2?${params}`, config.subsonic.url!);
 
 	const response = await phin<AlbumList2Response>({ url, parse: 'json' });
 
@@ -133,7 +130,7 @@ export const getAlbumTracks = async (albumId: string) => {
 		id: albumId,
 	});
 
-	const url = new URL(`/rest/getAlbum?${params}`, config.subsonic.url);
+	const url = new URL(`/rest/getAlbum?${params}`, config.subsonic.url!);
 
 	const response = await phin<AlbumResponse>({ url, parse: 'json' });
 
@@ -149,7 +146,7 @@ export const scrobbleTrack = async (trackId: number, timestamp: number) => {
 		time: `${timestamp}`,
 	});
 
-	const url = new URL(`/rest/scrobble?${params}`, config.subsonic.url);
+	const url = new URL(`/rest/scrobble?${params}`, config.subsonic.url!);
 
 	const response = await phin({ url, parse: 'json' });
 
@@ -168,7 +165,7 @@ const rawSearch = async (query: string, page = 0) => {
 		query,
 	});
 
-	const url = new URL(`/rest/search3?${params}`, config.subsonic.url);
+	const url = new URL(`/rest/search3?${params}`, config.subsonic.url!);
 
 	const response = await phin<Search3Response>({ url, parse: 'json' });
 	return response.body['subsonic-response'].searchResult3;

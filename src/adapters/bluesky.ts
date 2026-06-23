@@ -1,8 +1,8 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import phin from 'phin';
 import { type Entry, insertNote } from '../database/notes.js';
-import { config } from '../lib/config.js';
-import { minuteMs } from '../lib/formatDate.js';
+import { startOrRestartCron, stopCron } from '../lib/config/cron.js';
+import { config } from '../lib/config/index.js';
 import Logger from '../lib/logger.js';
 import type { Insert } from '../types/database.js';
 import type { AuthorFeedResponse, FeedItem, Post } from './blueskyTypes.js';
@@ -33,7 +33,7 @@ function savePostsToDisk() {
 
 async function fetchPosts(): Promise<AuthorFeedResponse> {
 	const { username } = config.bluesky;
-	const params = new URLSearchParams({ actor: username || '' });
+	const params = new URLSearchParams({ actor: username! });
 	const response = await phin<AuthorFeedResponse>({
 		url: `https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?${params.toString()}`,
 		method: 'GET',
@@ -169,11 +169,11 @@ async function getPostMetadata(item: FeedItem): Promise<Partial<Entry>> {
 }
 
 export function pollForBlueskyPosts() {
-	const { pollInterval, username, includeReplies, includeReposts } = config.bluesky;
+	const { pollCron, username, includeReplies, includeReposts } = config.bluesky;
 
-	const intervalMs = pollInterval * minuteMs;
-	if (intervalMs === 0 || !username) {
+	if (!(pollCron && username)) {
 		log.warn('Polling is disabled, no posts will be copied');
+		stopCron('bluesky');
 		return;
 	}
 
@@ -231,5 +231,5 @@ export function pollForBlueskyPosts() {
 		savePostsToDisk();
 	};
 
-	setInterval(copyPosts, intervalMs);
+	startOrRestartCron('bluesky', pollCron, copyPosts);
 }

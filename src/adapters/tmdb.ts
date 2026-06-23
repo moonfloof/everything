@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import phin from 'phin';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import Logger from '../lib/logger.js';
 import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
 import type { ImagesResponse, SearchResponse, TmbdMovieDetails, TmdbImage } from './tmdbTypes.js';
@@ -10,7 +10,7 @@ const log = new Logger('tmdb');
 async function request<T>(path: string, params?: URLSearchParams): Promise<T> {
 	const { accessToken, apiBaseUrl } = config.tmdb;
 
-	if (accessToken === undefined || accessToken.trim() === '') {
+	if (accessToken === null || accessToken.trim() === '') {
 		throw new Error('');
 	}
 
@@ -74,7 +74,7 @@ function getPreferredImage(images: TmdbImage[], preferredLanguage?: string): Tmd
 }
 
 export async function searchForImagesById(watchId: string, movieId: number, type: 'tv' | 'movie'): Promise<void> {
-	if (config.tmdb.accessToken === '' || config.tmdb.accessToken === undefined) return;
+	if (!config.tmdb.accessToken) return;
 
 	const heroPath = getImagePath('film', `hero-${watchId}`);
 	const posterPath = getImagePath('film', `poster-${watchId}`);
@@ -104,7 +104,7 @@ export async function searchForImagesById(watchId: string, movieId: number, type
 
 /** Only searches for movies, ignores TV shows */
 export async function searchForImagesByName(watchId: string, query: string, year?: string | number): Promise<void> {
-	if (config.tmdb.accessToken === '' || config.tmdb.accessToken === undefined) return;
+	if (!config.tmdb.accessToken) return;
 
 	const response = await tmbdSearch(query, year);
 	if (response.results.length === 0) {

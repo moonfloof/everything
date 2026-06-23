@@ -6,7 +6,7 @@ import {
 	insertBookmark,
 	updateBookmark,
 } from '../../database/bookmarks.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
 

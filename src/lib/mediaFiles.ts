@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { basename } from 'node:path';
 import phin from 'phin';
 import sharp, { type Sharp } from 'sharp';
-import { config } from './config.js';
+import { config } from './config/index.js';
 import Logger from './logger.js';
 import { queue } from './queue.js';
 

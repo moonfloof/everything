@@ -1,12 +1,12 @@
 import { existsSync } from 'node:fs';
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
+import { config } from '../lib/config/index.js';
 import { dateDefault, msToIsoDuration, prettyDuration } from '../lib/formatDate.js';
 import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
-import { config } from '../lib/config.js';
 
 interface Film {
 	id: string;
@@ -48,9 +48,9 @@ export function getFilmAssets(id: string) {
 	const hasPosterImage = existsSync(getImagePath('film', `poster-${id}`));
 
 	return {
-		heroUrl: hasHeroImage ? config.serverExternalUri + `/film-images/hero-${id}.avif` : null,
-		posterUrl: hasPosterImage ? config.serverExternalUri + `/film-images/poster-${id}.avif` : null,
-	}
+		heroUrl: hasHeroImage ? `${config.serverExternalUri}/film-images/hero-${id}.avif` : null,
+		posterUrl: hasPosterImage ? `${config.serverExternalUri}/film-images/poster-${id}.avif` : null,
+	};
 }
 
 export function getFilms(parameters: Parameters = {}) {

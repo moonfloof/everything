@@ -1,0 +1,1236 @@
+{{> pageHeader title="Config" url="/"}}
+
+<style>
+	#config-container {
+		display: flex;
+		flex-direction: row;
+		gap: 16px;
+
+		@media (max-width: 600px) {
+			flex-direction: column;
+		}
+
+		#sidebar {
+			display: flex;
+			flex-direction: column;
+			flex-basis: 192px;
+			flex-shrink: 0;
+
+			input[type="radio"] {
+				display: none;
+			}
+
+			h3 {
+				padding: 0 12px 16px;
+			}
+
+			label {
+				padding: 12px 16px;
+				cursor: pointer;
+				border-radius: 16px;
+			}
+
+			input[type="radio"]:checked+label {
+				background-color: var(--primary-bg-dark);
+				font-weight: 700;
+			}
+		}
+
+		.page {
+			display: none;
+			flex-direction: column;
+			flex: 1;
+
+			p.description {
+				font-size: 80%;
+			}
+
+			p,
+			ul {
+				margin-bottom: 4px;
+			}
+
+			.panel {
+				margin-bottom: 16px;
+			}
+		}
+
+		#page-server {
+			display: flex;
+		}
+
+		.icon-job-status {
+			min-width: 14px;
+
+			svg {
+				width: 14px;
+				height: 14px;
+			}
+		}
+	}
+</style>
+
+<div id="config-container">
+	<div id="sidebar">
+		<input type="radio" name="page" id="server" value="server" checked />
+		<label for="server">Server</label>
+
+		<input type="radio" name="page" id="location" value="location" />
+		<label for="location">Location Tracking</label>
+
+		<input type="radio" name="page" id="crontasks" value="crontasks" />
+		<label for="crontasks">Schedule Status</label>
+
+		<hr>
+		<h3>Integrations</h3>
+
+		<input type="radio" name="page" id="steam" value="steam" />
+		<label for="steam">Steam</label>
+
+		<input type="radio" name="page" id="psn" value="psn" />
+		<label for="psn">PSN</label>
+
+		<input type="radio" name="page" id="retroachievements" value="retroachievements" />
+		<label for="retroachievements">RetroAchievements</label>
+
+		<input type="radio" name="page" id="steamgriddb" value="steamgriddb" />
+		<label for="steamgriddb">Steam Grid DB</label>
+
+		<input type="radio" name="page" id="letterboxd" value="letterboxd" />
+		<label for="letterboxd">Letterboxd</label>
+
+		<input type="radio" name="page" id="tmdb" value="tmdb" />
+		<label for="tmdb">TMDB</label>
+
+		<input type="radio" name="page" id="bluesky" value="bluesky" />
+		<label for="bluesky">Bluesky</label>
+
+		<input type="radio" name="page" id="discord" value="discord" />
+		<label for="discord">Discord</label>
+
+		<input type="radio" name="page" id="google" value="google" />
+		<label for="google">YouTube / Google</label>
+
+		<input type="radio" name="page" id="sonarr" value="sonarr" />
+		<label for="sonarr">Sonarr</label>
+
+		<input type="radio" name="page" id="subsonic" value="subsonic" />
+		<label for="subsonic">Subsonic</label>
+
+		<input type="radio" name="page" id="swarm" value="swarm" />
+		<label for="swarm">Swarm</label>
+
+		<input type="radio" name="page" id="kawa" value="kawa" />
+		<label for="kawa">Kawa</label>
+	</div>
+
+	<div class="page" id="page-server">
+		<form action="/config/server" method="POST">
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>👤 Your Name</strong></p>
+						<p class="description">
+							This is displayed on every page, and used as metadata too.
+						</p>
+						<input class="right" type="text" name="personName" placeholder="Your Name"
+							value="{{config.personName}}" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>🤖 User Agent</strong></p>
+						<p class="description">
+							The string used to identify your server when making calls to external services. It's
+							strongly recommended you set this, as you may otherwise be blocked.
+						</p>
+						<p class="description">
+							💡 Something similar to:<br>
+							<code>my quantified-self data archive &lt;my@email.address&gt;</code>
+						</p>
+						<input class="right" type="text" name="versionString" placeholder="User Agent"
+							value="{{config.versionString}}" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>📱 Default Device ID</strong></p>
+						<p class="description">
+							Most endpoints will use the device provided in the API key, however some internal endpoints
+							and functions don't, so they will use the device ID provided here.
+						</p>
+						<select name="defaultDeviceId" class="right">
+							<option disabled>Select a default device ID</option>
+							{{#each devices as |device|}}
+							<option value="{{device.id}}" {{#xif device.id '=='
+								../config.defaultDeviceId}}selected{{/xif}}>
+								{{device.description}}
+							</option>
+							{{/each}}
+						</select>
+					</section>
+					<hr>
+
+					<section>
+						<input type="checkbox" name="serverCacheEnable" id="serverCacheEnable" {{#if
+							config.cacheClearCron}}checked="checked" {{/if}} />
+						<label for="serverCacheEnable"><strong>Enable page caching</strong></label>
+						<p class="description">
+							Cache common pages into memory, like <code>/music</code> and <code>/games</code>, to reduce
+							database load. Pages are cached for 20 minutes.
+						</p>
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-location">
+		<form action="/config/location" method="POST">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						Location tracking can be performed using the <a href="https://overland.p3k.app/" target="_blank"
+							rel="noopener"><strong>Overland app {{>svgExternal}}</strong></a> by Aaron Parecki (or, by
+						using an equivalent API). To use it, you'll need to set your URL:
+					</p>
+					<hr>
+
+					<p class="device-key-picker">
+						<label for="overland-device-key-picker">Select a device:</label>
+						<select id="overland-device-key-picker">
+							{{#each devices as |device|}}
+							<option value="{{device.api_key}}">{{device.description}}</option>
+							{{/each}}
+						</select>
+						<br>
+						<small>
+							<code>
+							{{externalRoot}}/api/device/overland?apiKey=<span class="device-key-display"></span>
+						</code>
+						</small>
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>🗺️ Enable Geocoder</strong></p>
+						<p class="description">
+							As your location tracking updates, perform a reverse lookup search using OpenStreetMap to
+							get the name of your nearest city.
+						</p>
+						<span class="right">
+							<input type="checkbox" name="enableGeocoder" id="enableGeocoder" {{#if
+								config.geocoder.enabled}}checked="checked" {{/if}} />
+							<label for="enableGeocoder">Enable Geocoder</label>
+						</span>
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>🌆 Display City on Homepage</strong></p>
+						<p class="description">
+							Displays your nearest city on the dashboard. This only works if the geocoder is also
+							enabled.
+						</p>
+						<span class="right">
+							<input type="checkbox" name="dashboardDisplay" id="dashboardDisplay" {{#if
+								config.location.dashboardDisplay}}checked="checked" {{/if}} />
+							<label for="dashboardDisplay">Display City on Homepage</label>
+						</span>
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>⏲️ Delay Location Display (in minutes)</strong></p>
+						<p class="description">
+							This hides all location related data (check-ins, current city) from public view for this
+							amount of time, for privacy reasons. The higher the better!
+						</p>
+						<input class="right" type="number" name="delayMins"
+							placeholder="Delay Location Display (minutes)" value="{{config.location.delayMins}}" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>🔐 Private Check-in Location</strong></p>
+						<p class="description">
+							This will automatically set any check-ins you make to "private" if the venue location is
+							near this location.
+						</p>
+						<p class="description">
+							💭 Set both fields to <code>0</code> (zero) to disable
+						</p>
+						<input class="right" type="number" step="0.001" name="privateLat"
+							placeholder="Private Location Latitude" value="{{config.location.privateLat}}" />
+						<input class="right" type="number" step="0.001" name="privateLong"
+							placeholder="Private Location Longitude" value="{{config.location.privateLong}}" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>⭕ Private Check-in Radius</strong></p>
+						<p class="description">
+							If you have a private location set, this determines how far away the check-in venue needs to
+							be before it can be marked as a public check-in. This value is based in co-ordinate points
+							(defaults to <code>0.01</code>)
+						</p>
+						<input class="right" type="number" step="0.001" name="privateRadius"
+							placeholder="Private Location Radius" value="{{config.location.privateRadius}}" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-crontasks">
+		<div class="panel">
+			{{> panelHeader title="running jobs"}}
+			<div class="content">
+				<p>
+					There are several jobs that run periodically in the background, based on the settings you've chosen.
+					Their status is displayed below, and you can click a name to change their settings.
+				</p>
+				<hr>
+
+				{{#each jobs as |job|}}
+				<div class="flex-row row">
+					{{#if job.status}}
+					<span class="text-success icon-job-status">{{> svgCheckCircle}}</span>
+					{{else}}
+					<span class="text-error icon-job-status">{{> svgCrossCircle}}</span>
+					{{/if}}
+					<span>
+						<a href="#{{job.configPage}}"><strong>{{job.name}}:</strong></a>
+						{{#if job.status}}
+						runs {{job.status}}
+						{{else}}
+						not running
+						{{/if}}
+					</span>
+				</div>
+				{{/each}}
+			</div>
+		</div>
+	</div>
+
+	<div class="page" id="page-steam">
+		<form action="/config/steam" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						Games played through Steam - and any achievements you earn - can be automatically tracked. It
+						will not track any external games you add to Steam, only ones that can be viewed on your Steam
+						profile.
+					</p>
+					<hr>
+					<p>
+						⚠️ For game tracking to work through Steam, you will either need to make sure:
+					</p>
+					<ul>
+						<li>the user ID and API key belong to the same account</li>
+						<li>
+							OR, your <em>profile</em> and <em>game details</em> on Steam are set to "public" via the
+							<a href="https://steamcommunity.com/id/me/edit/settings" target="_blank" rel="noopener">
+								<strong>Privacy Settings page {{> svgExternal}}</strong>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<input type="checkbox" name="steamEnabled" id="steamEnabled" {{#xif
+							config.steam.pollIntervalMinutes '>' 0}}checked="checked" {{/xif}} />
+						<label for="steamEnabled"><strong>Enable Steam tracking</strong></label>
+						<p class="description">
+							Tracking will only be enabled if both API key <em>and</em> user ID are also provided.
+						</p>
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Steam API Key</strong></p>
+						<p class="description">
+							Generate a key from the
+							<a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">
+								<strong>Steam Web API Key page {{> svgExternal}}</strong>
+							</a>, then paste it here.
+						</p>
+						<input type="text" class="right" name="steamApiKey" id="steamApiKey"
+							value="{{config.steam.apiKey}}" placeholder="Steam API Key" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Steam User ID</strong></p>
+						<p class="description">
+							Your Steam ID is a long string of numbers, which can be found at the top of your
+							<a href="https://store.steampowered.com/account/" target="_blank" rel="noopener">
+								<strong>Account page {{> svgExternal}}</strong>
+							</a>.
+						</p>
+						<input type="text" class="right" name="steamUserId" id="steamUserId"
+							value="{{config.steam.userId}}" placeholder="Steam User ID" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Device ID</strong></p>
+						<p class="description">
+							You can change which device steam games are logged as (eg. a device named "PC")
+						</p>
+						<select name="steamDeviceId" class="right">
+							<option value="">Use default device</option>
+							<hr>
+							{{#each devices as |device|}}
+							<option value="{{device.id}}" {{#xif device.id '=='
+								../config.steam.deviceId}}selected{{/xif}}>
+								{{device.description}}
+							</option>
+							{{/each}}
+						</select>
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-psn">
+		<form action="/config/psn" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						PlayStation 4 and 5 games - and any trophies earned - can be automatically tracked.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<input type="checkbox" name="psnEnabled" id="psnEnabled" {{#xif
+							config.psn.pollIntervalMinutes '>' 0}}checked="checked" {{/xif}} />
+						<label for="psnEnabled"><strong>Enable PSN game tracking</strong></label>
+						<p class="description">
+							Tracking will only be enabled if authentication is currently active.
+						</p>
+					</section>
+
+					{{#xif config.psn.pollIntervalMinutes '>' 0}}
+					<hr>
+
+					{{#if psnAuthentication.refreshTokenHasExpired}}
+					<div class="panel error">
+						<div class="content">
+							<span class="text-error icon-job-status">{{> svgCrossCircle}}</span>
+							<strong>Not authentication (or token has expired)!</strong>
+						</div>
+					</div>
+
+					<p>
+						To set up PSN tracking for the first time, follow these steps:
+					</p>
+					<ol>
+						<li>Enable PSN game tracking below, then click Save Changes.</li>
+						<li>
+							Log in to your PSN account by visiting
+							<a href="https://www.playstation.com/" target="_blank" rel="noopener">
+								<strong>the PlayStation website {{> svgExternal}}</strong>
+							</a>
+						</li>
+						<li>
+							Visit this URL - it will provide you with an "NPSSO" token:<br>
+							<a href="https://ca.account.sony.com/api/v1/ssocookie">
+								<strong>ca.account.sony.com/api/v1/ssocookie {{> svgExternal}}</strong>
+							</a>
+						</li>
+					</ol>
+					<hr>
+
+					<section>
+						<p><strong>NPSSO</strong></p>
+						<input type="text" class="right" name="psnNpsso" id="psnNpsso" placeholder="PSN NPSSO" />
+					</section>
+					<hr>
+					{{else}}
+					<div class="panel success">
+						<div class="content">
+							<span class="text-success icon-job-status">{{> svgCheckCircle}}</span>
+							Token expires
+							<strong>{{psnAuthentication.refreshTokenExpiresIn}}</strong>
+						</div>
+					</div>
+					{{/if}}
+
+					<section>
+						<p><strong>Device ID</strong></p>
+						<p class="description">
+							You can change which device PlayStation games are logged as (eg. a device named "PS5")
+						</p>
+						<select name="psnDeviceId" class="right">
+							<option value="">Use default device</option>
+							<hr>
+							{{#each devices as |device|}}
+							<option value="{{device.id}}" {{#xif device.id '=='
+								../config.psn.deviceId}}selected{{/xif}}>
+								{{device.description}}
+							</option>
+							{{/each}}
+						</select>
+					</section>
+
+					{{/xif}}
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-retroachievements">
+		<form action="/config/retroachievements" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						You can track emulated games using RetroAchievements. This also includes any achievements earned
+						during a play session.
+					</p>
+					<hr>
+
+					<p>
+						⚠️ <strong>NOTE:</strong> For games to be tracked, you must be logged in to RetroAchievements on
+						the emulator, achievements must already be added to the game's RetroAchievements page, and you
+						must be playing one of the supported hashes for that game.
+					</p>
+					<p>
+						For example, <a href="https://retroachievements.org/game/2774/hashes" target="_blank">
+							<strong>Jak and Daxter (PS2) {{> svgExternal}}</strong>
+						</a> only supports playing the NTSC-U version of the game, with a specific patch applied.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<input type="checkbox" name="retroachievementsEnabled" id="retroachievementsEnabled" {{#xif
+							config.retroachievements.pollIntervalMinutes '>' 0}}checked="checked" {{/xif}} />
+						<label for="retroachievementsEnabled">
+							<strong>Enable RetroAchievements game tracking</strong>
+						</label>
+						<p class="description">
+							Tracking will only be enabled if the API key and username below are <em>also</em> provided.
+						</p>
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>API Key</strong></p>
+						<p class="description">
+							Your API key can be retrieved from your
+							<a href="https://retroachievements.org/settings" target="_blank" rel="noopener">
+								<strong>RetroAchievements Settings page {{> svgExternal}}</strong>
+							</a>.
+						</p>
+						<input type="text" class="right" name="retroachievementsApiKey" id="retroachievementsApiKey"
+							value="{{config.retroachievements.apiKey}}" placeholder="API Key" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Username</strong></p>
+						<p class="description">
+							Games played using this account will be tracked.
+						</p>
+						<input type="text" class="right" name="retroachievementsUsername" id="retroachievementsUsername"
+							value="{{config.retroachievements.username}}" placeholder="Username" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Device ID</strong></p>
+						<p class="description">
+							You can change which device games are logged as (eg. a device named "Steam Deck")
+						</p>
+						<select name="retroachievementDeviceId" class="right">
+							<option value="">Use default device</option>
+							<hr>
+							{{#each devices as |device|}}
+							<option value="{{device.id}}" {{#xif device.id '=='
+								../config.retroachievements.deviceId}}selected{{/xif}}>
+								{{device.description}}
+							</option>
+							{{/each}}
+						</select>
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-steamgriddb">
+		<form action="/config/steamgriddb" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						Steam Grid DB is used for fetching images for PlayStation games and emulator games played using
+						RetroAchievements (these images are displayed on individual game pages and the homepage). If you
+						do not use either of these services, you can ignore this page.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>API Key</strong></p>
+						<p class="description">
+							To get an API key, log in to SteamGridDB using your Steam account, then visit the <a
+								href="https://www.steamgriddb.com/profile/preferences/api" target="_blank"
+								rel="noopener">
+								<strong>API Key page {{> svgExternal}}</strong>
+							</a>.
+						</p>
+						<p class="description">💭 Leave this field blank to disable any use of the API.</p>
+						<input type="text" class="right" name="steamgriddbApiKey" id="steamgriddbApiKey"
+							value="{{config.steamgriddb.apiKey}}" placeholder="SteamGridDB API Key" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-letterboxd">
+		<form action="/config/letterboxd" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						Films you log to
+						<a href="https://letterboxd.com" target="_blank" rel="noopener">
+							<strong>Letterboxd {{> svgExternal}}</strong>
+						</a>
+						can automatically be tracked. If enabled, they will be added once per day.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<input type="checkbox" name="letterboxdEnabled" id="letterboxdEnabled" {{#if
+							config.letterboxd.pollCron}}checked="checked" {{/if}} />
+						<label for="letterboxdEnabled"><strong>Enable Letterboxd film tracking</strong></label>
+						<p class="description">
+							Tracking will only be enabled if your username is also added.
+						</p>
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Letterboxd Username</strong></p>
+						<input type="text" class="right" name="letterboxdUsername" id="letterboxdUsername"
+							value="{{config.letterboxd.username}}" placeholder="Letterboxd Username" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-tmdb">
+		<form action="/config/tmdb" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						<a href="https://www.themoviedb.org" target="_blank" rel="noopener">
+							<strong>The Movie Database (TMDB) {{> svgExternal}}</strong>
+						</a> is used to fetch images and information about films you log. This API gets called either
+						through logging a film manually, or when it gets logged automatically using Letterboxd.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>API Read Access Token</strong></p>
+						<p class="description">
+							To get an access token, register for an account with TMDB, then visit the
+							<a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">
+								<strong>API settings page {{> svgExternal}}</strong>
+							</a>. Make sure to copy the <em>API Read Access Token</em>, not the API key.
+						</p>
+						<p class="description">💭 Leave this field blank to disable any use of TMDB.</p>
+						<input type="text" class="right" name="tmdbAccessToken" id="tmdbAccessToken"
+							value="{{config.tmdb.accessToken}}" placeholder="API Read Access Token" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-bluesky">
+		<form action="/config/bluesky" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						Connecting your Bluesky account will copy any posts you make as
+						<a href="{{externalRoot}}/notes" target="_blank">
+							<strong>notes {{> svgExternal}}</strong>
+						</a>.
+					</p>
+					<p>
+						This is a concept known in the IndieWeb community as "<a href="https://indieweb.org/PESOS"
+							target="_blank" rel="noopener"><strong>PESOS {{> svgExternal}}</strong></a>", short for
+						<b>P</b>ublish <b>E</b>lsewhere, <b>S</b>yndicate (to your) <b>O</b>wn <b>S</b>ite.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<input type="checkbox" name="blueskyEnabled" id="blueskyEnabled" {{#if
+							config.bluesky.pollCron}}checked="checked" {{/if}} />
+						<label for="blueskyEnabled"><strong>Enable Bluesky post syndication</strong></label>
+						<p class="description">
+							Tracking will only be enabled if your username identifier is also added.
+						</p>
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Username Identifier</strong></p>
+						<p class="description">
+							Your username identifier starts with <code>did:plc:</code>, followed by a sequence of
+							random characters. You can find this by searching for your display username on an ATProto
+							explorer website like <a href="http://pdsls.dev" target="_blank" rel="noopener">
+								<strong>PDSls.dev {{> svgExternal}}</strong>
+							</a>.
+						</p>
+						<input type="text" class="right" name="blueskyUsername" id="blueskyUsername"
+							value="{{config.bluesky.username}}"
+							placeholder="Bluesky Username Identifier (did:plc:...)" />
+					</section>
+					<hr>
+
+					<section>
+						<input type="checkbox" name="blueskyIncludeReplies" id="blueskyIncludeReplies" {{#if
+							config.bluesky.includeReplies}}checked="checked" {{/if}} />
+						<label for="blueskyIncludeReplies"><strong>Include replies</strong></label>
+						<p class="description">
+							This will also copy replies you post to other people.
+						</p>
+					</section>
+					<hr>
+
+					<section>
+						<input type="checkbox" name="blueskyIncludeReposts" id="blueskyIncludeReposts" {{#if
+							config.bluesky.includeReposts}}checked="checked" {{/if}} />
+						<label for="blueskyIncludeReposts"><strong>Include reposts</strong></label>
+						<p class="description">
+							This will also copy reposts. This is unchecked by default, because if somebody deletes
+							something you've reposted, the copy will not automatically get deleted from your site.
+						</p>
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-discord">
+		<form action="/config/discord" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						If you have a Discord server and would like to use commands to add records to the database, as
+						well as receive notifications for errors and warnings, you can set up a bot to send and listen
+						for new messages.
+					</p>
+					<p>
+						To start, make sure you have your own Discord Bot, by visiting the
+						<a href="https://discord.com/developers/applications" target="_blank" rel="noopener">
+							<strong>Discord Developer dashboard {{> svgExternal}}</strong>
+						</a>, and set up a bot with the ability to <em>read, send, and delete message content</em>.
+						Then, invite this bot to your private server.
+					</p>
+					<hr>
+					<p>
+						Adding a Discord bot to your server will listen for these commands. They are detected if sent as
+						regular messages.
+					</p>
+					<ul>
+						<li>
+							<p><code>youtube &lt;URL&gt; [optional date/time, ISO8601 format]</code></p>
+							<p>
+								Adds a YouTube video to your list of "liked youtube videos". If you provide a date/time,
+								it will be logged using that date/time, otherwise it will use the current date/time.
+							</p>
+							<p>
+								<em>Example:</em>
+								<small><code>youtube https://youtu.be/5G3M9WDK_eI</code></small>
+							</p>
+						</li>
+						<li>
+							<p><code>bookmark &lt;URL&gt; &lt;TITLE&gt;</code></p>
+							<p>Adds the following to your saved bookmarks, using the provided title.</p>
+							<p>
+								<em>Example:</em>
+								<small><code>bookmark https://floof.fm moonfloof</code></small>
+							</p>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>Bot Token</strong></p>
+						<p class="description">
+							To get an access token, visit the Developer dashboard linked above, and copy the Token from
+							the "Bot" page.
+						</p>
+						<p class="description">💭 Leave this field blank to disable any use of Discord.</p>
+						<input type="text" class="right" name="discordToken" id="discordToken"
+							value="{{config.discord.token}}" placeholder="Discord Bot Token" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Command Channel ID</strong></p>
+						<p class="description">
+							Once the bot is in your server, it will only listen to commands sent to this channel. To get
+							the channel ID, go to your Discord settings, enable Developer Mode, then right-click the
+							channel you want to use and click "<em>Copy Channel ID</em>".
+						</p>
+						<input type="text" class="right" name="discordChannelId" id="discordChannelId"
+							value="{{config.discord.channelId}}" placeholder="Discord Command Channel ID" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-google">
+		<form action="/config/google" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						Google's APIs are used for getting YouTube video details (i.e. channel name, video title, and
+						duration) and searching for map places for check-ins.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>API Key</strong></p>
+						<p class="description">
+							To get an API key, load up the
+							<a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">
+								<strong>Google Cloud API Credentials {{> svgExternal}}</strong>
+							</a> page, create a new API key, and make sure to restrict it to the
+							<em>YouTube Data API v3</em> API and, if you want to use Google Maps to search for check-in
+							locations, the <em>Places API</em> too.
+						</p>
+						<p class="description">💭 If you leave this blank, the Google APIs will not be used.</p>
+						<input type="text" class="right" name="googleApiKey" id="googleApiKey"
+							value="{{config.google.apiKey}}" placeholder="API Read Access Token" />
+					</section>
+					<hr>
+
+					<section>
+						<input type="checkbox" name="googlePlacesApiEnabled" id="googlePlacesApiEnabled" {{#if
+							config.google.placesApiEnabled}}checked="checked" {{/if}} />
+						<label for="googlePlacesApiEnabled"><strong>Enable the Places API</strong></label>
+						<p class="description">
+							For checking in, you can use the Places API. However, the use of this API
+							<strong>requires a billing account and you may be charged.</strong> If you do not have a
+							billing account associated with your Google Console account, the Places API will not work.
+						</p>
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Places API: Ignored Search Categories</strong></p>
+						<p class="description">
+							A comma-separated list of categories to exclude when searching for places to check-in. A
+							list of categories can be found in the
+							<a href="https://developers.google.com/maps/documentation/places/web-service/place-types?hl=en#table-a"
+								target="_blank" rel="noopener">
+								<strong>
+									Place Types documentation {{> svgExternal}}
+								</strong>
+							</a>, but be sure to only add categories from <em>Table A</em>.
+						</p>
+						<input type="text" class="right" name="googlePlacesIgnoredCategories"
+							id="googlePlacesIgnoredCategories" value="{{config.google.placesApiIgnoredCategories}}"
+							placeholder="Ignored Search Categories" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-sonarr">
+		<form action="/config/sonarr" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						Sonarr is used in <em>Everything</em> to fetch a list of TV shows on your home network, so you
+						can easily search through and log episodes you've seen. If it's set up correctly, you should be
+						able to visit the <a href="{{internalRoot}}/tv" target="_blank" rel="noopener">
+							<strong>Log a TV Episode</strong>
+						</a> page and see a list of shows to log.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>API URL Base</strong></p>
+						<p class="description">
+							This is where your Sonarr instance is hosted.
+						</p>
+						<input type="text" class="right" name="sonarrServerUrl" id="sonarrServerUrl"
+							value="{{config.sonarr.serverUrl}}" placeholder="API URL Base" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>API Key</strong></p>
+						<p class="description">
+							Go to your instance's General Settings page and find the <code>API Key</code> to use here.
+						</p>
+						<input type="text" class="right" name="sonarrApiKey" id="sonarrApiKey"
+							value="{{config.sonarr.apiKey}}" placeholder="API Key" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-subsonic">
+		<form action="/config/subsonic" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						If you scrobble tracks using the ListenBrainz endpoint, <em>Everything</em> can use your
+						Subsonic server to fetch missing metadata about the songs you listen to, like the genre, track
+						number, and song duration, if it's not provided in the scrobble requests.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>API URL Base</strong></p>
+						<p class="description">This is where your Subsonic instance is hosted.</p>
+						<p class="description">💭 Leave any of these fields blank to stop using Subsonic.</p>
+						<input type="text" class="right" name="subsonicUrl" id="subsonicUrl"
+							value="{{config.subsonic.url}}" placeholder="API URL Base" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Subsonic Username</strong></p>
+						<input type="text" class="right" name="subsonicUsername" id="subsonicUsername"
+							value="{{config.subsonic.username}}" placeholder="Subsonic Username" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Subsonic Password</strong></p>
+						<input type="password" class="right" name="subsonicPassword" id="subsonicPassword"
+							value="{{config.subsonic.password}}" placeholder="Subsonic Password" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-swarm">
+		<form action="/config/swarm" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						Check-ins added through the Swarm/Foursquare app can be automatically tracked, including adding
+						photos (they are fetched 20 minutes after you make the check-in). You must follow these steps in
+						order to get it working:
+					</p>
+					<hr>
+
+					<ol>
+						<li>
+							Register for a
+							<a href="https://foursquare.com/developers/home" target="_blank" rel="noopener">
+								<strong>Foursquare Developer Account {{> svgExternal}}</strong>
+							</a> and create a new project.
+						</li>
+						<li>
+							Create a Service API Key, then fill in the <em>Client ID</em>, <em>Client Secret</em>, and
+							<em>Push Secret</em> fields below.
+						</li>
+						<li>
+							Set the <em>Redirect URL</em> to<br>
+							<small><code>{{externalRoot}}/api/swarm/callback</code></small>
+						</li>
+						<li>
+							In the Foursquare project settings page, scroll down to find the <em>Push API</em> section.
+							Set <em>Push Notifications</em> to "Push checkins by this project's users", then use the
+							device picker below to grab a <em>Push URL</em>, and set it on the project settings page.
+						</li>
+						<li>
+							Once you've saved your changes on this page, visit the
+							<a href="{{externalRoot}}/api/swarm/login" target="_blank" rel="noopener">
+								<strong>Swarm login page {{> svgExternal}}</strong>
+							</a> to register your Swarm account with this server.
+						</li>
+						<li>
+							Finally, visit your
+							<a href="https://foursquare.com/settings" target="_blank" rel="noopener">
+								<strong>Foursquare Settings page {{> svgExternal}}</strong>
+							</a> and copy the <em>User ID</em> into the User ID field below.
+						</li>
+						<li>
+							⚠️ <strong>Note:</strong> You may need to add a billing method to your account in order to
+							lift the test account restrictions. You get 200,000 free requests - which are topped up
+							occasionally - so unless you're checking in a <em>lot</em>, you will never get charged.
+						</li>
+					</ol>
+					<hr>
+
+					<p class="device-key-picker">
+						<label for="swarm-device-key-picker">Select a device:</label>
+						<select id="swarm-device-key-picker">
+							{{#each devices as |device|}}
+							<option value="{{device.api_key}}">{{device.description}}</option>
+							{{/each}}
+						</select>
+						<br>
+						<strong>Push URL:</strong>
+						<small>
+							<code>
+								{{externalRoot}}/api/swarm/push?apiKey=<span class="device-key-display"></span>
+							</code>
+						</small>
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>Client ID</strong></p>
+						<input type="text" class="right" name="swarmClientId" id="swarmClientId"
+							value="{{config.swarm.oauthClientId}}" placeholder="Client ID" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Client Secret</strong></p>
+						<input type="text" class="right" name="swarmClientSecret" id="swarmClientSecret"
+							value="{{config.swarm.oauthClientSecret}}" placeholder="Client Secret" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Push Secret</strong></p>
+						<input type="text" class="right" name="swarmPushSecret" id="swarmPushSecret"
+							value="{{config.swarm.pushSecret}}" placeholder="Push Secret" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>Foursquare User ID</strong></p>
+						<input type="text" class="right" name="swarmUserId" id="swarmUserId"
+							value="{{config.swarm.userId}}" placeholder="Foursquare User ID" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-kawa">
+		<form action="/config/kawa" method="post">
+			<div class="panel">
+				{{> panelHeader title="Setup Information" }}
+				<div class="content">
+					<p>
+						<a href="https://git.floof.fm/floof/kawa" target="_blank" rel="noopener">
+							<strong>Kawa {{> svgExternal}}</strong>
+						</a> is a self-hosted server that converts images and videos into smaller, more efficient
+						formats than those provided by external services. It's optional, and is currently used when
+						copying Bluesky posts with images and videos.
+					</p>
+					<p>
+						If you choose not to use it, images and videos will be linked to their original source, which
+						may be slow to fetch, or may disappear one day.
+					</p>
+					<p>
+						Visit the repository linked above to set up the server. Then, once it's up and running, add your
+						URL and API Key below.
+					</p>
+				</div>
+			</div>
+
+			<div class="panel">
+				{{> panelHeader title="Settings" }}
+				<div class="content">
+					<section>
+						<p><strong>API URL Base</strong></p>
+						<p class="description">
+							The hostname or IP address and port where your Kawa server is accessible from.
+						</p>
+						<input type="text" class="right" name="kawaApiBaseUrl" id="kawaApiBaseUrl"
+							value="{{config.kawa.apiBaseUrl}}" placeholder="API URL Base" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>API Key</strong></p>
+						<input type="text" class="right" name="kawaApiKey" id="kawaApiKey"
+							value="{{config.kawa.apiKey}}" placeholder="API Key" />
+					</section>
+				</div>
+			</div>
+
+			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function showPage(hash, page) {
+		/** @type {HTMLCollectionOf<HTMLElement>} */
+		const pages = document.getElementsByClassName('page');
+		for (const page of pages) {
+			page.style.display = 'none';
+		}
+		page.style.display = 'flex';
+		window.location.hash = hash;
+	}
+
+	const pages = [
+		'server',
+		'location',
+		'crontasks',
+		'steam',
+		'psn',
+		'retroachievements',
+		'steamgriddb',
+		'letterboxd',
+		'tmdb',
+		'bluesky',
+		'discord',
+		'google',
+		'sonarr',
+		'subsonic',
+		'swarm',
+		'kawa',
+	];
+
+	/** @type Record<string, { radio: HTMLInputElement, page: HTMLElement }> */
+	const pageMap = pages.reduce((acc, cur) => {
+		/** @type {HTMLInputElement} */
+		const radio = document.getElementById(cur);
+		const page = document.getElementById(`page-${cur}`);
+
+		radio.addEventListener('change', () => {
+			showPage(cur, page);
+		})
+
+		acc[cur] = { radio, page };
+		return acc;
+	}, {});
+
+	const onHashChange = () => {
+		const hash = window.location.hash.replace(/^#/, '');
+		if (pageMap[hash] !== undefined) {
+			const { radio, page } = pageMap[hash];
+			radio.checked = true;
+			showPage(hash, page);
+		}
+	}
+
+	window.addEventListener('hashchange', onHashChange);
+	onHashChange();
+
+
+	// === Device Picker === //
+	/** @type HTMLCollectionOf<HTMLElement> */
+	const devicePickers = document.getElementsByClassName('device-key-picker');
+	for (const pickerContainer of devicePickers) {
+		/** @type HTMLSelectElement|undefined */
+		const pickerSelect = pickerContainer.getElementsByTagName('select')[0];
+		/** @type HTMLSpanElement|undefined */
+		const pickerDisplay = pickerContainer.getElementsByClassName('device-key-display')[0];
+		const updateText = () => {
+			if (pickerDisplay === undefined) return;
+			pickerDisplay.innerText = pickerSelect?.value || '';
+		};
+		updateText();
+		pickerSelect?.addEventListener('change', updateText);
+	}
+</script>

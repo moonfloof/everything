@@ -1,0 +1,7 @@
+BEGIN TRANSACTION;
+
+DROP TABLE "purchases";
+
+COMMIT;
+
+VACUUM;

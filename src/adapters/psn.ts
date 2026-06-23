@@ -21,10 +21,12 @@ const {
 import { getAchievementsForGame, getGameById } from '../database/game.js';
 import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { type GameSessionInsertResponse, updateGameSession } from '../database/gamesession.js';
-import { config } from '../lib/config.js';
-import { minuteMs } from '../lib/formatDate.js';
+import { startOrRestartInterval, stopCron } from '../lib/config/cron.js';
+import { config } from '../lib/config/index.js';
+import { isDateBefore, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { searchForImages } from './steamgriddb.js';
+import { timeago } from './timeago.js';
 
 const log = new Logger('PSN');
 
@@ -81,14 +83,14 @@ function convertPsnAuth(auth: AuthTokensResponse) {
 	};
 }
 
-async function authenticateApi() {
+export async function authenticateApi() {
 	if (authentication?.accessToken !== undefined) {
 		// Access token hasn't expired
 		if ((authentication.accessTokenExpiryDate?.getTime() || 0) - Date.now() > 0) {
 			return;
 		}
 
-		// Refresh token HAS expired
+		// Refresh token has expired
 		if ((authentication.refreshTokenExpiryDate?.getTime() || 0) - Date.now() < 0) {
 			throw new Error(
 				'Cannot generate new PSN credentials. Please provide a new NPSSO and restart the server',
@@ -244,7 +246,12 @@ async function getTrophiesForGame(game: { titleName: string; format: 'PS5' | 'ps
 }
 
 async function fetchGameActivity() {
-	await authenticateApi();
+	try {
+		await authenticateApi();
+	} catch (err) {
+		log.error(err);
+		return;
+	}
 
 	const {
 		basicPresence: { gameTitleInfoList },
@@ -258,7 +265,7 @@ async function fetchGameActivity() {
 				name: game.titleName,
 				playtime_mins: config.psn.pollIntervalMinutes,
 				url: null,
-				device_id: config.psn.deviceId,
+				device_id: config.psn.deviceId ?? config.defaultDeviceId,
 			},
 			config.psn.pollIntervalMinutes * minuteMs,
 		);
@@ -282,9 +289,29 @@ export function pollForPsnActivity() {
 	const pollIntervalMs = config.psn.pollIntervalMinutes * minuteMs;
 	if (pollIntervalMs === 0) {
 		log.warn('Polling disabled, no games will be tracked');
+		stopCron('psn');
 		return;
 	}
 
 	loadGamesFromDisk();
-	setInterval(fetchGameActivity, pollIntervalMs);
+	startOrRestartInterval('psn', pollIntervalMs, fetchGameActivity);
+}
+
+export function getAuthentication() {
+	if (!authentication) {
+		return {
+			refreshTokenHasExpired: true,
+		};
+	}
+
+	return {
+		accessTokenExpiryDate: authentication.accessTokenExpiryDate,
+		refreshTokenExpiryDate: authentication.refreshTokenExpiryDate,
+		refreshTokenExpiresIn: timeago.format(authentication.refreshTokenExpiryDate),
+		refreshTokenHasExpired: isDateBefore(authentication.refreshTokenExpiryDate, new Date()),
+	};
+}
+
+export function clearAuthentication() {
+	authentication = null;
 }

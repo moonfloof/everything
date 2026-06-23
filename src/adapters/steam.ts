@@ -3,7 +3,8 @@ import phin from 'phin';
 import { getAchievementsForGame } from '../database/game.js';
 import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { updateGameSession } from '../database/gamesession.js';
-import { config } from '../lib/config.js';
+import { startOrRestartInterval, stopCron } from '../lib/config/cron.js';
+import { config } from '../lib/config/index.js';
 import { dateDefault, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
@@ -201,8 +202,9 @@ export function pollForGameActivity() {
 	const { apiKey, userId } = config.steam;
 
 	const intervalMs = config.steam.pollIntervalMinutes * minuteMs;
-	if (intervalMs === 0 || !apiKey || !userId) {
+	if (!(intervalMs && apiKey && userId)) {
 		log.warn('Polling is disabled, no games will be tracked');
+		stopCron('steam');
 		return;
 	}
 
@@ -230,7 +232,7 @@ export function pollForGameActivity() {
 					name: game.name,
 					playtime_mins: game.newPlaytime,
 					url: `https://store.steampowered.com/app/${game.appid}/`,
-					device_id: config.steam.steamDeviceId,
+					device_id: config.steam.deviceId ?? config.defaultDeviceId,
 				},
 				intervalMs,
 			);
@@ -247,5 +249,5 @@ export function pollForGameActivity() {
 		saveGamesToDisk();
 	};
 
-	setInterval(fetchGames, intervalMs);
+	startOrRestartInterval('steam', intervalMs, fetchGames);
 }

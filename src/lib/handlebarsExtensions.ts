@@ -1,5 +1,5 @@
 import type { HelperDeclareSpec, HelperOptions } from 'handlebars';
-import { config } from './config.js';
+import { config } from './config/index.js';
 
 /**
  * @example <caption>Not Equal</caption>
@@ -61,14 +61,9 @@ export function person() {
 	return config.personName;
 }
 
-export function footerHtml() {
-	return config.footerHtml;
-}
-
 export const helpers: HelperDeclareSpec = {
 	xif,
 	externalRoot,
 	internalRoot,
 	person,
-	footerHtml,
 };

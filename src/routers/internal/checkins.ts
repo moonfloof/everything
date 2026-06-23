@@ -23,7 +23,7 @@ import {
 	updateCheckin,
 } from '../../database/checkins.js';
 import { type EntryStatus, entryStatusValues } from '../../database/notes.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import { parseExifDateTime } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import Logger from '../../lib/logger.js';

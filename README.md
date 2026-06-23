@@ -42,12 +42,6 @@ better way to do it).
 * **Scrobbles** - Custom implementation of the
   [**ListenBrainz API**](https://listenbrainz-server.readthedocs.io/en/latest/dev/api.html),
   by pointing your scrobbler to `/api/listenbrainz`.
-* **YouTube Likes** - Polls the
-  [**Google API**](https://developers.google.com/youtube/v3/) to get newly liked
-  videos, automate POST requests using IFTTT, Zapier or equivalent, or by
-  posting a message in Discord.  
-  By default, the Google API limits refresh tokens to 7 days, so I've found this
-  to be unreliable.
 * **Check-In to Places** - Receives push events (webhook) from
   [Swarm](https://www.swarmapp.com/) using the
   [**Foursquare API**](https://docs.foursquare.com/developer/reference/personalization-api-overview).
@@ -76,9 +70,6 @@ better way to do it).
   * Polls your [**Letterboxd**](https://letterboxd.com) profile for newly logged
     films to your diary.
   * Connects to [**The Movie Database**](https://tmdb.org) API to fetch images
-* **Card purchases** - Create a
-  [Monzo webhook](https://docs.monzo.com/#webhooks) to automatically POST to
-  `/api/purchases` whenever you make a purchase (or get paid).
 
 ### Manual Data Entry
 
@@ -125,14 +116,12 @@ It currently supports these commands, following this format:
 
 ### Prerequisites
 
-* Copy `.env.template` to `.env` and modify values as you see fit. **Most of the
-  setup instructions you'll need already appear within the .env file**, as they
-  are specific to each service you'd like to track.
-* Start the server and open the internal API: it'll prompt you to set up a new
-  device.
-* Add the new device ID to the `EVERYTHING_DEFAULT_DEVICE_ID` variable in `.env`
-* Now that you've gotten a device added, you can restart the server and start
-  collecting data!
+* Clone this repository
+* Copy `.env.template` to `.env` and modify values as you see fit.
+* Start the server and open the *Internal URL*. It'll prompt you to set up a
+  new device.
+* Now that you've gotten a device added, visit the *Config* page to configure
+  connections to external services.
 * ⚠ **Note:** You will likely want to change the homepage layout and specific
   theming elements of the site, you can do this by changing the styles in
   `public/style.css` and the various templates in `src/views`. If you're running
@@ -156,4 +145,6 @@ such, all that's required is:
 ## API / Connecting applications
 
 The [API documentation page](./API.md) contains a full list of endpoints and
-their requirements.
+their requirements. Some services can not be connected to *Everything*
+automatically, so you'll need to do that yourself (e.g. Use the *Shortcuts* app
+in iOS to log sleep/heartrate/etc. data once per day)

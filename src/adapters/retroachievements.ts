@@ -2,7 +2,8 @@ import phin from 'phin';
 import { getAchievementsForGame, getGameById } from '../database/game.js';
 import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { updateGameSession } from '../database/gamesession.js';
-import { config } from '../lib/config.js';
+import { startOrRestartInterval, stopCron } from '../lib/config/cron.js';
+import { config } from '../lib/config/index.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { searchForImages } from './steamgriddb.js';
@@ -244,11 +245,12 @@ function parseDateTime(dateTime?: string): Date {
 }
 
 export function pollForRetroAchievementsActivity() {
-	const { deviceId, pollIntervalMinutes, apiKey, username } = config.retroachievements;
+	const { deviceId, apiKey, username } = config.retroachievements;
+	const intervalMs = config.retroachievements.pollIntervalMinutes * minuteMs;
 
-	const intervalMs = pollIntervalMinutes * minuteMs;
-	if (intervalMs === 0 || !(apiKey && username)) {
+	if (!(intervalMs && apiKey && username)) {
 		log.warn('Polling is disabled, no games will be tracked');
+		stopCron('retroachievements');
 		return;
 	}
 
@@ -270,7 +272,7 @@ export function pollForRetroAchievementsActivity() {
 
 			const session = updateGameSession(
 				{
-					device_id: deviceId,
+					device_id: deviceId ?? config.defaultDeviceId,
 					name: game.Title,
 					playtime_mins,
 					url: `https://retroachievements.org/game/${game.GameID}`,
@@ -300,5 +302,5 @@ export function pollForRetroAchievementsActivity() {
 		await updateAchievementsForNewSession(recentlyInsertedGames);
 	};
 
-	setInterval(fetchGames, intervalMs);
+	startOrRestartInterval('retroachievements', intervalMs, fetchGames);
 }

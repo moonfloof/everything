@@ -1,6 +1,6 @@
 import { errors } from '@moonfloof/stdlib';
 import express from 'express';
-import helmet from 'helmet';
+import helmet, { type HelmetOptions } from 'helmet';
 
 // Adapters
 import { getNowPlaying } from '../../adapters/listenbrainz.js';
@@ -46,13 +46,18 @@ import { countEpisodes, getEpisodes } from '../../database/tv.js';
 import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../database/youtubelikes.js';
 
 // Lib
-import { config } from '../../lib/config.js';
 import { formatTime, prettyDate } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
 import type { RequestFrontend } from '../../types/express.js';
 
 const { NotFoundError } = errors;
+
+const helmetOptions: HelmetOptions = {
+	referrerPolicy: {
+		policy: ['same-origin'],
+	},
+};
 
 const router = express.Router();
 
@@ -193,7 +198,7 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 // Configure helmet to allow youtube-nocookie iframes for this URL ONLY
 router.use(
 	helmet({
-		...config.helmet,
+		...helmetOptions,
 		contentSecurityPolicy: {
 			directives: { 'frame-src': 'https://www.youtube-nocookie.com' },
 		},
@@ -216,7 +221,7 @@ router.get('/youtube/:id', (req, res) => {
 		description,
 	});
 });
-router.use(helmet(config.helmet));
+router.use(helmet(helmetOptions));
 
 // STEAM ACTIVITY
 
@@ -524,7 +529,7 @@ router.get('/checkin/image-thumbnail/:image_id', async (req, res) => {
 // reliable/trust-worthy sources (eg. from your own domains).
 router.use(
 	helmet({
-		...config.helmet,
+		...helmetOptions,
 		contentSecurityPolicy: {
 			directives: {
 				'media-src': 'https:',

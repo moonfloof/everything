@@ -1,12 +1,12 @@
 import { existsSync } from 'node:fs';
 import { timeago } from '../adapters/timeago.js';
+import { config } from '../lib/config/index.js';
 import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional } from '../types/database.js';
 import { calculateGetParameters, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 import { type GameAchievement, getGameAchievementsForSession } from './gameachievements.js';
 import type { GameSessionRaw } from './gamesession.js';
-import { config } from '../lib/config.js';
 
 export interface Game {
 	id: number;
@@ -68,8 +68,8 @@ export function getGameAssets(id: number) {
 	const hasPosterImage = existsSync(getImagePath('game', `library-${id}`));
 
 	return {
-		heroUrl: hasHeroImage ? config.serverExternalUri + `/game-images/hero-${id}.avif` : null,
-		posterUrl: hasPosterImage ? config.serverExternalUri + `/game-images/library-${id}.avif` : null,
+		heroUrl: hasHeroImage ? `${config.serverExternalUri}/game-images/hero-${id}.avif` : null,
+		posterUrl: hasPosterImage ? `${config.serverExternalUri}/game-images/library-${id}.avif` : null,
 	};
 }
 

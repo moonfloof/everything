@@ -1,7 +1,7 @@
 import express from 'express';
 import { getEpisode, getEpisodeList, getSeriesList } from '../../adapters/sonarr.js';
 import { countEpisodes, deleteEpisode, getEpisodes, insertEpisode, updateEpisode } from '../../database/tv.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import { padString } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import Logger from '../../lib/logger.js';

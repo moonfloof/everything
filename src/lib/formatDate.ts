@@ -18,6 +18,7 @@ export function padString(str: string | number, length: number, pad = '0') {
 	return newStr;
 }
 
+/** Formats a given date in local time - Make sure the TZ is set! */
 export function formatTime(date: Date, includeSeconds = true) {
 	const hour = padString(date.getHours(), 2);
 	const mins = padString(date.getMinutes(), 2);
@@ -165,6 +166,10 @@ export function isSameDate(dateA: Date, dateB: Date) {
 	if (daySame === false) return false;
 
 	return true;
+}
+
+export function isDateBefore(dateA: Date, dateB: Date) {
+	return dateA.getTime() < dateB.getTime();
 }
 
 export function dateDefault(input: string | number | Date | undefined | null) {

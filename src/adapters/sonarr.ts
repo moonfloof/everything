@@ -1,9 +1,6 @@
-import dotenv from 'dotenv';
 import phin from 'phin';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import type { Episode, EpisodeWithSeries, Series } from './sonarrTypes.js';
-
-dotenv.config();
 
 const api = <T = unknown>(path: string, params: { seriesId?: string } = {}) => {
 	if (!(config.sonarr.apiKey && config.sonarr.serverUrl)) {

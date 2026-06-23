@@ -1,6 +1,6 @@
 import express from 'express';
 import { countFood, deleteFood, getFood, insertFood, updateFood } from '../../database/food.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
 

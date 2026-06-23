@@ -1,6 +1,6 @@
 import phin from 'phin';
 import { type CheckinPlace, getCachedPlace } from '../database/checkinPlace.js';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import Logger from '../lib/logger.js';
 
 const log = new Logger('google-places');
@@ -52,7 +52,7 @@ credits.
 
 export async function searchNearbyPlaces(lat: number, long: number): Promise<CheckinPlace[]> {
 	const { placesApiEnabled, placesApiIgnoredCategories, apiKey } = config.google;
-	if (placesApiEnabled !== true || !apiKey) {
+	if (placesApiEnabled !== true || apiKey === '' || apiKey === null) {
 		log.warn('Attempting to use Places API, but use of this API is not enabled');
 		return [];
 	}

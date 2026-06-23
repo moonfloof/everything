@@ -1,6 +1,6 @@
 import express from 'express';
 import { countBooks, deleteBook, getBooks, insertBook, updateBook } from '../../database/books.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';
 

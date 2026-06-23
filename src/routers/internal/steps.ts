@@ -1,6 +1,6 @@
 import express from 'express';
 import { countSteps, deleteSteps, getSteps, insertSteps, updateSteps } from '../../database/steps.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import { shortDate } from '../../lib/formatDate.js';
 import { generateBarGraph } from '../../lib/graphs/bar.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';

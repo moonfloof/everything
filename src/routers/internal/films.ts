@@ -2,7 +2,7 @@ import express from 'express';
 import { fetchFilms } from '../../adapters/letterboxd.js';
 import { searchForImagesByName } from '../../adapters/tmdb.js';
 import { countFilms, deleteFilm, getFilms, insertFilm, updateFilm } from '../../database/films.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { deleteIfExists } from '../../lib/mediaFiles.js';
 import type { RequestFrontend } from '../../types/express.js';
@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/', (req: RequestFrontend, res) => {
 	const { page = 0, rescanerror } = req.query;
 	const pagination = handlebarsPagination(page, countFilms());
-	const hasLetterboxdConnected = config.letterboxd.username !== '' && config.letterboxd.username !== undefined;
+	const hasLetterboxdConnected = config.letterboxd.username !== '' && config.letterboxd.username !== null;
 
 	const films = getFilms({ page });
 

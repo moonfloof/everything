@@ -7,7 +7,7 @@ import {
 	insertYouTubeLike,
 	updateYouTubeLike,
 } from '../../database/youtubelikes.js';
-import { config } from '../../lib/config.js';
+import { config } from '../../lib/config/index.js';
 import { isoDurationToSeconds } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import type { RequestFrontend } from '../../types/express.js';

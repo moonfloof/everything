@@ -1,7 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
 import phin from 'phin';
 import type { CheckinImage } from '../database/checkins.js';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import type { BoundingBox, Filter, FilteredPath, OsmXml, Point, SvgOptions, Way } from './openstreetmapTypes.js';
 import { simplify } from './simplify.js';
 

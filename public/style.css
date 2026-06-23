@@ -19,6 +19,10 @@
 	--error-bg: #fddcdc;
 	--error-bg-dark: #f0baba;
 
+	--success-fg: #009951;
+	--success-bg: #ebffee;
+	--success-bg-dark: #bef4c6;
+
 	--tertiary-fg: #fbb03b;
 	--tertiary-fg-dark: #ba7911;
 
@@ -178,7 +182,8 @@ html {
 /*#region alerts */
 
 div.error,
-div.info {
+div.info,
+div.success {
 	padding: 16px;
 
 	p:not(:first-child) {
@@ -187,7 +192,8 @@ div.info {
 }
 
 div.panel.error,
-div.panel.info {
+div.panel.info,
+div.panel.success {
 	padding: 0;
 }
 
@@ -207,6 +213,33 @@ div.info {
 
 div.info a {
 	color: var(--secondary-fg);
+}
+
+div.success {
+	background-color: var(--success-bg);
+	border: 2px solid var(--success-fg);
+
+	a {
+		color: var(--success-fg);
+	}
+}
+
+.text-success {
+	color: var(--success-fg);
+	fill: var(--success-fg);
+}
+
+.text-error {
+	color: var(--error-fg);
+	fill: var(--error-fg);
+}
+
+.bg-success {
+	background-color: var(--success-bg);
+}
+
+.bg-success-dark {
+	background-color: var(--success-bg-dark);
 }
 
 /*#endregion alerts */
@@ -559,9 +592,6 @@ svg.external {
 	fill: none;
 	stroke-width: 2px;
 	display: inline;
-	width: 12px;
-	height: 12px;
-	vertical-align: middle;
 
 	&.large {
 		color: var(--primary-fg);
@@ -572,13 +602,19 @@ svg.external {
 	}
 }
 
+svg.inline {
+	width: 12px;
+	height: 12px;
+	vertical-align: middle;
+}
+
 .metadata svg.external,
 small svg.external {
 	width: 8px;
 	height: 8px;
 }
 
-ul {
+ul, ol {
 	margin-left: 16px;
 	line-height: 20px;
 }
@@ -1324,6 +1360,7 @@ textarea.right:focus {
 }
 
 input[type="submit"],
+input[type="reset"],
 input[type="button"],
 input[type="date"],
 select {
@@ -1679,6 +1716,10 @@ select {
 		--error-fg: #fddcdc;
 		--error-bg: #6e2828;
 		--error-bg-dark: #481111;
+
+		--success-fg: #ebffee;
+		--success-bg: #009951;
+		--success-bg-dark: #02542d;
 	}
 
 	body,

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import cron from 'node-cron';
 import phin from 'phin';
-import { config } from '../lib/config.js';
+import { startOrRestartCron, stopCron } from '../lib/config/cron.js';
+import { config } from '../lib/config/index.js';
 import { weekMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 
@@ -21,9 +21,12 @@ const log = new Logger('geocoder');
 let cache: Record<string, { city?: string; state?: string; retrievedAt: number }> = {};
 
 export function initLocationCache() {
-	if (!config.geocoder.enabled) return;
+	if (!config.geocoder.enabled) {
+		stopCron('cache');
+		return;
+	}
 
-	cron.schedule('0 1 * * *', cleanCache, { name: 'geocoder-cache' });
+	startOrRestartCron('geocoder', '0 1 * * *', cleanCache);
 
 	if (!existsSync(config.geocoder.cachePath)) {
 		saveLocationCache();

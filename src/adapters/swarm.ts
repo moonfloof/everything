@@ -4,7 +4,7 @@ import phin from 'phin';
 import sharp from 'sharp';
 import { getCachedPlace } from '../database/checkinPlace.js';
 import { insertCheckin, insertCheckinImage } from '../database/checkins.js';
-import { config } from '../lib/config.js';
+import { config } from '../lib/config/index.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { saveImageToBuffer } from '../lib/mediaFiles.js';
@@ -39,11 +39,11 @@ const swarmEndpoints = {
 
 function variablesArePresent(includePush = false) {
 	const { oauthClientId, oauthClientSecret, userId, pushSecret } = config.swarm;
-	if (oauthClientId === undefined || oauthClientSecret === undefined || userId === undefined) {
+	if (!(oauthClientId && oauthClientSecret && userId)) {
 		throw new ServerError('Swarm - Missing Client ID, Client Secret, and/or User ID, check your .env file');
 	}
 
-	if (includePush && pushSecret === undefined) {
+	if (includePush && !pushSecret) {
 		throw new ServerError('Swarm - Server does not have a push secret set, check your .env file');
 	}
 }

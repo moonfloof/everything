@@ -17,7 +17,6 @@
 		"@moonfloof/stdlib": "^1.0.0",
 		"better-sqlite3": "^12.10.0",
 		"discord.js": "^14.26.4",
-		"dotenv": "^17.2.3",
 		"exif-js": "^2.3.0",
 		"express": "^5.2.1",
 		"express-handlebars": "^8.0.7",

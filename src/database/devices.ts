@@ -37,6 +37,17 @@ export function getDevices() {
 	return statement.all();
 }
 
+export function getDevicesWithApiKeys() {
+	const statement = getStatement<Pick<Device, 'id' | 'description' | 'api_key'>>(
+		'getDevices',
+		`SELECT id, description, api_key
+		FROM devices
+		ORDER BY updated_at DESC`,
+	);
+
+	return statement.all();
+}
+
 export function getDeviceCount() {
 	const statement = getStatement<{ total: number }>('getDeviceCount', 'SELECT count(*) as total FROM devices');
 	return statement.get()?.total || 0;
