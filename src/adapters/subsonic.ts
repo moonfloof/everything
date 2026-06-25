@@ -4,7 +4,7 @@ import { config } from '../lib/config/index.js';
 
 const getPassword = () => {
 	const salt = randomBytes(5).toString('base64url');
-	const password = createHash('md5').update(`${config.subsonic.password}${salt}`).digest('hex');
+	const password = createHash('md5').update(`${config.subsonic.password!}${salt}`).digest('hex');
 
 	return {
 		password,
@@ -15,7 +15,7 @@ const getPassword = () => {
 const getBaseParams = () => {
 	const { password, salt } = getPassword();
 	return {
-		u: config.subsonic.username || '',
+		u: config.subsonic.username!,
 		v: '1.15.0',
 		c: 'everything',
 		t: password,
@@ -89,7 +89,7 @@ interface Search3Response {
 }
 
 export const getAlbumList = async (page = 0) => {
-	if (checkEnvironment()) return [];
+	if (!checkEnvironment()) return [];
 
 	const params = new URLSearchParams({
 		...getBaseParams(),
@@ -106,7 +106,7 @@ export const getAlbumList = async (page = 0) => {
 };
 
 export const getAllAlbums = async () => {
-	if (checkEnvironment()) return [];
+	if (!checkEnvironment()) return [];
 
 	let albums: AlbumList[] = [];
 	let lastResponseLength = 1;
@@ -123,7 +123,7 @@ export const getAllAlbums = async () => {
 };
 
 export const getAlbumTracks = async (albumId: string) => {
-	if (checkEnvironment()) return null;
+	if (!checkEnvironment()) return null;
 
 	const params = new URLSearchParams({
 		...getBaseParams(),
@@ -138,7 +138,7 @@ export const getAlbumTracks = async (albumId: string) => {
 };
 
 export const scrobbleTrack = async (trackId: number, timestamp: number) => {
-	if (checkEnvironment()) return null;
+	if (!checkEnvironment()) return null;
 
 	const params = new URLSearchParams({
 		...getBaseParams(),
@@ -154,7 +154,7 @@ export const scrobbleTrack = async (trackId: number, timestamp: number) => {
 };
 
 const rawSearch = async (query: string, page = 0) => {
-	if (checkEnvironment()) return null;
+	if (!checkEnvironment()) return null;
 
 	const params = new URLSearchParams({
 		...getBaseParams(),
