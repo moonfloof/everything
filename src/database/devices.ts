@@ -39,7 +39,7 @@ export function getDevices() {
 
 export function getDevicesWithApiKeys() {
 	const statement = getStatement<Pick<Device, 'id' | 'description' | 'api_key'>>(
-		'getDevices',
+		'getDevicesWithApiKeys',
 		`SELECT id, description, api_key
 		FROM devices
 		ORDER BY updated_at DESC`,
