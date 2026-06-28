@@ -1,6 +1,6 @@
 import express from 'express';
 import { reverseLocation } from '../../adapters/geocoder.js';
-import { updateDevice, validateDevice } from '../../database/devices.js';
+import { updateDeviceBattery, validateDevice } from '../../database/devices.js';
 import { insertLocation } from '../../database/locations.js';
 import Logger from '../../lib/logger.js';
 import type { RequestFrontend } from '../../types/express.js';
@@ -51,7 +51,7 @@ const updateBatteryState = (
 	// Round battery charge to 2 decimal places
 	const level = Math.round(battery.battery_level * level_exponent) / 100 || 100;
 
-	updateDevice(deviceId, level, status);
+	updateDeviceBattery(deviceId, level, status);
 };
 
 const isLocationValid = (location: Location): boolean => {

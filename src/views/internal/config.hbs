@@ -67,6 +67,38 @@
 				height: 14px;
 			}
 		}
+
+		table th,
+		table td {
+			text-align: left;
+			padding: 4px;
+
+			&.device-form {
+				width: 100%;
+
+				form {
+					display: flex;
+					gap: 4px;
+
+					input[type=text] {
+						margin-bottom: 0;
+					}
+				}
+			}
+		}
+
+		thead {
+			border-bottom: 2px dotted var(--primary-fg-light);
+		}
+
+		tbody tr:nth-child(odd) {
+			background-color: var(--panel-bg-dark);
+		}
+
+		.monoinput {
+			font-size: 12px;
+			font-family: monospace;
+		}
 	}
 </style>
 
@@ -74,6 +106,9 @@
 	<div id="sidebar">
 		<input type="radio" name="page" id="server" value="server" checked />
 		<label for="server">Server</label>
+
+		<input type="radio" name="page" id="devices" value="devices" />
+		<label for="devices">Devices</label>
 
 		<input type="radio" name="page" id="location" value="location" />
 		<label for="location">Location Tracking</label>
@@ -185,6 +220,82 @@
 			</div>
 
 			{{> internal/configSaveChanges}}
+		</form>
+	</div>
+
+	<div class="page" id="page-devices">
+		<div class="panel">
+			{{> panelHeader title="What Are Devices?"}}
+			<div class="content">
+				<p>
+					In <em>Everything</em>, each entry in the database is associated with a device. It allows you to
+					know where it came from, and may eventually be used for more interesting data visualisations and
+					analyses.
+				</p>
+				<p>
+					You need at least one device to use <em>Everything</em> (which you did when you first set up the
+					server), <strong>but you cannot delete them</strong>.
+				</p>
+			</div>
+		</div>
+
+		<div class="panel">
+			{{> panelHeader title="Device List"}}
+
+			<div class="content">
+				<table>
+					<thead>
+						<tr>
+							<th>Device Name</th>
+							<th>API Key</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each devices as |device|}}
+						<tr>
+							<td>{{device.description}}</td>
+							<td class="device-form">
+								<form action="/config/device/{{device.id}}" method="post">
+									<input type="hidden" name="deviceDescription" value="{{device.description}}" />
+									<input type="text" class="monoinput right" name="deviceApiKey"
+										value="{{device.api_key}}" />
+									<input type="submit" value="Update" />
+								</form>
+							</td>
+						</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<form action="/config/device" method="post">
+			<div class="panel">
+				{{> panelHeader title="Create a New Device"}}
+				<div class="content">
+					<section>
+						<p><strong>Device Name</strong></p>
+						<p class="description">
+							A short description you can use to identify this device (eg. "iPhone", "PC").
+						</p>
+						<input class="right" type="text" id="deviceDescription" name="deviceDescription"
+							placeholder="Device Name" />
+					</section>
+					<hr>
+
+					<section>
+						<p><strong>API Key</strong></p>
+						<p class="description">A long, secure password, used to authenticate via the external API.</p>
+						<input class="right" type="password" id="deviceApiKey" name="deviceApiKey"
+							placeholder="API Key" />
+					</section>
+					<hr>
+
+					<section>
+						<input class="right" type="submit" value="Create Device" />
+					</section>
+				</div>
+			</div>
 		</form>
 	</div>
 
@@ -1174,6 +1285,7 @@
 
 	const pages = [
 		'server',
+		'devices',
 		'location',
 		'crontasks',
 		'steam',

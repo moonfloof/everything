@@ -53,9 +53,9 @@ export function getDeviceCount() {
 	return statement.get()?.total || 0;
 }
 
-export function updateDevice(id: string, battery_level: number, battery_status: string | null) {
+export function updateDeviceBattery(id: string, battery_level: number, battery_status: string | null) {
 	const statement = getStatement(
-		'updateDevice',
+		'updateDeviceBattery',
 		`UPDATE devices
 		SET battery_status = $battery_status,
 		    battery_level = $battery_level,
@@ -67,6 +67,24 @@ export function updateDevice(id: string, battery_level: number, battery_status: 
 		id,
 		battery_level,
 		battery_status,
+		updated_at: new Date().toISOString(),
+	});
+}
+
+export function updateDevice(id: string, description: string, apiKey: string) {
+	const statement = getStatement(
+		'updateDevice',
+		`UPDATE devices
+		SET description = $description,
+		    api_key = $apiKey,
+		    updated_at = $updated_at
+		WHERE id = $id`,
+	);
+
+	return statement.run({
+		id,
+		description,
+		apiKey,
 		updated_at: new Date().toISOString(),
 	});
 }

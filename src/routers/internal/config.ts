@@ -6,7 +6,7 @@ import { authenticateApi, clearAuthentication, getAuthentication, pollForPsnActi
 import { pollForRetroAchievementsActivity } from '../../adapters/retroachievements.js';
 import { pollForGameActivity } from '../../adapters/steam.js';
 import { setConfigValue } from '../../database/config.js';
-import { getDevicesWithApiKeys } from '../../database/devices.js';
+import { addNewDevice, getDevicesWithApiKeys, updateDevice } from '../../database/devices.js';
 import { getJobs } from '../../lib/config/cron.js';
 import { config } from '../../lib/config/index.js';
 import convertPollIntervalToCron from '../../lib/config/pollIntervalToCron.js';
@@ -25,6 +25,35 @@ router.get('/', (_req: RequestFrontend, res) => {
 });
 
 // CRUD
+
+interface DevicePostBody {
+	deviceDescription: string;
+	deviceApiKey: string;
+}
+
+router.post('/device', (req: RequestFrontend<object, DevicePostBody>, res) => {
+	const description = req.body.deviceDescription;
+	const apiKey = req.body.deviceApiKey;
+
+	addNewDevice(description, apiKey);
+
+	res.redirect('/config#devices');
+});
+
+interface DeviceUpdateBody {
+	deviceDescription: string;
+	deviceApiKey: string;
+}
+
+router.post('/device/:deviceId', (req: RequestFrontend<object, DeviceUpdateBody>, res) => {
+	const id = req.params.deviceId;
+	const description = req.body.deviceDescription;
+	const apiKey = req.body.deviceApiKey;
+
+	updateDevice(id, description, apiKey);
+
+	res.redirect('/config#devices');
+});
 
 interface ServerBody {
 	personName: string;
