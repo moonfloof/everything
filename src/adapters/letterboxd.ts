@@ -4,7 +4,7 @@ import sax from 'sax';
 import { insertFilm } from '../database/films.js';
 import { startOrRestartCron, stopCron } from '../lib/config/cron.js';
 import { config } from '../lib/config/index.js';
-import { dayMs, formatDate } from '../lib/formatDate.js';
+import { dayMs, formatDate, formatTime } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { searchForImagesById, tmdbMovieDetails } from './tmdb.js';
 
@@ -157,7 +157,7 @@ async function logFilm(film: LetterboxdFilm) {
 		review,
 		url: film.link,
 		duration_secs,
-		watched_at: formatDate(film.watchedDate),
+		watched_at: `${formatDate(film.watchedDate)}T${formatTime(film.pubDate)}`,
 		created_at: film.pubDate.toISOString(),
 		device_id: config.defaultDeviceId,
 	});
