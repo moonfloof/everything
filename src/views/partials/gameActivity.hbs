@@ -1,22 +1,24 @@
-<div class="h-entry">
-	<div class="row">
-		<span class="left">🎮</span>
-		<span class="right">
-			<a href="/game/{{data.game_id}}" rel="noopener">
-				<span class="p-name entry-title">{{data.name}}</span>
-			</a>
+<div class="h-entry panel">
+	<div class="flex-row justify-start">
+		{{#if data.posterUrl}}
+		<img class="entry-poster" alt="Game poster for '{{data.name}}'" src="{{data.posterUrl}}" />
+		{{/if}}
 
-			for
-			<data class="p-duration" value="{{data.durationIso}}">
-				{{data.duration}}
-			</data>
-		</span>
-	</div>
+		<div class="content">
+			<p class="large">
+				played
+				<a href="/game/{{data.game_id}}" rel="noopener">
+					<span class="p-name">{{data.name}}</span>
+				</a>
+			</p>
+			<p>
+				for
+				<data class="p-duration" value="{{data.durationIso}}">
+					{{data.duration}}
+				</data>
+			</p>
 
-	{{#if data.achievements}}
-	<div class="row game-achievements--container">
-		<span class="left"></span>
-		<div class="right">
+			{{#if data.achievements}}
 			{{#if data.perfectedSession}}
 			<p class="game-achievements--bar pct-100" style="padding: 8px 0;">
 				🥳 Got 100% during this session!
@@ -25,46 +27,28 @@
 
 			<p>Got <strong>{{data.achievements.length}}</strong> {{data.achievementText}}</p>
 			<ul class="game-achievements--list">
-			{{#each data.achievements as |achievement|}}
+				{{#each data.achievements as |achievement|}}
 				<li>
-					<time
-						title="{{achievement.updated_at}}"
-						datetime="{{achievement.updated_at}}"
-					><strong>{{achievement.name}}</strong></time>
+					<time title="{{achievement.updated_at}}"
+						datetime="{{achievement.updated_at}}"><strong>{{achievement.name}}</strong></time>
 					{{#if achievement.description}}
-					<br/>{{achievement.description}}
+					<br />{{achievement.description}}
 					{{/if}}
 				</li>
-			{{/each}}
+				{{/each}}
 			</ul>
-		</div>
-	</div>
-	{{/if}}
+			{{/if}}
 
-	<div class="row">
-		<span class="left"></span>
-		<div class="right">
-			<small>
-				<time
-					title="{{data.created_at}}"
-					datetime="{{data.created_at}}"
-					class="dt-published"
-				>
-						<a href="/game-session/{{data.id}}" class="u-url u-uid">
-							{{data.timeago}}
-						</a>
-				</time>
+			{{#if data.url}}
+			<a href="{{data.url}}" target="_blank" class="p-play-of h-cite u-url" rel="noopener">
+				<strong>view store page</strong> {{>svg/external}}
+			</a>
+			{{/if}}
 
-				{{#if data.url}}
-				&bull;
-				<a href="{{data.url}}" target="_blank" class="p-play-of h-cite u-url" rel="noopener">
-					view store page {{>svgExternal}}
-				</a>
-				{{/if}}
 
-			</small>
+			{{> author }}
 		</div>
 	</div>
 
-	{{> author }}
+	{{> panelFooter data moreUrl='/games' moreText='games' }}
 </div>

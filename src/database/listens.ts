@@ -1,9 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { timeago } from '../adapters/timeago.js';
 import addMissingDates from '../lib/addMissingDates.js';
 import { dateDefault, dayMs, formatDate, hourMs, monthsShort, prettyDuration, shortDate } from '../lib/formatDate.js';
 import type { Insert, Optional, Select, Update } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export interface ListenTrack {
@@ -38,6 +37,9 @@ interface ListenGroup {
 	tracks: { title: string; id: string }[];
 	count: number;
 	countText: 'song' | 'songs';
+	showEtc: boolean;
+	durationSecs: number;
+	durationPretty: string;
 }
 
 function selectListenTrack(track: Insert<ListenTrack>): number | undefined {
@@ -113,12 +115,13 @@ export function getListens(parameters: Parameters = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => ({
 		...row,
-		timeago: timeago.format(new Date(row.created_at)),
+		...calculateRecordMetadata(row, 'music', 'created_at'),
+		durationPretty: row.duration_secs ? prettyDuration(row.duration_secs * 1000, true) : null,
 	}));
 }
 
 export function groupListens(listens: Select<Listen>[]) {
-	return listens.reduce((albums, listen) => {
+	const grouped = listens.reduce((albums, listen) => {
 		if (
 			albums.length === 0 ||
 			// Different album/artist
@@ -131,14 +134,17 @@ export function groupListens(listens: Select<Listen>[]) {
 			) > hourMs
 		) {
 			albums.push({
+				...calculateRecordMetadata(listen, 'music', 'created_at'),
 				artist: listen.artist,
 				album: listen.album,
 				created_at: listen.created_at,
 				ended_at: listen.created_at,
-				timeago: listen.timeago,
 				tracks: [{ title: listen.title, id: listen.id }],
 				count: 1,
 				countText: 'song',
+				showEtc: false,
+				durationSecs: listen.duration_secs ?? 0,
+				durationPretty: '',
 			});
 			return albums;
 		}
@@ -147,8 +153,15 @@ export function groupListens(listens: Select<Listen>[]) {
 		albums[albums.length - 1].count += 1;
 		albums[albums.length - 1].countText = 'songs';
 		albums[albums.length - 1].created_at = listen.created_at;
+		albums[albums.length - 1].durationSecs += listen.duration_secs ?? 0;
 		return albums;
 	}, [] as ListenGroup[]);
+
+	return grouped.map(group => {
+		group.durationPretty = prettyDuration(group.durationSecs * 1000, true);
+		group.tracks.reverse();
+		return group;
+	});
 }
 
 export function deleteListen(id: string) {

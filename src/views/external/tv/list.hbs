@@ -1,0 +1,7 @@
+{{> pageHeader title="recently watched tv shows" url="/" }}
+
+{{#each episodes as |episode|}}
+{{> tv data=episode }}
+{{/each}}
+
+{{> pagination pagination=pagination route="/tv" }}

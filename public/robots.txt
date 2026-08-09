@@ -7,4 +7,5 @@ Disallow: /tv/*
 Disallow: /film/*
 Disallow: /book/*
 Disallow: /note/*
+Disallow: /checkin/*
 Sitemap: https://now.floof.fm/sitemap.xml

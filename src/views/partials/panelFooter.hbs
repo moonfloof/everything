@@ -1,0 +1,16 @@
+<div class="panel-footer bar">
+	<p class="entry-timestamp">
+		{{#if canonicalUrl}}
+		<a href="{{canonicalUrl}}" class="u-url u-uid">
+			{{timeago}} &bull;
+			<time class="dt-published" datetime="{{timestampIso}}">{{timestampPretty}}</time>
+		</a>
+		{{else}}
+		<span>
+			{{timeago}} &bull;
+			<time class="dt-published" datetime="{{timestampIso}}">{{timestampPretty}}</time>
+		</span>
+		{{/if}}
+	</p>
+	{{#if moreUrl}}<a href="{{moreUrl}}" class="more-link">more {{moreText}} -&gt;</a>{{/if}}
+</div>

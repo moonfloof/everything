@@ -1,27 +1,13 @@
-<div class="h-entry">
-	<div class="row">
-		<div class="left">🏃‍♀️</div>
-		<div class="right">
-			<div class="entry-title e-content">
-				took
-				<span class="p-num p-count">{{data.step_count_total}}</span>
-				<span class="p-unit">steps</span>
-			</div>
+<div class="h-entry panel">
+	<div class="content">
+		<p class="large e-content">
+			walked
+			<strong class="p-num p-count">{{data.step_count_total}}</strong>
+			<strong class="p-unit">steps</strong>
 			on {{data.datePretty}}
-		</div>
-	</div>
-	<div class="row">
-		<div class="left"></div>
-		<time
-			title="{{data.created_at}}"
-			datetime="{{data.created_at}}"
-			class="right dt-published"
-		>
-			<small>
-				{{data.timeago}}
-			</small>
-		</time>
+		</p>
+		{{> author}}
 	</div>
 
-	{{> author}}
+	{{> panelFooter timeago=data.timeago timestampIso=data.timestampIso timestampPretty=data.datePretty }}
 </div>

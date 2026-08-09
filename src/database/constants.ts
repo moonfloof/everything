@@ -1,4 +1,6 @@
-import { dayMs } from '../lib/formatDate.js';
+import { timeago } from '../adapters/timeago.js';
+import { config } from '../lib/config/index.js';
+import { dayMs, prettyDateTime } from '../lib/formatDate.js';
 
 export interface Parameters {
 	id?: string;
@@ -38,5 +40,22 @@ export function calculateGetParameters({
 		limit,
 		offset: calculateOffset(page),
 		created_at: calculateCreatedAt(days),
+	};
+}
+
+// We don't care what types it has, other than `id` and the createdKey specified
+// by the function, therefore `any` is appropriate here.
+// biome-ignore lint/suspicious/noExplicitAny: See above.
+export function calculateRecordMetadata<T extends Record<string, any> & { id: string }>(
+	record: T,
+	path: string | null,
+	createdKey: keyof T = 'created_at',
+) {
+	const createdDate = new Date(record[createdKey]);
+	return {
+		canonicalUrl: path ? `${config.serverExternalUri}/${path}/${record.id}` : null,
+		timeago: timeago.format(createdDate),
+		timestampIso: createdDate.toISOString(),
+		timestampPretty: prettyDateTime(createdDate),
 	};
 }

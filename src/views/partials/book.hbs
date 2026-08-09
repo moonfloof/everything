@@ -1,80 +1,50 @@
-<div class="h-entry">
-	<div class="p-read-of h-cite">
-	<div class="row">
-		<span class="left">📙</span>
-		<span class="right">
-			<span class="entry-title">
-				{{#if data.url}}
-				<a href="{{data.url}}" target="_blank" rel="noopener" class="u-url">
-					<span class="p-name">{{data.title}}</span>
-				</a>
-				{{else}}
-					<span class="p-name">{{data.title}}</span>
-				{{/if}}
-				({{data.year}})
-			</span>
-			<span>by <span class="p-author">{{data.author}}</span></span>
-		</span>
-	</div>
-	</div>
+<div class="h-entry panel{{#if data.rating}} h-review{{/if}}">
+	<div class="content">
+		<p class="large p-read-of h-cite">
+			{{data.status}}
+			{{#if data.url}}
+			<a href="{{data.url}}" target="_blank" rel="noopener" class="u-url">
+				<span class="p-name">{{data.title}}</span> {{> svg/external}}
+			</a>
+			{{else}}
+			<strong class="p-name">{{data.title}}</strong>
+			{{/if}}
+			({{data.year}})
+			<span>by <strong class="p-author">{{data.author}}</strong></span>
+		</p>
 
-	{{#if data.progress}}
-	<div class="row">
-		<span class="left"></span>
-		<data class="right p-read-status" value="{{data.status}}">
-			{{> svgProgress perfected=data.completed percentage=data.progress_percentage }}
+		{{#if data.progress}}
+		<data class="p-read-status" value="{{data.status}}"></data>
+		<p>
+			{{> svg/progress perfected=data.completed percentage=data.progress_percentage }}
 			{{{data.progress}}}
-		</data>
-	</div>
-	{{/if}}
+		</p>
+		{{/if}}
 
-	<div class="row">
-		<span class="left"></span>
-		<span class="right"><strong>Started:</strong> {{data.started_at}}</span>
-	</div>
+		{{#if data.started_at}}
+		<p>started on <strong>{{data.started_at_pretty}}</strong></p>
+		{{/if}}
 
-	{{#if data.completed_at}}
-	<div class="row">
-		<span class="left"></span>
-		<span class="right"><strong>Finished:</strong> {{data.completed_at}}</span>
-	</div>
-	{{/if}}
+		{{#if data.completed_at}}
+		<p>finished on <strong>{{data.completed_at_pretty}}</strong></p>
+		{{/if}}
 
-	{{#if data.pages_total}}
-	<div class="row">
-		<span class="left"></span>
-		<span class="right"><strong>Pages:</strong> {{data.pages_total}}</span>
-	</div>
-	{{/if}}
+		{{#if data.rating}}
+		<p>
+			rated
+			<strong>
+				<span class="p-rating">{{data.rating}}</span> /
+				<span class="p-best">10</span>
+			</strong>
+		</p>
+		{{/if}}
 
-	{{#if data.rating}}
-	<div class="row">
-		<span class="left">⭐</span>
-		<span class="right"><strong>Rating:</strong> {{data.rating}} / 10</span>
-	</div>
-	{{/if}}
+		{{#if data.genre}}
+		<p class="p-category">{{data.genre}}</p>
+		{{/if}}
 
-	{{#if data.genre}}
-	<div class="row">
-		<span class="left"></span>
-		<span class="right"><strong>Genre:</strong> {{data.genre}}</span>
-	</div>
-	{{/if}}
-
-	<div class="row">
-		<span class="left"></span>
-		<time
-			title="{{data.updated_at}}"
-			datetime="{{data.updated_at}}"
-			class="right dt-published"
-		>
-			<small>
-				<a href="/book/{{data.id}}" class="u-url u-uid">
-					{{data.timeago}}
-				</a>
-			</small>
-		</time>
+		{{> author }}
 	</div>
 
-	{{> author }}
+	{{> panelFooter data moreUrl='/books' moreText='books' }}
 </div>

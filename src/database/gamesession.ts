@@ -10,9 +10,9 @@ import {
 	shortDate,
 } from '../lib/formatDate.js';
 import type { Insert, Update } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
-import { type Game, getGameById, selectOrInsertGame } from './game.js';
+import { type Game, getGameAssets, getGameById, selectOrInsertGame } from './game.js';
 import { getGameAchievementsForSession } from './gameachievements.js';
 
 export interface GameSessionRaw {
@@ -130,10 +130,11 @@ export function getGameSessions(parameters: Parameters = {}) {
 
 		return {
 			...row,
+			...calculateRecordMetadata(row, 'game-session', 'created_at'),
+			...getGameAssets(row.game_id),
 			duration: prettyDuration(row.playtime_mins * minuteMs),
 			durationNumber: row.playtime_mins / 60,
 			durationIso: msToIsoDuration(row.playtime_mins * minuteMs),
-			timeago: timeago.format(new Date(row.created_at)),
 			achievements,
 			achievementText,
 		};

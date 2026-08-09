@@ -1,14 +1,13 @@
 import { errors } from '@moonfloof/stdlib';
 import { v4 as uuid } from 'uuid';
 import { convertImageToThumbnail } from '../adapters/swarm.js';
-import { timeago } from '../adapters/timeago.js';
 import { config } from '../lib/config/index.js';
 import { dateDefault, dayMs, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { shortSummary, unsafe_stripTags } from '../lib/strings.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import type { CheckinPlace } from './checkinPlace.js';
-import { calculateGetParameters, DEFAULT_DAYS, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, DEFAULT_DAYS, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 import { ENTRY_STATUS, type EntryStatus } from './notes.js';
 
@@ -121,12 +120,12 @@ export function getCheckinImageThumbnailData(image_id: CheckinImage['id']): Prom
 	return Promise.resolve(result.thumbnail_data);
 }
 
-function getCheckinImages(checkin_id: CheckinImage['checkin_id']) {
+function getCheckinImages(checkin_id: CheckinImage['checkin_id'], limit = 10000) {
 	return getStatement<Pick<CheckinImage, 'id' | 'lat' | 'long'>>(
 		'getCheckinImages',
-		'SELECT id, lat, long FROM checkin_image WHERE checkin_id = $checkin_id ORDER BY taken_at ASC',
+		'SELECT id, lat, long FROM checkin_image WHERE checkin_id = $checkin_id ORDER BY taken_at ASC LIMIT $limit',
 	)
-		.all({ checkin_id })
+		.all({ checkin_id, limit })
 		.map(row => ({
 			...row,
 			thumbnailUrl: `${config.serverExternalUri}/checkin/image-thumbnail/${row.id}.avif`,
@@ -141,6 +140,7 @@ export function deleteCheckinImage(id: string) {
 
 interface CheckinParameters {
 	status: EntryStatus | '%';
+	maxImageCount: number;
 }
 
 export function getCheckins(parameters: Partial<Parameters & CheckinParameters> = {}) {
@@ -175,12 +175,18 @@ export function getCheckins(parameters: Partial<Parameters & CheckinParameters> 
 		LIMIT $limit OFFSET $offset`,
 	)
 		.all(params)
-		.map(checkin => ({
-			...checkin,
-			summary: shortSummary(unsafe_stripTags(checkin.description)),
-			timeago: timeago.format(new Date(checkin.created_at)),
-			images: getCheckinImages(checkin.id),
-		}));
+		.map(checkin => {
+			const images = getCheckinImages(checkin.id, parameters.maxImageCount);
+			const imageCount = images.length;
+
+			return {
+				...checkin,
+				...calculateRecordMetadata(checkin, 'checkin', 'created_at'),
+				summary: shortSummary(unsafe_stripTags(checkin.description)),
+				images,
+				imageCount,
+			};
+		});
 }
 
 export function deleteCheckin(id: string) {

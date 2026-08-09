@@ -75,7 +75,7 @@ export function getSleepStats() {
 		averageSleepStartHuman: '',
 	};
 
-	const sleepCycles = getSleepCycles({ days: 100 }).slice(0, 10);
+	const sleepCycles = getSleepCycles({ days: 14 }).slice(0, 10);
 
 	if (sleepCycles.length === 0) return null;
 

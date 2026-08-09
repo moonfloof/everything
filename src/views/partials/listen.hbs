@@ -1,39 +1,23 @@
-<div class="h-entry">
-	<div class="u-listen-of h-cite">
-		<div class="row">
-			<span class="left">🎵</span>
-			<span class="right">
-				<span class="p-name entry-title">{{data.title}}</span>
-			</span>
-		</div>
-		<div class="row">
-			<span class="left"></span>
-			<span class="right flex ellipsis">
-				💿 from <em class="p-publication">{{data.album}}</em>
-			</span>
-		</div>
-		<div class="row">
-			<span class="left"></span>
-			<span class="right flex ellipsis">
-				👤 by <em class="p-author">{{data.artist}}</em>
-			</span>
-		</div>
-	</div>
-
-	<div class="row">
-		<span class="left"></span>
-		<time
-			title="{{data.created_at}}"
-			datetime="{{data.created_at}}"
-			class="right dt-published"
-		>
-			<small>
-				<a href="/music/{{data.id}}" class="u-url u-uid">
-					{{data.timeago}}
-				</a>
-			</small>
-		</time>
+<div class="h-entry panel">
+	<div class="content p-listen-of h-cite">
+		<p class="large">
+			listened to <strong class="p-name">{{data.title}}</strong>
+			by <strong class="p-author">{{data.artist}}</strong>
+		</p>
+		<p>
+			from <strong class="p-publication">{{data.album}}</strong>
+			{{#if data.release_year}}
+			<strong>({{data.release_year}})</strong>
+			{{/if}}
+		</p>
+		{{#if data.duration_secs}}
+		<p>
+			for {{data.durationPretty}}
+		</p>
+		{{/if}}
 	</div>
 
 	{{> author }}
+
+	{{> panelFooter data }}
 </div>

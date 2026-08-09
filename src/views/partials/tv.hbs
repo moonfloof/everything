@@ -1,35 +1,16 @@
-<div class="h-entry">
-	<div class="u-watch-of h-cite">
-	<div class="row">
-		<span class="left">📺</span>
-		<span class="right">
-			<span class="p-name entry-title">{{data.episode_title}}</span>
-			<span class="p-author">{{data.series_title}}</span>
-		</span>
+<div class="h-entry panel">
+	<div class="content u-watch-of h-cite">
+		<p class="large">
+			watched <a href="/tv/{{data.id}}" class="u-uid u-url p-name">{{data.episode_title}}</a>
+			from <strong class="p-author">{{data.series_title}}</strong>
+		</p>
+
+		{{#if data.durationPretty}}
+		<data class="right p-duration" value="{{data.durationIso}}">for {{data.durationPretty}}</data>
+		{{/if}}
+
+		{{> author }}
 	</div>
 
-	{{#if data.durationPretty}}
-	<div class="row">
-		<div class="left">⏱️</div>
-		<data class="right p-duration" value="{{data.durationIso}}">it's {{data.durationPretty}} long</data>
-	</div>
-	{{/if}}
-	</div>
-
-	<div class="row">
-		<span class="left"></span>
-		<time
-			title="{{data.created_at}}"
-			datetime="{{data.created_at}}"
-			class="right dt-published"
-		>
-			<small>
-				<a href="/tv/{{data.id}}" class="u-url u-uid">
-					{{data.timeago}}
-				</a>
-			</small>
-		</time>
-	</div>
-
-	{{> author }}
+	{{> panelFooter data moreUrl='/tv' moreText='tv' }}
 </div>

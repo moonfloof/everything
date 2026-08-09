@@ -1,9 +1,8 @@
 import type { RunResult } from 'better-sqlite3';
 import { v4 as uuid } from 'uuid';
-import { timeago } from '../adapters/timeago.js';
-import { dateDefault, formatDate, prettyDate } from '../lib/formatDate.js';
+import { dateDefault, formatDate, formatDateTime, prettyDate } from '../lib/formatDate.js';
 import type { Insert, Optional } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 interface Book {
@@ -35,7 +34,7 @@ export function insertBook(book: Insert<Book>): RunResult {
 	return statement.run({
 		...book,
 		id: uuid(),
-		started_at: dateDefault(book.started_at),
+		started_at: book.started_at,
 		created_at: dateDefault(book.created_at),
 		completed_at: book.completed_at ? new Date(book.completed_at).toISOString() : null,
 		updated_at: new Date().toISOString(),
@@ -53,7 +52,7 @@ export function getBooks(parameters: Parameters = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => {
 		let progress = null;
-		let status = 'to-read';
+		let status = 'will read';
 		let progress_percentage = 0;
 		let completed = false;
 
@@ -61,7 +60,7 @@ export function getBooks(parameters: Parameters = {}) {
 			const finished = row.pages_total === row.pages_progress;
 			progress_percentage = Math.round((row.pages_progress / row.pages_total) * 100);
 
-			progress = `read ${progress_percentage}% <small>(${row.pages_progress || 0} / ${row.pages_total} pages)</small>`;
+			progress = `read ${progress_percentage}% (${row.pages_progress || 0} / ${row.pages_total} pages)`;
 			status = 'reading';
 
 			if (finished) {
@@ -73,11 +72,14 @@ export function getBooks(parameters: Parameters = {}) {
 
 		return {
 			...row,
+			...calculateRecordMetadata(row, 'book', 'updated_at'),
+			created_at: row.updated_at,
+			started_at_pretty: row.started_at ? prettyDate(new Date(row.started_at)) : null,
+			completed_at_pretty: row.completed_at ? prettyDate(new Date(row.completed_at)) : null,
 			progress,
 			status,
 			progress_percentage,
 			completed,
-			timeago: timeago.format(new Date(row.updated_at || row.created_at)),
 		};
 	});
 }
@@ -111,18 +113,22 @@ export function updateBook(book: Partial<Book>) {
 		WHERE id = $id`,
 	);
 
+	const now = new Date().toISOString();
+
 	// Auto-complete book if pages match
 	const completed_calculated = book.completed_at
 		? book.completed_at
-		: book.pages_progress === book.pages_total
-			? formatDate(new Date())
+		: book.pages_total !== null &&
+				book.pages_total !== undefined &&
+				book.pages_progress === book.pages_total
+			? now
 			: null;
 
 	return statement.run({
 		...book,
 		completed_at: completed_calculated,
-		started_at: dateDefault(book.started_at),
+		started_at: book.started_at === '' && completed_calculated !== null ? now : book.started_at,
 		created_at: dateDefault(book.created_at),
-		updated_at: new Date().toISOString(),
+		updated_at: now,
 	});
 }

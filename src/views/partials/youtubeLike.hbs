@@ -1,36 +1,41 @@
-<div class="h-entry">
-	<div class="u-like-of h-cite">
-	<div class="row">
-		<span class="left">🧡</span>
-		<span class="right">
-			<a
-				href="{{data.url}}"
-				target="_blank"
-				rel="noreferrer noopener"
-				class="p-name u-url entry-title"
-			>
-				{{data.title}}
-				{{>svgExternal}}
-			</a>
-			<span class="p-author h-card">by {{data.channel}}</span>
-		</span>
-	</div>
+<div class="h-entry panel">
+	<div class="content">
+		<div class="flex-row">
+			<p class="large">🧡</p>
+			<p class="u-like-of h-cite large">
+				liked <a href="{{data.url}}" target="_blank" rel="noreferrer noopener" class="p-name u-url">
+					{{data.title}}
+					{{>svg/external}}
+				</a><br>
+				<span class="p-author h-card">by {{data.channel}}</span>
+			</p>
+		</div>
+
+		<div class="youtube-preview" id="youtube-preview-{{data.video_id}}">
+			<img src="https://img.youtube.com/vi/{{data.video_id}}/maxresdefault.jpg" alt="{{data.title}}"
+				class="youtube" />
+			<div class="overlay"></div>
+			{{> svg/play}}
+		</div>
+
+		<iframe id="youtube-player-{{data.video_id}}" class="youtube hidden" data-src="{{data.embedUrl}}"
+			title="YouTube video player" frameborder="0"
+			data-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+			referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+		<script>
+			const button_{{@index}} = document.getElementById('youtube-preview-{{data.video_id}}');
+			const player_{{@index}} = document.getElementById('youtube-player-{{data.video_id}}');
+			button_{{@index}}.onclick = () => {
+				button_{{@index}}.classList.add('hidden');
+				player_{{@index}}.classList.remove('hidden');
+				player_{{@index}}.allow = player_{{@index}}.dataset.allow;
+				player_{{@index}}.src = player_{{@index}}.dataset.src;
+			};
+		</script>
+
+		{{> author }}
 	</div>
 
-	<div class="row">
-		<span class="left"></span>
-		<time
-			title="{{data.created_at}}"
-			datetime="{{data.created_at}}"
-			class="right dt-published"
-		>
-			<small>
-				<a class="u-url u-uid" href="/youtube/{{data.id}}">
-					{{data.timeago}}
-				</a>
-			</small>
-		</time>
-	</div>
-
-	{{> author }}
+	{{> panelFooter data moreUrl='/youtube' moreText='youtube videos' }}
 </div>

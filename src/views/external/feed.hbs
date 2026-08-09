@@ -1,27 +1,68 @@
-<div class="panel info margin">
-	{{> panelHeader icon="🧪" title="Everything I've done from the last seven days, on one page!" }}
-	<div class="content">
-		This is a little experiment to see if/how I like all the data
-		being displayed at once. Don't be alarmed if this page suddenly
-		disappears. You may find that the most common type of data is
-		music scrobbles, because I listen to a lot more music than
-		anything else, apparently!
+<div id="dashboard--lead__container" class="rounded-panel info margin">
+	<img id="dashboard--lead__img" src="/favicon.png" />
+	<div id="dashboard--lead__text">
+		Hello! I personally track everything I listen to, everything I
+		watch on TV, every game I play, and more. And so, I call this
+		project “Everything”. You can find out more by visiting the
+		<a href="https://github.com/moonfloof/everything#readme" target="_blank"><strong>code repository
+				homepage</strong> {{>svg/external}}</a>.
 	</div>
 </div>
 
-<div class="panel margin">
-	{{> panelHeader title="the everything feed" url="/" }}
-	<div class="content">
-	{{#each entries as |entry|}}
-		{{#xif type '==' 'note'}}{{> note data=data }}{{/xif}}
-		{{#xif type '==' 'game'}}{{> gameActivity data=data }}{{/xif}}
-		{{#xif type '==' 'episode'}}{{> tv data=data }}{{/xif}}
-		{{#xif type '==' 'book'}}{{> book data=data }}{{/xif}}
-		{{#xif type '==' 'like'}}{{> youtubeLike data=data }}{{/xif}}
-		{{#xif type '==' 'film'}}{{> film data=data }}{{/xif}}
-		{{#xif type '==' 'listen'}}{{> listenCompact data=data }}{{/xif}}
-		{{#xif type '==' 'checkin'}}{{> checkin data=data }}{{/xif}}
-		{{#xif type '==' 'steps'}}{{> stepsDaily data=data }}{{/xif}}
-	{{/each}}
-	</div>
+{{#if showDashboard}}
+<div id="dash-panels">
+	{{#if latestGame}}
+	{{#> dashpanel title="last played game" more="games" url=latestGame.canonicalUrl }}
+	<div class="left">{{latestGame.name}}</div>
+	<div class="right">{{latestGame.timeago}}</div>
+	{{/dashpanel}}
+	{{/if}}
+
+	{{#if latestCheckin}}
+	{{#> dashpanel title="last check-in" more="checkin" url=latestCheckin.canonicalUrl }}
+	<div class="left">{{latestCheckin.name}}</div>
+	<div class="right">{{latestCheckin.timeago}}</div>
+	{{/dashpanel}}
+	{{/if}}
+
+	{{#if latestFilm}}
+	{{#> dashpanel title="last film watched" more="films" url=latestFilm.canonicalUrl }}
+	<div class="left">{{latestFilm.title}}</div>
+	<div class="right">{{latestFilm.timeago}}</div>
+	{{/dashpanel}}
+	{{/if}}
+
+	{{#if latestSteps}}
+	{{#> dashpanel title="yesterday's step count" }}
+	<div class="left large">{{latestSteps.step_count_total}}</div>
+	<div class="right">steps</div>
+	{{/dashpanel}}
+	{{/if}}
+
+	{{#if latestSleep}}
+	{{#> dashpanel title="latest sleep" }}
+	<div class="left large">{{latestSleep.duration}}</div>
+	<div class="right">{{latestSleep.timeago}}</div>
+	{{/dashpanel}}
+	{{/if}}
+
+	{{#if latestLocation}}
+	{{#> dashpanel title="latest location" }}
+	<div class="left">{{latestLocation}}</div>
+	{{/dashpanel}}
+	{{/if}}
 </div>
+<hr>
+{{/if}}
+
+{{#each entries as |entry|}}
+{{#xif type '==' 'note'}}{{> note data=data }}{{/xif}}
+{{#xif type '==' 'game'}}{{> gameActivity data=data }}{{/xif}}
+{{#xif type '==' 'episode'}}{{> tv data=data }}{{/xif}}
+{{#xif type '==' 'book'}}{{> book data=data }}{{/xif}}
+{{#xif type '==' 'like'}}{{> youtubeLike data=data }}{{/xif}}
+{{#xif type '==' 'film'}}{{> film data=data }}{{/xif}}
+{{#xif type '==' 'listen'}}{{> listenCompact data=data }}{{/xif}}
+{{#xif type '==' 'checkin'}}{{> checkin data=data }}{{/xif}}
+{{#xif type '==' 'steps'}}{{> stepsDaily data=data }}{{/xif}}
+{{/each}}

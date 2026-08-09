@@ -1,9 +1,10 @@
 import { existsSync } from 'node:fs';
 import { timeago } from '../adapters/timeago.js';
 import { config } from '../lib/config/index.js';
+import { minuteMs, msToIsoDuration, prettyDuration } from '../lib/formatDate.js';
 import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 import { type GameAchievement, getGameAchievementsForSession } from './gameachievements.js';
 import type { GameSessionRaw } from './gamesession.js';
@@ -86,16 +87,25 @@ export function getGameById(id: string | number) {
 export function getSessionsForGame(game_id: number, order: 'DESC' | 'ASC' = 'DESC'): GameSessionRaw[] {
 	return getStatement<GameSessionRaw>(
 		`getSessionsForGame-${order}`,
-		`SELECT * FROM game_session
-		WHERE game_id = $game_id
-		ORDER BY created_at ${order}`,
+		`SELECT
+			s.*, g.name, g.url,
+			(SELECT a.unlocked_session_id FROM game_achievements AS a WHERE a.game_id = s.game_id GROUP BY a.unlocked_session_id ORDER BY a.unlocked_session_id IS NOT NULL, a.updated_at DESC LIMIT 1) = s.id AS perfectedSession
+		FROM game_session AS s
+		JOIN games AS g ON g.id = s.game_id
+		WHERE s.game_id = $game_id
+		ORDER BY s.created_at ${order}`,
 	)
 		.all({ game_id })
-		.map(session => {
-			const achievements = getGameAchievementsForSession(session.id);
+		.map(row => {
+			const achievements = getGameAchievementsForSession(row.id);
 			const achievementText = achievements.length === 1 ? 'achievement' : 'achievements';
 			return {
-				...session,
+				...row,
+				...calculateRecordMetadata(row, 'game-session', 'created_at'),
+				...getGameAssets(row.game_id),
+				duration: prettyDuration(row.playtime_mins * minuteMs),
+				durationNumber: row.playtime_mins / 60,
+				durationIso: msToIsoDuration(row.playtime_mins * minuteMs),
 				achievements,
 				achievementText,
 			};

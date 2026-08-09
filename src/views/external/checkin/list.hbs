@@ -1,0 +1,14 @@
+{{> pageHeader url='/' title='recent check-ins'}}
+
+{{#if checkins}}
+{{#each checkins as |checkin|}}
+{{> checkin data=checkin }}
+{{/each}}
+{{else}}
+<br />
+<div class="error rounded-panel">
+	<p class="lead">I've not checked in anywhere! 😭</p>
+</div>
+{{/if}}
+
+{{> pagination pagination=pagination route="/checkin" }}

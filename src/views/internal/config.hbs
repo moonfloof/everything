@@ -306,7 +306,7 @@
 				<div class="content">
 					<p>
 						Location tracking can be performed using the <a href="https://overland.p3k.app/" target="_blank"
-							rel="noopener"><strong>Overland app {{>svgExternal}}</strong></a> by Aaron Parecki (or, by
+							rel="noopener"><strong>Overland app {{>svg/external}}</strong></a> by Aaron Parecki (or, by
 						using an equivalent API). To use it, you'll need to set your URL:
 					</p>
 					<hr>
@@ -416,9 +416,9 @@
 				{{#each jobs as |job|}}
 				<div class="flex-row row">
 					{{#if job.status}}
-					<span class="text-success icon-job-status">{{> svgCheckCircle}}</span>
+					<span class="text-success icon-job-status">{{> svg/checkCircle}}</span>
 					{{else}}
-					<span class="text-error icon-job-status">{{> svgCrossCircle}}</span>
+					<span class="text-error icon-job-status">{{> svg/crossCircle}}</span>
 					{{/if}}
 					<span>
 						<a href="#{{job.configPage}}"><strong>{{job.name}}:</strong></a>
@@ -453,7 +453,7 @@
 						<li>
 							OR, your <em>profile</em> and <em>game details</em> on Steam are set to "public" via the
 							<a href="https://steamcommunity.com/id/me/edit/settings" target="_blank" rel="noopener">
-								<strong>Privacy Settings page {{> svgExternal}}</strong>
+								<strong>Privacy Settings page {{> svg/external}}</strong>
 							</a>
 						</li>
 					</ul>
@@ -478,7 +478,7 @@
 						<p class="description">
 							Generate a key from the
 							<a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">
-								<strong>Steam Web API Key page {{> svgExternal}}</strong>
+								<strong>Steam Web API Key page {{> svg/external}}</strong>
 							</a>, then paste it here.
 						</p>
 						<input type="text" class="right" name="steamApiKey" id="steamApiKey"
@@ -491,7 +491,7 @@
 						<p class="description">
 							Your Steam ID is a long string of numbers, which can be found at the top of your
 							<a href="https://store.steampowered.com/account/" target="_blank" rel="noopener">
-								<strong>Account page {{> svgExternal}}</strong>
+								<strong>Account page {{> svg/external}}</strong>
 							</a>.
 						</p>
 						<input type="text" class="right" name="steamUserId" id="steamUserId"
@@ -551,7 +551,7 @@
 					{{#if psnAuthentication.refreshTokenHasExpired}}
 					<div class="panel error">
 						<div class="content">
-							<span class="text-error icon-job-status">{{> svgCrossCircle}}</span>
+							<span class="text-error icon-job-status">{{> svg/crossCircle}}</span>
 							<strong>Not authentication (or token has expired)!</strong>
 						</div>
 					</div>
@@ -564,13 +564,13 @@
 						<li>
 							Log in to your PSN account by visiting
 							<a href="https://www.playstation.com/" target="_blank" rel="noopener">
-								<strong>the PlayStation website {{> svgExternal}}</strong>
+								<strong>the PlayStation website {{> svg/external}}</strong>
 							</a>
 						</li>
 						<li>
 							Visit this URL - it will provide you with an "NPSSO" token:<br>
 							<a href="https://ca.account.sony.com/api/v1/ssocookie">
-								<strong>ca.account.sony.com/api/v1/ssocookie {{> svgExternal}}</strong>
+								<strong>ca.account.sony.com/api/v1/ssocookie {{> svg/external}}</strong>
 							</a>
 						</li>
 					</ol>
@@ -584,7 +584,7 @@
 					{{else}}
 					<div class="panel success">
 						<div class="content">
-							<span class="text-success icon-job-status">{{> svgCheckCircle}}</span>
+							<span class="text-success icon-job-status">{{> svg/checkCircle}}</span>
 							Token expires
 							<strong>{{psnAuthentication.refreshTokenExpiresIn}}</strong>
 						</div>
@@ -634,7 +634,7 @@
 					</p>
 					<p>
 						For example, <a href="https://retroachievements.org/game/2774/hashes" target="_blank">
-							<strong>Jak and Daxter (PS2) {{> svgExternal}}</strong>
+							<strong>Jak and Daxter (PS2) {{> svg/external}}</strong>
 						</a> only supports playing the NTSC-U version of the game, with a specific patch applied.
 					</p>
 				</div>
@@ -660,7 +660,7 @@
 						<p class="description">
 							Your API key can be retrieved from your
 							<a href="https://retroachievements.org/settings" target="_blank" rel="noopener">
-								<strong>RetroAchievements Settings page {{> svgExternal}}</strong>
+								<strong>RetroAchievements Settings page {{> svg/external}}</strong>
 							</a>.
 						</p>
 						<input type="text" class="right" name="retroachievementsApiKey" id="retroachievementsApiKey"
@@ -723,7 +723,7 @@
 							To get an API key, log in to SteamGridDB using your Steam account, then visit the <a
 								href="https://www.steamgriddb.com/profile/preferences/api" target="_blank"
 								rel="noopener">
-								<strong>API Key page {{> svgExternal}}</strong>
+								<strong>API Key page {{> svg/external}}</strong>
 							</a>.
 						</p>
 						<p class="description">💭 Leave this field blank to disable any use of the API.</p>
@@ -745,7 +745,7 @@
 					<p>
 						Films you log to
 						<a href="https://letterboxd.com" target="_blank" rel="noopener">
-							<strong>Letterboxd {{> svgExternal}}</strong>
+							<strong>Letterboxd {{> svg/external}}</strong>
 						</a>
 						can automatically be tracked. If enabled, they will be added once per day.
 					</p>
@@ -784,7 +784,7 @@
 				<div class="content">
 					<p>
 						<a href="https://www.themoviedb.org" target="_blank" rel="noopener">
-							<strong>The Movie Database (TMDB) {{> svgExternal}}</strong>
+							<strong>The Movie Database (TMDB) {{> svg/external}}</strong>
 						</a> is used to fetch images and information about films you log. This API gets called either
 						through logging a film manually, or when it gets logged automatically using Letterboxd.
 					</p>
@@ -799,7 +799,7 @@
 						<p class="description">
 							To get an access token, register for an account with TMDB, then visit the
 							<a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">
-								<strong>API settings page {{> svgExternal}}</strong>
+								<strong>API settings page {{> svg/external}}</strong>
 							</a>. Make sure to copy the <em>API Read Access Token</em>, not the API key.
 						</p>
 						<p class="description">💭 Leave this field blank to disable any use of TMDB.</p>
@@ -821,12 +821,12 @@
 					<p>
 						Connecting your Bluesky account will copy any posts you make as
 						<a href="{{externalRoot}}/notes" target="_blank">
-							<strong>notes {{> svgExternal}}</strong>
+							<strong>notes {{> svg/external}}</strong>
 						</a>.
 					</p>
 					<p>
 						This is a concept known in the IndieWeb community as "<a href="https://indieweb.org/PESOS"
-							target="_blank" rel="noopener"><strong>PESOS {{> svgExternal}}</strong></a>", short for
+							target="_blank" rel="noopener"><strong>PESOS {{> svg/external}}</strong></a>", short for
 						<b>P</b>ublish <b>E</b>lsewhere, <b>S</b>yndicate (to your) <b>O</b>wn <b>S</b>ite.
 					</p>
 				</div>
@@ -851,7 +851,7 @@
 							Your username identifier starts with <code>did:plc:</code>, followed by a sequence of
 							random characters. You can find this by searching for your display username on an ATProto
 							explorer website like <a href="http://pdsls.dev" target="_blank" rel="noopener">
-								<strong>PDSls.dev {{> svgExternal}}</strong>
+								<strong>PDSls.dev {{> svg/external}}</strong>
 							</a>.
 						</p>
 						<input type="text" class="right" name="blueskyUsername" id="blueskyUsername"
@@ -899,7 +899,7 @@
 					<p>
 						To start, make sure you have your own Discord Bot, by visiting the
 						<a href="https://discord.com/developers/applications" target="_blank" rel="noopener">
-							<strong>Discord Developer dashboard {{> svgExternal}}</strong>
+							<strong>Discord Developer dashboard {{> svg/external}}</strong>
 						</a>, and set up a bot with the ability to <em>read, send, and delete message content</em>.
 						Then, invite this bot to your private server.
 					</p>
@@ -984,7 +984,7 @@
 						<p class="description">
 							To get an API key, load up the
 							<a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">
-								<strong>Google Cloud API Credentials {{> svgExternal}}</strong>
+								<strong>Google Cloud API Credentials {{> svg/external}}</strong>
 							</a> page, create a new API key, and make sure to restrict it to the
 							<em>YouTube Data API v3</em> API and, if you want to use Google Maps to search for check-in
 							locations, the <em>Places API</em> too.
@@ -1015,7 +1015,7 @@
 							<a href="https://developers.google.com/maps/documentation/places/web-service/place-types?hl=en#table-a"
 								target="_blank" rel="noopener">
 								<strong>
-									Place Types documentation {{> svgExternal}}
+									Place Types documentation {{> svg/external}}
 								</strong>
 							</a>, but be sure to only add categories from <em>Table A</em>.
 						</p>
@@ -1133,7 +1133,7 @@
 						<li>
 							Register for a
 							<a href="https://foursquare.com/developers/home" target="_blank" rel="noopener">
-								<strong>Foursquare Developer Account {{> svgExternal}}</strong>
+								<strong>Foursquare Developer Account {{> svg/external}}</strong>
 							</a> and create a new project.
 						</li>
 						<li>
@@ -1152,13 +1152,13 @@
 						<li>
 							Once you've saved your changes on this page, visit the
 							<a href="{{externalRoot}}/api/swarm/login" target="_blank" rel="noopener">
-								<strong>Swarm login page {{> svgExternal}}</strong>
+								<strong>Swarm login page {{> svg/external}}</strong>
 							</a> to register your Swarm account with this server.
 						</li>
 						<li>
 							Finally, visit your
 							<a href="https://foursquare.com/settings" target="_blank" rel="noopener">
-								<strong>Foursquare Settings page {{> svgExternal}}</strong>
+								<strong>Foursquare Settings page {{> svg/external}}</strong>
 							</a> and copy the <em>User ID</em> into the User ID field below.
 						</li>
 						<li>
@@ -1230,7 +1230,7 @@
 				<div class="content">
 					<p>
 						<a href="https://git.floof.fm/floof/kawa" target="_blank" rel="noopener">
-							<strong>Kawa {{> svgExternal}}</strong>
+							<strong>Kawa {{> svg/external}}</strong>
 						</a> is a self-hosted server that converts images and videos into smaller, more efficient
 						formats than those provided by external services. It's optional, and is currently used when
 						copying Bluesky posts with images and videos.

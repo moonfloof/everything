@@ -1,0 +1,21 @@
+<div class="entry-film">
+	{{#if film.heroUrl}}
+	<div class="image--banner" style="background-image: url({{film.heroUrl}})">
+		<div class="image--banner__overlay image--banner__16x9"></div>
+	</div>
+	{{/if}}
+
+	{{> pageHeader title=film.title url="/films" }}
+
+	{{> film data=film hideTitle="yes"}}
+
+	{{#if film.heroUrl}}
+	<div class="film-attribution">
+		<small>
+			ℹ️ <strong>Attribution:</strong> The image on this page was retrieved using
+			<a href="https://tmdb.org/" target="_blank" rel="noopener">The Movie Database
+				(tmdb.org){{>svg/external}}</a>
+		</small>
+	</div>
+	{{/if}}
+</div>

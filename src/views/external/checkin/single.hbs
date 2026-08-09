@@ -1,0 +1,32 @@
+{{> pageHeader url="/checkin" title=""}}
+
+{{> checkin data=checkin includePopovers="yes" }}
+
+{{#if checkin.map_svg }}
+<div id="checkin-map" class="panel margin">
+	{{> panelHeader title="map view" }}
+
+	<div style="position: relative;">
+		{{{checkin.map_svg}}}
+		{{#if mapImages}}
+		<div id="checkin-map-image-overlay">
+			{{#each mapImages as |image|}}
+			<button class="checkin-map-image" popovertarget="{{image.id}}"
+				style="left:{{image.left}}%;top:{{image.top}}%;">
+				<img src="{{image.thumbnailUrl}}">
+			</button>
+			{{/each}}
+		</div>
+		{{/if}}
+	</div>
+</div>
+{{/if}}
+
+{{#if checkin.images }}
+{{#each checkin.images as |image|}}
+<button class="checkin-image-popover" id="{{image.id}}" popover="auto" popovertarget="{{image.id}}"
+	popovertargetaction="hide">
+	<img src="{{image.fullUrl}}">
+</button>
+{{/each}}
+{{/if}}

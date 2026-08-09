@@ -1,64 +1,55 @@
-<div class="h-entry {{#if data.rating}}h-review {{/if}}{{#if data.posterUrl}}entry-with-poster{{/if}}">
-	<div>
-	<div class="row">
-		<span class="left">🎥</span>
-		<span class="right entry-title">
-			<a href="/film/{{data.id}}" class="u-uid u-url"><span class="p-name p-item">{{data.title}}</span></a>
-			({{data.year}})
-		</span>
-	</div>
+<div class="h-entry panel{{#if data.rating}} h-review{{/if}}">
+	<div class="flex-row">
+		{{#if data.posterUrl}}
+		<img class="entry-poster" alt="Film poster for '{{data.title}}'" src="{{data.posterUrl}}" />
+		{{/if}}
 
-	{{#if data.rating}}
-	<div class="row">
-		<span class="left">⭐</span>
-		<span class="right">
-			<strong class="p-rating">{{data.rating}}</strong>
-			<small>/ <span class="p-best">10</span></small>
-		</span>
-	</div>
-	{{/if}}
-
-	{{#if data.review}}
-		<div class="row">
-			<span class="left">💬</span>
-			<div class="right e-content">{{{data.review}}}</div>
-		</div>
-	{{/if}}
-
-	{{#if data.url}}
-		<div class="row metadata">
-			<span class="left">🔗</span>
-			<span class="right">
-				Originally posted on
-				<strong><a class="right u-watch-of" href="{{data.url}}" target="_blank" rel="noopener">{{data.urlPretty}} {{>svgExternal}}</a></strong>
-			</span>
-		</div>
-	{{/if}}
-
-	<div class="row">
-		<span class="left"></span>
-		<time
-			title="{{data.watched_at}}"
-			datetime="{{data.watched_at}}"
-			class="right dt-published"
-		>
-			<small>
-				<a href="/film/{{data.id}}" class="u-url u-uid">
-					{{data.timeago}}
+		<div class="content">
+			{{#if hideTitle}}
+			<data class="p-name p-item" value="{{data.title}}"></data>
+			{{else}}
+			<p class="large">
+				watched
+				<a href="/film/{{data.id}}" class="u-uid u-url">
+					<span class="p-name p-item">{{data.title}}</span>
+					({{data.year}})
 				</a>
-			</small>
-		</time>
+			</p>
+			{{/if}}
+
+			{{#if data.review}}
+			<div class="large e-content">{{{data.review}}}</div>
+			{{/if}}
+
+			<p>
+				<data class="p-duration" value="{{data.durationIso}}">
+					for <strong>{{data.durationPretty}}</strong>
+				</data>
+			</p>
+
+			{{#if data.rating}}
+			<p>
+				rated
+				<strong>
+					<span class="p-rating">{{data.rating}}</span> /
+					<span class="p-best">5</span>
+				</strong>
+				{{#each data.ratingStars as |star|}}{{>(star)}}{{/each}}
+			</p>
+			{{/if}}
+
+			{{#if data.url}}
+			<p>
+				originally posted on
+				<strong><a class="right u-watch-of" href="{{data.url}}" target="_blank"
+						rel="noopener">{{data.urlPretty}}
+						{{>svg/external}}</a></strong>
+			</p>
+			{{/if}}
+
+			{{> author }}
+		</div>
 	</div>
 
-	{{> author }}
-
-	</div>
-
-	{{#if data.posterUrl}}
-	<img
-		class="entry-poster"
-		alt="Film poster for '{{data.title}}'"
-		src="{{data.posterUrl}}"
-	/>
-	{{/if}}
+	{{> panelFooter data moreUrl='/films' moreText='films' }}
 </div>

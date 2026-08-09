@@ -27,35 +27,40 @@ import {
 	countGameSessionsForDays,
 	getAllPerfectedGames,
 	getGameSessions,
-	getGameStats,
 	getPopularGames,
 } from '../../database/gamesession.js';
 import {
 	countListens,
 	getListenActivityGraph,
-	getListenPopularDashboard,
 	getListens,
 	getListensPopular,
 	groupListens,
 } from '../../database/listens.js';
-import { getLatestCity } from '../../database/locations.js';
 import { countNotes, getNotes } from '../../database/notes.js';
-import { getSleepStats } from '../../database/sleep.js';
+import { getSleepCycles } from '../../database/sleep.js';
 import { getSteps, getStepsYesterday } from '../../database/steps.js';
 import { countEpisodes, getEpisodes } from '../../database/tv.js';
 import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../database/youtubelikes.js';
 
 // Lib
-import { formatTime, prettyDate } from '../../lib/formatDate.js';
+import { formatTime, prettyDate, prettyDateTime } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
 import type { RequestFrontend } from '../../types/express.js';
+import { getLatestCity } from '../../database/locations.js';
 
 const { NotFoundError } = errors;
 
 const helmetOptions: HelmetOptions = {
 	referrerPolicy: {
 		policy: ['same-origin'],
+	},
+	contentSecurityPolicy: {
+		directives: {
+			'script-src': "'unsafe-inline'",
+			'img-src': "'self' https://img.youtube.com",
+			'frame-src': 'https://www.youtube-nocookie.com',
+		},
 	},
 };
 
@@ -64,42 +69,7 @@ const router = express.Router();
 // DASHBOARD
 
 router.use(pageCache.getCache());
-
-router.get('/', (_req, res) => {
-	const devices = getDevices();
-	if (devices.length === 0) {
-		res.render('external/setup-required');
-		return;
-	}
-
-	const listens = getListenPopularDashboard(14);
-	const youtubeLikes = getLikes().slice(0, 2);
-	const tvEpisodes = getEpisodes().slice(0, 2);
-	const films = getFilms().slice(0, 2);
-	const gameStats = getGameStats(14);
-	const device = devices[0];
-	const location = getLatestCity();
-	const steps = getStepsYesterday()?.step_count_total;
-	const sleepStats = getSleepStats();
-	const books = getBooks().slice(0, 2);
-	const notes = getNotes().slice(0, 5);
-	const checkins = getCheckins().slice(0, 2);
-
-	res.render('external/dashboard', {
-		sleepStats,
-		listens,
-		youtubeLikes,
-		tvEpisodes,
-		films,
-		books,
-		gameStats,
-		notes,
-		device,
-		steps,
-		location,
-		checkins,
-	});
-});
+router.use(helmet(helmetOptions));
 
 // SVGs
 
@@ -130,7 +100,7 @@ router.get('/music', (req: RequestFrontend, res) => {
 			? `My favourite artist in the last ${daysInt} days has been ${popular[0].artist}, who I listened to for ${popular[0].count} hours`
 			: `I haven't listened to any music in the last ${daysInt} days!`;
 
-	res.render('external/listen-list', {
+	res.render('external/listen/list', {
 		nowPlaying,
 		listens,
 		pagination,
@@ -157,7 +127,7 @@ router.get('/music/:id', (req, res) => {
 		false,
 	)}`;
 
-	res.render('external/listen-single', {
+	res.render('external/listen/single', {
 		listen,
 		title: 'listened to...',
 		description,
@@ -183,7 +153,7 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 			? `My favourite YouTube channel in the last ${daysInt} days has been ${popular[0].channel}, who I watched for ${popular[0].durationPretty}`
 			: `I haven't liked any YouTube videos in the last ${daysInt} days!`;
 
-	res.render('external/youtubelike-list', {
+	res.render('external/youtubelike/list', {
 		youtubeLikes,
 		pagination,
 		title: 'watches YouTube',
@@ -195,15 +165,6 @@ router.get('/youtube', (req: RequestFrontend, res) => {
 	});
 });
 
-// Configure helmet to allow youtube-nocookie iframes for this URL ONLY
-router.use(
-	helmet({
-		...helmetOptions,
-		contentSecurityPolicy: {
-			directives: { 'frame-src': 'https://www.youtube-nocookie.com' },
-		},
-	}),
-);
 router.get('/youtube/:id', (req, res) => {
 	const [youtubeLike] = getLikes({ id: req.params.id, limit: 1 });
 
@@ -215,13 +176,12 @@ router.get('/youtube/:id', (req, res) => {
 		new Date(youtubeLike.created_at),
 	)}`;
 
-	res.render('external/youtubelike-single', {
+	res.render('external/youtubelike/single', {
 		youtubeLike,
 		title: `watched ${youtubeLike.channel} on ${prettyDate(new Date(youtubeLike.created_at))}`,
 		description,
 	});
 });
-router.use(helmet(helmetOptions));
 
 // STEAM ACTIVITY
 
@@ -251,7 +211,7 @@ router.get('/games', (req: RequestFrontend, res) => {
 	const description = `and earned ${achievementsTotal} achievements in that time`;
 	const assets = popular[0] !== undefined ? getGameAssets(popular[0].id) : null;
 
-	res.render('external/game-list', {
+	res.render('external/game/list', {
 		sessions,
 		pagination,
 		title,
@@ -277,7 +237,7 @@ router.get('/game-session/:id', (req, res) => {
 	const title = `played ${session.name} for ${session.duration} on ${prettyDate(new Date(session.created_at))}`;
 	const description = `and got ${session.achievements.length} ${session.achievementText}`;
 
-	res.render('external/game-session', {
+	res.render('external/game/session', {
 		session,
 		description,
 		title,
@@ -303,27 +263,15 @@ router.get('/game/:id', (req, res) => {
 	const achievements = getAchievementsForGame(game_id);
 	const achievementsUnlockedCount = achievements.filter(a => a.unlocked_session_id !== null).length;
 	const achievementPercentage = Math.round((achievementsUnlockedCount / achievements.length) * 100);
-	const lastSession = getSessionsForGame(game_id)[0];
+	const sessions = getSessionsForGame(game_id);
+	const lastSession = sessions.length > 0 ? sessions[0] : null;
 	const hasImage = game.heroUrl !== null;
 
-	// TODO: Remove after a substantial amount of time, once achievements can be properly updated.
-	const lastUpdateCutoff = new Date('2024-12-14').getTime();
-	const lastPlayedTime = new Date(game.last_played).getTime();
-	const lastUpdatedAchievements = achievements.reduce((time, achievement) => {
-		const newTime = new Date(achievement.created_at).getTime();
-		return newTime > time ? newTime : time;
-	}, 0);
-
-	const playedRecently =
-		achievementPercentage < 100 ||
-		lastPlayedTime > lastUpdateCutoff ||
-		lastUpdatedAchievements > lastUpdateCutoff;
-
-	res.render('external/game-stats', {
+	res.render('external/game/stats', {
 		game,
 		gameUrlPretty,
 		title,
-		playedRecently,
+		sessions,
 		lastSession,
 		hasImage,
 		metaImage: game.posterUrl,
@@ -341,7 +289,7 @@ router.get('/tv', (req: RequestFrontend, res) => {
 
 	const episodes = getEpisodes({ page });
 
-	res.render('external/tv-list', {
+	res.render('external/tv/list', {
 		episodes,
 		pagination,
 		title: 'watches TV',
@@ -359,7 +307,7 @@ router.get('/tv/:id', (req, res) => {
 		new Date(episode.created_at),
 	)}`;
 
-	res.render('external/tv-single', {
+	res.render('external/tv/single', {
 		episode,
 		description,
 		title: 'watched...',
@@ -375,7 +323,7 @@ router.get('/films', (req: RequestFrontend, res) => {
 	const films = getFilms({ page });
 	const metaImage = films[0]?.posterUrl;
 
-	res.render('external/film-list', {
+	res.render('external/film/list', {
 		films,
 		pagination,
 		title: 'watches films',
@@ -392,15 +340,13 @@ router.get('/film/:id', (req, res) => {
 
 	const title = `watched ${film.title} (${film.year}) on ${prettyDate(new Date(film.watched_at))}`;
 	const description = film.rating !== null ? `and rated it ${film.rating}/10` : null;
-	const rating = film.rating !== null ? '⭐'.repeat(film.rating) : '';
 	const watchDate = prettyDate(new Date(film.watched_at));
 
-	res.render('external/film-single', {
+	res.render('external/film/single', {
 		film,
 		title,
 		description,
 		metaImage: film.posterUrl,
-		rating,
 		watchDate,
 	});
 });
@@ -413,7 +359,7 @@ router.get('/books', (req: RequestFrontend, res) => {
 
 	const books = getBooks({ page });
 
-	res.render('external/book-list', {
+	res.render('external/book/list', {
 		books,
 		pagination,
 		title: 'reads books',
@@ -442,7 +388,7 @@ router.get('/book/:id', (req, res) => {
 
 	const description = `${prefix} '${book.title}' (${book.year}) by ${book.author}${suffix}`;
 
-	res.render('external/book-single', {
+	res.render('external/book/single', {
 		book,
 		description,
 		title: prefixTitle,
@@ -457,7 +403,7 @@ router.get('/checkin', (req: RequestFrontend, res) => {
 
 	const checkins = getCheckins({ page, status: 'public' });
 
-	res.render('external/checkin-list', {
+	res.render('external/checkin/list', {
 		checkins,
 		pagination,
 		title: 'goes places',
@@ -483,7 +429,7 @@ router.get('/checkin/:checkin_id', (req, res) => {
 		}
 	}
 
-	res.render('external/checkin-single', {
+	res.render('external/checkin/single', {
 		checkin,
 		title,
 		description: checkin.summary,
@@ -532,6 +478,8 @@ router.use(
 		...helmetOptions,
 		contentSecurityPolicy: {
 			directives: {
+				'frame-src': 'https://www.youtube-nocookie.com',
+				'script-src': "'unsafe-inline'",
 				'media-src': 'https:',
 				'img-src': 'https:',
 			},
@@ -545,7 +493,7 @@ router.get('/notes', (req: RequestFrontend, res) => {
 
 	const notes = getNotes({ status: 'public', page });
 
-	res.render('external/note-list', {
+	res.render('external/note/list', {
 		notes,
 		pagination,
 		title: 'rambles',
@@ -559,30 +507,40 @@ router.get('/note/:id', (req, res) => {
 		throw new NotFoundError('Note not found');
 	}
 
-	res.render('external/note-single', {
+	res.render('external/note/single', {
 		note,
 		description: note.summary,
 		title: note.title || 'rambled...',
 	});
 });
 
-// GLOBAL FEED
+// Finally, render the homepage, using the extra helmet options specified above.
+router.get('/', async (_req, res) => {
+	const devices = getDevices();
+	if (devices.length === 0) {
+		res.render('external/setup-required');
+		return;
+	}
 
-router.get('/feed', async (_req, res) => {
-	const parameters = { limit: 1000, days: 7 };
+	const latestCheckin = getCheckins({ limit: 1 })[0];
+	const latestGame = getGameSessions({ limit: 1 })[0];
+	const latestFilm = getFilms({ limit: 1 })[0];
+	const latestLocation = getLatestCity();
+	const latestSleep = getSleepCycles({ limit: 1 })[0];
+	const latestSteps = getStepsYesterday();
+	const showDashboard = latestCheckin || latestGame || latestFilm || latestLocation || latestSleep || latestSteps;
+
+	const parameters = { limit: 10000, days: 7 };
 
 	// biome-ignore lint/suspicious/noExplicitAny: It doesn't matter what the data is.
 	const typeMap = (type: string, entries: Record<string, any>[]) =>
 		entries.map(data => ({
 			type,
 			created_at: new Date(data.created_at),
+			created_at_pretty: prettyDateTime(new Date(data.created_at)),
 			data,
 		}));
 
-	// None of these are promises, but my original thought was that this
-	// would fetch them all in parallel. I'll have to benchmark whether this
-	// is actually more performant or not...
-	// TODO: Benchmark Promise.all vs. one by one
 	const entries = (
 		await Promise.all([
 			typeMap('game', getGameSessions(parameters)),
@@ -592,7 +550,7 @@ router.get('/feed', async (_req, res) => {
 			typeMap('film', getFilms(parameters)),
 			typeMap('book', getBooks(parameters)),
 			typeMap('like', getLikes(parameters)),
-			typeMap('checkin', getCheckins({ ...parameters, status: 'public' })),
+			typeMap('checkin', getCheckins({ ...parameters, status: 'public', maxImageCount: 4 })),
 			typeMap('steps', getSteps(parameters)),
 		])
 	).flat(1);
@@ -601,8 +559,13 @@ router.get('/feed', async (_req, res) => {
 
 	res.render('external/feed', {
 		entries,
-		title: ' / The Everything Feed',
-		description: "Everything I've done from the last seven days, on one page!",
+		latestCheckin,
+		latestGame,
+		latestFilm,
+		latestLocation,
+		latestSleep,
+		latestSteps,
+		showDashboard,
 	});
 });
 

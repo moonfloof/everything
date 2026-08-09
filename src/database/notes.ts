@@ -1,9 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
 import { shortSummary, unsafe_stripTags } from '../lib/strings.js';
 import type { Insert, Optional, Update } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export const ENTRY_TYPES = {
@@ -96,8 +95,8 @@ export function getNotes(parameters: Partial<Parameters & { status: EntryStatus 
 
 			return {
 				...row,
+				...calculateRecordMetadata(row, 'note', 'created_at'),
 				emoji: ENTRY_TYPES[row.type || 'note'],
-				timeago: timeago.format(new Date(row.created_at)),
 				summary: shortSummary(unsafe_stripTags(row.description)),
 				syndication,
 			};

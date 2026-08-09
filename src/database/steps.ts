@@ -1,8 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { timeago } from '../adapters/timeago.js';
 import { dayMs, formatDate, prettyDate } from '../lib/formatDate.js';
 import type { Insert, Update } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 interface Steps {
@@ -39,7 +38,8 @@ export function getSteps(parameters: Parameters = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => ({
 		...row,
-		timeago: timeago.format(new Date(row.created_at)),
+		...calculateRecordMetadata(row, null, 'created_at'),
+		created_at: new Date(new Date(row.created_at).getTime() + dayMs).toISOString(),
 		datePretty: prettyDate(new Date(row.created_at)),
 	}));
 }

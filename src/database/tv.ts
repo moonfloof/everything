@@ -1,8 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { timeago } from '../adapters/timeago.js';
 import { dateDefault, msToIsoDuration, prettyDuration } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 interface Episode {
@@ -39,9 +38,9 @@ export function getEpisodes(parameters: Parameters = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => ({
 		...row,
+		...calculateRecordMetadata(row, 'tv', 'created_at'),
 		durationIso: row.duration_secs ? msToIsoDuration(row.duration_secs * 1000) : null,
 		durationPretty: row.duration_secs ? prettyDuration(row.duration_secs * 1000) : null,
-		timeago: timeago.format(new Date(row.created_at)),
 	}));
 }
 

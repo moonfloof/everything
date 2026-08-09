@@ -1,11 +1,10 @@
 import { existsSync } from 'node:fs';
 import { v4 as uuid } from 'uuid';
-import { timeago } from '../adapters/timeago.js';
 import { config } from '../lib/config/index.js';
 import { dateDefault, msToIsoDuration, prettyDuration } from '../lib/formatDate.js';
 import { deleteIfExists, getImagePath } from '../lib/mediaFiles.js';
 import type { Insert, Optional, Update } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 interface Film {
@@ -62,16 +61,27 @@ export function getFilms(parameters: Parameters = {}) {
 		LIMIT $limit OFFSET $offset`,
 	);
 
-	return statement.all(calculateGetParameters(parameters)).map(row => ({
-		...row,
-		...getFilmAssets(row.id),
+	return statement.all(calculateGetParameters(parameters)).map(row => {
+		const rating = (row.rating ?? 0) / 2;
+		const hasHalfStar = rating - Math.floor(rating) > 0;
+		const ratingStars = Array.from({ length: Math.floor(rating) }).fill('svg/starFull');
+		if (hasHalfStar) {
+			ratingStars.push('svg/starHalf');
+		}
 
-		durationIso: row.duration_secs ? msToIsoDuration(row.duration_secs * 1000) : null,
-		durationPretty: row.duration_secs ? prettyDuration(row.duration_secs * 1000) : null,
+		return {
+			...row,
+			...getFilmAssets(row.id),
+			...calculateRecordMetadata(row, 'film', 'watched_at'),
 
-		urlPretty: row.url ? new URL(row.url).host : null,
-		timeago: timeago.format(new Date(row.watched_at)),
-	}));
+			durationIso: row.duration_secs ? msToIsoDuration(row.duration_secs * 1000) : null,
+			durationPretty: row.duration_secs ? prettyDuration(row.duration_secs * 1000) : null,
+
+			rating,
+			ratingStars,
+			urlPretty: row.url ? new URL(row.url).host : null,
+		};
+	});
 }
 
 export function deleteFilm(id: string) {

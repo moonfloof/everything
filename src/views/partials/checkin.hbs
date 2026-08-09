@@ -1,50 +1,38 @@
-<div class="h-entry">
-	<div class="row">
-		<span class="left">📍</span>
-		<span class="right">
-			<span class="entry-title p-name"><a href="/checkin/{{data.id}}">{{data.name}}</a></span>
-			<small>{{data.address}}</small>
-			<data class="p-latitude" value="{{data.lat}}"></data>
-			<data class="p-longitude" value="{{data.long}}"></data>
-		</span>
-	</div>
+<div class="h-entry panel">
+	<div class="content h-card">
+		<p class="large">
+			checked-in to
+			<span class="p-name"><a href="/checkin/{{data.id}}">{{data.name}}</a></span>
+		</p>
 
-	{{#if data.description}}
-	<div class="row">
-		<span class="left">💬</span>
-		<span class="right e-content">
-			{{{data.description}}}
-		</span>
-	</div>
-	{{/if}}
+		{{#if data.description}}
+		<div class="large e-content">{{{data.description}}}</div>
+		{{/if}}
 
-	{{#if data.images}}
-		<div class="row">
-			<span class="left">🖼️</span>
-			<div class="right checkin-image-row">
-				{{#each data.images as |image|}}
-					<{{#if ../includePopovers}}button popovertarget="{{image.id}}"{{else}}div{{/if}} class="checkin-image-container">
-						<img src="{{image.thumbnailUrl}}" class="checkin-image">
-					</{{#if ../includePopovers}}button{{else}}div{{/if}}>
+		<p class="p-location">{{data.address}}</p>
+		<data class="p-latitude" value="{{data.lat}}"></data>
+		<data class="p-longitude" value="{{data.long}}"></data>
+
+		{{#if data.images}}
+		<div class="checkin-image-row">
+			{{#xif data.imageCount '<=' 3}} {{#each data.images as |image|}} <{{#if ../includePopovers}}button
+				popovertarget="{{image.id}}" {{else}}div{{/if}}
+				class="checkin-image-container width-{{../data.imageCount}}">
+				<img src="{{image.fullUrl}}" class="checkin-image u-photo">
+				</{{#if ../includePopovers}}button{{else}}div{{/if}}>
 				{{/each}}
-			</div>
+				{{else}}
+				{{#each data.images as |image|}}
+				<{{#if ../includePopovers}}button popovertarget="{{image.id}}" {{else}}div{{/if}}
+					class="checkin-image-container width-{{../data.imageCount}}">
+					<img src="{{image.thumbnailUrl}}" class="checkin-image u-photo">
+				</{{#if ../includePopovers}}button{{else}}div{{/if}}>
+				{{/each}}
+				{{/xif}}
 		</div>
-	{{/if}}
+		{{/if}}
 
-	<div class="row">
-		<span class="left"></span>
-		<time
-			title="{{data.created_at}}"
-			datetime="{{data.created_at}}"
-			class="right dt-published"
-		>
-			<small>
-				<a class="u-url u-uid" href="/checkin/{{data.id}}">
-					{{data.timeago}}
-				</a>
-			</small>
-		</time>
+		{{> author }}
 	</div>
-
-	{{> author }}
+	{{> panelFooter data moreUrl='/checkin' moreText='check-ins' }}
 </div>

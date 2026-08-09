@@ -1,8 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { timeago } from '../adapters/timeago.js';
 import { dateDefault, dayMs, prettyDuration } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
-import { calculateGetParameters, type Parameters } from './constants.js';
+import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
 
 interface YouTubeLike {
@@ -42,8 +41,9 @@ export function getLikes(parameters: Parameters = {}) {
 
 	return statement.all(calculateGetParameters(parameters)).map(row => ({
 		...row,
+		...calculateRecordMetadata(row, 'youtube', 'created_at'),
 		url: `https://www.youtube.com/watch?v=${row.video_id}`,
-		timeago: timeago.format(new Date(row.created_at)),
+		embedUrl: `https://www.youtube-nocookie.com/embed/${row.video_id}`,
 	}));
 }
 
