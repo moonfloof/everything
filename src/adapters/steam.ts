@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import phin from 'phin';
-import { getAchievementsForGame } from '../database/game.js';
+import { type Game, getAchievementsForGame } from '../database/game.js';
 import { type GameAchievement, insertNewGameAchievement, updateGameAchievement } from '../database/gameachievements.js';
 import { updateGameSession } from '../database/gamesession.js';
 import { startOrRestartInterval, stopCron } from '../lib/config/cron.js';
@@ -8,6 +8,7 @@ import { config } from '../lib/config/index.js';
 import { dateDefault, minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
 import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
+import { searchForImages } from './steamgriddb.js';
 
 const log = new Logger('Steam');
 
@@ -238,7 +239,7 @@ export function pollForGameActivity() {
 			);
 
 			await updateSteamAchievementsDatabase(game.appid, session);
-			saveImages(game.appid, session.game_id);
+			searchForImages(game.name, { id: session.game_id } as Game);
 		}
 
 		gameActivity = body.response.games.map(game => ({

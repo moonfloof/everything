@@ -4,7 +4,6 @@ import type { Game } from '../database/game.js';
 import { config } from '../lib/config/index.js';
 import Logger from '../lib/logger.js';
 import { getImagePath, saveImageToDisk } from '../lib/mediaFiles.js';
-import { saveImages } from './steam.js';
 import type { GridsQuery, HeroesQuery, ImageResponse, SearchAutocompleteResponse } from './steamgriddbTypes.js';
 
 const log = new Logger('steamgriddb');
@@ -64,14 +63,6 @@ function gridsForGame(game_id: number, params?: GridsQuery) {
 }
 
 export async function searchForImages(term: string, game: Game) {
-	if (game.url?.includes('store.steampowered.com')) {
-		const appid = game.url.match(/store\.steampowered\.com\/app\/([0-9]+)/)?.[1];
-		if (!appid) return;
-
-		saveImages(Number(appid), game.id);
-		return;
-	}
-
 	const heroImagePath = getImagePath('game', `hero-${game.id}`);
 	const libraryImagePath = getImagePath('game', `library-${game.id}`);
 
