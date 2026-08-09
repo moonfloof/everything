@@ -36,6 +36,7 @@ import {
 	getListensPopular,
 	groupListens,
 } from '../../database/listens.js';
+import { getLatestCity } from '../../database/locations.js';
 import { countNotes, getNotes } from '../../database/notes.js';
 import { getSleepCycles } from '../../database/sleep.js';
 import { getSteps, getStepsYesterday } from '../../database/steps.js';
@@ -46,8 +47,8 @@ import { countYouTubeLikes, getLikes, getPopularYouTubeChannels } from '../../da
 import { formatTime, prettyDate, prettyDateTime } from '../../lib/formatDate.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
 import { pageCache } from '../../lib/middleware/cachePage.js';
+import { unsafe_stripTags } from '../../lib/strings.js';
 import type { RequestFrontend } from '../../types/express.js';
-import { getLatestCity } from '../../database/locations.js';
 
 const { NotFoundError } = errors;
 
@@ -339,8 +340,12 @@ router.get('/film/:id', (req, res) => {
 	}
 
 	const title = `watched ${film.title} (${film.year}) on ${prettyDate(new Date(film.watched_at))}`;
-	const description = film.rating !== null ? `and rated it ${film.rating}/10` : null;
 	const watchDate = prettyDate(new Date(film.watched_at));
+	let description = film.rating !== null ? `${film.rating}/5` : '';
+	if (film.review) {
+		if (description) description += ' - ';
+		description += unsafe_stripTags(film.review);
+	}
 
 	res.render('external/film/single', {
 		film,
