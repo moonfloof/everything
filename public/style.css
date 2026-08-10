@@ -180,6 +180,18 @@ html {
 	}
 }
 
+.home-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 16px;
+	font-weight: 700;
+	font-size: 16px;
+
+	a {
+		text-decoration: underline;
+	}
+}
+
 /*#endregion header */
 
 /** ALERTS **/
@@ -397,7 +409,7 @@ div.success {
 
 			.title {
 				font-size: 14px;
-				padding: 6px 16px;
+				padding: 6px 0 6px 16px;
 				color: var(--primary-fg-light);
 			}
 
@@ -1520,19 +1532,18 @@ select {
 	}
 
 	.entry-poster {
-		display: block;
+		width: 120px;
+		height: 160px;
 	}
 
-	.entry-poster {
-		object-fit: cover;
-		max-width: 100%;
-		width: 100%;
-		max-height: 240px;
-		margin: 16px 0 0 0;
+	.h-entry {
+		p.large, div.large {
+			font-size: 18px;
+		}
 	}
 
 	.checkin-image-container {
-		width: calc(50% - 16px);
+		width: calc(50% - 1px);
 	}
 
 	.checkin-image-popover img {

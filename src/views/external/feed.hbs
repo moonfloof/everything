@@ -55,6 +55,18 @@
 <hr>
 {{/if}}
 
+<div class="home-links">
+	<span>more pages:</span>
+	<a href="/games">games</a>
+	<a href="/music">music</a>
+	<a href="/films">films</a>
+	<a href="/checkin">check-ins</a>
+	<a href="/notes">notes</a>
+	<a href="/youtube">youtube</a>
+	<a href="/tv">tv episodes</a>
+	<a href="/books">books</a>
+</div>
+
 {{#each entries as |entry|}}
 {{#xif type '==' 'note'}}{{> note data=data }}{{/xif}}
 {{#xif type '==' 'game'}}{{> gameActivity data=data }}{{/xif}}
