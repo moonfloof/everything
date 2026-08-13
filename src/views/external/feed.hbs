@@ -11,43 +11,49 @@
 
 {{#if showDashboard}}
 <div id="dash-panels">
+	{{#if nowPlaying}}
+	{{#> dashpanel title="🎧 now playing" more="music" url="/music" }}
+	<p><strong>{{nowPlaying.title}}</strong> by <strong>{{nowPlaying.artist}}</strong></p>
+	{{/dashpanel}}
+	{{/if}}
+
 	{{#if latestGame}}
-	{{#> dashpanel title="last played game" more="games" url=latestGame.canonicalUrl }}
+	{{#> dashpanel title="🎮 last played game" more="games" url=latestGame.canonicalUrl }}
 	<div class="left">{{latestGame.name}}</div>
 	<div class="right">{{latestGame.timeago}}</div>
 	{{/dashpanel}}
 	{{/if}}
 
 	{{#if latestCheckin}}
-	{{#> dashpanel title="last check-in" more="checkin" url=latestCheckin.canonicalUrl }}
+	{{#> dashpanel title="📍 last check-in" more="checkin" url=latestCheckin.canonicalUrl }}
 	<div class="left">{{latestCheckin.name}}</div>
 	<div class="right">{{latestCheckin.timeago}}</div>
 	{{/dashpanel}}
 	{{/if}}
 
 	{{#if latestFilm}}
-	{{#> dashpanel title="last film watched" more="films" url=latestFilm.canonicalUrl }}
+	{{#> dashpanel title="🎥 last film watched" more="films" url=latestFilm.canonicalUrl }}
 	<div class="left">{{latestFilm.title}}</div>
 	<div class="right">{{latestFilm.timeago}}</div>
 	{{/dashpanel}}
 	{{/if}}
 
 	{{#if latestSteps}}
-	{{#> dashpanel title="yesterday's step count" }}
+	{{#> dashpanel title="🚶 yesterday's step count" }}
 	<div class="left large">{{latestSteps.step_count_total}}</div>
 	<div class="right">steps</div>
 	{{/dashpanel}}
 	{{/if}}
 
 	{{#if latestSleep}}
-	{{#> dashpanel title="latest sleep" }}
+	{{#> dashpanel title="🛌 latest sleep" }}
 	<div class="left large">{{latestSleep.duration}}</div>
 	<div class="right">{{latestSleep.timeago}}</div>
 	{{/dashpanel}}
 	{{/if}}
 
 	{{#if latestLocation}}
-	{{#> dashpanel title="latest location" }}
+	{{#> dashpanel title="🌆 latest location" }}
 	<div class="left">{{latestLocation}}</div>
 	{{/dashpanel}}
 	{{/if}}

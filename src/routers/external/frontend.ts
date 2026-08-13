@@ -527,13 +527,15 @@ router.get('/', async (_req, res) => {
 		return;
 	}
 
+	const nowPlaying = getNowPlaying();
 	const latestCheckin = getCheckins({ limit: 1 })[0];
 	const latestGame = getGameSessions({ limit: 1 })[0];
 	const latestFilm = getFilms({ limit: 1 })[0];
 	const latestLocation = getLatestCity();
 	const latestSleep = getSleepCycles({ limit: 1 })[0];
 	const latestSteps = getStepsYesterday();
-	const showDashboard = latestCheckin || latestGame || latestFilm || latestLocation || latestSleep || latestSteps;
+	const showDashboard =
+		latestCheckin || latestGame || latestFilm || latestLocation || latestSleep || latestSteps || nowPlaying;
 
 	const parameters = { limit: 10000, days: 7 };
 
@@ -570,6 +572,7 @@ router.get('/', async (_req, res) => {
 		latestLocation,
 		latestSleep,
 		latestSteps,
+		nowPlaying,
 		showDashboard,
 	});
 });
