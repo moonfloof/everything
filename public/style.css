@@ -465,6 +465,18 @@ div.success {
 			font-weight: 700;
 			text-align: right;
 		}
+
+		p {
+			font-size: 16px;
+			font-weight: 700;
+
+			display: -webkit-box;
+			max-width: 100%;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+			padding-bottom: 2px;
+		}
 	}
 }
 
@@ -632,7 +644,7 @@ summary {
 	cursor: pointer;
 }
 
-.h-entry {
+.h-entry, .about {
 	margin: 32px 0;
 
 	p {

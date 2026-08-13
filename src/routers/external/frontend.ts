@@ -67,10 +67,12 @@ const helmetOptions: HelmetOptions = {
 
 const router = express.Router();
 
-// DASHBOARD
-
 router.use(pageCache.getCache());
 router.use(helmet(helmetOptions));
+
+router.get('/about', (_req, res) => {
+	res.render('external/about');
+});
 
 // SVGs
 
