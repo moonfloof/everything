@@ -125,14 +125,11 @@ router.get('/music/:id', (req, res) => {
 	}
 
 	const at = new Date(listen.created_at);
-	const description = `I listened to '${listen.title}' by ${listen.artist} on ${prettyDate(at)} at ${formatTime(
-		at,
-		false,
-	)}`;
+	const description = `'${listen.title}' by ${listen.artist} on ${prettyDate(at)} at ${formatTime(at, false)}`;
 
 	res.render('external/listen/single', {
 		listen,
-		title: 'listened to...',
+		title: 'listened to',
 		description,
 	});
 });
@@ -306,14 +303,14 @@ router.get('/tv/:id', (req, res) => {
 		throw new NotFoundError('Episode not found');
 	}
 
-	const description = `I watched '${episode.episode_title}' of ${episode.series_title} on ${prettyDate(
+	const description = `'${episode.episode_title}' of ${episode.series_title} on ${prettyDate(
 		new Date(episode.created_at),
 	)}`;
 
 	res.render('external/tv/single', {
 		episode,
 		description,
-		title: 'watched...',
+		title: 'watched',
 	});
 });
 
@@ -517,7 +514,7 @@ router.get('/note/:id', (req, res) => {
 	res.render('external/note/single', {
 		note,
 		description: note.summary,
-		title: note.title || 'rambled...',
+		title: note.title ? `- ${note.title}` : `on ${note.timestampPretty}`,
 	});
 });
 

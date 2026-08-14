@@ -10,9 +10,7 @@ export function unsafe_stripTags(input: string): string {
 	return output;
 }
 
-export function shortSummary(input: string): string {
-	const maxLength = 160;
-
+export function shortSummary(input: string, maxLength = 500): string {
 	if (input.length < maxLength) {
 		return input;
 	}
