@@ -526,17 +526,21 @@ router.get('/', async (_req, res) => {
 		return;
 	}
 
+	const parameters = { limit: 10000, days: 7 };
+
+	const feedCheckins = getCheckins({ ...parameters, status: 'public', maxImageCount: 4 });
+	const feedGameSessions = getGameSessions(parameters);
+	const feedFilms = getFilms(parameters);
+
 	const nowPlaying = getNowPlaying();
-	const latestCheckin = getCheckins({ limit: 1 })[0];
-	const latestGame = getGameSessions({ limit: 1 })[0];
-	const latestFilm = getFilms({ limit: 1 })[0];
+	const latestCheckin = feedCheckins[0];
+	const latestGame = feedGameSessions[0];
+	const latestFilm = feedFilms[0];
 	const latestLocation = getLatestCity();
-	const latestSleep = getSleepCycles({ limit: 1 })[0];
+	const latestSleep = getSleepCycles({ limit: 1, days: 7 })[0];
 	const latestSteps = getStepsYesterday();
 	const showDashboard =
 		latestCheckin || latestGame || latestFilm || latestLocation || latestSleep || latestSteps || nowPlaying;
-
-	const parameters = { limit: 10000, days: 7 };
 
 	// biome-ignore lint/suspicious/noExplicitAny: It doesn't matter what the data is.
 	const typeMap = (type: string, entries: Record<string, any>[]) =>
@@ -549,14 +553,14 @@ router.get('/', async (_req, res) => {
 
 	const entries = (
 		await Promise.all([
-			typeMap('game', getGameSessions(parameters)),
+			typeMap('game', feedGameSessions),
 			typeMap('listen', groupListens(getListens(parameters))),
 			typeMap('note', getNotes({ ...parameters, status: 'public' })),
 			typeMap('episode', getEpisodes(parameters)),
-			typeMap('film', getFilms(parameters)),
+			typeMap('film', feedFilms),
 			typeMap('book', getBooks(parameters)),
 			typeMap('like', getLikes(parameters)),
-			typeMap('checkin', getCheckins({ ...parameters, status: 'public', maxImageCount: 4 })),
+			typeMap('checkin', feedCheckins),
 			typeMap('steps', getSteps(parameters)),
 		])
 	).flat(1);
