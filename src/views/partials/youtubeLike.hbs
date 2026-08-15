@@ -12,8 +12,8 @@
 		</div>
 
 		<div class="youtube-preview" id="youtube-preview-{{data.video_id}}">
-			<img src="https://img.youtube.com/vi/{{data.video_id}}/maxresdefault.jpg" alt="{{data.title}}"
-				class="youtube" />
+			<img loading="lazy" width="800" height="450" src="https://img.youtube.com/vi/{{data.video_id}}/maxresdefault.jpg"
+				alt="{{data.title}}" class="youtube" />
 			<div class="overlay"></div>
 			{{> svg/play}}
 		</div>
