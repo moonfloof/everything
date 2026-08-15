@@ -62,9 +62,9 @@ export function getFilms(parameters: Parameters = {}) {
 	);
 
 	return statement.all(calculateGetParameters(parameters)).map(row => {
-		const rating = (row.rating ?? 0) / 2;
-		const hasHalfStar = rating - Math.floor(rating) > 0;
-		const ratingStars = Array.from({ length: Math.floor(rating) }).fill('svg/starFull');
+		const halfRating = (row.rating ?? 0) / 2;
+		const hasHalfStar = halfRating - Math.floor(halfRating) > 0;
+		const ratingStars = Array.from({ length: Math.floor(halfRating) }).fill('svg/starFull');
 		if (hasHalfStar) {
 			ratingStars.push('svg/starHalf');
 		}
@@ -77,7 +77,7 @@ export function getFilms(parameters: Parameters = {}) {
 			durationIso: row.duration_secs ? msToIsoDuration(row.duration_secs * 1000) : null,
 			durationPretty: row.duration_secs ? prettyDuration(row.duration_secs * 1000) : null,
 
-			rating,
+			halfRating,
 			ratingStars,
 			urlPretty: row.url ? new URL(row.url).host : null,
 		};
