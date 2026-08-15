@@ -33,7 +33,7 @@
 
 		{{#xif data.type '==' 'audio'}}
 		{{#if data.url}}
-		<audio class="u-audio" controls src="{{data.url}}">
+		<audio class="u-audio" controls src="{{data.url}}" loading="lazy">
 			<p>Unfortunately, your browser doesn't support this audio format</p>
 		</audio>
 		{{/if}}
@@ -41,7 +41,7 @@
 
 		{{#xif data.type '==' 'video'}}
 		{{#if data.url}}
-		<video class="u-video" src="{{data.url}}" controls>
+		<video class="u-video" src="{{data.url}}" controls loading="lazy">
 			<p>Unfortunately, your browser doesn't support this video format</p>
 		</video>
 		{{/if}}
