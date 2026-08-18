@@ -1,0 +1,9 @@
+{{> pageHeader title="Link Previews" url="/" }}
+
+{{> internal/linkpreview }}
+
+{{#each linkpreviews as |linkpreview| }}
+{{> internal/linkpreview data=linkpreview }}
+{{/each}}
+
+{{> pagination route="/linkpreviews" pagination=pagination }}

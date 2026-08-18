@@ -4,6 +4,7 @@ import { shortSummary, unsafe_stripTags } from '../lib/strings.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
+import { getLinkPreviewForUrl } from './linkpreview.js';
 
 export const ENTRY_TYPES = {
 	note: '💬',
@@ -96,6 +97,7 @@ export function getNotes(parameters: Partial<Parameters & { status: EntryStatus 
 			return {
 				...row,
 				...calculateRecordMetadata(row, 'note', 'created_at'),
+				linkPreview: row.url ? getLinkPreviewForUrl(row.url) : undefined,
 				emoji: ENTRY_TYPES[row.type || 'note'],
 				summary: shortSummary(unsafe_stripTags(row.description)),
 				syndication,

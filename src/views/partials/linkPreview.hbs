@@ -1,0 +1,15 @@
+{{#with data}}
+<a href="{{url}}" target="_blank" rel="nofollow noopener" class="bar link-preview">
+	{{#if imageBase64}}
+	<img src="{{imageBase64}}" alt="Image preview for this note's context" />
+	{{/if}}
+	<div class="metadata">
+		{{#if title}}
+		<p><strong>{{title}}</strong></p>
+		{{/if}}
+		{{#if description}}
+		<p>{{{description}}}</p>
+		{{/if}}
+	</div>
+</a>
+{{/with}}

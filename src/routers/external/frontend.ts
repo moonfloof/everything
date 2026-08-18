@@ -59,7 +59,7 @@ const helmetOptions: HelmetOptions = {
 	contentSecurityPolicy: {
 		directives: {
 			'script-src': "'unsafe-inline'",
-			'img-src': "'self' https://img.youtube.com",
+			'img-src': "'self' data: https://img.youtube.com",
 			'frame-src': 'https://www.youtube-nocookie.com',
 		},
 	},
@@ -485,7 +485,7 @@ router.use(
 				'frame-src': 'https://www.youtube-nocookie.com',
 				'script-src': "'unsafe-inline'",
 				'media-src': 'https:',
-				'img-src': 'https:',
+				'img-src': "'self' data: https:",
 			},
 		},
 	}),

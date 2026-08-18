@@ -88,6 +88,7 @@ html {
 	font-size: 22px;
 	line-height: 1.4;
 	margin-top: 0;
+
 	svg {
 		fill: var(--primary-fg);
 		margin-top: -2px;
@@ -309,9 +310,36 @@ div.success {
 		padding: 0;
 		min-height: 32px;
 		background-color: var(--panel-bg-dark);
-		> p {
+
+		&.link-preview {
+			max-height: 72px;
+			overflow-y: hidden;
+			background-color: var(--primary-bg);
+			color: var(--primary-fg);
+			gap: 0;
+
+			&:hover {
+				text-decoration: none;
+				opacity: 0.75;
+			}
+
+			.metadata {
+				display: -webkit-box;
+				-webkit-line-clamp: 3;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+				padding: 2px 16px;
+			}
+		}
+
+		>p {
 			line-height: 1;
 			padding: 8px 16px;
+		}
+
+		>img {
+			max-width: 72px;
+			max-height: 72px;
 		}
 	}
 
