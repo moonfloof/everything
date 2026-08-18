@@ -1,6 +1,6 @@
 import type { RunResult } from 'better-sqlite3';
 import { v4 as uuid } from 'uuid';
-import { dateDefault, formatDate, formatDateTime, prettyDate } from '../lib/formatDate.js';
+import { dateDefault, prettyDate } from '../lib/formatDate.js';
 import type { Insert, Optional } from '../types/database.js';
 import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';

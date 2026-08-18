@@ -21,6 +21,7 @@ export async function saveImageToBuffer(url: string) {
 		headers: {
 			'User-Agent': config.versionString,
 		},
+		followRedirects: true,
 		url,
 		parse: 'none',
 	});
