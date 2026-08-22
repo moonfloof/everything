@@ -1,12 +1,15 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import phin from 'phin';
+import { type LinkPreview, selectOrInsertLinkPreview } from '../database/linkpreview.js';
 import { type Entry, insertNote } from '../database/notes.js';
 import { startOrRestartCron, stopCron } from '../lib/config/cron.js';
 import { config } from '../lib/config/index.js';
 import Logger from '../lib/logger.js';
+import { saveImageToBuffer } from '../lib/mediaFiles.js';
 import type { Insert } from '../types/database.js';
 import type { AuthorFeedResponse, FeedItem, Post } from './blueskyTypes.js';
 import { getKawaUrl } from './kawa.js';
+import { convertImageToThumbnail } from './swarm.js';
 
 const log = new Logger('bluesky');
 
@@ -48,8 +51,9 @@ async function fetchPosts(): Promise<AuthorFeedResponse> {
 
 const getHashtagUrl = (hashtag: string) => `https://bsky.app/hashtag/${hashtag}`;
 const getProfileUrl = (handle: string) => `https://bsky.app/profile/${handle}`;
-const getBlobUrl = (did: string, cid: string) =>
-	getKawaUrl(`https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${cid}`);
+const getRawBlobUrl = (did: string, cid: string) =>
+	`https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${cid}`;
+const getBlobUrl = (did: string, cid: string) => getKawaUrl(getRawBlobUrl(did, cid));
 
 function parsePostContents(post: Post): string {
 	const encoder = new TextEncoder();
@@ -88,7 +92,7 @@ function parsePostContents(post: Post): string {
 	}
 
 	// Step 2: Replace new-lines with paragraph tags
-	const finalContents = decoder.decode(contents).replace(/\n\n/g, '</p><p>');
+	const finalContents = decoder.decode(contents).replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
 
 	return `<p>${finalContents}</p>`;
 }
@@ -104,16 +108,33 @@ function transformAtUri(post: Post): string {
 	return `https://bsky.app/profile/${post.author.handle ?? match.groups.did}/post/${match.groups.id}`;
 }
 
-async function getPostMetadata(item: FeedItem): Promise<Partial<Entry>> {
+async function convertPostToLinkPreview(post: Post): Promise<LinkPreview> {
+	const linkPreview: LinkPreview = {
+		description: post.record.text,
+		title: `${post.author.displayName ?? ''} (${post.author.handle})`.trim(),
+		url: transformAtUri(post),
+		thumbnail_data: null,
+	};
+
+	if (post.author.avatar) {
+		const imageData = await saveImageToBuffer(post.author.avatar);
+		linkPreview.thumbnail_data = await convertImageToThumbnail(imageData);
+	}
+
+	return linkPreview;
+}
+
+async function getPostMetadata(item: FeedItem): Promise<Partial<Entry & { linkPreview: LinkPreview }>> {
 	const { post, reply, reason } = item;
 
-	const metadata: Partial<Entry> & { description: string } = {
+	const metadata: Partial<Entry & { linkPreview: LinkPreview }> = {
 		description: parsePostContents(post),
 	};
 
 	if (reason?.$type === 'app.bsky.feed.defs#reasonRepost') {
 		metadata.url = transformAtUri(post);
 		metadata.type = 'repost';
+		metadata.linkPreview = await convertPostToLinkPreview(post);
 
 		// Include embedded images and videos in reposts
 		switch (post.record.embed?.$type) {
@@ -125,13 +146,13 @@ async function getPostMetadata(item: FeedItem): Promise<Partial<Entry>> {
 
 				const blobUrl = await getBlobUrl(post.author.did, images[0].image.ref.$link);
 				const altText = images[0].alt;
-				metadata.description = `<img class='u-photo' src='${blobUrl}' alt='${altText}' />${metadata.description}`;
+				metadata.description = `<img class='u-photo' src='${blobUrl}' alt='${altText}' />`;
 				break;
 			}
 			case 'app.bsky.embed.video': {
 				const { embed } = post.record;
 				const blobUrl = await getBlobUrl(post.author.did, embed.video.ref.$link);
-				metadata.description = `<video class='u-video' src='${blobUrl}' controls></video>${metadata.description}`;
+				metadata.description = `<video class='u-video' src='${blobUrl}' controls></video>`;
 			}
 		}
 
@@ -142,6 +163,7 @@ async function getPostMetadata(item: FeedItem): Promise<Partial<Entry>> {
 	if (reply) {
 		metadata.url = transformAtUri(reply.parent);
 		metadata.type = 'reply';
+		metadata.linkPreview = await convertPostToLinkPreview(reply.parent);
 		return metadata;
 	}
 
@@ -162,6 +184,23 @@ async function getPostMetadata(item: FeedItem): Promise<Partial<Entry>> {
 			metadata.url = await getBlobUrl(post.author.did, images[0].image.ref.$link);
 			metadata.type = 'photo';
 			return metadata;
+		}
+		case 'app.bsky.embed.external': {
+			const { external } = post.record.embed;
+
+			let thumbnail_data = null;
+			if (external.thumb !== undefined) {
+				const imageUrl = getRawBlobUrl(post.author.did, external.thumb.ref.$link);
+				const buffer = await saveImageToBuffer(imageUrl);
+				thumbnail_data = await convertImageToThumbnail(buffer);
+			}
+
+			metadata.linkPreview = {
+				title: external.title,
+				description: external.description,
+				url: external.uri,
+				thumbnail_data,
+			};
 		}
 	}
 
@@ -209,7 +248,7 @@ export function pollForBlueskyPosts() {
 		for (const item of newPosts) {
 			const { post } = item;
 			const syndicationUrl = transformAtUri(post);
-			const metadata = await getPostMetadata(item);
+			const { linkPreview, ...metadata } = await getPostMetadata(item);
 			const entry: Insert<Entry> = {
 				description: parsePostContents(post),
 				title: null,
@@ -223,6 +262,11 @@ export function pollForBlueskyPosts() {
 				device_id: config.defaultDeviceId,
 			};
 			insertNote(entry);
+
+			if (linkPreview) {
+				selectOrInsertLinkPreview(linkPreview);
+			}
+
 			log.debug(`Inserted new post: '${entry.description.slice(0, 40)}...'`);
 		}
 
