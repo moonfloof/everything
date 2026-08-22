@@ -15,7 +15,7 @@
 	"license": "AGPL-3.0-or-later",
 	"dependencies": {
 		"@moonfloof/stdlib": "^1.0.0",
-		"better-sqlite3": "^12.10.0",
+		"better-sqlite3": "^13.0.3",
 		"discord.js": "^14.26.4",
 		"exif-js": "^2.3.0",
 		"express": "^5.2.1",
@@ -30,17 +30,17 @@
 		"phin": "^3.7.1",
 		"psn-api": "^2.17.0",
 		"sax": "^1.6.0",
-		"sharp": "^0.34.5",
+		"sharp": "^0.35.3",
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.15",
-		"@types/better-sqlite3": "^7.6.13",
+		"@types/better-sqlite3": "^9.6.0",
 		"@types/express": "^5.0.6",
 		"@types/node-cron": "^3.0.11",
 		"@types/sax": "^1.2.7",
 		"esbuild": "^0.28.0",
-		"typescript": "^5.9.3"
+		"typescript": "^7.0.2"
 	},
 	"nodemonConfig": {
 		"ext": "ts",
@@ -49,5 +49,9 @@
 			"dist"
 		],
 		"exec": "npm run build && node"
+	},
+	"allowScripts": {
+		"esbuild@0.28.1": true,
+		"better-sqlite3@13.0.3": true
 	}
 }
