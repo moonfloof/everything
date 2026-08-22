@@ -9,6 +9,12 @@ export interface LinkPreview {
 	thumbnail_data: Optional<Buffer>;
 }
 
+export interface ImageBase64 {
+	imageBase64: string | null;
+}
+
+export type LinkPreviewWithImage = LinkPreview & ImageBase64;
+
 function insertLinkPreview(record: LinkPreview) {
 	const statement = getStatement(
 		'insertLinkPreview',
@@ -50,7 +56,9 @@ export function getLinkPreviews(parameters: Parameters = {}) {
 	}));
 }
 
-export function getLinkPreviewForUrl(url: string) {
+export function getLinkPreviewForUrl(url: string | undefined): LinkPreviewWithImage | undefined {
+	if (url === undefined || url.trim() === '') return undefined;
+
 	const statement = getStatement<LinkPreview>(
 		'getLinkPreviewForUrl',
 		`SELECT * FROM link_preview

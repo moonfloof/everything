@@ -4,7 +4,7 @@ import { shortSummary, unsafe_stripTags } from '../lib/strings.js';
 import type { Insert, Optional, Update } from '../types/database.js';
 import { calculateGetParameters, calculateRecordMetadata, type Parameters } from './constants.js';
 import { getStatement } from './database.js';
-import { getLinkPreviewForUrl } from './linkpreview.js';
+import { getLinkPreviewForUrl, type LinkPreviewWithImage } from './linkpreview.js';
 
 export const ENTRY_TYPES = {
 	note: '💬',
@@ -70,6 +70,11 @@ export function countNotes(status: EntryStatus | '%' = ENTRY_STATUS.PUBLIC) {
 	return statement.get({ status: status || '%' })?.total || 0;
 }
 
+function detectLinkInText(text: string): string | undefined {
+	const match = text.match(/<a(?=\W).+?href=['"](?<url>http.+?)['"]/);
+	return match?.groups?.url;
+}
+
 export function getNotes(parameters: Partial<Parameters & { status: EntryStatus | '%' }> = {}) {
 	const statement = getStatement<Entry>(
 		'getNotes',
@@ -94,21 +99,26 @@ export function getNotes(parameters: Partial<Parameters & { status: EntryStatus 
 				}
 			}
 
+			let linkPreview: LinkPreviewWithImage | undefined;
+			if (row.type === 'audio' || row.type === 'video' || row.type === 'photo') {
+				linkPreview = getLinkPreviewForUrl(detectLinkInText(row.description));
+			} else {
+				linkPreview = getLinkPreviewForUrl(row.url ?? detectLinkInText(row.description));
+			}
+
 			return {
 				...row,
 				...calculateRecordMetadata(row, 'note', 'created_at'),
-				linkPreview: row.url ? getLinkPreviewForUrl(row.url) : undefined,
 				emoji: ENTRY_TYPES[row.type || 'note'],
 				summary: shortSummary(unsafe_stripTags(row.description)),
+				linkPreview,
 				syndication,
 			};
 		});
 }
 
 export function deleteNote(id: string) {
-	const statement = getStatement('deleteNote', 'DELETE FROM entries WHERE id = $id');
-
-	return statement.run({ id });
+	return getStatement('deleteNote', 'DELETE FROM entries WHERE id = $id').run({ id });
 }
 
 export function updateNote(note: Update<Entry>) {
